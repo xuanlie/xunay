@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 const name = process.argv[2] || 'myapp'
 const dir = path.resolve(name)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const xunayRoot = path.resolve(__dirname, '..')
 
 if (fs.existsSync(dir)) {
   console.error('目录已存在: ' + dir)
@@ -32,7 +35,7 @@ write('package.json', JSON.stringify({
     devtools: true
   },
   devDependencies: {
-    xunay: '^1.0.0',
+    xunay: 'file:' + xunayRoot,
     esbuild: '^0.24.0'
   }
 }, null, 2) + '\n')
