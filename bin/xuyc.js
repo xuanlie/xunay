@@ -27,11 +27,11 @@ const DEVTOOLS_ON = XUNAY_CFG.devtools !== false && !IS_PROD
 const MINIFY = XUNAY_CFG.minify !== undefined ? XUNAY_CFG.minify : IS_PROD
 const TARGET = XUNAY_CFG.target || "es2020"
 const SOURCEMAP = XUNAY_CFG.sourcemap !== undefined ? XUNAY_CFG.sourcemap : !IS_PROD
-const EXTERNALS = XUNAY_CFG.external || []
+const EXTERNALS = XUNAY_CFG.externals || []
 const ALIAS = XUNAY_CFG.alias || {}
 const DEFINE = XUNAY_CFG.define || {}
 const TITLE_CFG = XUNAY_CFG.title || null
-const OPEN_BROWSER = XUNAY_CFG.openBrowser === true
+const OPEN_BROWSER = XUNAY_CFG.open === true
 
 let DEVTOOLS_INJECTED = false
 console.log('[xuyc] devtools:', DEVTOOLS_ON ? 'on' : 'off')
