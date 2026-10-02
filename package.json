@@ -1,7 +1,16 @@
 {
-  "name": "xunay",
+  "name": "xunay-monorepo",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
+  "workspaces": ["core", "compiler2"],
+  "xunay": {
+    "css": ["tw", "ui"],
+    "devtools": true,
+    "minify": false,
+    "sourcemap": true,
+    "target": "es2020"
+  },
   "scripts": {
     "build": "cd core && node build.js",
     "xuyc": "node bin/xuyc.js",
