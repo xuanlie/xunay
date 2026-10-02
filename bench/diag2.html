@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head><body>
+<div id="app"></div>
+<pre id="out"></pre>
+<script type="module">
+const out = []
+function log(s) { out.push(s); document.getElementById('out').textContent = out.join('\n') }
+
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, div, span, render, mount } = X
+
+const rt = window.__XUNAY_RUNTIME__
+let effectCount = 0
+const origHook = rt.hooks.onEffectCreate
+rt.hooks.onEffectCreate = (e) => { effectCount++; if (origHook) origHook(e) }
+
+const N = 1000
+const n = signal(0)
+const kids = []
+for (let i = 0; i < N; i++) kids.push(span(null, () => n() + i))
+const vnode = div(null, ...kids)
+
+// 测试 1：render 结果丢弃
+effectCount = 0
+const t0 = performance.now()
+const dom1 = render(vnode)
+const t1 = performance.now()
+log('【丢弃】render 单次: ' + ((t1 - t0) * 1000).toFixed(1) + ' µs')
+log('  effect 创建数: ' + effectCount)
+log('  n.subsCount(): ' + n.subsCount())
+log('  dom1.children.length: ' + (dom1.children ? dom1.children.length : '?'))
+log('  dom1.innerHTML.length: ' + dom1.innerHTML.length)
+
+// 测试 2：append 到真实 DOM
+effectCount = 0
+const host = document.getElementById('app')
+host.innerHTML = ''
+const t2 = performance.now()
+const dom2 = render(vnode)
+host.appendChild(dom2)
+const t3 = performance.now()
+log('')
+log('【真实挂载】render+append 单次: ' + ((t3 - t2) * 1000).toFixed(1) + ' µs')
+log('  effect 创建数: ' + effectCount)
+log('  n.subsCount(): ' + n.subsCount())
+
+// 测试 3：连续 100 次都挂到真实 DOM
+const t4 = performance.now()
+for (let i = 0; i < 100; i++) {
+  host.innerHTML = ''
+  host.appendChild(render(vnode))
+}
+const t5 = performance.now()
+log('')
+log('【真实挂载 × 100】单次: ' + ((t5 - t4) / 100 * 1000).toFixed(1) + ' µs')
+log('  n.subsCount(): ' + n.subsCount())
+</script></body></html>

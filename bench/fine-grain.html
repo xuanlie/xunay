@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head><body>
+<div id="app"></div>
+<pre id="out"></pre>
+<script type="module">
+const out = []
+function log(s) { out.push(s); document.getElementById('out').textContent = out.join('\n') }
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, div, span, render } = X
+const host = document.getElementById('app')
+const N = 1000
+
+// === A：1000 个 span 共享 1 个 signal ===
+{
+  host.innerHTML = ''
+  const n = signal(0)
+  const t0 = performance.now()
+  host.appendChild(render(div(null, ...Array.from({length:N}, (_, i) => span(null, () => n() + i)))))
+  const t1 = performance.now()
+  const t2 = performance.now()
+  for (let i = 0; i < 100; i++) n(i)
+  const t3 = performance.now()
+  log(`A. 1000 span 共享 1 signal`)
+  log(`   首挂: ${(t1-t0).toFixed(2)} ms`)
+  log(`   更新 100 次: ${((t3-t2)/100*1000).toFixed(1)} µs/次  (每次全量改 1000)`)
+
+  // 再测：只改 1 个（用另一个独立 signal）
+  const k = signal(0)
+  const t4 = performance.now()
+  for (let i = 0; i < 10000; i++) k(i)
+  const t5 = performance.now()
+  log(`   对比：改一个没人订阅的 signal × 10000: ${(t5-t4).toFixed(1)} ms`)
+}
+
+// === B：1000 个 span 各读各的 signal ===
+{
+  host.innerHTML = ''
+  const sigs = Array.from({length:N}, (_, i) => signal(i))
+  const t0 = performance.now()
+  host.appendChild(render(div(null, ...sigs.map((s, i) => span(null, () => s())))))
+  const t1 = performance.now()
+  const t2 = performance.now()
+  for (let i = 0; i < 100; i++) sigs[0](i)   // 只改第 1 个
+  const t3 = performance.now()
+  log(``)
+  log(`B. 1000 span 各读各的 signal`)
+  log(`   首挂: ${(t1-t0).toFixed(2)} ms`)
+  log(`   更新 100 次（只改第 1 个）: ${((t3-t2)/100*1000).toFixed(1)} µs/次  ← 细粒度`)
+}
+
+// === C：1000 个 span 各读各的 signal，全改 ===
+{
+  host.innerHTML = ''
+  const sigs = Array.from({length:N}, (_, i) => signal(i))
+  host.appendChild(render(div(null, ...sigs.map((s, i) => span(null, () => s())))))
+  const t2 = performance.now()
+  for (let i = 0; i < 100; i++) {
+    for (const s of sigs) s(i)
+  }
+  const t3 = performance.now()
+  log(``)
+  log(`C. 1000 span 各读各的 signal，全改 100 轮`)
+  log(`   单轮: ${((t3-t2)/100*1000).toFixed(1)} µs  (改 1000 个 signal)`)
+}
+</script></body></html>

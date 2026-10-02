@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>merge experiment</title>
+<style>body{font-family:monospace;padding:20px;line-height:1.8}pre{background:#f5f5f5;padding:16px;border-radius:8px;font-size:13px}</style>
+</head>
+<body>
+<h2>1000 动态节点：A/B 实验</h2>
+<pre id="out">跑测试中...</pre>
+<div id="sandbox" style="position:fixed;left:-99999px;top:0"></div>
+<script type="module">
+const log = []
+function out(s) { log.push(s); document.getElementById('out').textContent = log.join('\n') }
+
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, effect, div, span, render } = X
+
+const N = 1000
+const iters = 200
+const sandbox = document.getElementById('sandbox')
+
+async function nextFrame() { return new Promise(r => setTimeout(r, 50)) }
+
+// === A：现在的做法（1000 effect）===
+{
+  const n = signal(0)
+  const make = () => {
+    const kids = []
+    for (let i = 0; i < N; i++) kids.push(span(null, () => n() + i))
+    return div(null, ...kids)
+  }
+  for (let i = 0; i < 10; i++) render(make())
+  await nextFrame()
+  const t0 = performance.now()
+  for (let i = 0; i < iters; i++) render(make())
+  const dt = performance.now() - t0
+  out(`A. 现在 (1000 effect × ${iters} 次):  ${dt.toFixed(1)} ms   单次 ${(dt/iters*1000).toFixed(1)} µs`)
+}
+
+await nextFrame()
+
+// === B：合并成 1 个 effect ===
+{
+  const n = signal(0)
+  const make = () => {
+    const host = document.createElement('div')
+    const slots = []
+    for (let i = 0; i < N; i++) {
+      const s = document.createElement('span')
+      const t = document.createTextNode(String(n() + i))
+      s.appendChild(t)
+      host.appendChild(s)
+      slots.push({ t, i, last: n() + i })
+    }
+    effect(() => {
+      const v = n()
+      for (let k = 0; k < slots.length; k++) {
+        const s = slots[k]
+        const val = v + s.i
+        if (s.last !== val) { s.t.textContent = String(val); s.last = val }
+      }
+    })
+    return host
+  }
+  for (let i = 0; i < 10; i++) make()
+  await nextFrame()
+  const t0 = performance.now()
+  for (let i = 0; i < iters; i++) make()
+  const dt = performance.now() - t0
+  out(`B. 合并 (1 effect × ${iters} 次):      ${dt.toFixed(1)} ms   单次 ${(dt/iters*1000).toFixed(1)} µs`)
+}
+
+await nextFrame()
+
+// === C：惰性（首屏 0 effect，之后手动接一次）===
+{
+  const n = signal(0)
+  const batches = []
+  const make = () => {
+    const host = document.createElement('div')
+    const slots = []
+    for (let i = 0; i < N; i++) {
+      const s = document.createElement('span')
+      const t = document.createTextNode(String(n() + i))
+      s.appendChild(t)
+      host.appendChild(s)
+      slots.push({ t, i, last: n() + i })
+    }
+    batches.push(slots)
+    return host
+  }
+  for (let i = 0; i < 10; i++) make()
+  batches.length = 0
+  await nextFrame()
+  const t0 = performance.now()
+  for (let i = 0; i < iters; i++) make()
+  const dt = performance.now() - t0
+  out(`C. 惰性首屏 (0 effect × ${iters} 次):   ${dt.toFixed(1)} ms   单次 ${(dt/iters*1000).toFixed(1)} µs`)
+
+  // 建 1 个 effect 管所有
+  const t1 = performance.now()
+  const all = batches.slice()
+  effect(() => {
+    const v = n()
+    for (const slots of all) {
+      for (let k = 0; k < slots.length; k++) {
+        const s = slots[k]
+        const val = v + s.i
+        if (s.last !== val) { s.t.textContent = String(val); s.last = val }
+      }
+    }
+  })
+  out(`   建 effect 管 ${all.length * N} 槽位:  ${(performance.now() - t1).toFixed(2)} ms`)
+
+  // 测一次 signal.write 触发全量更新
+  const t2 = performance.now()
+  n(1)
+  out(`   触发 1 次全量更新 (${all.length * N} 节点): ${(performance.now() - t2).toFixed(2)} ms`)
+}
+
+out('')
+out('=== 对比总结 ===')
+out('A = 现在 xunay 的做法')
+out('B = 1000 个 span 合并成 1 个 effect')
+out('C = 首屏 0 effect + 后续批量挂 1 个 effect')
+</script>
+</body>
+</html>

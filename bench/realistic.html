@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head><body>
+<div id="app"></div>
+<pre id="out"></pre>
+<script type="module">
+const out = []
+function log(s) { out.push(s); document.getElementById('out').textContent = out.join('\n') }
+
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, div, span, render, mount, list } = X
+
+const N = 1000
+const n = signal(0)
+const host = document.getElementById('app')
+
+// === 场景 1：首次挂载 1000 个动态 span ===
+host.innerHTML = ''
+const t0 = performance.now()
+const vnode = div(null, ...Array.from({length: N}, (_, i) => span(null, () => n() + i)))
+host.appendChild(render(vnode))
+const t1 = performance.now()
+log(`场景1 首次挂载 1000 span: ${(t1-t0).toFixed(2)} ms   subs=${n.subsCount()}`)
+
+// === 场景 2：更新 100 次（每次只改 1 个 signal）===
+const t2 = performance.now()
+for (let i = 0; i < 100; i++) n(i)
+const t3 = performance.now()
+log(`场景2 更新 100 次:        ${(t3-t2).toFixed(2)} ms   单次 ${((t3-t2)/100*1000).toFixed(1)} µs`)
+
+// === 场景 3：list 版本对比 ===
+host.innerHTML = ''
+const arr = signal(Array.from({length: N}, (_, i) => ({id:i, t:'row '+i})))
+const t4 = performance.now()
+mount(() => div(null, list(arr, x => x.id, x => span(null, x.t))), host)
+const t5 = performance.now()
+log(`场景3 list 首挂 1000 项:  ${(t5-t4).toFixed(2)} ms`)
+
+// === 场景 4：list 更新 100 次（每次改数组）===
+const t6 = performance.now()
+for (let i = 0; i < 100; i++) {
+  arr(prev => prev.map((x, k) => k === 0 ? {...x, t: 'row '+i} : x))
+}
+const t7 = performance.now()
+log(`场景4 list 更新 100 次:   ${(t7-t6).toFixed(2)} ms   单次 ${((t7-t6)/100*1000).toFixed(1)} µs`)
+</script></body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head><body>
+<div id="app"></div>
+<pre id="out"></pre>
+<script type="module">
+const out = []
+function log(s) { out.push(s); document.getElementById('out').textContent = out.join('\n') }
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, div, span, render } = X
+
+const n = signal(0)
+// 一半正常，一半抛异常
+const kids = []
+for (let i = 0; i < 100; i++) {
+  if (i % 2 === 0) kids.push(span(null, () => n()))
+  else kids.push(span(null, () => { throw new Error('boom') }))
+}
+
+const dom = render(div(null, ...kids))
+log('render 完成，subsCount = ' + n.subsCount())
+log('（如果 bug 存在，subsCount 会 > 实际有效订阅数；修复后应该合理）')
+
+// 再 render 一次，看会不会继续累积
+const dom2 = render(div(null, ...kids))
+log('第二次 render，subsCount = ' + n.subsCount())
+</script></body></html>
