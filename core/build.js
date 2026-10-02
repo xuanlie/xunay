@@ -10,28 +10,28 @@ await esbuild.build({
   entryPoints: [path.join(__dirname, 'src/index.js')],
   bundle: true, minify: true, format: 'iife', globalName: 'XuNay',
   outfile: path.join(__dirname, 'dist/xunay.min.js'),
-  target: ['es2020'], legalComments: 'none',
+  target: ['es2020'], charset: 'utf8', legalComments: 'none',
 })
 
 await esbuild.build({
   entryPoints: [path.join(__dirname, 'src/index.js')],
   bundle: true, minify: true, format: 'esm',
   outfile: path.join(__dirname, 'dist/xunay.esm.js'),
-  target: ['es2020'], legalComments: 'none',
+  target: ['es2020'], charset: 'utf8', legalComments: 'none',
 })
 
 await esbuild.build({
   entryPoints: [path.join(__dirname, 'src/kit-entry.js')],
   bundle: true, minify: true, format: 'esm',
   outfile: path.join(__dirname, 'dist/xunay-kit.min.js'),
-  target: ['es2020'], legalComments: 'none',
+  target: ['es2020'], charset: 'utf8', legalComments: 'none',
 })
 
 await esbuild.build({
   entryPoints: [path.join(__dirname, 'src/full-entry.js')],
   bundle: true, minify: true, format: 'esm',
   outfile: path.join(__dirname, 'dist/xunay-full.min.js'),
-  target: ['es2020'], legalComments: 'none',
+  target: ['es2020'], charset: 'utf8', legalComments: 'none',
 })
 
 for (const [entry, out] of [
@@ -43,7 +43,7 @@ for (const [entry, out] of [
     entryPoints: [path.join(__dirname, 'src/' + entry)],
     bundle: true, minify: true, format: 'esm',
     outfile: path.join(__dirname, 'dist/' + out),
-    target: ['es2020'], legalComments: 'none',
+    target: ['es2020'], charset: 'utf8', legalComments: 'none',
   })
 }
 
@@ -51,7 +51,7 @@ await esbuild.build({
   entryPoints: [path.join(__dirname, 'src/devtools-entry.js')],
   bundle: true, minify: true, format: 'esm',
   outfile: path.join(__dirname, 'dist/xunay-devtools.min.js'),
-  target: ['es2020'], legalComments: 'none',
+  target: ['es2020'], charset: 'utf8', legalComments: 'none',
 })
 
 const a = fs.readFileSync(path.join(__dirname, 'dist/xunay.min.js'))

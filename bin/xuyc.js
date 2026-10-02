@@ -88,6 +88,21 @@ function processFile(file) {
   src = src.replace(/^(\s*import\s+[^\n]*?\s+from\s+)['"]xunay['"]/gm, (m, prefix) => prefix + "'" + xunayPath.replace(/\\/g, '/') + "'")
 
   src = src.replace(/from\s+(['"])([^'"]+)\.xuy\1/g, "from $1$2.js$1")
+
+  // 展开 xunay.alias：@/xxx → 绝对路径
+  // （esbuild 的 alias 只对裸包名生效，不支持路径别名）
+  src = src.replace(/from\s+(['"])([^'"]+)\1/g, (m, q, p2) => {
+    if (p2.startsWith('.') || p2.startsWith('/') || p2.startsWith('node:')) return m
+    if (p2 === 'xunay' || p2.startsWith('xunay/')) return m
+    for (const [key, value] of Object.entries(ALIAS)) {
+      if (p2 === key || p2.startsWith(key + '/')) {
+        const rel = p2 === key ? '' : p2.slice(key.length + 1)
+        const abs = path.resolve(process.cwd(), value, rel)
+        return `from ${q}${abs}${q}`
+      }
+    }
+    return m
+  })
   const out = file.replace(/\.xuy$/, '.js')
   fs.writeFileSync(out, src)
   cache.set(file, out)
@@ -130,6 +145,7 @@ await esbuild.build({
   outfile: path.join(outDir, 'app.js'),
   target: [TARGET],
   legalComments: 'none',
+  charset: 'utf8',
   sourcemap: SOURCEMAP,
   external: EXTERNALS,
   alias: ALIAS,
