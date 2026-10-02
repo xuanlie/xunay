@@ -203,14 +203,14 @@ function applyList(parent, def) {
         if (map.size) { for (const [, e] of map) if (e.dom.__xunay_scope) disposeScope(e.dom.__xunay_scope); map.clear(); holder.textContent = '' }
         return
       }
-      const keys = new Set()
-      const ordered = []
-      let dirty = false
-      for (const item of items) {
+      const newDoms = new Array(N)
+      const keySet = new Set()
+      for (let i = 0; i < N; i++) {
+        const item = items[i]
         const key = def.keyFn(item)
-        keys.add(key)
+        keySet.add(key)
         let e = map.get(key)
-        if (!e) { const dom = render(def.renderFn(item)); e = { dom, item }; map.set(key, e); dirty = true }
+        if (!e) { const dom = render(def.renderFn(item)); e = { dom, item }; map.set(key, e) }
         else if (e.item !== item) {
           if (!fastUpdate(e.dom, def.renderFn(item))) {
             if (e.dom.__xunay_scope) disposeScope(e.dom.__xunay_scope)
@@ -219,24 +219,21 @@ function applyList(parent, def) {
           }
           e.item = item
         }
-        ordered.push(e.dom)
+        newDoms[i] = e.dom
       }
       if (map.size !== N) {
         for (const [k, e] of map) {
-          if (!keys.has(k)) {
+          if (!keySet.has(k)) {
             if (e.dom.__xunay_scope) disposeScope(e.dom.__xunay_scope)
-            e.dom.remove(); map.delete(k); dirty = true
+            e.dom.remove(); map.delete(k)
           }
         }
       }
-      if (dirty || holder.childNodes.length !== N) {
-        const frag = document.createDocumentFragment()
-        for (const d of ordered) frag.appendChild(d)
-        holder.textContent = ''; holder.appendChild(frag)
-      } else {
-        let need = false, cur = holder.firstChild
-        for (let i = 0; i < N; i++) { if (cur !== ordered[i]) { need = true; break } cur = cur.nextSibling }
-        if (need) { const frag = document.createDocumentFragment(); for (const d of ordered) frag.appendChild(d); holder.textContent = ''; holder.appendChild(frag) }
+      for (let j = N - 1; j >= 0; j--) {
+        const cur = holder.childNodes[j]
+        if (cur === newDoms[j]) continue
+        const next = j + 1 < N ? newDoms[j + 1] : null
+        holder.insertBefore(newDoms[j], next)
       }
     })
   })
