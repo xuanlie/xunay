@@ -95,8 +95,23 @@ function processFile(file) {
   let m
   while ((m = re.exec(src))) {
     const dep = m[1]
-    if (dep.startsWith('.') || dep.startsWith('/')) {
-      let depPath = path.resolve(path.dirname(file), dep)
+    let depPath = null
+
+    // 1. 尝试 alias 展开（@/x → <cwd>/<alias value>/x）
+    for (const [key, value] of Object.entries(ALIAS)) {
+      if (dep === key || dep.startsWith(key + '/')) {
+        const rel = dep === key ? '' : dep.slice(key.length + 1)
+        depPath = path.resolve(process.cwd(), value, rel)
+        break
+      }
+    }
+
+    // 2. 相对路径
+    if (!depPath && (dep.startsWith('.') || dep.startsWith('/'))) {
+      depPath = path.resolve(path.dirname(file), dep)
+    }
+
+    if (depPath) {
       let depXuy = depPath.replace(/\.js$/, '.xuy')
       if (fs.existsSync(depXuy)) processFile(depXuy)
       else if (fs.existsSync(depPath) && depPath.endsWith('.xuy')) processFile(depPath)
