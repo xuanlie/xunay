@@ -15,11 +15,25 @@
     "./dev": "./src/dev-entry.js",
     "./full": "./src/full-entry.js"
   },
-  "files": ["src", "dist", "README.md", "LICENSE"],
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "node build.js",
     "test": "cd test && node run.js"
   },
-  "keywords": ["xunay", "framework", "signal", "reactive"],
-  "license": "MIT"
+  "keywords": [
+    "xunay",
+    "framework",
+    "signal",
+    "reactive"
+  ],
+  "license": "MIT",
+  "author": "XuNay",
+  "engines": {
+    "node": ">=18"
+  }
 }

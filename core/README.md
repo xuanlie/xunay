@@ -14,23 +14,23 @@ XuNay
 
   app(() => div(null,
     button({ on: { click: () => n(v => v + 1) } }, '+1'),
-    span(null, txtn = ${n})
+    span(null, txt`n = ${n}`)
   ), '#app')
 
 体积（gzip）
 
-  xunay.esm.js           5.9KB
-  xunay.min.js           6.2KB
-  xunay-devtools.min.js  3.9KB
-  xunay-kit.min.js      14.5KB
-  xunay-full.min.js     19.4KB
+  xunay.esm.js           4.86KB
+  xunay.min.js           5.09KB
+  xunay-devtools.min.js 13.14KB
+  xunay-kit.min.js      14.43KB
+  xunay-full.min.js     18.35KB
 
 核心含 signal / computed / effect / batch / render / mount / list / show / frag / txt / SSR / 生命周期，不含 UI 组件和 devtools。
 
 对比（gzip）
 
   Preact              4KB
-  XuNay（核心）        6.2KB
+  XuNay（核心）        4.86KB
   Solid               7KB
   Vue 3              34KB
   React 18 + DOM     45KB
@@ -71,7 +71,7 @@ API 速览
   条件        show(cond, render)
   Fragment    frag / F
   生命周期    onMount / onUnmount
-  响应式文本  txtn = ${n}
+  响应式文本  txt`n = ${n}`
   SSR         renderToString / hydrate
 
 License
