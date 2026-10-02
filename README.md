@@ -1,14 +1,19 @@
 XuNay
 
-内存最少、速度最快的前端框架。gzip 4.5KB，零依赖，无 VDOM，无 Fiber。
+内存最少、速度最快的前端框架。gzip 5.0KB，零依赖，无 VDOM，无 Fiber。
 
 数字
 
   操作   XuNay   React 18   Vue 3
-  gzip   4.5KB   45KB   34KB
-  create 1000   22ms   35ms   28ms
-  update 10th   13ms   20ms   16ms
+  gzip   5.0KB   45KB   34KB
+  首挂 1000 动态节点   18.6ms   35ms   28ms
+  更新 1/1000（细粒度）   2.0µs   20ms*   16ms*
+  更新 1000/1000   393µs   —   —
   内存   9.5MB   18MB   15MB
+
+  * React/Vue 无细粒度更新，更新任一状态都会重渲整个组件；
+    表中数字为社区常见 benchmark 参考值，环境不同仅供参考。
+  * XuNay 数字可复现：见 bench/README.md
 
 全栈架构
 
@@ -64,7 +69,7 @@ xunay.config.json：
 目录
 
   xunay/
-  ├── core/          核心框架（4.5KB，零依赖）
+  ├── core/          核心框架（5.0KB，零依赖）
   │   └── src/rpc.js         前端 RPC 客户端
   ├── bin/           命令行工具
   │   ├── create.js          脚手架
@@ -79,11 +84,15 @@ xunay.config.json：
   │   ├── python/    Python 后端（FastAPI）
   │   ├── go/        Go 后端（标准库）
   │   └── cpp/       C++ 后端（httplib）
-  ├── site/          文档站（125 篇）
+  ├── site/          文档站（156 篇）
   ├── playground/    在线编辑器
   ├── examples/      示例
-  ├── myapp/         大项目骨架
+  ├── backend/       运行中的 FastAPI 应用（实际服务）
   ├── frontend/      前端示例
+  ├── bench/         基准测试（Node + 浏览器）
+  ├── docs/          项目文档
+  ├── deploy/        nginx / systemd 部署配置
+  ├── test/          单元测试
   └── compiler2/     .xuy 编译器
 
 在线
