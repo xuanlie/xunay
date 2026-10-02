@@ -1,0 +1,15 @@
+// kit: Btn
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Btn"),
+    P("kit 里的按钮组件。"),
+    H2("引入"),
+    Code("import { Btn } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","类型","说明"], [["text","string | () => string","按钮文字"],["type","\"default\" | \"primary\" | \"danger\" | \"ghost\"","样式"],["size","\"sm\" | \"lg\"","尺寸"],["block","boolean","撑满整行"],["disabled","boolean | () => boolean","禁用"],["onClick","(e) => void","点击回调"],["icon","VNode","图标"]]),
+    H2("示例"),
+    Code("import { Btn } from 'xunay/kit'\nimport { div, signal } from 'xunay'\n\nconst n = signal(0)\n\ndiv(null,\n  Btn({ text: '+1', type: 'primary', onClick: () => n(v => v + 1) }),\n  Btn({ text: '删除', type: 'danger', onClick: () => n(0) }),\n  Btn({ text: () => '数量: ' + n() })\n)", "xuy"),
+  )
+}

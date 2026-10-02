@@ -1,0 +1,15 @@
+// kit: Modal
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Modal"),
+    P("模态框组件。"),
+    H2("引入"),
+    Code("import { Modal } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["open","是否显示"],["title","标题"],["onClose","关闭回调"],["footer","底部内容"],["maskClose","点遮罩关闭"]]),
+    H2("示例"),
+    Code("import { Modal } from 'xunay/kit'\nimport { signal, div, button } from 'xunay'\n\nfunction App() {\n  const open = signal(false)\n  return div(null,\n    button({ on: { click: () => open(true) } }, '打开'),\n    Modal({\n      open: () => open(),\n      title: '提示',\n      onClose: () => open(false),\n      footer: () => button({ on: { click: () => open(false) } }, '确定')\n    }, '这是内容')\n  )\n}", "xuy"),
+  )
+}

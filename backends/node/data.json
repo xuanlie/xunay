@@ -1,0 +1,23 @@
+{
+  "todos": [
+    {
+      "id": 1,
+      "title": "吃饭",
+      "done": false,
+      "created_at": 1790873690415
+    }
+  ],
+  "tokens": [
+    {
+      "token": "98cd7f419ca8f9914b7ab1235aa57db6",
+      "ip": "::1",
+      "expires_at": 1790873990289
+    },
+    {
+      "token": "b653a3511355ae5e934d1db4b5d20c91",
+      "ip": "::1",
+      "expires_at": 1790873990351
+    }
+  ],
+  "nextId": 2
+}

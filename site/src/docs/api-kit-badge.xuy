@@ -1,0 +1,15 @@
+// kit: Badge
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Badge"),
+    P("徽标组件——显示数字或状态。"),
+    H2("引入"),
+    Code("import { Badge } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["text","文字"],["type","\"primary\" | \"success\" | \"warn\" | \"danger\""],["dot","是否只显示小圆点"]]),
+    H2("示例"),
+    Code("import { Badge } from 'xunay/kit'\nimport { div, span, signal } from 'xunay'\n\nconst count = signal(3)\n\ndiv(null,\n  span(null, '消息'),\n  Badge({ text: () => count(), type: 'danger' }),\n  Badge({ text: '成功', type: 'success' }),\n  Badge({ dot: true, type: 'primary' })\n)", "xuy"),
+  )
+}

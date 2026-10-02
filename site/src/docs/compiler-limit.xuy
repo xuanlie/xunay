@@ -1,0 +1,35 @@
+// 已知限制
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("已知限制"),
+    P("编译器简单换来的代价——这些场景会踩坑。"),
+    H2("1. 参数化模板必须包箭头函数"),
+    Warn("裸写 tag 调用引用外部变量会崩。必须用 (params) => tag(...) 包装。"),
+    Code("// 错误：r 未定义\nconst row = div(null, span(null, r.id))\n\n// 正确：(r) => div(...)\nconst row = (r) => div(null, span(null, r.id))", "xuy"),
+    P("原因：编译器扫描顶层 tag(...) 一律转立即执行 IIFE。包一层箭头函数后，IIFE 落到函数体内，改为调用时才执行。"),
+    H2("2. 字符串里的 tag 名会被处理"),
+    Code("// 字符串里的 div( 可能被误处理\nconst s = \"div(null, 'x')\"", "xuy"),
+    P("实际影响很小——.xuy 里很少在字符串里写代码片段。"),
+    H2("3. 动态生成标签名不支持"),
+    Code("// 不支持\nconst name = 'div'\nname(null, 'x')\n\n// 用 createElement\ncreateElement(name, null, 'x')", "xuy"),
+    H2("4. 嵌套太深有性能问题"),
+    P("编译器不做深递归——嵌套超过几百层可能有栈溢出风险。实际项目不会遇到。"),
+    H2("5. 不支持 JSX"),
+    Code("// 不支持\nreturn <div>hello</div>\n\n// 用函数调用\nreturn div(null, 'hello')", "xuy"),
+    H2("6. 不支持自定义语法"),
+    P(".xuy 只支持标签名省略 import。其他都是标准 JS。"),
+    H2("7. 正则字面量可能误判"),
+    Code("const re = /abc/g   // 可能被 tokenizer 误判", "xuy"),
+    P(".xuy 里不鼓励用正则字面量——用 new RegExp() 或写到 .js 里。"),
+    H2("8. 编译产物依赖运行时"),
+    P("编译后的代码引用 __rt__.bindText 等函数——这些在 xunay 运行时里。必须引入 xunay.js。"),
+    H2("9. 不支持 TypeScript 语法"),
+    P(".xuy 里不能写类型注解、interface 等。"),
+    H2("10. 单文件作用域"),
+    P("每个 .xuy 是独立模块——顶部变量不会泄漏到其他文件。"),
+    H2("为什么要接受这些限制"),
+    P("换取的是 360 行的编译器、零配置的构建、秒级编译。对于绝大多数场景，这些限制不构成障碍。"),
+  )
+}

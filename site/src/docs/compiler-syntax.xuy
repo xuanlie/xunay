@@ -1,0 +1,31 @@
+// .xuy 语法
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1(".xuy 语法"),
+    P(".xuy 就是 JavaScript——只是标签名可以当函数直接用。"),
+    H2("唯一区别"),
+    Code("// .js 里\nimport { div, span, button } from 'xunay'\nreturn div(null, span(null, 'x'), button(null, 'y'))\n\n// .xuy 里\n// 不用 import 标签名\nreturn div(null, span(null, 'x'), button(null, 'y'))", "xuy"),
+    P("除了这一条，.xuy 和 JS 完全一样——所有语法、所有运算符、所有内置对象都能用。"),
+    H2("内置标签"),
+    Code("div span p a button input form label ul ol li\nh1 h2 h3 h4 h5 h6 table thead tbody tr td th\nimg br hr pre code blockquote", "txt"),
+    H2("标签使用"),
+    Code("// 基本调用\ndiv(null, 'hello')\n\n// 带属性\ndiv({ class: 'card', id: 'x' }, 'hello')\n\n// 嵌套\ndiv(null,\n  h1(null, '标题'),\n  p(null, '正文'),\n  button({ on: { click: () => n(1) } }, '点击')\n)\n\n// 动态内容\ndiv(null, () => 'n = ' + n())\n\n// 事件\nbutton({ on: { click: () => count(count() + 1) } }, '+')", "xuy"),
+    H2("自定义标签"),
+    P("不在内置列表里的标签用 createElement 或 tag："),
+    Code("import { createElement, tag } from 'xunay'\n\n// 一次性\ncreateElement('video', { src: '/a.mp4' })\n\n// 复用\nconst video = tag('video')\nvideo({ src: '/a.mp4' })", "xuy"),
+    H2("文件标题"),
+    P("文件开头可以写 `// title: 标题`，构建时用来做 HTML 的 title。"),
+    Code("// title: 我的应用\nimport { div, mount } from 'xunay'\n\nmount(() => div(null, 'Hello'), '#app')", "xuy"),
+    H2("文件后缀"),
+    Table(["后缀","含义"], [[".xuy","xunay 源码"],[".js","普通 JS（可以 import .xuy）"]]),
+    H2("导入其他 .xuy"),
+    Code("// app.xuy\nimport { Button } from './components/Button.xuy'\nimport { Home } from './pages/Home.xuy'\n\nmount(() => div(null, Home()), '#app')", "xuy"),
+    P("编译器会自动把 .xuy 编译成 .js，再让 esbuild 打包。"),
+    H2("不能用什么"),
+    Ul("不能用 JSX（<div />）——.xuy 没有 JSX","不能用模板语法（{{ }}、v-if）——用函数式 API","不能省略 import xunay 的其他 API"),
+    H2("一个完整例子"),
+    Code("// title: 计数器\nimport { signal, computed, mount, onMount } from 'xunay'\n\nconst count = signal(0)\nconst double = computed(() => count() * 2)\n\nmount(() => div({ class: 'app' },\n  h1(null, '计数器'),\n\n  div({ class: 'counter' },\n    button({ on: { click: () => count(v => v - 1) } }, '-'),\n    span({ class: 'value' }, () => String(count())),\n    button({ on: { click: () => count(v => v + 1) } }, '+')\n  ),\n\n  p(null, () => '双倍: ' + double()),\n\n  div({ class: 'actions' },\n    button({ on: { click: () => count(0) } }, '重置'),\n    button({ on: { click: () => count(100) } }, '设为 100')\n  )\n), '#app')", "xuy"),
+  )
+}

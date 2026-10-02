@@ -1,0 +1,14 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+*.bak
+*.bak.*
+*.bak.*.*
+site.bak.*
+dist/
+build/
+.DS_Store
+*.log
+.env
+.craft/

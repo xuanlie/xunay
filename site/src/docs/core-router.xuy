@@ -1,0 +1,33 @@
+// 路由
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("路由"),
+    P("xunay 没有内置路由器——只有 signal + 事件监听。20 行代码就能写一个，完全可控。"),
+    H2("hash 路由（推荐）"),
+    Code("import { signal } from 'xunay'\n\nfunction norm(h) {\n  h = (h || '').replace(/^#/, '')\n  if (!h) return '/'\n  if (!h.startsWith('/')) h = '/' + h\n  return h\n}\n\nexport const route = signal(norm(location.hash))\n\nwindow.addEventListener('hashchange', () => route(norm(location.hash)))\n\nexport function go(path) {\n  location.hash = path.startsWith('/') ? path : '/' + path\n}", "xuy"),
+    H2("history 路由"),
+    Code("import { signal } from 'xunay'\n\nexport const route = signal(location.pathname)\n\nwindow.addEventListener('popstate', () => route(location.pathname))\n\nexport function go(path) {\n  history.pushState({}, '', path)\n  route(path)\n}", "xuy"),
+    P("history 模式需要服务器配合——所有路径回退到 index.html。hash 模式不需要服务器配置。"),
+    H2("用路由切换页面"),
+    Code("import { div } from 'xunay'\nimport { route } from './router.js'\nimport { Home } from './pages/Home.js'\nimport { Todo } from './pages/Todo.js'\n\nfunction App() {\n  return div(null,\n    () => {\n      const r = route()\n      if (r === '/') return Home()\n      if (r === '/todo') return Todo()\n      return div(null, '404')\n    }\n  )\n}", "xuy"),
+    H2("带参数的路由"),
+    Code("// 路由：/user/123\nconst route = signal(location.pathname)\n\nfunction App() {\n  return div(null, () => {\n    const r = route()\n    const m = r.match(/^\\/user\\/(\\d+)$/)\n    if (m) return UserPage({ id: m[1] })\n    return div(null, '404')\n  })\n}", "xuy"),
+    H2("查询参数"),
+    Code("const query = () => {\n  const s = location.hash.split('?')[1] || ''\n  const p = new URLSearchParams(s)\n  return { page: +(p.get('page') || 1) }\n}\n\n// /#/list?page=2 → { page: 2 }", "xuy"),
+    H2("导航守卫"),
+    Code("function go(path) {\n  if (path === '/admin' && !user()) {\n    path = '/login'\n  }\n  location.hash = path\n}", "xuy"),
+    H2("懒加载路由"),
+    Code("import { lazy } from 'xunay'\n\nconst pages = {\n  '/': lazy(() => import('./pages/Home.js')),\n  '/todo': lazy(() => import('./pages/Todo.js')),\n  '/login': lazy(() => import('./pages/Login.js'))\n}\n\nfunction App() {\n  return div(null, () => {\n    const Page = pages[route()]\n    return Page ? Page({}) : div(null, '404')\n  })\n}", "xuy"),
+    H2("完整示例"),
+    Code("// router.js\nimport { signal } from 'xunay'\n\nexport const route = signal(location.hash.slice(1) || '/')\n\nwindow.addEventListener('hashchange', () => {\n  route(location.hash.slice(1) || '/')\n  window.scrollTo(0, 0)\n})\n\nexport function go(path) {\n  location.hash = path\n}\n\n// app.js\nimport { div, a, mount } from 'xunay'\nimport { route, go } from './router.js'\nimport { Home } from './pages/Home.js'\nimport { Todo } from './pages/Todo.js'\n\nfunction Nav() {\n  return div({ class: 'nav' },\n    a({ class: () => 'link' + (route() === '/' ? ' on' : ''), href: '#/', on: { click: () => go('/') } }, '首页'),\n    a({ class: () => 'link' + (route() === '/todo' ? ' on' : ''), href: '#/todo', on: { click: () => go('/todo') } }, '待办')\n  )\n}\n\nfunction App() {\n  return div({ class: 'app' },\n    Nav(),\n    () => route() === '/' ? Home() :\n          route() === '/todo' ? Todo() :\n          div(null, '404')\n  )\n}\n\nmount(() => App(), '#app')", "xuy"),
+    H2("路由的性能"),
+    Table(["操作","耗时","说明"], [["切换路由","~1~5ms","整块重建"],["预加载","0","lazy 已在缓存"],["hashchange 触发","~0.1ms","浏览器原生"]]),
+    H2("常见陷阱"),
+    H3("陷阱 1：history 模式刷新 404"),
+    P("history 模式需要服务器配置回退。用 hash 模式最简单。"),
+    H3("陷阱 2：忘记 scrollTo"),
+    Code("window.addEventListener('hashchange', () => {\n  route(location.hash.slice(1))\n  window.scrollTo(0, 0)   // 别忘了\n})", "xuy"),
+  )
+}

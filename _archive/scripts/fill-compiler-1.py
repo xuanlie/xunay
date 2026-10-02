@@ -1,0 +1,240 @@
+#!/usr/bin/env python3
+
+p = "site/gen-docs.py"
+with open(p, 'r', encoding='utf-8') as f:
+    s = f.read()
+
+def swap(anchor, replacement, label):
+    global s
+    if anchor not in s:
+        print("未命中:", label)
+        return
+    s = s.replace(anchor, replacement)
+
+swap("    ('compiler-overview', '总览', []),", r"""    ('compiler-overview', '总览', [
+      ('H1','编译器总览'),
+      ('P','xuyc 是 xunay 的编译器——把 .xuy 文件编译成标准 JS。核心只有三个文件：tokenizer、parser、gen。'),
+      ('H2','为什么需要编译器'),
+      ('P','.xuy 就是 JS 加一个约定：标签名（div、span、button）当函数直接用，不用 import。这个替换由编译器完成。'),
+      ('Code',"// 你写的 .xuy\nconst n = signal(0)\nreturn div(null, button(null, 'x'))\n\n// 编译后（概念上）\nimport { div, button } from 'xunay'\nconst n = signal(0)\nreturn div(null, button(null, 'x'))",'xuy'),
+      ('H2','三个文件'),
+      ('Table',['文件','职责','行数'],[
+        ['tokenizer.js','词法分析','40 行'],
+        ['parser.js','语法分析','204 行'],
+        ['gen.js','代码生成','118 行'],
+      ]),
+      ('P','加起来约 360 行——一个完整编译器。'),
+      ('H2','编译流程'),
+      ('Code',"源代码 (.xuy)\n  ↓ tokenize()\nToken 数组\n  ↓ parse()\nAST（部分）\n  ↓ genFunction()\n可执行 JS\n  ↓ esbuild\n浏览器可跑",'txt'),
+      ('H2','和其他编译器对比'),
+      ('Table',['编译器','用途','行数'],[
+        ['Babel','JS → JS','~15 万'],
+        ['TypeScript','TS → JS','~30 万'],
+        ['Svelte','Svelte → JS','~5 万'],
+        ['Vue','Vue → JS','~8 万'],
+        ['xuyc','xuy → JS','~360'],
+      ]),
+      ('P','xuyc 做的事情特别少——只做标签名替换。所以能做到这么小。'),
+      ('H2','使用'),
+      ('Code',"node bin/xuyc.js build app.xuy --out dist",'bash'),
+      ('H2','不用编译也能用'),
+      ('P','xunay 的核心是纯运行时的。不想用 .xuy 就直接写 JS——把 import 加上，其余一样。'),
+      ('Code',"// 不编译，直接写 JS\nimport { div, button, signal, mount } from 'xunay'\n\nmount(() => div(null, button(null, 'x')), '#app')",'xuy'),
+      ('H2','下一步'),
+      ('Link','#compiler-syntax','.xuy 语法'),
+      ('Link','#compiler-pipeline','编译流程'),
+    ]),""", "compiler-overview")
+
+swap("    ('compiler-syntax', '.xuy 语法', []),", r"""    ('compiler-syntax', '.xuy 语法', [
+      ('H1','.xuy 语法'),
+      ('P','.xuy 就是 JavaScript——只是标签名可以当函数直接用。'),
+      ('H2','唯一区别'),
+      ('Code',"// .js 里\nimport { div, span, button } from 'xunay'\nreturn div(null, span(null, 'x'), button(null, 'y'))\n\n// .xuy 里\n// 不用 import 标签名\nreturn div(null, span(null, 'x'), button(null, 'y'))",'xuy'),
+      ('P','除了这一条，.xuy 和 JS 完全一样——所有语法、所有运算符、所有内置对象都能用。'),
+      ('H2','内置标签'),
+      ('Code','div span p a button input form label ul ol li\nh1 h2 h3 h4 h5 h6 table thead tbody tr td th\nimg br hr pre code blockquote','txt'),
+      ('H2','标签使用'),
+      ('Code',"// 基本调用\ndiv(null, 'hello')\n\n// 带属性\ndiv({ class: 'card', id: 'x' }, 'hello')\n\n// 嵌套\ndiv(null,\n  h1(null, '标题'),\n  p(null, '正文'),\n  button({ on: { click: () => n(1) } }, '点击')\n)\n\n// 动态内容\ndiv(null, () => 'n = ' + n())\n\n// 事件\nbutton({ on: { click: () => count(count() + 1) } }, '+')",'xuy'),
+      ('H2','自定义标签'),
+      ('P','不在内置列表里的标签用 createElement 或 tag：'),
+      ('Code',"import { createElement, tag } from 'xunay'\n\n// 一次性\ncreateElement('video', { src: '/a.mp4' })\n\n// 复用\nconst video = tag('video')\nvideo({ src: '/a.mp4' })",'xuy'),
+      ('H2','文件标题'),
+      ('P','文件开头可以写 `// title: 标题`，构建时用来做 HTML 的 title。'),
+      ('Code',"// title: 我的应用\nimport { div, mount } from 'xunay'\n\nmount(() => div(null, 'Hello'), '#app')",'xuy'),
+      ('H2','文件后缀'),
+      ('Table',['后缀','含义'],[
+        ['.xuy','xunay 源码'],
+        ['.js','普通 JS（可以 import .xuy）'],
+      ]),
+      ('H2','导入其他 .xuy'),
+      ('Code',"// app.xuy\nimport { Button } from './components/Button.xuy'\nimport { Home } from './pages/Home.xuy'\n\nmount(() => div(null, Home()), '#app')",'xuy'),
+      ('P','编译器会自动把 .xuy 编译成 .js，再让 esbuild 打包。'),
+      ('H2','不能用什么'),
+      ('Ul',
+        '不能用 JSX（<div />）——.xuy 没有 JSX',
+        '不能用模板语法（{{ }}、v-if）——用函数式 API',
+        '不能省略 import xunay 的其他 API'),
+      ('H2','一个完整例子'),
+      ('Code',"// title: 计数器\nimport { signal, computed, mount, onMount } from 'xunay'\n\nconst count = signal(0)\nconst double = computed(() => count() * 2)\n\nmount(() => div({ class: 'app' },\n  h1(null, '计数器'),\n\n  div({ class: 'counter' },\n    button({ on: { click: () => count(v => v - 1) } }, '-'),\n    span({ class: 'value' }, () => String(count())),\n    button({ on: { click: () => count(v => v + 1) } }, '+')\n  ),\n\n  p(null, () => '双倍: ' + double()),\n\n  div({ class: 'actions' },\n    button({ on: { click: () => count(0) } }, '重置'),\n    button({ on: { click: () => count(100) } }, '设为 100')\n  )\n), '#app')",'xuy'),
+    ]),""", "compiler-syntax")
+
+swap("    ('compiler-pipeline', '编译流程', []),", r"""    ('compiler-pipeline', '编译流程', [
+      ('H1','编译流程'),
+      ('P','从 .xuy 到能在浏览器跑的 JS，一共 5 步。'),
+      ('H2','流程图'),
+      ('Code',"app.xuy\n  ↓ [1] 读取源码\n源代码字符串\n  ↓ [2] tokenize()\nToken 数组\n  ↓ [3] parse()\nRawNode 数组（tag 调用的位置）\n  ↓ [4] genFunction()\n替换后的 JS 字符串\n  ↓ [5] esbuild 打包\napp.js（浏览器可执行）",'txt'),
+      ('H2','第 1 步：读源码'),
+      ('Code',"const src = fs.readFileSync('app.xuy', 'utf8')",'js'),
+      ('H2','第 2 步：tokenize'),
+      ('P','把源码切成 token——关键字、标识符、标点、字符串等。'),
+      ('Code',"// tokenize('div(null, \"x\")')\n[\n  { t: 'id', v: 'div' },\n  { t: 'p', v: '(' },\n  { t: 'id', v: 'null' },\n  { t: 'p', v: ',' },\n  { t: 'str', v: '\"x\"' },\n  { t: 'p', v: ')' }\n]",'js'),
+      ('H2','第 3 步：parse'),
+      ('P','扫描源码，找出所有 tag 调用的位置和结构。'),
+      ('Code',"// parse('div(null, \"x\")')\n[\n  {\n    type: 'raw',\n    start: 0,\n    end: 14,\n    node: {\n      type: 'tag',\n      name: 'div',\n      props: [],\n      children: [{ type: 'text', expr: '\"x\"' }]\n    }\n  }\n]",'js'),
+      ('H2','第 4 步：genFunction'),
+      ('P','把每个 tag 调用替换成生成 DOM 的代码。'),
+      ('Code',"// 输入\ndiv(null, 'hello')\n\n// 输出\n(() => {\n  const el = document.createElement('div')\n  const t = document.createTextNode('hello')\n  el.appendChild(t)\n  return el\n})()",'js'),
+      ('H2','第 5 步：esbuild'),
+      ('P','把编译后的 JS 和 xunay 运行时打包成一个文件。'),
+      ('Code',"esbuild.build({\n  entryPoints: ['app.js'],\n  bundle: true,\n  minify: true,\n  format: 'esm',\n  outfile: 'dist/app.js'\n})",'js'),
+      ('H2','完整代码'),
+      ('Code',"// bin/xuyc.js\nconst src = fs.readFileSync(entry, 'utf8')\nconst nodes = parse(src)\nconst js = genFunction(entry, nodes, src)\nfs.writeFileSync('temp.js', js)\n\nawait esbuild.build({\n  entryPoints: ['temp.js'],\n  bundle: true,\n  outfile: 'dist/app.js'\n})",'js'),
+      ('H2','增量编译'),
+      ('P','改一个文件时不用重编译所有 .xuy——编译器维护缓存，只处理变化的。'),
+      ('Code',"const cache = new Map()\nfunction processFile(file) {\n  if (cache.has(file)) return cache.get(file)\n  // ... 编译\n  cache.set(file, out)\n  return out\n}",'js'),
+    ]),""", "compiler-pipeline")
+
+swap("    ('compiler-tokenizer', '词法分析', []),", r"""    ('compiler-tokenizer', '词法分析', [
+      ('H1','词法分析'),
+      ('P','把源码字符串切成 token 数组。核心 40 行。'),
+      ('H2','代码'),
+      ('Code',"export function tokenize(src) {\n  const tokens = []\n  let i = 0\n  const N = src.length\n  while (i < N) {\n    const c = src[i]\n    // 跳过空白\n    if (/\\s/.test(c)) { i++; continue }\n    // 跳过行注释\n    if (c === '/' && src[i+1] === '/') {\n      while (i < N && src[i] !== '\\n') i++\n      continue\n    }\n    // 跳过块注释\n    if (c === '/' && src[i+1] === '*') {\n      i += 2\n      while (i < N && !(src[i] === '*' && src[i+1] === '/')) i++\n      i += 2\n      continue\n    }\n    // 字符串\n    if (c === '\"' || c === \"'\" || c === '`') {\n      const q = c\n      let v = c\n      i++\n      while (i < N && src[i] !== q) {\n        if (src[i] === '\\\\') { v += src[i] + src[i+1]; i += 2; continue }\n        v += src[i]; i++\n      }\n      v += src[i] || ''\n      i++\n      tokens.push({ t: 'str', v })\n      continue\n    }\n    // 标识符\n    if (/[a-zA-Z_$]/.test(c)) {\n      let v = ''\n      while (i < N && /[\\w$]/.test(src[i])) { v += src[i]; i++ }\n      tokens.push({ t: 'id', v })\n      continue\n    }\n    // 数字\n    if (/[0-9]/.test(c)) {\n      let v = ''\n      while (i < N && /[\\d.xXa-fA-F]/.test(src[i])) { v += src[i]; i++ }\n      tokens.push({ t: 'num', v })\n      continue\n    }\n    // 单字符标点\n    if ('(){}[],:.='.includes(c)) {\n      tokens.push({ t: 'p', v: c })\n      i++\n      continue\n    }\n    // 操作符\n    if ('+-*/<>!&|?'.includes(c)) {\n      let v = c\n      i++\n      while (i < N && '+-*/<>!&|='.includes(src[i])) { v += src[i]; i++ }\n      tokens.push({ t: 'op', v })\n      continue\n    }\n    i++\n  }\n  return tokens\n}",'js'),
+      ('H2','Token 类型'),
+      ('Table',['类型','含义','示例'],[
+        ['str','字符串','"hello"'],
+        ['id','标识符','div、signal'],
+        ['num','数字','42'],
+        ['p','标点','()、{}、,'],
+        ['op','操作符','=>、+、=='],
+      ]),
+      ('H2','注意'),
+      ('P','tokenize 一次扫描完成，不回溯。它不关心语法——只识别 token 边界。'),
+      ('H2','局限'),
+      ('Ul',
+        '不处理正则字面量（会误判为除法）',
+        '不处理模板字符串里的表达式'),
+      ('P','对 .xuy 足够——.xuy 不鼓励复杂语法。'),
+    ]),""", "compiler-tokenizer")
+
+swap("    ('compiler-parser', '语法分析', []),", r"""    ('compiler-parser', '语法分析', [
+      ('H1','语法分析'),
+      ('P','扫描源码，找出所有 tag 调用的起止位置和结构。204 行。'),
+      ('H2','策略'),
+      ('P','xuyc 不做全量 AST。它只扫描 tag 调用，其他代码原样保留。'),
+      ('Code',"// 输入\nconst n = signal(0)\nreturn div(null, span(null, 'x'))\n\n// parse 只关心 div(...) 和 span(...)\n// 其他代码不动",'xuy'),
+      ('H2','核心函数'),
+      ('Table',['函数','作用'],[
+        ['parse(src)','扫描所有 tag 调用'],
+        ['parseTag()','解析一个 tag 调用'],
+        ['parseProps()','解析 { class: "x" }'],
+        ['parseChild()','解析子节点'],
+        ['readArg()','读到逗号或右括号'],
+        ['readBracket()','读完整括号内容'],
+      ]),
+      ('H2','扫描逻辑'),
+      ('Code',"export function parse(src) {\n  const result = []\n  let pos = 0\n  while (pos < src.length) {\n    skipWs()\n    const c = src[pos]\n    if (/[a-z]/.test(c)) {\n      const saved = pos\n      const name = readIdent()\n      if (TAGS.has(name) && src[pos] === '(') {\n        pos = saved\n        const node = parseTag()\n        if (node) {\n          result.push({ type: 'raw', node, start: saved, end: pos })\n          continue\n        }\n      }\n      pos = saved + name.length\n      continue\n    }\n    pos++\n  }\n  return result\n}",'js'),
+      ('H2','输出结构'),
+      ('Code',"[\n  {\n    type: 'raw',\n    start: 20,   // 在源码中的起始位置\n    end: 47,     // 结束位置\n    node: {\n      type: 'tag',\n      name: 'div',\n      props: [{ k: 'class', v: '\"card\"' }],\n      children: [\n        { type: 'text', expr: '\"hello\"' },\n        { type: 'tag', name: 'span', props: null, children: [...] }\n      ]\n    }\n  }\n]",'js'),
+      ('H2','为什么不做全量 AST'),
+      ('Ul',
+        '简单——只处理标签，其他代码原样',
+        '快——一遍扫描，不递归',
+        '不易出错——没有复杂的优先级处理',
+        '够用——.xuy 只需要这一个功能'),
+      ('H2','局限'),
+      ('P','解析器不知道 JS 作用域。以下情况会出错：'),
+      ('Code',"// 字符串里的 div( 会被误认\nconst s = 'div(null, \"x\")'   // 字符串\n\n// 但实际测试里，在 tag 调用外的 div( 不会被误处理",'xuy'),
+      ('P','实际场景中影响极小——.xuy 不鼓励在字符串里写代码片段。'),
+    ]),""", "compiler-parser")
+
+swap("    ('compiler-gen', '代码生成', []),", r"""    ('compiler-gen', '代码生成', [
+      ('H1','代码生成'),
+      ('P','把 parser 输出的 AST 转成生成 DOM 的 JS 代码。118 行。'),
+      ('H2','核心函数'),
+      ('Code',"export function genNode(node, indent, out) {\n  const pad = '  '.repeat(indent)\n\n  if (node.type === 'text') {\n    return { code: node.expr, isStatic: true }\n  }\n\n  if (node.type === 'dyn') {\n    return { code: node.expr, isDynamic: true }\n  }\n\n  if (node.type === 'tag') {\n    const v = nextVar(node.name)\n    const lines = []\n    lines.push(pad + 'const ' + v + ' = document.createElement(' + JSON.stringify(node.name) + ')')\n\n    // props\n    for (const p of node.props) {\n      if (p.k === 'on') {\n        // 事件\n        lines.push(pad + v + '.addEventListener(' + ... + ')')\n      } else if (p.k === 'class') {\n        lines.push(pad + v + '.className = ' + p.v)\n      } else {\n        lines.push(pad + v + '.setAttribute(' + JSON.stringify(p.k) + ', ' + p.v + ')')\n      }\n    }\n\n    // 子节点\n    for (const c of node.children) {\n      const r = genChild(c, indent, lines)\n      lines.push(pad + v + '.appendChild(' + r.code + ')')\n    }\n\n    return { code: v, lines, varName: v }\n  }\n}",'js'),
+      ('H2','生成的代码'),
+      ('Code',"// 输入\ndiv({ class: 'card' },\n  h1(null, '标题'),\n  span(null, () => n())\n)\n\n// 输出（概念上）\n(() => {\n  const el1 = document.createElement('div')\n  el1.className = 'card'\n  const el2 = document.createElement('h1')\n  const t1 = document.createTextNode('标题')\n  el2.appendChild(t1)\n  el1.appendChild(el2)\n  const el3 = document.createElement('span')\n  const t2 = document.createTextNode('')\n  __rt__.bindText(t2, () => n())\n  el3.appendChild(t2)\n  el1.appendChild(el3)\n  return el1\n})()",'js'),
+      ('H2','变量命名'),
+      ('P','每个元素用 _div7、_span10、_t2 这种唯一名字。数字来自全局计数器，保证不冲突。'),
+      ('Code',"let varCounter = 0\nfunction nextVar(prefix) {\n  return '_' + prefix + (varCounter++)\n}",'js'),
+      ('H2','静态优化'),
+      ('P','常量（字符串、数字）直接生成 createTextNode，动态的用 bindText。'),
+      ('Code',"// 静态：一次创建\ndocument.createTextNode('hello')\n\n// 动态：建空文本 + 挂 effect\ndocument.createTextNode('')\n__rt__.bindText(textNode, () => 'n = ' + n())",'js'),
+      ('H2','IIFE 包装'),
+      ('P','每个 tag 调用被包成 IIFE（立即执行函数），返回生成的 DOM。这样能嵌进任何 JS 表达式。'),
+      ('Code',"// 输入\nconst x = div(null, 'hi')\n\n// 输出\nconst x = (() => {\n  const el = document.createElement('div')\n  const t = document.createTextNode('hi')\n  el.appendChild(t)\n  return el\n})()",'js'),
+      ('H2','参数化模板'),
+      ('P','如果 tag 调用在箭头函数里，编译成工厂函数：'),
+      ('Code',"// 输入\nconst row = (r) => div(null, span(null, r.id))\n\n// 输出\nconst row = (r) => (() => {\n  const el = document.createElement('div')\n  const sp = document.createElement('span')\n  const t = document.createTextNode(String(r.id))\n  sp.appendChild(t)\n  el.appendChild(sp)\n  return el\n})()",'js'),
+    ]),""", "compiler-gen")
+
+swap("    ('compiler-errors', '错误处理', []),", r"""    ('compiler-errors', '错误处理', [
+      ('H1','错误处理'),
+      ('P','编译器出错时给出准确的行号、列号、附近代码，而不是一个堆栈。'),
+      ('H2','核心工具'),
+      ('Code',"export function describeError(src, pos, msg) {\n  const before = src.slice(0, pos)\n  const line = before.split('\\n').length\n  const col = pos - before.lastIndexOf('\\n')\n  const lineStart = before.lastIndexOf('\\n') + 1\n  const lineEnd = src.indexOf('\\n', pos)\n  const text = src.slice(lineStart, lineEnd < 0 ? src.length : lineEnd)\n  const caret = ' '.repeat(Math.max(0, col - 1)) + '^'\n  return [\n    '[xunay compile] ' + msg,\n    '  行 ' + line + ', 列 ' + col,\n    '  ' + text,\n    '  ' + caret\n  ].join('\\n')\n}",'js'),
+      ('H2','错误输出'),
+      ('Code',"[xunay compile] 期望 )\n  行 12, 列 8\n  return div(null, span(null, 'x'\n         ^",'txt'),
+      ('H2','wrapError'),
+      ('Code',"export function wrapError(src, pos, msg, cause) {\n  const e = new Error(describeError(src, pos, msg))\n  e.pos = pos\n  e.cause = cause\n  return e\n}",'js'),
+      ('H2','在 parser 里用'),
+      ('Code',"function expect(c) {\n  if (!match(c)) {\n    throw wrapError(src, pos, '期望 ' + c)\n  }\n}",'js'),
+      ('H2','错误类型'),
+      ('Table',['错误','原因'],[
+        ['期望 )','括号不匹配'],
+        ['期望 ,','参数分隔缺失'],
+        ['期望 {','对象字面量不完整'],
+        ['未预期 token','非法字符'],
+      ]),
+      ('H2','编译错误 vs 运行时错误'),
+      ('Table',['','编译错误','运行时错误'],[
+        ['时机','构建时','浏览器执行时'],
+        ['能定位','源码行列','堆栈'],
+        ['例子','括号不匹配','n 未定义'],
+      ]),
+    ]),""", "compiler-errors")
+
+swap("    ('compiler-limit', '已知限制', []),", r"""    ('compiler-limit', '已知限制', [
+      ('H1','已知限制'),
+      ('P','编译器简单换来的代价——这些场景会踩坑。'),
+      ('H2','1. 参数化模板必须包箭头函数'),
+      ('Warn','裸写 tag 调用引用外部变量会崩。必须用 (params) => tag(...) 包装。'),
+      ('Code',"// 错误：r 未定义\nconst row = div(null, span(null, r.id))\n\n// 正确：(r) => div(...)\nconst row = (r) => div(null, span(null, r.id))",'xuy'),
+      ('P','原因：编译器扫描顶层 tag(...) 一律转立即执行 IIFE。包一层箭头函数后，IIFE 落到函数体内，改为调用时才执行。'),
+      ('H2','2. 字符串里的 tag 名会被处理'),
+      ('Code',"// 字符串里的 div( 可能被误处理\nconst s = \"div(null, 'x')\"",'xuy'),
+      ('P','实际影响很小——.xuy 里很少在字符串里写代码片段。'),
+      ('H2','3. 动态生成标签名不支持'),
+      ('Code',"// 不支持\nconst name = 'div'\nname(null, 'x')\n\n// 用 createElement\ncreateElement(name, null, 'x')",'xuy'),
+      ('H2','4. 嵌套太深有性能问题'),
+      ('P','编译器不做深递归——嵌套超过几百层可能有栈溢出风险。实际项目不会遇到。'),
+      ('H2','5. 不支持 JSX'),
+      ('Code',"// 不支持\nreturn <div>hello</div>\n\n// 用函数调用\nreturn div(null, 'hello')",'xuy'),
+      ('H2','6. 不支持自定义语法'),
+      ('P','.xuy 只支持标签名省略 import。其他都是标准 JS。'),
+      ('H2','7. 正则字面量可能误判'),
+      ('Code',"const re = /abc/g   // 可能被 tokenizer 误判",'xuy'),
+      ('P','.xuy 里不鼓励用正则字面量——用 new RegExp() 或写到 .js 里。'),
+      ('H2','8. 编译产物依赖运行时'),
+      ('P','编译后的代码引用 __rt__.bindText 等函数——这些在 xunay 运行时里。必须引入 xunay.js。'),
+      ('H2','9. 不支持 TypeScript 语法'),
+      ('P','.xuy 里不能写类型注解、interface 等。'),
+      ('H2','10. 单文件作用域'),
+      ('P','每个 .xuy 是独立模块——顶部变量不会泄漏到其他文件。'),
+      ('H2','为什么要接受这些限制'),
+      ('P','换取的是 360 行的编译器、零配置的构建、秒级编译。对于绝大多数场景，这些限制不构成障碍。'),
+    ]),""", "compiler-limit")
+
+with open(p, 'w', encoding='utf-8') as f:
+    f.write(s)
+print("编译器 8 篇已填")

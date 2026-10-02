@@ -1,0 +1,15 @@
+// kit: Radio
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Radio"),
+    P("单选框组件。"),
+    H2("引入"),
+    Code("import { Radio } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["label","文字标签"],["checked","布尔或函数"],["onChange","(checked) => void"],["name","同组 name"]]),
+    H2("示例"),
+    Code("import { Radio } from 'xunay/kit'\nimport { signal, div } from 'xunay'\n\nfunction Form() {\n  const gender = signal('male')\n  return div(null,\n    Radio({ label: '男', name: 'g', checked: () => gender() === 'male', onChange: () => gender('male') }),\n    Radio({ label: '女', name: 'g', checked: () => gender() === 'female', onChange: () => gender('female') })\n  )\n}", "xuy"),
+  )
+}

@@ -1,0 +1,22 @@
+// 路线图
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("路线图"),
+    H2("v1.0 ✓"),
+    Ul("Signal 内核","元素渲染","列表 diff","事件委托","SSR",".xuy 编译器"),
+    H2("v1.0.1 ✓"),
+    Ul("sanitize——HTML 白名单","resource——异步三态","model——表单绑定","transition——FLIP","hydration——SSR 校验","devtools 完整版","类型声明","测试"),
+    H2("v1.1 计划"),
+    Ul("虚拟列表内置","表单库","路由库","Vite 插件发布 npm","Devtools 浏览器扩展"),
+    H2("v1.2 计划"),
+    Ul("SSR 完善（流式）","i18n 内置","动画库","React / Vue 桥接"),
+    H2("v2.0 愿景"),
+    Ul("编译器优化（编译期特化）","多后端运行时（Rust / WASM）","生态（组件库、工具链）","社区贡献者"),
+    H2("不做"),
+    Table(["不做","原因"], [["兼容 React","保留 VDOM 就没法精确更新"],["TS 重写","背离\"不写 TS\""],["Fiber 调度","同步渲染够快"],["大型组件库","kit 已够"],["商业化","保持开源"]]),
+    H2("现状"),
+    Table(["模块","状态"], [["核心运行时","稳定"],["编译器","稳定"],["四套后端","稳定"],["文档站","150 篇"],["DevTools","可用"],["npm 发布","待发布"],["生产验证","不足"]]),
+  )
+}

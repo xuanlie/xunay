@@ -1,0 +1,33 @@
+// hydrate
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("hydrate"),
+    P("hydrate 是\"接管已有 DOM\"——服务端已经渲染好 HTML，客户端不再重建，而是给这些 DOM 挂上事件和响应式。"),
+    H2("和 mount 的区别"),
+    Table(["","mount","hydrate"], [["目标","空容器","有内容的容器"],["行为","清空后重建","复用已有 DOM"],["速度","慢（从头创建）","快（绑定即可）"],["场景","纯客户端","SSR 后的客户端"]]),
+    H2("基础用法"),
+    Code("import { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')\n// 假设 #app 里已经有服务端渲染的 HTML", "xuy"),
+    H2("内部做什么"),
+    P("hydrate 遍历已有的 DOM 和 vnode，一一对应："),
+    Ul("DOM 元素类型和 vnode.type 一致 → 复用","挂上事件监听","建立 effect","给动态文本节点挂更新"),
+    H2("不匹配检测"),
+    P("如果服务端和客户端 vnode 结构不同，会打印警告到 console，然后降级到重建。"),
+    Code("// 服务端渲染：<div><span>0</span></div>\n// 客户端 vnode：div(null, span(null, '0'))\n// 匹配 → 只挂事件\n\n// 服务端渲染：<div><span>0</span></div>\n// 客户端 vnode：div(null, p(null, '0'))\n// 不匹配 → 警告 + 重建", "js"),
+    H2("什么时候用 hydrate"),
+    Ul("服务端已渲染","希望复用已有 DOM","首屏已有 HTML"),
+    Warn("如果容器是空的，用 mount 而不是 hydrate——hydrate 期望已有内容。"),
+    H2("数据一致性"),
+    P("服务端和客户端的初始 signal 值必须一致，否则会出现\"闪变\"。"),
+    Code("// 服务端：把初始数据序列化到 HTML\nconst initial = await fetchData()\nconst html = renderToString(App({ initial }))\n\nres.send(`\n  <div id=\"app\">${html}</div>\n  <script>window.__INITIAL__ = ${JSON.stringify(initial)}</script>\n`)\n\n// 客户端：读 window.__INITIAL__ 恢复状态\nconst initial = window.__INITIAL__\nhydrate(App({ initial }), '#app')", "xuy"),
+    H2("完整示例"),
+    Code("// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\napp.get('/', async (req, res) => {\n  const todos = await db.getTodos()\n  const html = renderToString(App({ initialTodos: todos }))\n  res.send(\n    '<!DOCTYPE html><html><body>' +\n    '<div id=\"app\">' + html + '</div>' +\n    '<script>window.__TODOS__ = ' + JSON.stringify(todos) + '</script>' +\n    '<script src=\"/client.js\"></script>' +\n    '</body></html>'\n  )\n})\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nconst initialTodos = window.__TODOS__ || []\nhydrate(App({ initialTodos }), '#app')", "xuy"),
+    H2("常见陷阱"),
+    H3("陷阱 1：容器里没内容"),
+    Code("// 错误：空的容器用 hydrate\n// <div id=\"app\"></div>\nhydrate(App(), '#app')\n\n// 正确：用 mount\nmount(App(), '#app')", "xuy"),
+    H3("陷阱 2：服务端和客户端初次渲染不同"),
+    Code("// 服务端：按 UTC 时间渲染\n// 客户端：按本地时间渲染\n// → hydration 不匹配警告", "js"),
+    P("所有依赖环境（时间、随机数、用户代理）的逻辑都放到 onMount 之后再执行。"),
+  )
+}

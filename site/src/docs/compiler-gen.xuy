@@ -1,0 +1,25 @@
+// 代码生成
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("代码生成"),
+    P("把 parser 输出的 AST 转成生成 DOM 的 JS 代码。118 行。"),
+    H2("核心函数"),
+    Code("export function genNode(node, indent, out) {\n  const pad = '  '.repeat(indent)\n\n  if (node.type === 'text') {\n    return { code: node.expr, isStatic: true }\n  }\n\n  if (node.type === 'dyn') {\n    return { code: node.expr, isDynamic: true }\n  }\n\n  if (node.type === 'tag') {\n    const v = nextVar(node.name)\n    const lines = []\n    lines.push(pad + 'const ' + v + ' = document.createElement(' + JSON.stringify(node.name) + ')')\n\n    // props\n    for (const p of node.props) {\n      if (p.k === 'on') {\n        // 事件\n        lines.push(pad + v + '.addEventListener(' + ... + ')')\n      } else if (p.k === 'class') {\n        lines.push(pad + v + '.className = ' + p.v)\n      } else {\n        lines.push(pad + v + '.setAttribute(' + JSON.stringify(p.k) + ', ' + p.v + ')')\n      }\n    }\n\n    // 子节点\n    for (const c of node.children) {\n      const r = genChild(c, indent, lines)\n      lines.push(pad + v + '.appendChild(' + r.code + ')')\n    }\n\n    return { code: v, lines, varName: v }\n  }\n}", "js"),
+    H2("生成的代码"),
+    Code("// 输入\ndiv({ class: 'card' },\n  h1(null, '标题'),\n  span(null, () => n())\n)\n\n// 输出（概念上）\n(() => {\n  const el1 = document.createElement('div')\n  el1.className = 'card'\n  const el2 = document.createElement('h1')\n  const t1 = document.createTextNode('标题')\n  el2.appendChild(t1)\n  el1.appendChild(el2)\n  const el3 = document.createElement('span')\n  const t2 = document.createTextNode('')\n  __rt__.bindText(t2, () => n())\n  el3.appendChild(t2)\n  el1.appendChild(el3)\n  return el1\n})()", "js"),
+    H2("变量命名"),
+    P("每个元素用 _div7、_span10、_t2 这种唯一名字。数字来自全局计数器，保证不冲突。"),
+    Code("let varCounter = 0\nfunction nextVar(prefix) {\n  return '_' + prefix + (varCounter++)\n}", "js"),
+    H2("静态优化"),
+    P("常量（字符串、数字）直接生成 createTextNode，动态的用 bindText。"),
+    Code("// 静态：一次创建\ndocument.createTextNode('hello')\n\n// 动态：建空文本 + 挂 effect\ndocument.createTextNode('')\n__rt__.bindText(textNode, () => 'n = ' + n())", "js"),
+    H2("IIFE 包装"),
+    P("每个 tag 调用被包成 IIFE（立即执行函数），返回生成的 DOM。这样能嵌进任何 JS 表达式。"),
+    Code("// 输入\nconst x = div(null, 'hi')\n\n// 输出\nconst x = (() => {\n  const el = document.createElement('div')\n  const t = document.createTextNode('hi')\n  el.appendChild(t)\n  return el\n})()", "js"),
+    H2("参数化模板"),
+    P("如果 tag 调用在箭头函数里，编译成工厂函数："),
+    Code("// 输入\nconst row = (r) => div(null, span(null, r.id))\n\n// 输出\nconst row = (r) => (() => {\n  const el = document.createElement('div')\n  const sp = document.createElement('span')\n  const t = document.createTextNode(String(r.id))\n  sp.appendChild(t)\n  el.appendChild(sp)\n  return el\n})()", "js"),
+  )
+}

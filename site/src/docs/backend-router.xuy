@@ -1,0 +1,21 @@
+// 路由表
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("路由表"),
+    P("所有接口的唯一真相源——shared/routes.json。"),
+    H2("结构"),
+    Code("{\n  \"routes\": [\n    {\n      \"name\": \"token\",\n      \"method\": \"GET\",\n      \"path\": \"/rpc/token\",\n      \"auth\": false,\n      \"handler\": \"handleToken\",\n      \"desc\": \"获取 token\"\n    },\n    {\n      \"name\": \"getTodos\",\n      \"method\": \"GET\",\n      \"path\": \"/rpc/getTodos\",\n      \"auth\": true,\n      \"handler\": \"handleGetTodos\",\n      \"desc\": \"获取列表\"\n    }\n  ]\n}", "json"),
+    H2("字段说明"),
+    Table(["字段","说明"], [["name","接口名（前端用）"],["method","HTTP 方法"],["path","URL 路径"],["auth","是否需要 token"],["handler","后端处理函数名"],["desc","描述"]]),
+    H2("四套后端都读它"),
+    P("Python / Node / Go / C++ 各自实现一个加载器，读取 routes.json 自动注册路由。"),
+    Code("# Python\nwith open('shared/routes.json') as f:\n    routes = json.load(f)['routes']\n\nfor r in routes:\n    handler = handlers[r['handler']]\n    app.add_api_route(r['path'], handler, methods=[r['method']])", "py"),
+    H2("增接口流程"),
+    Code("1. shared/routes.json 加一条\n2. 四套后端各加 handler 函数\n3. bash bin/check-routes.js 校验一致性\n4. bash bin/sync-routes.js 生成前端 API", "bash"),
+    H2("路由校验"),
+    P("check-routes.js 检查："),
+    Ul("JSON 格式正确","path 不重复","name 不重复","handler 在后端存在"),
+  )
+}

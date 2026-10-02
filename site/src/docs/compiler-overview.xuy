@@ -1,0 +1,28 @@
+// 总览
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("编译器总览"),
+    P("xuyc 是 xunay 的编译器——把 .xuy 文件编译成标准 JS。核心只有三个文件：tokenizer、parser、gen。"),
+    H2("为什么需要编译器"),
+    P(".xuy 就是 JS 加一个约定：标签名（div、span、button）当函数直接用，不用 import。这个替换由编译器完成。"),
+    Code("// 你写的 .xuy\nconst n = signal(0)\nreturn div(null, button(null, 'x'))\n\n// 编译后（概念上）\nimport { div, button } from 'xunay'\nconst n = signal(0)\nreturn div(null, button(null, 'x'))", "xuy"),
+    H2("三个文件"),
+    Table(["文件","职责","行数"], [["tokenizer.js","词法分析","40 行"],["parser.js","语法分析","204 行"],["gen.js","代码生成","118 行"]]),
+    P("加起来约 360 行——一个完整编译器。"),
+    H2("编译流程"),
+    Code("源代码 (.xuy)\n  ↓ tokenize()\nToken 数组\n  ↓ parse()\nAST（部分）\n  ↓ genFunction()\n可执行 JS\n  ↓ esbuild\n浏览器可跑", "txt"),
+    H2("和其他编译器对比"),
+    Table(["编译器","用途","行数"], [["Babel","JS → JS","~15 万"],["TypeScript","TS → JS","~30 万"],["Svelte","Svelte → JS","~5 万"],["Vue","Vue → JS","~8 万"],["xuyc","xuy → JS","~360"]]),
+    P("xuyc 做的事情特别少——只做标签名替换。所以能做到这么小。"),
+    H2("使用"),
+    Code("node bin/xuyc.js build app.xuy --out dist", "bash"),
+    H2("不用编译也能用"),
+    P("xunay 的核心是纯运行时的。不想用 .xuy 就直接写 JS——把 import 加上，其余一样。"),
+    Code("// 不编译，直接写 JS\nimport { div, button, signal, mount } from 'xunay'\n\nmount(() => div(null, button(null, 'x')), '#app')", "xuy"),
+    H2("下一步"),
+
+
+  )
+}

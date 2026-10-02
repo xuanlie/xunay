@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8"><title>XuNay 生命周期</title>
+<style>body{font-family:sans-serif;padding:2rem}button{padding:.5rem 1rem}</style>
+</head><body><div id="app"></div>
+<script type="module">
+import { div, button, span, sig, app, show, onMount, onUnmount, frag } from '../../core/src/all.js'
+const visible = sig(true)
+app(() => div(null,
+  button({ on: { click: () => visible(!visible()) } }, '切换'),
+  show(() => visible(), () => {
+    onMount(() => console.log('子组件挂载'))
+    onUnmount(() => console.log('子组件卸载'))
+    return frag(
+      span(null, 'A'),
+      span(null, 'B'),
+      span(null, 'C')
+    )
+  })
+), '#app')
+</script></body></html>

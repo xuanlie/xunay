@@ -1,0 +1,89 @@
+// title: XuNay 数据表格
+// 排序 / 筛选 / 分页 / 编辑
+import { div,h1,input,button,table,thead,tbody,tr,th,td,span,p,signal,computed,mount,list,show } from 'xunay'
+
+const makeData = () => Array.from({ length: 200 }, (_, i) => ({
+  id: i + 1,
+  name: ['张三','李四','王五','赵六','孙七','周八'][i % 6] + i,
+  age: 18 + (i * 7) % 50,
+  city: ['北京','上海','广州','深圳','杭州','成都'][i % 6],
+  score: 60 + (i * 13) % 40
+}))
+
+const rows = signal(makeData())
+const keyword = signal('')
+const sortKey = signal('id')
+const sortDir = signal('asc')
+const page = signal(1)
+const pageSize = 20
+
+const filtered = computed(() => {
+  const kw = keyword().toLowerCase().trim()
+  let r = rows()
+  if (kw) r = r.filter(x => x.name.toLowerCase().includes(kw) || x.city.toLowerCase().includes(kw))
+  const k = sortKey()
+  const d = sortDir() === 'asc' ? 1 : -1
+  r = [...r].sort((a, b) => (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * d)
+  return r
+})
+
+const total = computed(() => filtered().length)
+const pageCount = computed(() => Math.max(1, Math.ceil(total() / pageSize)))
+const paged = computed(() => {
+  const p = page()
+  return filtered().slice((p - 1) * pageSize, p * pageSize)
+})
+
+const sortBy = (k) => {
+  if (sortKey() === k) sortDir(sortDir() === 'asc' ? 'desc' : 'asc')
+  else { sortKey(k); sortDir('asc') }
+}
+
+const del = (id) => rows(rows().filter(r => r.id !== id))
+const edit = (id, key, val) => rows(rows().map(r => r.id === id ? { ...r, [key]: val } : r))
+
+mount(() => div({ class: 'app' },
+  h1(null, 'XuNay 数据表格'),
+  div({ class: 'bar' },
+    input({
+      class: 'inp',
+      placeholder: '搜索姓名或城市...',
+      value: () => keyword(),
+      on: { input: e => { keyword(e.target.value); page(1) } }
+    }),
+    span({ class: 'info' }, () => `共 ${total()} 条，第 ${page()} / ${pageCount()} 页`)
+  ),
+  table({ class: 'tbl' },
+    thead(null,
+      tr(null,
+        th({ class: 'sortable', on: { click: () => sortBy('id') } }, () => `ID ${sortKey() === 'id' ? (sortDir() === 'asc' ? '↑' : '↓') : ''}`),
+        th({ class: 'sortable', on: { click: () => sortBy('name') } }, () => `姓名 ${sortKey() === 'name' ? (sortDir() === 'asc' ? '↑' : '↓') : ''}`),
+        th({ class: 'sortable', on: { click: () => sortBy('age') } }, () => `年龄 ${sortKey() === 'age' ? (sortDir() === 'asc' ? '↑' : '↓') : ''}`),
+        th({ class: 'sortable', on: { click: () => sortBy('city') } }, () => `城市 ${sortKey() === 'city' ? (sortDir() === 'asc' ? '↑' : '↓') : ''}`),
+        th({ class: 'sortable', on: { click: () => sortBy('score') } }, () => `分数 ${sortKey() === 'score' ? (sortDir() === 'asc' ? '↑' : '↓') : ''}`),
+        th(null, '操作')
+      )
+    ),
+    tbody(null,
+      list(paged, r => r.id, r =>
+        tr(null,
+          td(null, r.id),
+          td(null, input({ class: 'cell', value: r.name, on: { change: e => edit(r.id, 'name', e.target.value) } })),
+          td(null, r.age),
+          td(null, r.city),
+          td(null, span({ class: () => `score ${r.score >= 90 ? 'hi' : r.score >= 75 ? 'mid' : 'lo'}` }, r.score)),
+          td(null, button({ class: 'del', on: { click: () => del(r.id) } }, '删除'))
+        )
+      )
+    )
+  ),
+  div({ class: 'pager' },
+    button({ class: 'btn', disabled: () => page() <= 1, on: { click: () => page(page() - 1) } }, '上一页'),
+    span(null, () => `${page()} / ${pageCount()}`),
+    button({ class: 'btn', disabled: () => page() >= pageCount(), on: { click: () => page(page() + 1) } }, '下一页')
+  )
+), '#app')
+
+const s = document.createElement('style')
+s.textContent = `*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;background:#f5f5f7;padding:24px}.app{max-width:1000px;margin:0 auto;background:#fff;border-radius:12px;padding:28px;box-shadow:0 4px 24px rgba(0,0,0,.06)}h1{font-size:22px;margin-bottom:16px}.bar{display:flex;gap:12px;align-items:center;margin-bottom:16px}.inp{flex:1;padding:8px 14px;font-size:14px;border:1px solid #ddd;border-radius:8px;outline:none}.info{font-size:13px;color:#888}.tbl{width:100%;border-collapse:collapse;font-size:14px}.tbl th{background:#f8f8fa;padding:10px 12px;text-align:left;font-weight:600;border-bottom:2px solid #eee}.sortable{cursor:pointer;user-select:none}.sortable:hover{background:#eef}.tbl td{padding:8px 12px;border-bottom:1px solid #f0f0f0}.cell{border:1px solid transparent;background:none;padding:4px 6px;font-size:14px;width:100%;border-radius:4px}.cell:focus{border-color:#1f6feb;background:#fff;outline:none}.score{padding:2px 8px;border-radius:4px;font-weight:600}.score.hi{background:#d4f4dd;color:#0a7}.score.mid{background:#fff3cd;color:#a80}.score.lo{background:#fdd;color:#c33}.del{padding:4px 10px;font-size:12px;background:#fdd;color:#c33;border:none;border-radius:4px;cursor:pointer}.pager{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:16px}.btn{padding:8px 16px;font-size:13px;background:#eee;border:none;border-radius:6px;cursor:pointer}.btn:disabled{opacity:.4;cursor:not-allowed}`
+document.head.appendChild(s)

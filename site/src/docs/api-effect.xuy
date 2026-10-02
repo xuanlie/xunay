@@ -1,0 +1,28 @@
+// effect(fn)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("effect(fn)"),
+    P("创建自动追踪依赖的副作用。"),
+    H2("签名"),
+    Code("const stop = effect(fn)", "js"),
+    H2("参数"),
+    Table(["参数","类型","说明"], [["fn","() => void | (() => void)","副作用函数，可返回清理函数"]]),
+    H2("返回值"),
+    P("返回一个停止函数 stop()。调用它会 dispose effect。"),
+    H2("示例"),
+    Code("const n = signal(0)\n\nconst stop = effect(() => {\n  console.log('n =', n())\n})\n// 立即执行一次 → 打印 n = 0\n\nn(1)      // 打印 n = 1\nstop()    // 停止\nn(2)      // 不打印", "xuy"),
+    H2("清理函数"),
+    Code("const interval = signal(1000)\n\neffect(() => {\n  const id = setInterval(tick, interval())\n  return () => clearInterval(id)   // 重跑前清理旧的\n})", "xuy"),
+    H2("特性"),
+    Ul("立即执行一次","依赖自动收集——执行时读到的 signal 都订阅","下次重跑前先清空旧依赖，重新收集","返回清理函数会在重跑前 / dispose 时调用"),
+    H2("生命周期"),
+    Code("// 1. 首次执行\n// 2. 依赖变化 → 跑清理函数 → 重跑\n// 3. stop() → 跑清理函数 → dispose", "js"),
+    H2("陷阱"),
+    H3("不要读写同一个 signal"),
+    Code("effect(() => {\n  n(n() + 1)   // 死循环\n})", "xuy"),
+    H3("异步读不算订阅"),
+    Code("effect(() => {\n  setTimeout(() => console.log(n()), 100)   // 不订阅 n\n})", "xuy"),
+  )
+}

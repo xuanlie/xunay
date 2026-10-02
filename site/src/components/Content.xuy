@@ -1,0 +1,26 @@
+// 主内容：按路由渲染对应文档
+import { div, span } from 'xunay'
+import { route } from '../router.xuy'
+import { docMap, docTitle } from '../docs-index.xuy'
+
+export function Content() {
+  return div({ class: 'content' },
+    () => {
+      const r = route()
+      if (r === '/') {
+        const Home = docMap['01-overview']
+        return Home ? Home() : div(null, '首页待补充')
+      }
+      const key = r.slice(1)
+      const Doc = docMap[key]
+      if (!Doc) {
+        return div({ class: 'not-found' },
+          div({ class: 'nf-code' }, '404'),
+          div({ class: 'nf-text' }, '找不到页面：' + r),
+          div({ class: 'nf-hint' }, '检查侧栏，或点击左上角回首页')
+        )
+      }
+      return Doc()
+    }
+  )
+}

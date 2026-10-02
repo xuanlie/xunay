@@ -1,0 +1,23 @@
+// 类型声明
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("类型声明"),
+    P("xunay 提供 d.ts 类型声明文件——编辑器有补全。"),
+    H2("文件位置"),
+    Code("types/xunay.d.ts", "txt"),
+    H2("核心类型"),
+    Code("// 信号\nexport type Signal<T> = {\n  (): T\n  (v: T | ((prev: T) => T)): T\n}\n\nexport type Accessor<T> = () => T\n\n// vnode\nexport interface VNode {\n  [ELEMENT]: true\n  type: string\n  props: Record<string, unknown>\n  children: unknown[]\n}\n\nexport type Child = VNode | string | number | boolean | null | (() => unknown)", "ts"),
+    H2("API 声明"),
+    Code("export function signal<T>(init: T): Signal<T>\nexport function computed<T>(fn: () => T): Accessor<T>\nexport function effect(fn: () => void): () => void\nexport function batch(fn: () => void): void\n\nexport function mount(comp: () => VNode, target: string | Element): () => void\n\nexport function list<T>(\n  arr: T[] | Accessor<T[]>,\n  keyFn: (item: T) => string | number,\n  renderFn: (item: T) => VNode\n): () => { __xunay_list: true }\n\nexport function show(cond: Accessor<boolean>, renderFn: () => VNode): unknown", "ts"),
+    H2("标签声明"),
+    Code("export const tags: Record<string, (p: Props | null, ...c: Child[]) => VNode>\nexport const div: typeof tags.div\nexport const span: typeof tags.span\nexport const button: typeof tags.button\nexport const input: typeof tags.input", "ts"),
+    H2("在项目里用"),
+    Code("// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"types\": [\"./types/xunay.d.ts\"]\n  }\n}", "json"),
+    H2("在 .xuy 里的类型"),
+    P(".xuy 是 JS，不写类型。但编辑器读 d.ts 后能给 .xuy 里的 API 补全。"),
+    H2("不写 TS 的设计"),
+    P("xunay 的设计哲学明确\"不写 TS\"。d.ts 是给使用方的可选便利，不是框架内部的要求。"),
+  )
+}

@@ -1,0 +1,30 @@
+// 编译流程
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("编译流程"),
+    P("从 .xuy 到能在浏览器跑的 JS，一共 5 步。"),
+    H2("流程图"),
+    Code("app.xuy\n  ↓ [1] 读取源码\n源代码字符串\n  ↓ [2] tokenize()\nToken 数组\n  ↓ [3] parse()\nRawNode 数组（tag 调用的位置）\n  ↓ [4] genFunction()\n替换后的 JS 字符串\n  ↓ [5] esbuild 打包\napp.js（浏览器可执行）", "txt"),
+    H2("第 1 步：读源码"),
+    Code("const src = fs.readFileSync('app.xuy', 'utf8')", "js"),
+    H2("第 2 步：tokenize"),
+    P("把源码切成 token——关键字、标识符、标点、字符串等。"),
+    Code("// tokenize('div(null, \"x\")')\n[\n  { t: 'id', v: 'div' },\n  { t: 'p', v: '(' },\n  { t: 'id', v: 'null' },\n  { t: 'p', v: ',' },\n  { t: 'str', v: '\"x\"' },\n  { t: 'p', v: ')' }\n]", "js"),
+    H2("第 3 步：parse"),
+    P("扫描源码，找出所有 tag 调用的位置和结构。"),
+    Code("// parse('div(null, \"x\")')\n[\n  {\n    type: 'raw',\n    start: 0,\n    end: 14,\n    node: {\n      type: 'tag',\n      name: 'div',\n      props: [],\n      children: [{ type: 'text', expr: '\"x\"' }]\n    }\n  }\n]", "js"),
+    H2("第 4 步：genFunction"),
+    P("把每个 tag 调用替换成生成 DOM 的代码。"),
+    Code("// 输入\ndiv(null, 'hello')\n\n// 输出\n(() => {\n  const el = document.createElement('div')\n  const t = document.createTextNode('hello')\n  el.appendChild(t)\n  return el\n})()", "js"),
+    H2("第 5 步：esbuild"),
+    P("把编译后的 JS 和 xunay 运行时打包成一个文件。"),
+    Code("esbuild.build({\n  entryPoints: ['app.js'],\n  bundle: true,\n  minify: true,\n  format: 'esm',\n  outfile: 'dist/app.js'\n})", "js"),
+    H2("完整代码"),
+    Code("// bin/xuyc.js\nconst src = fs.readFileSync(entry, 'utf8')\nconst nodes = parse(src)\nconst js = genFunction(entry, nodes, src)\nfs.writeFileSync('temp.js', js)\n\nawait esbuild.build({\n  entryPoints: ['temp.js'],\n  bundle: true,\n  outfile: 'dist/app.js'\n})", "js"),
+    H2("增量编译"),
+    P("改一个文件时不用重编译所有 .xuy——编译器维护缓存，只处理变化的。"),
+    Code("const cache = new Map()\nfunction processFile(file) {\n  if (cache.has(file)) return cache.get(file)\n  // ... 编译\n  cache.set(file, out)\n  return out\n}", "js"),
+  )
+}

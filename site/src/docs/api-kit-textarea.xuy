@@ -1,0 +1,15 @@
+// kit: Textarea
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Textarea"),
+    P("多行文本框。跟 Input 类似，多了 rows。"),
+    H2("引入"),
+    Code("import { Textarea } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["label","标签"],["value","值"],["onChange","(v) => void"],["rows","行数（默认 4）"],["error","错误提示"],["placeholder","占位符"]]),
+    H2("示例"),
+    Code("import { Textarea } from 'xunay/kit'\nimport { signal, div } from 'xunay'\n\nfunction Form() {\n  const bio = signal('')\n  return div(null,\n    Textarea({\n      label: '个人简介',\n      value: () => bio(),\n      onChange: v => bio(v),\n      rows: 6,\n      placeholder: '介绍一下自己…'\n    }),\n    div(null, () => bio().length + ' 字符')\n  )\n}", "xuy"),
+  )
+}

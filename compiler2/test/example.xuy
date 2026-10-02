@@ -1,0 +1,13 @@
+const { n, sig, app } = __rt__
+
+app(() => div({ class: 'box' },
+  button({ on: { click: () => n(v => v - 1) } }, '-'),
+  span(null, () => `n = ${n()}`),
+  button({ on: { click: () => n(v => v + 1) } }, '+')
+), '#app')
+
+const row = (r) => div({ class: 'row' },
+  span({ class: 'id' }, r.id),
+  span({ class: 'label' }, r.label),
+  span({ class: 'del' }, 'x')
+)

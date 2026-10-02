@@ -1,0 +1,15 @@
+// kit: Input
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Input"),
+    P("kit 里的输入框组件。带 label / error / hint。"),
+    H2("引入"),
+    Code("import { Input } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","类型","说明"], [["label","string","标签"],["value","string | () => string","值"],["onChange","(v) => void","值变化回调"],["placeholder","string","占位符"],["error","string","错误提示"],["hint","string","辅助提示"],["type","\"text\" | \"password\" | ...","输入类型"],["disabled","boolean","禁用"]]),
+    H2("示例"),
+    Code("import { Input } from 'xunay/kit'\nimport { signal, div } from 'xunay'\n\nfunction Form() {\n  const name = signal('')\n  const err = () => name().length < 2 ? '至少 2 个字' : ''\n\n  return div(null,\n    Input({\n      label: '用户名',\n      value: () => name(),\n      onChange: v => name(v),\n      error: err(),\n      hint: '输入你的名字'\n    })\n  )\n}", "xuy"),
+  )
+}

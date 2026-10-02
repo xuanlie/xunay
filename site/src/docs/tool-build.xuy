@@ -1,0 +1,24 @@
+// 构建配置
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("构建配置"),
+    P("xuyc 的构建行为可以通过 package.json 和命令行参数控制。"),
+    H2("package.json 配置"),
+    Code("{\n  \"scripts\": {\n    \"build\": \"node ../bin/xuyc.js build app.xuy --out dist\",\n    \"dev\": \"npm run build && cd dist && python3 -m http.server 8080\",\n    \"deploy\": \"bash deploy.sh\"\n  },\n  \"xunay\": {\n    \"devtools\": true\n  }\n}", "json"),
+    H2("命令行参数"),
+    Code("node bin/xuyc.js build app.xuy --out public", "bash"),
+    H2("产物结构"),
+    Code("dist/\n├── index.html\n├── app.js\n├── xunay.js\n├── tw.css\n├── ui.css\n└── src/", "txt"),
+    H2("构建流程"),
+    Ul("1. 生成 .xuy → .js","2. esbuild 打包 + minify","3. 复制 xunay.js","4. 收集 CSS","5. 生成 index.html"),
+    H2("环境区分"),
+    Code("# 开发\nNODE_ENV=development node bin/xuyc.js build app.xuy\n\n# 生产\nNODE_ENV=production node bin/xuyc.js build app.xuy", "bash"),
+    H2("多入口"),
+    P("xuyc 一次只处理一个入口。多入口自己写脚本："),
+    Code("#!/bin/bash\nnode bin/xuyc.js build app.xuy --out dist/app\nnode bin/xuyc.js build admin.xuy --out dist/admin", "bash"),
+    H2("构建时长"),
+    Table(["项目大小","构建耗时"], [["1 个 .xuy","~200ms"],["10 个 .xuy","~500ms"],["100 个 .xuy","~2s"]]),
+  )
+}

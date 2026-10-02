@@ -1,0 +1,21 @@
+// Vite 集成
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Vite 集成"),
+    P("xuyc 自带构建，但也能接 Vite——如果你想用 Vite 的生态。"),
+    H2("插件代码"),
+    Code("// build/vite-plugin-xunay.js\nimport { readFileSync } from 'node:fs'\nimport { tokenize } from '../compiler2/src/tokenizer.js'\nimport { parse } from '../compiler2/src/parser.js'\nimport { genFunction } from '../compiler2/src/gen.js'\n\nconst XUY = /\\.xuy$/\n\nexport default function xunay() {\n  return {\n    name: 'vite-plugin-xunay',\n    enforce: 'pre',\n    transform(src, id) {\n      if (!XUY.test(id)) return null\n      const raw = src || readFileSync(id, 'utf8')\n      let nodes, code\n      try {\n        nodes = parse(raw)\n        code = genFunction(id, nodes, raw)\n      } catch (e) {\n        this.error(e.message)\n      }\n      return { code, map: null }\n    }\n  }\n}", "js"),
+    H2("配置"),
+    Code("// vite.config.js\nimport { defineConfig } from 'vite'\nimport xunay from './build/vite-plugin-xunay.js'\n\nexport default defineConfig({\n  plugins: [xunay()]\n})", "js"),
+    H2("用法"),
+    Code("vite dev    # 开发服务器\nvite build  # 生产构建", "bash"),
+    H2("vs xuyc"),
+    Table(["","xuyc","Vite + plugin"], [["安装","零依赖","~50MB"],["配置","零","vite.config"],["HMR","无","有"],["构建速度","快","快"],["生态","无","丰富"]]),
+    H2("什么时候用 Vite"),
+    Ul("需要 HMR","需要复杂构建配置","需要插件生态（PostCSS、Tailwind 等）","团队已经用 Vite"),
+    H2("什么时候不用"),
+    Ul("个人小项目","学习框架","不想装 50MB 依赖","要最简构建"),
+  )
+}

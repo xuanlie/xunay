@@ -1,0 +1,21 @@
+// 插件
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("插件"),
+    P("xuyc 没有正式的插件系统——但可以通过修改源码或预处理扩展。"),
+    H2("为什么没插件系统"),
+    P("xuyc 只做一件事，做的事情足够少——加插件系统本身会变成额外的复杂度。"),
+    H2("三种扩展方式"),
+    H3("1. 预处理脚本"),
+    Code("// preprocess.js\nimport fs from 'node:fs'\n\nconst files = ['app.xuy', 'src/Home.xuy']\nfor (const f of files) {\n  let s = fs.readFileSync(f, 'utf8')\n  // 把 @click 换成 on: { click\n  s = s.replace(/@(\\w+):/g, 'on: { $1:')\n  fs.writeFileSync(f, s)\n}\n\n// 然后跑 xuyc\nnode preprocess.js && node bin/xuyc.js build app.xuy", "js"),
+    H3("2. 直接改编译器"),
+    P("xuyc 只有 360 行——fork 后直接改。"),
+    Code("// gen.js 加自定义处理\nif (p.k === 'myCustomProp') {\n  lines.push(pad + v + '.setAttribute(\"data-custom\", ' + p.v + ')')\n}", "js"),
+    H3("3. 用 build API"),
+    Code("import { parse } from './compiler2/src/parser.js'\nimport { genFunction } from './compiler2/src/gen.js'\nimport esbuild from 'esbuild'\n\n// 自定义编译流程\nconst src = fs.readFileSync('app.xuy', 'utf8')\nlet js = genFunction('app', parse(src), src)\n\n// 后处理\njs = js.replace(/console\\.log/g, '')\n\nawait esbuild.build({ entryPoints: ['temp.js'], bundle: true, outfile: 'dist/app.js' })", "js"),
+    H2("常见的扩展"),
+    Table(["需求","方式"], [["加新标签","改 tokenizer TAGS"],["加语法糖","改 parser"],["改生成代码","改 gen.js"],["加后处理","build 脚本里替换产物"],["加 CSS 处理","build.sh 里跑 tailwind"]]),
+  )
+}

@@ -1,0 +1,15 @@
+// 安装
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("安装"),
+    P("XuNay 提供三种引入方式。"),
+    H2("CDN（最快）"),
+    Code("<script src=\"https://unpkg.com/xunay/dist/xunay.min.js\"></script>", "html"),
+    H2("npm（推荐）"),
+    Code("npm install xunay", "bash"),
+    H2("可选模块"),
+    Code("import { Btn, Input } from 'xunay/kit'\nimport { openDevtools } from 'xunay/devtools'\nimport { renderToString } from 'xunay/ssr'", "js"),
+  )
+}

@@ -1,0 +1,35 @@
+// 概念对照
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("概念对照"),
+    P("从 React 或 Vue 过来，下面这几张表让你 30 秒上手 xunay。"),
+    H2("核心 API 对照"),
+    Table(["XuNay","React","Vue 3"], [["signal(0)","useState(0)","ref(0)"],["n()","n","n.value"],["n(1)","setN(1)","n.value = 1"],["n(v => v + 1)","setN(v => v + 1)","n.value++"],["computed(fn)","useMemo(fn, deps)","computed(fn)"],["effect(fn)","useEffect(fn, deps)","watchEffect(fn)"],["mount(App, \"#app\")","createRoot().render()","createApp().mount()"],["list(arr, key, fn)","arr.map(fn)","v-for"],["show(cond, fn)","cond ? A : B","v-if"],["frag(a, b)","<>{a}{b}</>","<template>"],["onMount(fn)","useEffect(fn, [])","onMounted(fn)"],["onUnmount(fn)","useEffect(() => fn, [])","onUnmounted(fn)"],["ref()","useRef()","ref()"],["ctx(default)","createContext()","provide/inject"]]),
+    H2("渲染模型对比"),
+    Table(["","XuNay","React","Vue 3"], [["组件执行次数","1 次","每次状态变","1 次"],["更新粒度","节点","组件","节点"],["虚拟 DOM","无","有","有"],["Diff","无","组件树 diff","模板 diff"],["依赖收集","运行时自动","手动数组","编译期 + 运行时"]]),
+    H2("心智模型"),
+    P("这是最关键的区别——React 里组件是\"可重复执行的函数\"；xunay 里组件只执行一次，之后只有包着 signal 的小函数重跑。"),
+    Code("// React：count 变了，Counter 整个重跑\nfunction Counter() {\n  const [count, setCount] = useState(0)\n  const other = expensive()   // 每次重跑都算\n  return <div><span>{count}</span></div>\n}\n\n// XuNay：count 变了，只有最后一个函数重跑\nfunction Counter() {\n  const count = signal(0)\n  const other = expensive()   // 只跑一次\n  return div(null, span(null, () => count()))\n}", "xuy"),
+    H2("Hooks 对比"),
+    Table(["React Hooks","XuNay"], [["useState","signal"],["useMemo","computed"],["useEffect","effect"],["useRef","ref"],["useContext","ctx"],["useCallback","不需要（组件只跑一次）"],["useReducer","signal + 手写 reducer"],["React.memo","不需要（精确更新）"],["Hooks 顺序规则","不存在"],["依赖数组","不存在（自动收集）"]]),
+    H2("打包体积对比"),
+    Table(["框架","gzip 大小"], [["React 18 + ReactDOM","~45 KB"],["Vue 3","~34 KB"],["Preact","~4 KB"],["Solid","~7 KB"],["XuNay 核心","~4.7 KB"]]),
+    H2("性能对比（1000 项列表更新）"),
+    Table(["操作","React","Vue 3","XuNay"], [["创建 1000 行","~90ms","~70ms","~40ms"],["更新 1 行文本","~5ms","~3ms","~0.2ms"],["交换两行","~15ms","~10ms","~0.5ms"],["删除 1 行","~8ms","~5ms","~0.3ms"]]),
+    P("差距来自\"无 diff\"——xunay 知道数据变了就直接改对应节点，不重建整棵树。"),
+    H2("常见写法的对照"),
+    H3("计数器"),
+    H3("列表"),
+    Code("// React\n{todos.map(t => <li key={t.id}>{t.title}</li>)}\n\n// Vue 3\n<li v-for=\"t in todos\" :key=\"t.id\">{{ t.title }}</li>\n\n// XuNay\nlist(todos, t => t.id, t => li(null, t.title))", "xuy"),
+    H3("条件"),
+    Code("// React\n{open && <div>内容</div>}\n\n// Vue 3\n<div v-if=\"open\">内容</div>\n\n// XuNay\nshow(() => open(), () => div(null, '内容'))", "xuy"),
+    H3("事件"),
+    H2("迁移建议"),
+    Ul("useState → signal","useMemo → computed","useEffect → effect 或 onMount","useRef → ref","useContext → ctx","useCallback → 删掉（不需要）","React.memo → 删掉（自动精确更新）"),
+    H2("下一步"),
+
+
+  )
+}

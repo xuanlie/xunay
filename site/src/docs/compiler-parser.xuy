@@ -1,0 +1,24 @@
+// 语法分析
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("语法分析"),
+    P("扫描源码，找出所有 tag 调用的起止位置和结构。204 行。"),
+    H2("策略"),
+    P("xuyc 不做全量 AST。它只扫描 tag 调用，其他代码原样保留。"),
+    Code("// 输入\nconst n = signal(0)\nreturn div(null, span(null, 'x'))\n\n// parse 只关心 div(...) 和 span(...)\n// 其他代码不动", "xuy"),
+    H2("核心函数"),
+    Table(["函数","作用"], [["parse(src)","扫描所有 tag 调用"],["parseTag()","解析一个 tag 调用"],["parseProps()","解析 { class: \"x\" }"],["parseChild()","解析子节点"],["readArg()","读到逗号或右括号"],["readBracket()","读完整括号内容"]]),
+    H2("扫描逻辑"),
+    Code("export function parse(src) {\n  const result = []\n  let pos = 0\n  while (pos < src.length) {\n    skipWs()\n    const c = src[pos]\n    if (/[a-z]/.test(c)) {\n      const saved = pos\n      const name = readIdent()\n      if (TAGS.has(name) && src[pos] === '(') {\n        pos = saved\n        const node = parseTag()\n        if (node) {\n          result.push({ type: 'raw', node, start: saved, end: pos })\n          continue\n        }\n      }\n      pos = saved + name.length\n      continue\n    }\n    pos++\n  }\n  return result\n}", "js"),
+    H2("输出结构"),
+    Code("[\n  {\n    type: 'raw',\n    start: 20,   // 在源码中的起始位置\n    end: 47,     // 结束位置\n    node: {\n      type: 'tag',\n      name: 'div',\n      props: [{ k: 'class', v: '\"card\"' }],\n      children: [\n        { type: 'text', expr: '\"hello\"' },\n        { type: 'tag', name: 'span', props: null, children: [...] }\n      ]\n    }\n  }\n]", "js"),
+    H2("为什么不做全量 AST"),
+    Ul("简单——只处理标签，其他代码原样","快——一遍扫描，不递归","不易出错——没有复杂的优先级处理","够用——.xuy 只需要这一个功能"),
+    H2("局限"),
+    P("解析器不知道 JS 作用域。以下情况会出错："),
+    Code("// 字符串里的 div( 会被误认\nconst s = 'div(null, \"x\")'   // 字符串\n\n// 但实际测试里，在 tag 调用外的 div( 不会被误处理", "xuy"),
+    P("实际场景中影响极小——.xuy 不鼓励在字符串里写代码片段。"),
+  )
+}

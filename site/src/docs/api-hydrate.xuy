@@ -1,0 +1,19 @@
+// hydrate
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("hydrate"),
+    P("客户端接管 SSR 渲染的 DOM。"),
+    H2("签名"),
+    Code("import { hydrate } from \"xunay/ssr\"\nhydrate(comp, target)", "js"),
+    H2("示例"),
+    Code("import { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')", "xuy"),
+    H2("行为"),
+    Table(["DOM 和 vnode","处理"], [["一致","复用 + 挂事件"],["不一致","警告 + 重建"]]),
+    H2("vs mount"),
+    Table(["","mount","hydrate"], [["目标","空容器","有内容"],["行为","清空 + 创建","复用"]]),
+    H2("陷阱"),
+    P("容器必须已有 SSR 内容。空容器用 mount。"),
+  )
+}

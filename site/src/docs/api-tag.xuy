@@ -1,0 +1,15 @@
+// tag(name)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("tag(name)"),
+    P("生成自定义标签工厂。"),
+    H2("签名"),
+    Code("const video = tag(\"video\")", "js"),
+    H2("示例"),
+    Code("import { tag } from 'xunay'\n\nconst video = tag('video')\nconst canvas = tag('canvas')\n\nvideo({ src: '/a.mp4', controls: true })\ncanvas({ width: 800, height: 600 })", "xuy"),
+    H2("vs createElement"),
+    Table(["","tag","createElement"], [["用法","tag(\"video\")(props)","createElement(\"video\", props)"],["复用","可缓存工厂","每次调用"]]),
+  )
+}

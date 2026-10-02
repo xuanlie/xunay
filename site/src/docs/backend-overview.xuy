@@ -1,0 +1,32 @@
+// 总览
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("后端总览"),
+    P("xunay 提供四套后端实现（Node / Python / Go / C++），共享同一份路由表和 RPC 协议。"),
+    H2("为什么四套"),
+    P("不是\"多此一举\"，是\"换语言不用改前端\"。同一份前端代码配任意后端都能跑。"),
+    Table(["后端","技术栈","端口"], [["Node","原生 http","12341"],["Python","FastAPI + granian","12342"],["Go","net/http","12343"],["C++","httplib","12344"]]),
+    H2("切换后端"),
+    P("改 xunay.config.json 一行："),
+    Code("{\n  \"backend\": \"python\",\n  \"ports\": {\n    \"node\": 12341,\n    \"python\": 12342,\n    \"go\": 12343,\n    \"cpp\": 12344\n  }\n}", "json"),
+    P("然后 `bash bin/start.sh`。前端不用改任何代码。"),
+    H2("路由唯一真相源"),
+    P("所有接口定义在 shared/routes.json："),
+    Code("{\n  \"routes\": [\n    { \"name\": \"token\", \"method\": \"GET\", \"path\": \"/rpc/token\", \"auth\": false },\n    { \"name\": \"getTodos\", \"method\": \"GET\", \"path\": \"/rpc/getTodos\", \"auth\": true },\n    { \"name\": \"addTodo\", \"method\": \"POST\", \"path\": \"/rpc/addTodo\", \"auth\": true }\n  ]\n}", "json"),
+    P("四套后端都读这份文件——加接口只改一处。"),
+    H2("RPC 协议"),
+    Code("// 请求\nGET /rpc/getTodos\nAuthorization: Bearer <token>\n\n// 响应\n{\n  \"ok\": true,\n  \"data\": [...],\n  \"error\": null\n}", "txt"),
+    H2("目录结构"),
+    Code("backends/\n├── node/       server.js + handlers.js + db.js\n├── python/     main.py + handlers.py + db.py\n├── go/         main.go + handlers.go + db.go\n└── cpp/        main.cpp + handlers.cpp + db.cpp", "txt"),
+    H2("前端调用"),
+    P("前端不写 URL——RPC 客户端自动生成："),
+    Code("import { client } from './api/client.js'\n\nconst todos = await client.get('/rpc/getTodos')\nawait client.post('/rpc/addTodo', { title: '新任务' })", "xuy"),
+    H2("增删接口"),
+    Code("1. 改 shared/routes.json 加一条\n2. 四套后端的 handlers 各加一个函数\n3. 前端 RPC 客户端自动可用\n4. bash bin/check-routes.js 校验", "bash"),
+    H2("下一步"),
+
+
+  )
+}

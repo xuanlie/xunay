@@ -1,0 +1,35 @@
+// 版本历史
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("版本历史"),
+    H2("v1.0.1"),
+    P("核心加固与优化。"),
+    H3("新增"),
+    Ul("sanitize.js —— HTML 白名单净化","resource.js —— 异步三态助手","model.js —— 表单双向绑定","transition.js —— FLIP 过渡","hydration.js —— SSR 校验","devpanel.js —— 调试面板","errors.js —— 编译器错误提示","vite-plugin-xunay.js —— Vite 插件","types/xunay.d.ts —— 类型声明","test/core.test.js —— core 测试","test/compiler.test.js —— 编译器测试"),
+    H3("性能"),
+    Table(["操作","v1.0.0","v1.0.1"], [["signal 读","262ns","128ns"],["signal 写","272ns","183ns"],["触发 effect","988ns","650ns"],["computed 写触发","2528ns","1263ns"],["batch","7212ns","4829ns"]]),
+    P("signal 读快 2 倍。"),
+    H3("修复"),
+    Ul("render.js 探针污染——动态子节点判断时误追踪外层 effect","renderDyn 不跑 onMount——动态节点里 onMount 静默失效","fastUpdate 错误复用——函数子节点被跳过但父节点被判为可复用","example.xuy 参数化模板——裸 tag 引用未定义变量","包体积虚高——kit / devtools 全打进核心"),
+    H3("包体积"),
+    Table(["产物","gzip"], [["xunay.esm.js","5.9 KB"],["xunay.min.js","6.2 KB"],["xunay-devtools.min.js","3.9 KB"],["xunay-kit.min.js","14.5 KB"],["xunay-full.min.js","19.4 KB"]]),
+    H2("v1.0.0"),
+    H3("核心"),
+    Ul("Signal 内核——signal / computed / effect / batch","元素渲染——createElement + render + mount","列表——list + key 复用 + fastUpdate","事件委托 / 条件渲染 / Fragment / 生命周期","进阶——ref / ctx / err / lazy / trans / ssr / hydrate / devtool","gzip 4.5KB，零依赖"),
+    H3("全栈"),
+    Ul("shared/routes.json 路由唯一真相源","四个后端——Node / Python / Go / C++","统一 RPC 客户端，前端不写 URL","端口配置化（xunay.config.json）","一键切换后端","路由一致性校验"),
+    H3("工具"),
+    Ul("bin/create.js —— 脚手架","bin/xuyc.js —— .xuy 构建工具","bin/switch.js —— 后端切换","bin/check-routes.js —— 路由校验","bin/sync-routes.js —— 路由同步","bin/start.sh —— 启动脚本"),
+    H3("文档"),
+    Ul("文档站 125 篇（12 组）","Playground 在线编辑器","代码块复制按钮","上一篇 / 下一篇导航"),
+    H3("示例"),
+    Ul("计数器 / Todo / 1000 行列表 / 生命周期","完整 Todo / 聊天 / 表格 / 表单验证","myapp 大项目骨架","demo 脚手架示例"),
+    H2("版本规则"),
+    Table(["版本","含义"], [["主版本","破坏性变更"],["次版本","新增功能"],["补丁","bug 修复"]]),
+    H2("升级指南"),
+    P("从 v1.0.0 升级到 v1.0.1："),
+    Ul("无破坏性变更","可选引入 sanitize / resource 等新模块","旧代码无需改动"),
+  )
+}

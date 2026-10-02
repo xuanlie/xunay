@@ -1,0 +1,15 @@
+// kit: Checkbox
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Checkbox"),
+    P("复选框组件。"),
+    H2("引入"),
+    Code("import { Checkbox } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["label","文字标签"],["checked","布尔或函数"],["onChange","(checked) => void"],["disabled","禁用"]]),
+    H2("示例"),
+    Code("import { Checkbox } from 'xunay/kit'\nimport { signal, div } from 'xunay'\n\nfunction Form() {\n  const agree = signal(false)\n  return div(null,\n    Checkbox({\n      label: '我同意条款',\n      checked: () => agree(),\n      onChange: v => agree(v)\n    })\n  )\n}", "xuy"),
+  )
+}

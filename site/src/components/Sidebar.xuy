@@ -1,0 +1,25 @@
+// 侧栏导航
+import { div, span, a } from 'xunay'
+import { nav } from '../docs-nav.xuy'
+import { route, go } from '../router.xuy'
+
+export function Sidebar({ onPick }) {
+  const isOpen = window.__sidebarOpen || (window.__sidebarOpen = { v: false })
+  return div({ class: 'sidebar' },
+    div({ class: 'sidebar-brand', on: { click: () => go('/') } },
+      span({ class: 'brand-logo' }, 'X'),
+      span({ class: 'brand-name' }, 'XuNay'),
+      span({ class: 'brand-ver' }, 'v1.0')
+    ),
+    div({ class: 'sidebar-body' },
+      ...nav.map(g => div({ class: 'nav-group' },
+        div({ class: 'nav-group-title' }, g.group),
+        ...g.items.map(it => a({
+          class: () => 'nav-item' + (route() === '/' + it.slug ? ' on' : ''),
+          href: '#' + it.slug,
+          on: { click: () => { if (onPick) onPick() } }
+        }, it.title))
+      ))
+    )
+  )
+}

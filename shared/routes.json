@@ -1,0 +1,10 @@
+{
+  "_comment": "路由唯一真相源。所有后端从这里读，前端也从这里生成 API。",
+  "routes": [
+    { "name": "token",      "method": "GET",  "path": "/rpc/token",      "auth": false, "handler": "handleToken",       "desc": "获取 token" },
+    { "name": "getTodos",   "method": "GET",  "path": "/rpc/getTodos",   "auth": true,  "handler": "handleGetTodos",    "desc": "获取列表" },
+    { "name": "addTodo",    "method": "POST", "path": "/rpc/addTodo",    "auth": true,  "handler": "handleAddTodo",     "desc": "新建" },
+    { "name": "toggleTodo", "method": "POST", "path": "/rpc/toggleTodo", "auth": true,  "handler": "handleToggleTodo",  "desc": "切换完成" },
+    { "name": "deleteTodo", "method": "POST", "path": "/rpc/deleteTodo", "auth": true,  "handler": "handleDeleteTodo",  "desc": "删除" }
+  ]
+}

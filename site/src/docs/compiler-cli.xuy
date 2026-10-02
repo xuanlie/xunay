@@ -1,0 +1,23 @@
+// xuyc 命令
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("xuyc 命令"),
+    P("xuyc 是命令行工具，一个命令搞定编译。"),
+    H2("语法"),
+    Code("xuyc build <entry.xuy> [--out <dir>]", "txt"),
+    H2("参数"),
+    Table(["参数","必填","说明"], [["build","是","固定子命令"],["entry.xuy","是","入口文件"],["--out dir","否","输出目录（默认 dist）"]]),
+    H2("示例"),
+    Code("# 基本\nnode bin/xuyc.js build app.xuy\n\n# 指定输出\nnode bin/xuyc.js build app.xuy --out public\n\n# 从子目录\ncd myapp && node ../bin/xuyc.js build app.xuy --out dist", "bash"),
+    H2("行为"),
+    Ul("读入口 .xuy","递归处理所有 .xuy 依赖","把 from \"xunay\" 替换成本地路径","esbuild 打包 + minify","复制 CSS","生成 index.html"),
+    H2("输出文件"),
+    Code("<out>/\n├── index.html        自动生成（读入口的 // title:）\n├── app.js            打包产物\n├── xunay.js          xunay 运行时\n├── tw.css            内置样式\n├── ui.css            内置样式\n└── src/              复制的 CSS", "txt"),
+    H2("环境变量"),
+    Table(["变量","作用"], [["NODE_ENV=production","启用完整 minify"]]),
+    H2("退出码"),
+    Table(["码","含义"], [["0","成功"],["1","参数错误 / 文件不存在 / 编译失败"]]),
+  )
+}

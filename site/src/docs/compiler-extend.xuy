@@ -1,0 +1,25 @@
+// 扩展编译器
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("扩展编译器"),
+    P("xuyc 只有 360 行——想加功能可以直接改。"),
+    H2("加新标签"),
+    P("内置标签列表在 tokenizer.js 的 TAGS 里。"),
+    Code("// tokenizer.js\nconst TAGS = new Set('div span p a button input ...'.split(' '))\n\n// 加新标签\nTAGS.add('video')\nTAGS.add('canvas')\nTAGS.add('audio')", "js"),
+    H2("加属性处理"),
+    P("在 gen.js 里扩展属性分派："),
+    Code("// gen.js\nfor (const p of node.props) {\n  if (p.k === 'on') { ... }\n  else if (p.k === 'class') { ... }\n  else if (p.k === 'myCustomProp') {\n    // 自定义处理\n    lines.push(pad + v + '.myProp = ' + p.v)\n  }\n  else { ... }\n}", "js"),
+    H2("加语法糖"),
+    P("比如支持 @click 简写——在 parser 里处理："),
+    Code("// 输入\ndiv({ '@click': handler })\n\n// 在 parseProps 里转换\nif (k.startsWith('@')) {\n  out.push({ k: 'on', v: '{ ' + k.slice(1) + ': ' + v + ' }' })\n}", "js"),
+    H2("加新的文件类型"),
+    P("想支持 .xuyx（带扩展语法）——复制一份编译器，改 tokenizer / parser。"),
+    H2("不改源码的方式"),
+    P("写一个预处理脚本，把自定义语法转成标准 .xuy："),
+    Code("// preprocess.js\nconst src = fs.readFileSync('app.xuyx', 'utf8')\nconst transformed = src.replace(/@click/g, 'on: { click')\nfs.writeFileSync('app.xuy', transformed)\n// 然后正常编译", "js"),
+    H2("参与贡献"),
+    P("xunay 核心只有 2000 行——改起来不费劲。fork 后直接改，跑测试验证。"),
+  )
+}

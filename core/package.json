@@ -1,0 +1,25 @@
+{
+  "name": "xunay",
+  "version": "1.0.0",
+  "description": "内存最少、速度最快的前端框架",
+  "type": "module",
+  "main": "./src/index.js",
+  "unpkg": "./dist/xunay-full.min.js",
+  "jsdelivr": "./dist/xunay-full.min.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./kit": "./src/kit-entry.js",
+    "./devtools": "./src/devtools-entry.js",
+    "./ssr": "./src/ssr-entry.js",
+    "./anim": "./src/anim-entry.js",
+    "./dev": "./src/dev-entry.js",
+    "./full": "./src/full-entry.js"
+  },
+  "files": ["src", "dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "node build.js",
+    "test": "cd test && node run.js"
+  },
+  "keywords": ["xunay", "framework", "signal", "reactive"],
+  "license": "MIT"
+}

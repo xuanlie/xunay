@@ -1,0 +1,27 @@
+// 配置
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("配置"),
+    P("xuyc 只有少量配置——尽量零配置。"),
+    H2("package.json 的 xunay 字段"),
+    Code("{\n  \"name\": \"myapp\",\n  \"xunay\": {\n    \"devtools\": true\n  }\n}", "json"),
+    H2("配置项"),
+    Table(["键","类型","默认","说明"], [["devtools","boolean","true","是否打包 devtools"]]),
+    H2("配置优先级"),
+    Code("1. 当前目录的 package.json\n2. 项目根的 package.json\n3. 内置默认值", "txt"),
+    H2("入口文件头"),
+    P("入口 .xuy 的第一行可以写标题，会用于生成 index.html 的 <title>。"),
+    Code("// title: 我的应用\nimport { mount } from 'xunay'\n\nmount(() => div(null, 'Hello'), '#app')", "xuy"),
+    H2("输出目录"),
+    Code("# --out 指定\nnode bin/xuyc.js build app.xuy --out build\n\n# 默认 dist\nnode bin/xuyc.js build app.xuy", "bash"),
+    H2("CSS 收集"),
+    P("xuyc 自动收集两类 CSS："),
+    Ul("入口目录及 src/ 下的所有 .css","core/src/ 里的 tw.css / ui.css（内置）"),
+    P("收集到的 CSS 会在 index.html 里按顺序引入。"),
+    H2("xunay.config.json"),
+    P("项目根的 xunay.config.json 是后端配置，跟前端编译器无关："),
+    Code("{\n  \"backend\": \"node\",\n  \"ports\": {\n    \"node\": 12341,\n    \"python\": 12342\n  }\n}", "json"),
+  )
+}

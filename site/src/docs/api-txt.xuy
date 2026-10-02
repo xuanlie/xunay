@@ -1,0 +1,22 @@
+// txt 模板标签
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("txt 模板标签"),
+    P("响应式模板字符串——内部的插值自动追踪 signal。"),
+    H2("签名"),
+    Code("txt`文字 ${值}`", "js"),
+    H2("示例"),
+    Code("import { txt, signal, span } from 'xunay'\n\nconst n = signal(0)\nspan(null, txt`n = ${n}`)\n// 等价于 span(null, () => 'n = ' + n())", "xuy"),
+    H2("插值形式"),
+    Table(["写法","行为"], [["${n}","响应式（signal 或普通值）"],["${n()}","立即求值，不响应式"],["${() => n()}","响应式"]]),
+    H2("多个插值"),
+    Code("const a = signal(1)\nconst b = signal(2)\n\ndiv(null, txt`a=${a} b=${b}`)\n// a 或 b 变化都会更新", "xuy"),
+    H2("特性"),
+    Ul("内部创建一个文本节点，更新时只改 textContent","任一插值变化都触发更新","支持任意表达式"),
+    H2("陷阱"),
+    H3("不要写模板嵌套"),
+    Code("txt`${txt`inner`}`   // 错误：嵌套无法追踪", "xuy"),
+  )
+}

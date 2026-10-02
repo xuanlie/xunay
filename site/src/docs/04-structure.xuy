@@ -1,0 +1,9 @@
+// 项目结构
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("项目结构"),
+    Code("myapp/\n├── app.xuy              入口\n├── index.html\n├── src/\n│   ├── components/      通用组件\n│   ├── pages/           页面\n│   ├── store/           状态\n│   ├── api/             接口封装\n│   └── router.xuy       路由\n└── dist/                构建产物", "txt"),
+  )
+}

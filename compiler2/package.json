@@ -1,0 +1,8 @@
+{
+  "name": "xunay-compiler2",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": { "xuyc2": "./cli.js" },
+  "main": "./src/index.js",
+  "license": "MIT"
+}

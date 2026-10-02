@@ -1,0 +1,21 @@
+// 错误处理
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("错误处理"),
+    P("编译器出错时给出准确的行号、列号、附近代码，而不是一个堆栈。"),
+    H2("核心工具"),
+    Code("export function describeError(src, pos, msg) {\n  const before = src.slice(0, pos)\n  const line = before.split('\\n').length\n  const col = pos - before.lastIndexOf('\\n')\n  const lineStart = before.lastIndexOf('\\n') + 1\n  const lineEnd = src.indexOf('\\n', pos)\n  const text = src.slice(lineStart, lineEnd < 0 ? src.length : lineEnd)\n  const caret = ' '.repeat(Math.max(0, col - 1)) + '^'\n  return [\n    '[xunay compile] ' + msg,\n    '  行 ' + line + ', 列 ' + col,\n    '  ' + text,\n    '  ' + caret\n  ].join('\\n')\n}", "js"),
+    H2("错误输出"),
+    Code("[xunay compile] 期望 )\n  行 12, 列 8\n  return div(null, span(null, 'x'\n         ^", "txt"),
+    H2("wrapError"),
+    Code("export function wrapError(src, pos, msg, cause) {\n  const e = new Error(describeError(src, pos, msg))\n  e.pos = pos\n  e.cause = cause\n  return e\n}", "js"),
+    H2("在 parser 里用"),
+    Code("function expect(c) {\n  if (!match(c)) {\n    throw wrapError(src, pos, '期望 ' + c)\n  }\n}", "js"),
+    H2("错误类型"),
+    Table(["错误","原因"], [["期望 )","括号不匹配"],["期望 ,","参数分隔缺失"],["期望 {","对象字面量不完整"],["未预期 token","非法字符"]]),
+    H2("编译错误 vs 运行时错误"),
+    Table(["","编译错误","运行时错误"], [["时机","构建时","浏览器执行时"],["能定位","源码行列","堆栈"],["例子","括号不匹配","n 未定义"]]),
+  )
+}

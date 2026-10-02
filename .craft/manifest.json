@@ -1,0 +1,25 @@
+{
+  "name": "my-project",
+  "root": ".",
+  "recipe": "react",
+  "pm": "npm",
+  "max_file_size": 104857600,
+  "allowed_ext": [],
+  "deny_paths": [
+    ".env",
+    ".env.*",
+    "*.key",
+    "*.pem",
+    "*.secret",
+    ".git/*",
+    "node_modules/*",
+    "vendor/*",
+    "*.exe",
+    "*.so",
+    "*.dylib",
+    "*.o",
+    "*.a",
+    ".craft/*"
+  ],
+  "backup_keep": 10
+}

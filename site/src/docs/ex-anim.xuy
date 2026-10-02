@@ -1,0 +1,24 @@
+// 动画
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("动画"),
+    P("列表增删淡入、模态框进出、按钮反馈。"),
+    H2("CSS 过渡"),
+    Code("// style.css\n.fade-enter { opacity: 0; transform: translateY(-8px) }\n.fade-enter-active { opacity: 1; transform: none; transition: all .3s }\n.fade-leave { opacity: 1 }\n.fade-leave-active { opacity: 0; transition: opacity .2s }", "css"),
+    H2("列表项淡入"),
+    Code("import { list, li, onMount } from 'xunay'\n\nlist(items, i => i.id, i => {\n  const el = li({ class: 'fade-enter' }, i.title)\n  onMount(() => {\n    requestAnimationFrame(() => el.classList.add('fade-enter-active'))\n  })\n  return el\n})", "xuy"),
+    H2("按钮点击反馈"),
+    Code("button({\n  class: () => 'btn' + (pressed() ? ' pressed' : ''),\n  on: {\n    pointerdown: () => pressed(true),\n    pointerup: () => pressed(false),\n    pointerleave: () => pressed(false)\n  }\n}, '点击')", "xuy"),
+    H2("模态框过渡"),
+    Code("const visible = signal(false)\nconst active = signal(false)\n\nfunction open() {\n  visible(true)\n  requestAnimationFrame(() => active(true))\n}\n\nfunction close() {\n  active(false)\n  setTimeout(() => visible(false), 300)\n}\n\nshow(visible, () => {\n  const el = div({ class: () => 'modal' + (active() ? ' in' : '') }, '内容')\n  return el\n})", "xuy"),
+    H2("FLIP 动画"),
+    P("列表重排时用 FLIP——先记录位置，再改，再动画。"),
+    Code("export function flip(container, mutate) {\n  const before = new Map()\n  for (const el of container.children) {\n    before.set(el, el.getBoundingClientRect())\n  }\n  mutate()\n  for (const el of container.children) {\n    const a = before.get(el)\n    if (!a) continue\n    const b = el.getBoundingClientRect()\n    const dx = a.left - b.left\n    const dy = a.top - b.top\n    if (!dx && !dy) continue\n    el.animate(\n      [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],\n      { duration: 200, easing: 'ease-out' }\n    )\n  }\n}", "js"),
+    H2("内置 trans"),
+    Code("import { trans } from 'xunay'\n\nconst fade = trans(200)\n\nonMount(() => fade.enter(el))\nonUnmount(() => fade.leave(el, () => {}))", "xuy"),
+    H2("性能提示"),
+    Ul("用 transform / opacity——GPU 加速","避免 height / top / left 变化","will-change 提示浏览器","requestAnimationFrame 保证时机"),
+  )
+}

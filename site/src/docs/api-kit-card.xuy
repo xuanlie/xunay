@@ -1,0 +1,15 @@
+// kit: Card
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Card"),
+    P("卡片容器组件。"),
+    H2("引入"),
+    Code("import { Card } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["title","标题"],["extra","右上角额外内容"],["footer","底部内容"],["shadow","是否阴影"]]),
+    H2("示例"),
+    Code("import { Card } from 'xunay/kit'\nimport { div, p } from 'xunay'\n\nCard({\n  title: '用户信息',\n  extra: () => '更多',\n  footer: () => '底部'\n}, p(null, '卡片内容'))", "xuy"),
+  )
+}

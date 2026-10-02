@@ -1,0 +1,27 @@
+// 构建工具
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("构建工具"),
+    P("xuyc 是自带构建器——不依赖 Vite / Webpack / Rollup。"),
+    H2("使用"),
+    Code("node bin/xuyc.js build <入口.xuy> [--out 输出目录]", "bash"),
+    H2("示例"),
+    Code("node bin/xuyc.js build app.xuy --out dist\nnode bin/xuyc.js build src/main.xuy --out public\nnode bin/xuyc.js build myapp/app.xuy --out myapp/dist", "bash"),
+    H2("输出"),
+    Code("dist/\n├── index.html         自动生成\n├── app.js             打包后的应用\n├── xunay.js           xunay 运行时\n└── src/               样式等静态资源", "txt"),
+    H2("构建过程"),
+    Code("// 1. 编译所有 .xuy → .js\nconst processedEntry = processFile(entryPath)\n\n// 2. esbuild 打包\nawait esbuild.build({\n  entryPoints: [processedEntry],\n  bundle: true,\n  minify: true,\n  format: 'esm',\n  outfile: 'dist/app.js'\n})\n\n// 3. 复制 xunay.js\nfs.copyFileSync(coreDist + '/xunay.esm.js', 'dist/xunay.js')\n\n// 4. 复制 CSS\ncollectCss(entryDir, '')\n\n// 5. 生成 index.html\nfs.writeFileSync('dist/index.html', html)", "js"),
+    H2("为什么不用 Vite / Webpack"),
+    Table(["","Vite","xuyc"], [["配置","复杂","零"],["安装体积","~50MB","~5MB（只依赖 esbuild）"],["启动","慢","快"],["HMR","有","无"],["插件生态","丰富","无"]]),
+    P("xuyc 只做一件事：把 .xuy 编译成能在浏览器跑的代码。不需要 HMR、不需要插件——改完刷新页面就行。"),
+    H2("npm 脚本集成"),
+    Code("{\n  \"scripts\": {\n    \"build\": \"node ../bin/xuyc.js build app.xuy --out dist\",\n    \"dev\": \"npm run build && cd dist && python3 -m http.server 8080\"\n  }\n}", "json"),
+    H2("自定义构建"),
+    P("不用 xuyc 也行——直接用 compiler2："),
+    Code("import { tokenize } from './compiler2/src/tokenizer.js'\nimport { parse } from './compiler2/src/parser.js'\nimport { genFunction } from './compiler2/src/gen.js'\nimport esbuild from 'esbuild'\n\nconst src = fs.readFileSync('app.xuy', 'utf8')\nconst nodes = parse(src)\nconst js = genFunction('app', nodes, src)\nfs.writeFileSync('app.js', js)\n\nawait esbuild.build({ entryPoints: ['app.js'], bundle: true, outfile: 'dist/app.js' })", "js"),
+    H2("完整流程"),
+    Code("# 开发\nnode bin/xuyc.js build app.xuy --out dist\npython3 -m http.server 8080 --directory dist\n\n# 部署\ncp -r dist/* /var/www/", "bash"),
+  )
+}

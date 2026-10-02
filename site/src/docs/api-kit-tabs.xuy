@@ -1,0 +1,15 @@
+// kit: Tabs
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Tabs"),
+    P("标签页组件。"),
+    H2("引入"),
+    Code("import { Tabs } from 'xunay/kit'", "js"),
+    H2("参数"),
+    Table(["参数","说明"], [["items","[{ key, label, content }]"],["value","当前选中的 key"],["onChange","(key) => void"]]),
+    H2("示例"),
+    Code("import { Tabs } from 'xunay/kit'\nimport { signal, div } from 'xunay'\n\nfunction Page() {\n  const tab = signal('a')\n  return Tabs({\n    value: () => tab(),\n    onChange: k => tab(k),\n    items: [\n      { key: 'a', label: '概览', content: () => div(null, '概览内容') },\n      { key: 'b', label: '设置', content: () => div(null, '设置内容') },\n      { key: 'c', label: '关于', content: () => div(null, '关于内容') }\n    ]\n  })\n}", "xuy"),
+  )
+}

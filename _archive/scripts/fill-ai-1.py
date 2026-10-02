@@ -1,0 +1,285 @@
+#!/usr/bin/env python3
+
+p = "site/gen-docs.py"
+with open(p, 'r', encoding='utf-8') as f:
+    s = f.read()
+
+def swap(anchor, replacement, label):
+    global s
+    if anchor not in s:
+        print("未命中:", label)
+        return
+    s = s.replace(anchor, replacement)
+
+# 在"入门"组前插入"AI 参考"组
+old_groups = """GROUPS = [
+  ('入门', ["""
+new_groups = """GROUPS = [
+  ('AI 参考', [
+    ('ai-overview', 'AI 总纲', [
+      ('H1','AI 总纲'),
+      ('P','给 AI 助手的一页速查——读完这篇能写正确的 xunay 代码。'),
+      ('H2','一句话'),
+      ('P','xunay 是极简前端框架。核心 4.7KB，无 VDOM，无 Fiber，无 Hooks。用 signal 存状态，用 effect 订阅变化，组件只执行一次。'),
+      ('H2','唯一心智模型'),
+      ('Quote','静态内容直接写，动态内容用函数包。'),
+      ('Code',"// 静态：永不更新\\nspan(null, 'hello')\\n\\n// 动态：跟 n 变\\nspan(null, () => n())\\n\\n// 这就是全部规则",'xuy'),
+      ('H2','7 个核心 API'),
+      ('Table',['API','签名','说明'],[
+        ['signal','signal(init)','响应式状态'],
+        ['computed','computed(fn)','派生值（缓存）'],
+        ['effect','effect(fn)','副作用（自动追踪依赖）'],
+        ['batch','batch(fn)','合并多次写'],
+        ['mount','mount(comp, target)','挂载应用'],
+        ['list','list(arr, keyFn, renderFn)','keyed 列表'],
+        ['show','show(cond, renderFn)','条件渲染']),
+      ('H2','常用标签工厂'),
+      ('Code','div span p a button input form label\\nul ol li h1 h2 h3 h4 h5 h6\\ntable thead tbody tr td th\\nimg br hr pre code blockquote\\nheader footer nav main section article\\nselect option textarea','txt'),
+      ('H2','常见别名'),
+      ('Table',['全名','别名','用途'],[
+        ['signal','s','状态'],
+        ['computed','c','派生'],
+        ['effect','f','副作用'],
+        ['batch','bat','批量'],
+        ['mount','m / app','挂载'],
+        ['list','l / each','列表']),
+      ('H2','写代码的规则'),
+      ('H3','规则 1：动态值必须包函数'),
+      ('Code',"// 对\\ndiv(null, () => n())\\ninput({ value: () => name() })\\nbutton({ class: () => active() ? 'on' : '' })\\n\\n// 错\\ndiv(null, n())\\ninput({ value: name() })",'xuy'),
+      ('H3','规则 2：事件用 on 对象'),
+      ('Code',"button({ on: { click: () => n(v => v + 1) } }, '+')",'xuy'),
+      ('H3','规则 3：列表必须用 list'),
+      ('Code',"// 对\\nul(null, list(todos, t => t.id, t => li(null, t.title)))\\n\\n// 错（静态展开，不会更新）\\nul(null, ...todos().map(t => li(null, t.title)))",'xuy'),
+      ('H3','规则 4：条件用 show 或三目'),
+      ('Code',"// 方式 A\\nshow(() => open(), () => div(null, '内容'))\\n\\n// 方式 B\\n() => open() ? div(null, '内容') : null",'xuy'),
+      ('H3','规则 5：组件只执行一次'),
+      ('Code',"function Counter() {\\n  const n = signal(0)\\n  console.log('初始化')   // 只打印一次\\n  return div(null, () => n())\\n}",'xuy'),
+      ('H3','规则 6：onMount 必须在组件内'),
+      ('Code',"// 对\\nfunction Home() {\\n  onMount(() => console.log('挂载'))\\n  return div(null, 'Home')\\n}\\n\\n// 错（模块顶层不生效）\\nonMount(() => console.log('挂载'))",'xuy'),
+      ('H3','规则 7：signal 读写都带 ()'),
+      ('Code',"const n = signal(0)\\nn()             // 读 → 0\\nn(1)            // 写 → 1\\nn(v => v + 1)   // 函数式 → 2",'xuy'),
+      ('H2','文件类型'),
+      ('Table',['后缀','说明'],[
+        ['.xuy','标签名可当函数直接用，不用 import'],
+        ['.js','标准 JS，需要 import 标签名']),
+      ('H2','最小完整应用'),
+      ('Code',"// app.xuy\\n// title: 我的应用\\nimport { div, h1, button, span, signal, mount } from 'xunay'\\n\\nconst n = signal(0)\\n\\nmount(() => div({ class: 'app' },\\n  h1(null, '计数器'),\\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\\n  span(null, () => String(n())),\\n  button({ on: { click: () => n(v => v + 1) } }, '+')\\n), '#app')",'xuy'),
+      ('H2','100% 会踩的坑'),
+      ('Table',['坑','正确做法'],[
+        ['忘加 ()','n() 不是 n'],
+        ['静态值当动态用','用 () => n() 不用 n()'],
+        ['effect 里读写同一 signal','会死循环'],
+        ['list 用索引做 key','用稳定的 id'],
+        ['模块顶层 onMount','移到组件函数体内'],
+        ['深层对象修改','整体替换触发更新']),
+      ('H2','性能'),
+      ('Table',['操作','耗时'],[
+        ['signal 读','~128 ns'],
+        ['signal 写','~183 ns'],
+        ['触发 1 个 effect','~650 ns'],
+        ['更新 1 个文本节点','~1 µs']),
+      ('H2','进阶 API 速查'),
+      ('Table',['API','用途'],[
+        ['ref','DOM 引用 / 普通变量'],
+        ['ctx','跨层级传值'],
+        ['err','错误边界'],
+        ['lazy','懒加载组件'],
+        ['trans','过渡助手'],
+        ['txt','响应式模板字符串'],
+        ['frag / F','多节点容器'],
+        ['onMount / onUnmount','生命周期']),
+      ('H2','不要做的'),
+      ('Ul',
+        '不要写 <div> 这种 JSX（用 div(...)）',
+        '不要用 key={} 属性（用 list 的 keyFn）',
+        '不要手动写依赖数组（自动收集）',
+        '不要在 effect 里读又写同一 signal',
+        '不要在组件函数体里做副作用（用 onMount 或 event）'),
+    ]),
+    ('ai-contract', 'API 契约', [
+      ('H1','API 契约'),
+      ('P','每个 API 的完整签名、参数、返回值、边界、错误。AI 写代码前必读。'),
+      ('H2','signal(init)'),
+      ('Code','const s = signal(init)','js'),
+      ('Table',['项','内容'],[
+        ['参数','init: T——初始值'],
+        ['返回','函数 s'],
+        ['s()','读——返回 T'],
+        ['s(v)','写——设置新值，返回 T'],
+        ['s(fn)','函数式——fn(旧值) 返回新值，返回 T'],
+        ['相等比较','Object.is——相同值不触发更新'],
+        ['订阅','在 effect 里读时自动订阅'],
+        ['扩展','s.subsCount() / s.writeCount()']),
+      ('H2','computed(fn)'),
+      ('Code','const c = computed(fn)','js'),
+      ('Table',['项','内容'],[
+        ['参数','fn: () => T——纯函数'],
+        ['返回','函数 c'],
+        ['c()','读——返回缓存或重算'],
+        ['缓存','依赖不变时返回缓存'],
+        ['惰性','只在读时算，不是依赖变就立即算'],
+        ['副作用','不该有——只读 signal，不写']),
+      ('H2','effect(fn)'),
+      ('Code','const stop = effect(fn)','js'),
+      ('Table',['项','内容'],[
+        ['参数','fn: () => void | (() => void)'],
+        ['返回','函数 stop——dispose effect'],
+        ['执行时机','立即执行一次 + 依赖变化时'],
+        ['清理','fn 返回函数——重跑前 / dispose 时调'],
+        ['依赖','运行时收集——执行时读的 signal'],
+        ['坑','不要在 fn 里写自己订阅的 signal']),
+      ('H2','batch(fn)'),
+      ('Code','batch(fn)','js'),
+      ('Table',['项','内容'],[
+        ['参数','fn: () => void——同步代码'],
+        ['返回','void'],
+        ['作用','合并 fn 里的多次写为一次更新'],
+        ['嵌套','支持——只有最外层结束才 flush'],
+        ['坑','await 之后失效']),
+      ('H2','mount(comp, target)'),
+      ('Code','const unmount = mount(comp, target)','js'),
+      ('Table',['项','内容'],[
+        ['comp','() => VNode 或 VNode'],
+        ['target','CSS 选择器字符串 或 DOM 元素'],
+        ['返回','unmount 函数'],
+        ['行为','清空 target + 建根 scope + 挂载'],
+        ['坑','target 找不到会抛错']),
+      ('H2','render(vnode)'),
+      ('Code','const dom = render(vnode)','js'),
+      ('Table',['项','内容'],[
+        ['参数','任意 vnode / 字符串 / 数字 / 函数'],
+        ['返回','真实 DOM 节点'],
+        ['说明','底层 API，一般用 mount'],
+        ['不建立','scope、onMount、清理']),
+      ('H2','list(arr, keyFn, renderFn)'),
+      ('Code','list(arr, keyFn, renderFn)','js'),
+      ('Table',['项','内容'],[
+        ['arr','T[] 或 () => T[]'],
+        ['keyFn','(item, i) => string | number——唯一 key'],
+        ['renderFn','(item, i) => VNode'],
+        ['返回','特殊对象（render 时识别）'],
+        ['diff','key 相同的复用 DOM，不同的重建'],
+        ['坑','key 不唯一 / 用索引']),
+      ('H2','show(cond, renderFn)'),
+      ('Code','show(cond, renderFn)','js'),
+      ('Table',['项','内容'],[
+        ['cond','() => boolean——响应式条件'],
+        ['renderFn','() => VNode'],
+        ['行为','true 时挂载，false 时卸载 + dispose scope'],
+        ['坑','cond 传值不传函数']),
+      ('H2','frag(...children)'),
+      ('Code','frag(...children)  // 或 F(...)','js'),
+      ('Table',['项','内容'],[
+        ['参数','任意数量子节点'],
+        ['返回','特殊对象（FRAGMENT 标记）'],
+        ['DOM','display:contents 的 span'],
+        ['坑','不接受 props']),
+      ('H2','txt 模板'),
+      ('Code','txt`n = ${n}`','js'),
+      ('Table',['项','内容'],[
+        ['插值','${n} 自动响应式；${n()} 立即求值'],
+        ['返回','() => string'],
+        ['DOM','一个文本节点'],
+        ['更新','只改 textContent']),
+      ('H2','onMount(fn) / onUnmount(fn)'),
+      ('Code','onMount(fn)\\nonUnmount(fn)','js'),
+      ('Table',['项','内容'],[
+        ['fn','() => void'],
+        ['时机','onMount——元素挂到文档后'],
+        ['时机','onUnmount——dispose scope 前'],
+        ['坑','模块顶层调用不生效'],
+        ['多次','同一 scope 可多次调用，按序执行']),
+      ('H2','ref(init)'),
+      ('Code','const r = ref(init)','js'),
+      ('Table',['项','内容'],[
+        ['参数','init: T（可选）'],
+        ['r()','读'],
+        ['r(v)','写'],
+        ['响应式','否——不触发 effect'],
+        ['用途','DOM 引用 / 内部变量']),
+      ('H2','ctx(default)'),
+      ('Code','const C = ctx(default)','js'),
+      ('Table',['项','内容'],[
+        ['C.get()','读最近 provide 的值'],
+        ['C.provide(value, fn)','fn 执行期间提供值'],
+        ['栈','同步——provide 返回后失效'],
+        ['嵌套','内层覆盖外层'],
+        ['默认','没人 provide 时返回 default']),
+      ('H2','err(fn, fallback)'),
+      ('Code','err(fn, fallback)','js'),
+      ('Table',['项','内容'],[
+        ['fn','() => T——可能抛错'],
+        ['fallback','T 或 (e) => T'],
+        ['返回','fn() 结果或 fallback'],
+        ['坑','不捕获异步错误']),
+      ('H2','lazy(loader)'),
+      ('Code','const C = lazy(loader)','js'),
+      ('Table',['项','内容'],[
+        ['loader','() => Promise<Module>'],
+        ['返回','组件函数——第一次调用时加载'],
+        ['加载中','返回 null'],
+        ['失败','抛出错误']),
+      ('H2','trans(duration)'),
+      ('Code','const t = trans(200)','js'),
+      ('Table',['项','内容'],[
+        ['t.enter(el)','淡入'],
+        ['t.leave(el, done)','淡出后调 done']),
+      ('H2','renderToString(vnode)'),
+      ('Code','import { renderToString } from "xunay/ssr"\\nconst html = renderToString(vnode)','js'),
+      ('Table',['项','内容'],[
+        ['返回','HTML 字符串'],
+        ['环境','服务端（无 document / window）'],
+        ['跳过','onMount / effect / 事件']),
+      ('H2','hydrate(comp, target)'),
+      ('Code','import { hydrate } from "xunay/ssr"\\nhydrate(comp, target)','js'),
+      ('Table',['项','内容'],[
+        ['comp','() => VNode'],
+        ['target','选择器或元素'],
+        ['行为','接管已有 DOM，不重建'],
+        ['坑','容器必须已有 SSR 内容']),
+      ('H2','标签工厂'),
+      ('Code','div(props, ...children)\\nspan(props, ...children)','js'),
+      ('Table',['项','内容'],[
+        ['props','对象 或 null'],
+        ['children','任意数量（字符串/数字/vnode/函数）'],
+        ['返回','VNode 对象'],
+        ['内置','30+ 个常用标签']),
+      ('H2','tag(name)'),
+      ('Code','const video = tag("video")\\nvideo({ src: "a.mp4" })','js'),
+      ('Table',['项','内容'],[
+        ['参数','标签名'],
+        ['返回','标签工厂函数']),
+      ('H2','createElement(type, props, ...children)'),
+      ('Code','createElement("video", { src: "a.mp4" })','js'),
+      ('Table',['项','内容'],[
+        ['参数','标签名 / props / 子节点'],
+        ['返回','VNode']),
+      ('H2','props 处理规则'),
+      ('Table',['key','处理'],[
+        ['class / className','dom.className = 值'],
+        ['style（对象）','Object.assign'],
+        ['style（函数）','动态更新'],
+        ['value','dom.value'],
+        ['checked / disabled / selected','强转 bool'],
+        ['html','innerHTML（有 XSS 风险）'],
+        ['on','事件绑定'],
+        ['ref','回调（el => ref(el)）'],
+        ['其他','setAttribute']),
+      ('H2','子节点处理规则'),
+      ('Table',['类型','处理'],[
+        ['字符串 / 数字','文本节点'],
+        ['VNode','递归渲染'],
+        ['函数返回字符串','建 effect 更新 textContent'],
+        ['函数返回 VNode','整块重建'],
+        ['函数返回 list 对象','走 applyList'],
+        ['函数返回 show 对象','走 renderShow'],
+        ['null / false / true','空文本节点']),
+    ]),
+  ]),
+  ('入门', ["""
+
+swap(old_groups, new_groups, "AI 总纲 + API 契约")
+
+with open(p, 'w', encoding='utf-8') as f:
+    f.write(s)
+print("AI 总纲 / API 契约 已填")

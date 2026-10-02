@@ -1,0 +1,19 @@
+{
+  "name": "xunay",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "cd core && node build.js",
+    "xuyc": "node bin/xuyc.js",
+    "create": "node bin/create.js",
+    "dev": "bash scripts/run-backend.sh"
+  },
+  "bin": {
+    "xuyc": "./bin/xuyc.js",
+    "xunay": "./bin/create.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "license": "MIT"
+}

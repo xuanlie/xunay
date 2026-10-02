@@ -1,0 +1,32 @@
+// trans
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("trans"),
+    P("trans 是内置的过渡助手——返回一对 enter / leave 方法，用在 onMount / onUnmount 里做淡入淡出动画。"),
+    H2("基础用法"),
+    Code("import { trans, div, onMount, onUnmount } from 'xunay'\n\nconst fade = trans(200)   // 200ms\n\ndiv(null, '内容')   // 在这个元素上用 fade.enter / fade.leave", "xuy"),
+    H2("trans 返回什么"),
+    Code("const fade = trans(300)\n// 返回：\n{\n  enter(el) { ... },        // 元素出现时调用\n  leave(el, done) { ... }   // 元素消失时调用\n}", "js"),
+    H2("enter"),
+    P("设置 opacity: 0，下一帧改 opacity: 1——触发 CSS transition 淡入。"),
+    Code("enter(el) {\n  el.style.transition = 'opacity 200ms ease'\n  el.style.opacity = '0'\n  requestAnimationFrame(() => { el.style.opacity = '1' })\n}", "js"),
+    H2("leave"),
+    P("设置 opacity: 0，动画结束后调用 done 回调。"),
+    Code("leave(el, done) {\n  el.style.transition = 'opacity 200ms ease'\n  el.style.opacity = '0'\n  setTimeout(done, 200)\n}", "js"),
+    H2("完整用法"),
+    Code("import { trans, div, onMount, onUnmount, signal, show, button, mount } from 'xunay'\n\nfunction Modal() {\n  const fade = trans(300)\n  const open = signal(false)\n\n  return div(null,\n    button({ on: { click: () => open(!open()) } }, '切换'),\n    show(() => open(), () => {\n      const overlay = div({ class: 'overlay' }, '模态框')\n      onMount(() => fade.enter(overlay))\n      onUnmount(() => {\n        fade.leave(overlay, () => {})\n      })\n      return overlay\n    })\n  )\n}\n\nmount(() => Modal(), '#app')", "xuy"),
+    H2("show 的过渡限制"),
+    Warn("show 切换是同步的——leave 阶段元素已经被移除，动画看不到。需要真过渡时手动控制挂载："),
+    Code("const open = signal(false)\nconst visible = signal(false)\n\nfunction toggle() {\n  if (open()) {\n    open(false)\n    setTimeout(() => visible(false), 300)\n  } else {\n    visible(true)\n    requestAnimationFrame(() => open(true))\n  }\n}\n\ndiv(null,\n  button({ on: { click: toggle } }, '切换'),\n  show(() => visible(), () => {\n    const el = div({ class: () => 'modal' + (open() ? ' in' : '') }, '内容')\n    return el\n  })\n)", "xuy"),
+    P("配合 CSS：.modal { opacity: 0; transition: opacity .3s } .modal.in { opacity: 1 }。"),
+    H2("用 CSS 替代 trans"),
+    P("大多数场景不需要 trans——纯 CSS 更简单："),
+    Code(".fade-enter { opacity: 0 }\n.fade-enter-active { opacity: 1; transition: opacity .3s }", "css"),
+    P("用 class 切换即可。trans 适合需要 JS 精确控制时机的场景。"),
+    H2("完整示例：列表项淡入"),
+    Code("import { div, ul, li, list, onMount, signal, button, mount } from 'xunay'\n\nfunction List() {\n  const items = signal([1, 2, 3])\n\n  return div(null,\n    button({ on: { click: () => items(list => [...list, list.length + 1]) } }, '添加'),\n    ul(null,\n      list(items, i => i, i => {\n        const el = li({ class: 'item-enter' }, '项目 ' + i)\n        onMount(() => {\n          requestAnimationFrame(() => el.classList.add('item-enter-active'))\n        })\n        return el\n      })\n    )\n  )\n}\n\nmount(() => List(), '#app')", "xuy"),
+    Code(".item-enter { opacity: 0; transform: translateX(-20px) }\n.item-enter-active { opacity: 1; transform: none; transition: all .3s }", "css"),
+  )
+}

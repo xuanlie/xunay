@@ -1,0 +1,51 @@
+// docs-kit: 文档构建块
+import { div, span, button, h1, h2, h3, p, ul, ol, li, pre, code, blockquote, table, thead, tbody, tr, th, td, a, signal } from 'xunay'
+import { highlight } from '../../core/src/hl.js'
+
+export function D(...children) {
+  return div({ class: 'doc' }, ...children)
+}
+export function H1(text) { return h1(null, text) }
+export function H2(text) { return h2(null, text) }
+export function H3(text) { return h3(null, text) }
+export function P(text) { return p(null, text) }
+
+export function Code(text, lang) {
+  const L = lang || 'js'
+  const copied = signal(false)
+  const copy = () => {
+    const doCopy = t => {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t)
+      return new Promise((res, rej) => {
+        const ta = document.createElement('textarea')
+        ta.value = t; ta.style.position = 'fixed'; ta.style.left = '-9999px'
+        document.body.appendChild(ta); ta.select()
+        document.execCommand('copy') ? res() : rej()
+        document.body.removeChild(ta)
+      })
+    }
+    doCopy(text).then(() => { copied(true); setTimeout(() => copied(false), 1500) }).catch(() => {})
+  }
+  return div({ class: 'code-block' },
+    div({ class: 'code-head' },
+      span({ class: 'code-lang' }, L.toUpperCase()),
+      button({ class: () => 'code-copy' + (copied() ? ' on' : ''), on: { click: copy } },
+        () => copied() ? '已复制' : '复制')
+    ),
+    pre({ class: 'code-pre' }, code({ html: highlight(text, L) }))
+  )
+}
+
+export function Ul(...items) { return ul(null, ...items.map(i => li(null, i))) }
+export function Ol(...items) { return ol(null, ...items.map(i => li(null, i))) }
+export function Quote(text) { return blockquote({ class: 'callout note' }, text) }
+export function Tip(text) { return blockquote({ class: 'callout tip' }, text) }
+export function Warn(text) { return blockquote({ class: 'callout warn' }, text) }
+export function Danger(text) { return blockquote({ class: 'callout danger' }, text) }
+export function Table(headers, rows) {
+  return table({ class: 'doc-table' },
+    thead(null, tr(null, ...headers.map(h => th(null, h)))),
+    tbody(null, ...rows.map(r => tr(null, ...r.map(c => td(null, c)))))
+  )
+}
+export function Link(href, text) { return a({ href, class: 'doc-link' }, text) }

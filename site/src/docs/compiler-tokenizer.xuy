@@ -1,0 +1,18 @@
+// 词法分析
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("词法分析"),
+    P("把源码字符串切成 token 数组。核心 40 行。"),
+    H2("代码"),
+    Code("export function tokenize(src) {\n  const tokens = []\n  let i = 0\n  const N = src.length\n  while (i < N) {\n    const c = src[i]\n    // 跳过空白\n    if (/\\s/.test(c)) { i++; continue }\n    // 跳过行注释\n    if (c === '/' && src[i+1] === '/') {\n      while (i < N && src[i] !== '\\n') i++\n      continue\n    }\n    // 跳过块注释\n    if (c === '/' && src[i+1] === '*') {\n      i += 2\n      while (i < N && !(src[i] === '*' && src[i+1] === '/')) i++\n      i += 2\n      continue\n    }\n    // 字符串\n    if (c === '\"' || c === \"'\" || c === '`') {\n      const q = c\n      let v = c\n      i++\n      while (i < N && src[i] !== q) {\n        if (src[i] === '\\\\') { v += src[i] + src[i+1]; i += 2; continue }\n        v += src[i]; i++\n      }\n      v += src[i] || ''\n      i++\n      tokens.push({ t: 'str', v })\n      continue\n    }\n    // 标识符\n    if (/[a-zA-Z_$]/.test(c)) {\n      let v = ''\n      while (i < N && /[\\w$]/.test(src[i])) { v += src[i]; i++ }\n      tokens.push({ t: 'id', v })\n      continue\n    }\n    // 数字\n    if (/[0-9]/.test(c)) {\n      let v = ''\n      while (i < N && /[\\d.xXa-fA-F]/.test(src[i])) { v += src[i]; i++ }\n      tokens.push({ t: 'num', v })\n      continue\n    }\n    // 单字符标点\n    if ('(){}[],:.='.includes(c)) {\n      tokens.push({ t: 'p', v: c })\n      i++\n      continue\n    }\n    // 操作符\n    if ('+-*/<>!&|?'.includes(c)) {\n      let v = c\n      i++\n      while (i < N && '+-*/<>!&|='.includes(src[i])) { v += src[i]; i++ }\n      tokens.push({ t: 'op', v })\n      continue\n    }\n    i++\n  }\n  return tokens\n}", "js"),
+    H2("Token 类型"),
+    Table(["类型","含义","示例"], [["str","字符串","\"hello\""],["id","标识符","div、signal"],["num","数字","42"],["p","标点","()、{}、,"],["op","操作符","=>、+、=="]]),
+    H2("注意"),
+    P("tokenize 一次扫描完成，不回溯。它不关心语法——只识别 token 边界。"),
+    H2("局限"),
+    Ul("不处理正则字面量（会误判为除法）","不处理模板字符串里的表达式"),
+    P("对 .xuy 足够——.xuy 不鼓励复杂语法。"),
+  )
+}

@@ -1,0 +1,15 @@
+// 快速开始
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("快速开始"),
+    P("从空目录到可运行应用，5 分钟。"),
+    H2("第一步：写 HTML"),
+    Code("<!DOCTYPE html>\n<html>\n<head><meta charset=\"UTF-8\"><title>我的应用</title></head>\n<body>\n  <div id=\"app\"></div>\n  <script type=\"module\" src=\"./app.js\"></script>\n</body>\n</html>", "html"),
+    H2("第二步：写 JS"),
+    Code("import { div, h1, button, span, signal, mount } from 'xunay'\n\nconst n = signal(0)\n\nmount(() => div(null,\n  h1(null, '计数器'),\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\n  span(null, () => String(n())),\n  button({ on: { click: () => n(v => v + 1) } }, '+')\n), '#app')", "js"),
+    H2("第三步：打开"),
+    P("用任意静态服务器托管，浏览器打开即可。"),
+  )
+}

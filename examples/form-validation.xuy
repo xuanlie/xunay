@@ -1,0 +1,118 @@
+// title: XuNay 表单验证
+// 实时校验 / 多字段 / 提交
+import { div,h1,form,input,button,label,span,p,signal,computed,mount,show } from 'xunay'
+
+const name = signal('')
+const email = signal('')
+const password = signal('')
+const confirm = signal('')
+const agree = signal(false)
+const submitted = signal(false)
+
+const nameErr = computed(() => {
+  const v = name().trim()
+  if (!v) return ''
+  if (v.length < 2) return '至少 2 个字符'
+  if (v.length > 20) return '最多 20 个字符'
+  return ''
+})
+
+const emailErr = computed(() => {
+  const v = email().trim()
+  if (!v) return ''
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) return '邮箱格式不正确'
+  return ''
+})
+
+const passwordErr = computed(() => {
+  const v = password()
+  if (!v) return ''
+  if (v.length < 8) return '至少 8 位'
+  if (!/[a-z]/.test(v)) return '需要小写字母'
+  if (!/[A-Z]/.test(v)) return '需要大写字母'
+  if (!/\d/.test(v)) return '需要数字'
+  return ''
+})
+
+const confirmErr = computed(() => {
+  if (!confirm()) return ''
+  if (confirm() !== password()) return '两次密码不一致'
+  return ''
+})
+
+const strength = computed(() => {
+  const v = password()
+  if (!v) return 0
+  let s = 0
+  if (v.length >= 8) s++
+  if (/[a-z]/.test(v)) s++
+  if (/[A-Z]/.test(v)) s++
+  if (/\d/.test(v)) s++
+  if (/[^a-zA-Z0-9]/.test(v)) s++
+  return s
+})
+
+const canSubmit = computed(() => {
+  return name() && !nameErr() &&
+         email() && !emailErr() &&
+         password() && !passwordErr() &&
+         confirm() && !confirmErr() &&
+         agree()
+})
+
+const submit = () => {
+  if (!canSubmit()) return
+  submitted(true)
+  setTimeout(() => submitted(false), 3000)
+}
+
+function Field(label_, value, setter, err, type) {
+  return div({ class: 'field' },
+    label({ class: 'lbl' }, label_),
+    input({
+      class: () => `inp ${err() ? 'err' : ''}`,
+      type: type || 'text',
+      value: () => value(),
+      on: { input: e => setter(e.target.value) }
+    }),
+    show(() => err() !== '', () => span({ class: 'err-msg' }, () => err()))
+  )
+}
+
+mount(() => form({
+  class: 'app',
+  on: { submit: { fn: submit, prevent: true } }
+},
+  h1(null, '注册'),
+  Field('用户名', name, name, nameErr),
+  Field('邮箱', email, email, emailErr, 'email'),
+  Field('密码', password, password, passwordErr, 'password'),
+  div({ class: 'strength' },
+    span(null, '密码强度：'),
+    div({ class: 'bar' },
+      div({ class: () => `fill s${strength()}`, style: () => ({ width: (strength() * 20) + '%' }) })
+    ),
+    span({ class: 'lvl' }, () => ['','很弱','弱','中','强','很强'][strength()])
+  ),
+  Field('确认密码', confirm, confirm, confirmErr, 'password'),
+  div({ class: 'field row' },
+    input({
+      type: 'checkbox',
+      checked: () => agree(),
+      on: { change: e => agree(e.target.checked) }
+    }),
+    label(null, '我已阅读并同意服务条款')
+  ),
+  button({
+    class: 'btn',
+    type: 'submit',
+    disabled: () => !canSubmit()
+  }, '注册'),
+  show(() => submitted(), () =>
+    div({ class: 'ok' }, '注册成功！')
+  )
+), '#app')
+
+const s = document.createElement('style')
+s.textContent = `*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;background:#f0f2f5;padding:40px 20px}.app{max-width:440px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 4px 24px rgba(0,0,0,.06)}h1{font-size:22px;margin-bottom:20px}.field{margin-bottom:16px}.field.row{display:flex;align-items:center;gap:8px}.lbl{display:block;font-size:13px;color:#555;margin-bottom:6px;font-weight:500}.inp{width:100%;padding:10px 12px;font-size:14px;border:1px solid #ddd;border-radius:8px;outline:none;transition:border-color .15s}.inp:focus{border-color:#1f6feb}.inp.err{border-color:#e33;background:#fff5f5}.err-msg{display:block;font-size:12px;color:#e33;margin-top:4px}.strength{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:13px;color:#666}.bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden}.fill{height:100%;transition:all .3s}.fill.s0{width:0}.fill.s1{background:#e33}.fill.s2{background:#f80}.fill.s3{background:#fc0}.fill.s4{background:#8c4}.fill.s5{background:#0a7}.lvl{font-size:12px;color:#666;width:40px;text-align:right}.btn{width:100%;padding:12px;background:#1f6feb;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px}.btn:disabled{background:#ccc;cursor:not-allowed}.ok{background:#d4f4dd;color:#0a7;padding:12px;border-radius:8px;margin-top:16px;text-align:center;font-size:14px}`
+document.head.appendChild(s)
