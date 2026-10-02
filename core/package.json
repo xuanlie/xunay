@@ -1,6 +1,6 @@
 {
   "name": "xunay",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "内存最少、速度最快的前端框架",
   "type": "module",
   "main": "./src/index.js",
@@ -18,6 +18,7 @@
   "files": [
     "src",
     "dist",
+    "bin",
     "README.md",
     "LICENSE"
   ],
@@ -35,5 +36,8 @@
   "author": "XuNay",
   "engines": {
     "node": ">=18"
+  },
+  "bin": {
+    "xuyc": "./bin/xuyc.js"
   }
 }
