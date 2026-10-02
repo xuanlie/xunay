@@ -15,7 +15,7 @@ export function Doc() {
     H2("Hooks 对比"),
     Table(["React Hooks","XuNay"], [["useState","signal"],["useMemo","computed"],["useEffect","effect"],["useRef","ref"],["useContext","ctx"],["useCallback","不需要（组件只跑一次）"],["useReducer","signal + 手写 reducer"],["React.memo","不需要（精确更新）"],["Hooks 顺序规则","不存在"],["依赖数组","不存在（自动收集）"]]),
     H2("打包体积对比"),
-    Table(["框架","gzip 大小"], [["React 18 + ReactDOM","~45 KB"],["Vue 3","~34 KB"],["Preact","~4 KB"],["Solid","~7 KB"],["XuNay 核心","~4.7 KB"]]),
+    Table(["框架","gzip 大小"], [["React 18 + ReactDOM","~45 KB"],["Vue 3","~34 KB"],["Preact","~4 KB"],["Solid","~7 KB"],["XuNay 核心","~4.86 KB"]]),
     H2("性能对比（1000 项列表更新）"),
     Table(["操作","React","Vue 3","XuNay"], [["创建 1000 行","~90ms","~70ms","~40ms"],["更新 1 行文本","~5ms","~3ms","~0.2ms"],["交换两行","~15ms","~10ms","~0.5ms"],["删除 1 行","~8ms","~5ms","~0.3ms"]]),
     P("差距来自\"无 diff\"——xunay 知道数据变了就直接改对应节点，不重建整棵树。"),

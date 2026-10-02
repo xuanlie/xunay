@@ -19,7 +19,7 @@ export function Doc() {
     Code("{\n  \"xunay\": {\n    \"devtools\": true\n  }\n}", "json"),
     Table(["值","行为"], [["true","打包并在页面显示"],["false","完全剔除——产物无按钮代码"]]),
     H2("配置为 false 时"),
-    P("构建产物里没有 devtools 相关代码——gzip 从 6.2KB 降到 4.7KB。"),
+    P("devtools 是独立 bundle——核心 4.86KB 从不包含它，按需加载 13.14KB。"),
     H2("不打包也能用"),
     P("用 CDN 或手动引入："),
     Code("<script src=\"/xunay-devtools.js\"></script>\n<script>\n  window.openDevtools()\n</script>", "html"),

@@ -8,7 +8,7 @@ export function Doc() {
     H2("跑基准"),
     Code("node scripts/bench-runtime.mjs", "bash"),
     H2("实测结果"),
-    Table(["操作","耗时","ops/s"], [["signal 创建","~228 ns","4.4M"],["signal 读","~128 ns","7.8M"],["signal 写（无订阅）","~183 ns","5.5M"],["signal 写 → 触发 effect","~650 ns","1.5M"],["computed 读","~230 ns","4.3M"],["computed 写触发","~1.3 µs","0.79M"],["batch 两写合并","~4.8 µs","0.21M"]]),
+    Table(["操作","耗时","ops/s"], [["signal 创建","~440 ns","2.3M"],["signal 读","~150 ns","6.8M"],["signal 写（无订阅）","~180 ns","5.4M"],["signal 写 → 触发 effect","~1.6 µs","0.62M"],["computed 读","~210 ns","4.8M"],["computed 写触发","~6.8 µs","0.15M"],["batch 两写合并","~2.6 µs","0.38M"]]),
     H2("对比 React"),
     Table(["操作","XuNay","React"], [["读状态","130ns","Hook 调度 ~50ns"],["写状态","180ns","调度 + Diff ~50µs"],["更新 1 个文本节点","1µs","~10µs ~ 5ms"]]),
     H2("为什么快"),
