@@ -55,17 +55,94 @@ function el(v) {
     else set(dom, k, pv)
   }
 
-  for (const c of children) {
+  const MERGE_MIN = runtime.mergeSiblings === false ? Infinity : 8
+  const probeDeps = (fn) => {
+    const fake = { deps: [], disposed: false }
+    const saved = runtime.currentEffect
+    runtime.currentEffect = fake
+    let out = null
+    try {
+      fn()
+      out = fake.deps.slice()
+    } catch (e) {
+      out = null
+    } finally {
+      runtime.currentEffect = saved
+      for (let i = 0; i < fake.deps.length; i++) {
+        const subs = fake.deps[i]
+        const j = subs.indexOf(fake)
+        if (j >= 0) subs.splice(j, 1)
+      }
+    }
+    return out
+  }
+  const sameDeps = (a, b) => {
+    if (!a || !b || a.length !== b.length) return false
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false
+    return true
+  }
+  const tryMergeInfo = (c) => {
+    if (!c || typeof c !== 'object' || !c[ELEMENT]) return null
+    if (!c.children || c.children.length !== 1) return null
+    if (typeof c.children[0] !== 'function') return null
+    const cp = c.props
+    if (cp) for (const k in cp) {
+      const pv = cp[k]
+      if (typeof pv === 'function') return null
+      if (pv && typeof pv === 'object') return null
+    }
+    const deps = probeDeps(c.children[0])
+    if (!deps || deps.length === 0) return null
+    return deps
+  }
+  let ci = 0
+  const clen = children.length
+  while (ci < clen) {
+    const c = children[ci]
+    const cInfo = typeof c !== 'function' ? tryMergeInfo(c) : null
+    if (cInfo) {
+      const rt = c.type
+      let cj = ci + 1
+      while (cj < clen) {
+        const nxt = children[cj]
+        if (typeof nxt === 'function') break
+        const nInfo = tryMergeInfo(nxt)
+        if (!nInfo || nxt.type !== rt || !sameDeps(cInfo, nInfo)) break
+        cj++
+      }
+      if (cj - ci >= MERGE_MIN) {
+        gs()
+        for (let k = ci; k < cj; k++) {
+          const cv = children[k]
+          const cd = document.createElement(cv.type)
+          const cp = cv.props
+          if (cp) for (const pk in cp) set(cd, pk, cp[pk])
+          const txt = document.createTextNode('')
+          cd.appendChild(txt)
+          dom.appendChild(cd)
+          bind.push([0, txt, cv.children[0]])
+        }
+        ci = cj
+        continue
+      }
+    }
     if (typeof c === 'function') {
       const __saved = runtime.currentEffect
       runtime.currentEffect = null
-      let r
-      try { r = c() } finally { runtime.currentEffect = __saved }
-      if (r && r.__xunay_list) { gs(); applyList(dom, r) }
+      let r, err = null
+      try { r = c() } catch (e) { err = e } finally { runtime.currentEffect = __saved }
+      if (err) {
+        gs()
+        const t = document.createTextNode('')
+        t.textContent = '[XuNay] ' + (err.message || String(err))
+        dom.appendChild(t)
+      }
+      else if (r && r.__xunay_list) { gs(); applyList(dom, r) }
       else if (r && r.__xunay_show) { gs(); dom.appendChild(renderShow(r)) }
       else if (r && (r[ELEMENT] || r[FRAGMENT])) { gs(); dom.appendChild(renderDyn(c)) }
       else { gs(); const t = document.createTextNode(''); dom.appendChild(t); bind.push([0, t, c]) }
     } else dom.appendChild(render(c))
+    ci++
   }
 
   if (scope) {
