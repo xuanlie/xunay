@@ -109,6 +109,7 @@
     if (m === 'PUT' || m === 'PATCH') return 'put'
     if (m === 'DELETE') return 'del'
     return 'get'
+    if (m === 'WS') return 'ws'
   }
   function statusClass(c) {
     if (!c) return 'pending'
@@ -220,10 +221,16 @@
     'display:flex;flex-direction:column;overflow:hidden;',
     'border:1px solid #d0d5dd;border-radius:14px;',
     'box-shadow:0 32px 64px -16px rgba(16,24,40,.18),0 16px 32px -16px rgba(16,24,40,.08),0 0 0 1px rgba(255,255,255,.5) inset}',
-    '.__xd_panel.desktop{right:20px;bottom:84px;width:760px;height:540px;animation:xd-pop .32s cubic-bezier(.34,1.4,.64,1)}',
-    '.__xd_panel.mobile{left:0;right:0;bottom:0;width:100vw;height:72vh;border-radius:18px 18px 0 0;animation:xd-slide-up .4s cubic-bezier(.22,1,.36,1)}',
-    '.__xd_panel.mobile::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);',
-    'width:42px;height:4px;background:#d0d5dd;border-radius:2px}',
+    '.__xd_panel.desktop{right:20px;bottom:84px;width:760px;height:540px;min-height:280px;max-height:calc(100vh - 120px);animation:xd-pop .32s cubic-bezier(.34,1.4,.64,1);overflow:hidden}',
+    '.__xd_panel.mobile{left:0;right:0;bottom:0;width:100vw;height:72vh;min-height:36vh;max-height:calc(100vh - 40px);border-radius:18px 18px 0 0;animation:xd-slide-up .4s cubic-bezier(.22,1,.36,1);overflow:hidden}',
+    /* 拖动把手 */
+    '.__xd_rh{position:absolute;top:0;left:0;right:0;height:14px;cursor:ns-resize;z-index:20;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;background:transparent}',
+    '.__xd_rh:hover{background:rgba(99,102,241,.05)}',
+    '.__xd_rh .bar{width:42px;height:4px;background:#d0d5dd;border-radius:2px;transition:background .15s,width .2s}',
+    '.__xd_rh:hover .bar{background:#98a2b3;width:56px}',
+    '.__xd_rh.active .bar{background:#6366f1;width:64px}',
+    '.__xd_panel.mobile .__xd_rh{height:20px;padding-top:6px}',
+    '.__xd_panel.mobile .__xd_rh .bar{width:44px;height:5px}',
 
     /* ============ 顶栏 ============ */
     '.__xd_head{display:flex;align-items:center;padding:10px 14px;background:linear-gradient(180deg,#f9fafb,#fcfcfd);',
@@ -291,6 +298,7 @@
     '.__xd_tag.s3{background:#fffaeb;color:#b54708}',
     '.__xd_tag.s4{background:#fff6ed;color:#c4320a}',
     '.__xd_tag.s5{background:#fef3f2;color:#b42318}',
+    '.__xd_tag.ws{background:#f5f3ff;color:#7c3aed}',
     '.__xd_tag.pending{background:#f2f4f7;color:#475467;position:relative}',
     '.__xd_tag.pending::after{content:"";position:absolute;inset:0;border-radius:6px;background:rgba(99,102,241,.15);animation:xd-pulse 1.4s ease-in-out infinite}',
 
@@ -374,6 +382,55 @@
     '.xd-count{color:#6366f1;font-size:11px;font-weight:700;font-family:ui-monospace,monospace;white-space:nowrap;flex-shrink:0;',
     'background:#eff4ff;padding:3px 9px;border-radius:10px;min-width:28px;text-align:center}',
     '.xd-info-bar{padding:7px 12px;background:#f9fafb;border-bottom:1px solid #eaecf0;font-size:10.5px;color:#98a2b3;font-family:ui-monospace,monospace}',
+
+    /* ============ Elements 面板 ============ */
+    '.__xd_el-tree{flex:1;overflow-y:auto;min-height:0}',
+    '.__xd_el-tree::-webkit-scrollbar{width:8px}',
+    '.__xd_el-tree::-webkit-scrollbar-thumb{background:#d0d5dd;border-radius:4px}',
+    '.__xd_el-row{display:flex;align-items:center;gap:4px;padding:5px 8px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;position:relative}',
+    '.__xd_el-row:hover{background:#f2f4f7}',
+    '.__xd_el-row.on{background:rgba(99,102,241,.12)}',
+    '.__xd_el-row.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#6366f1}',
+    '.__xd_el-arrow{width:12px;font-size:9px;color:#98a2b3;flex-shrink:0;text-align:center;cursor:pointer}',
+    '.__xd_el-tag{color:#9a3412;font-weight:500;flex-shrink:0}',
+    '.__xd_el-id{color:#b54708;flex-shrink:0}',
+    '.__xd_el-cls{color:#0e7490;overflow:hidden;text-overflow:ellipsis;min-width:0}',
+    '.__xd_el-txt{padding:3px 8px;color:#98a2b3;font-style:italic;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:ui-monospace,monospace}',
+    /* 行内详情块 */
+    '.__xd_el-inline{margin:2px 8px 8px;background:#fff;border:1px solid #e4e7ec;border-radius:8px;padding:10px 12px;animation:xd-fade-in .22s;box-shadow:0 1px 3px rgba(16,24,40,.04)}',
+    '.__xd_el-ihead{display:flex;flex-direction:column;gap:3px;padding-bottom:8px;border-bottom:1px solid #f2f4f7;margin-bottom:8px}',
+    '.__xd_el-itag{font-weight:600;font-size:12.5px;color:#9a3412;font-family:ui-monospace,monospace}',
+    '.__xd_el-ipath{color:#98a2b3;font-size:10.5px;font-family:ui-monospace,monospace;word-break:break-all;line-height:1.4}',
+    '.__xd_el-iblock{margin-bottom:10px}',
+    '.__xd_el-iblock:last-child{margin-bottom:0}',
+    '.__xd_el-ititle{font-size:10.5px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}',
+    '.__xd_el-iattr{display:flex;gap:8px;padding:2px 0;font-family:ui-monospace,monospace;font-size:11.5px;word-break:break-all}',
+    '.__xd_el-iakey{color:#6366f1;font-weight:500;flex-shrink:0;min-width:70px}',
+    '.__xd_el-iaval{color:#101828;flex:1;min-width:0;word-break:break-all}',
+    '.__xd_el-ikv{color:#475467;font-family:ui-monospace,monospace;font-size:11.5px}',
+    '.__xd_el-ihtml{background:#f9fafb;border:1px solid #eaecf0;border-radius:6px;padding:7px 9px;font-family:ui-monospace,monospace;font-size:10.5px;line-height:1.55;color:#475467;word-break:break-all;white-space:pre-wrap;max-height:180px;overflow-y:auto}',
+    '.__xd_el-iacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}',
+    '.__xd_el-ibtn{padding:5px 10px;font-size:11px;background:#fff;border:1px solid #d0d5dd;border-radius:6px;cursor:pointer;color:#475467;font-family:inherit;transition:all .15s}',
+    '.__xd_el-ibtn:hover{background:#f2f4f7;color:#101828;border-color:#98a2b3}',
+    '.__xd_el-ibtn:active{transform:scale(.96)}',
+    '@media (max-width:768px){',
+    '.__xd_el-row{font-size:14px;padding:11px 10px;gap:6px}',
+    '.__xd_el-arrow{font-size:11px;width:14px}',
+    '.__xd_el-txt{font-size:12.5px;padding:4px 8px}',
+    '.__xd_el-tag{font-size:13.5px}',
+    '.__xd_el-id{font-size:13px}',
+    '.__xd_el-cls{font-size:13px}',
+    '.__xd_el-inline{margin:4px 10px 12px;padding:12px 14px}',
+    '.__xd_el-itag{font-size:14px}',
+    '.__xd_el-ipath{font-size:11.5px}',
+    '.__xd_el-ititle{font-size:11.5px}',
+    '.__xd_el-iattr{font-size:12.5px;padding:4px 0;gap:10px}',
+    '.__xd_el-iakey{min-width:80px;font-size:12.5px}',
+    '.__xd_el-iaval{font-size:12.5px}',
+    '.__xd_el-ikv{font-size:12.5px}',
+    '.__xd_el-ihtml{font-size:12px;max-height:none}',
+    '.__xd_el-ibtn{padding:10px 14px;font-size:13px;min-height:40px;border-radius:8px;flex:1}',
+    '}',
 
     /* ============ 统计 ============ */
     '.__xd_stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px}',
@@ -562,41 +619,63 @@
   }
 
   /* ============ 元素 ============ */
+  var TAG_COLORS = {
+    div: '#9a3412', section: '#9a3412', article: '#9a3412', main: '#9a3412',
+    header: '#9a3412', footer: '#9a3412', nav: '#9a3412', aside: '#9a3412',
+    span: '#0e7490', p: '#0e7490', em: '#0e7490', strong: '#0e7490',
+    a: '#6d28d9',
+    button: '#b45309', input: '#166534', textarea: '#166534', select: '#166534',
+    form: '#be185d', label: '#be185d',
+    h1: '#1e40af', h2: '#1e40af', h3: '#1e40af', h4: '#1e40af', h5: '#1e40af', h6: '#1e40af',
+    ul: '#7c2d12', ol: '#7c2d12', li: '#7c2d12',
+    img: '#c026d3', svg: '#c026d3', canvas: '#c026d3',
+    table: '#0369a1', tr: '#0369a1', td: '#0369a1', th: '#0369a1',
+    code: '#0f766e', pre: '#0f766e',
+  }
+
+  function treePrefix(ancestors) {
+    var s = ''
+    for (var i = 0; i < ancestors.length - 1; i++) {
+      s += ancestors[i] ? '\u2502  ' : '   '
+    }
+    if (ancestors.length > 0) {
+      s += ancestors[ancestors.length - 1] ? '\u251C\u2500 ' : '\u2514\u2500 '
+    }
+    return s
+  }
+
   function renderElements() {
     if (XD._elFilter === undefined) XD._elFilter = ''
+    if (XD._selNode === undefined) XD._selNode = null
+
+    var st0 = bodyEl.scrollTop
+    bodyEl.innerHTML = ''
     var sb = searchBar('过滤元素（标签 / #id / .class）', function (v) {
       XD._elFilter = v.toLowerCase()
-      var scrollTop = bodyEl.scrollTop
-      bodyEl.innerHTML = ''
       renderElements()
-      bodyEl.scrollTop = scrollTop
     }, XD._elFilter)
     bodyEl.appendChild(sb.el)
-    var bar = h('div', { class: 'xd-info-bar' })
+
+    var treeEl = h('div', { class: '__xd_el-tree' })
+    bodyEl.appendChild(treeEl)
+    treeElRef = treeEl
+
     var cnt = 0
     ;(function count(n) {
-      if (!n || n === panel) return
+      if (!n || n === panel || n === hlEl) return
       if (n.nodeType === 1) {
         cnt++
-        var tag = n.tagName.toLowerCase()
-        var id = n.id ? '#' + n.id : ''
-        var cls = n.className && typeof n.className === 'string' ? '.' + n.className.trim().replace(/\s+/g, '.') : ''
-        var text = (tag + id + cls).toLowerCase()
-        if (XD._elFilter && text.indexOf(XD._elFilter) < 0) return
         for (var i = 0; i < n.childNodes.length; i++) count(n.childNodes[i])
       }
     })(document.body)
-    bar.textContent = cnt + ' 个元素'
-    bodyEl.appendChild(bar)
+    treeEl.appendChild(h('div', { class: 'xd-info-bar' }, cnt + ' 个元素'))
 
     function matchNode(node) {
       if (!XD._elFilter) return true
       var tag = node.tagName.toLowerCase()
       var id = node.id ? '#' + node.id : ''
       var cls = node.className && typeof node.className === 'string' ? '.' + node.className.trim().replace(/\s+/g, '.') : ''
-      var text = (tag + id + cls).toLowerCase()
-      if (text.indexOf(XD._elFilter) >= 0) return true
-      // 子节点有匹配也算
+      if ((tag + id + cls).toLowerCase().indexOf(XD._elFilter) >= 0) return true
       for (var i = 0; i < node.childNodes.length; i++) {
         var c = node.childNodes[i]
         if (c.nodeType === 1 && matchNode(c)) return true
@@ -604,90 +683,185 @@
       return false
     }
 
-    function walk(node, depth, idx) {
-      if (node && node.nodeType === 1 && !matchNode(node)) return
+    // 渲染"详情块"（嵌在行下方）
+    function renderInlineDetail(node, depth) {
+      var box = h('div', { class: '__xd_el-inline' })
+      box.style.marginLeft = (18 + depth * 14) + 'px'
+
+      var tag = node.tagName.toLowerCase()
+
+      // 头部：选择器
+      var head = h('div', { class: '__xd_el-ihead' })
+      head.appendChild(h('span', { class: '__xd_el-itag' }, '<' + tag + '>'))
+      head.appendChild(h('span', { class: '__xd_el-ipath' }, buildSelector(node)))
+      box.appendChild(head)
+
+      // 属性
+      if (node.attributes.length > 0) {
+        var attrs = h('div', { class: '__xd_el-iblock' })
+        attrs.appendChild(h('div', { class: '__xd_el-ititle' }, '属性'))
+        for (var i = 0; i < node.attributes.length; i++) {
+          var a = node.attributes[i]
+          var r = h('div', { class: '__xd_el-iattr' })
+          r.appendChild(h('span', { class: '__xd_el-iakey' }, a.name))
+          r.appendChild(h('span', { class: '__xd_el-iaval' }, a.value))
+          attrs.appendChild(r)
+        }
+        box.appendChild(attrs)
+      }
+
+      // 尺寸
+      var rc = node.getBoundingClientRect()
+      var sz = h('div', { class: '__xd_el-iblock' })
+      sz.appendChild(h('div', { class: '__xd_el-ititle' }, '尺寸'))
+      sz.appendChild(h('div', { class: '__xd_el-ikv' }, Math.round(rc.width) + ' × ' + Math.round(rc.height) + '   (' + Math.round(rc.top) + ',' + Math.round(rc.left) + ')'))
+      box.appendChild(sz)
+
+      // HTML
+      var htmlBlock = h('div', { class: '__xd_el-iblock' })
+      htmlBlock.appendChild(h('div', { class: '__xd_el-ititle' }, 'HTML'))
+      var oh = node.outerHTML || ''
+      var pre = h('div', { class: '__xd_el-ihtml' })
+      pre.textContent = oh.length > 600 ? oh.slice(0, 600) + '\u2026' : oh
+      htmlBlock.appendChild(pre)
+      box.appendChild(htmlBlock)
+
+      // 操作
+      var acts = h('div', { class: '__xd_el-iacts' })
+      var b1 = h('button', { class: '__xd_el-ibtn' }, '复制选择器')
+      b1.onclick = function (e) { e.stopPropagation(); copy(buildSelector(node)) }
+      acts.appendChild(b1)
+      var b2 = h('button', { class: '__xd_el-ibtn' }, '复制 HTML')
+      b2.onclick = function (e) { e.stopPropagation(); copy(oh) }
+      acts.appendChild(b2)
+      var b3 = h('button', { class: '__xd_el-ibtn' }, '收起')
+      b3.onclick = function (e) { e.stopPropagation(); XD._selNode = null; clearHl(); renderElements() }
+      acts.appendChild(b3)
+      box.appendChild(acts)
+
+      return box
+    }
+
+    function walk(node, depth) {
       if (!node) return
-      if (node === panel) return
-      if (node.nodeType === 1) {
-        var tag = node.tagName.toLowerCase()
-        var hasKids = node.childNodes.length > 0
-        var collapsed = XD._collapsed.has(node)
+      if (node === panel || node === hlEl) return
+      if (node.nodeType === 1 && !matchNode(node)) return
 
-        var row = h('div', { class: '__xd_row click anim' })
-        row.style.paddingLeft = (12 + depth * 14) + 'px'
-        row.style.animationDelay = Math.min(idx * 0.008, 0.3) + 's'
-
-        if (hasKids) {
-          var arrow = h('span', null, collapsed ? '▶' : '▼')
-          arrow.style.cssText = 'width:12px;font-size:9px;color:#98a2b3;flex-shrink:0;text-align:center;transition:transform .2s'
-          arrow.onclick = function (e) {
-            e.stopPropagation()
-            if (collapsed) XD._collapsed.delete(node)
-            else XD._collapsed.add(node)
-            renderBody()
-          }
-          row.appendChild(arrow)
-        } else {
-          var dot = h('span', null, '·')
-          dot.style.cssText = 'width:12px;font-size:12px;color:#d0d5dd;flex-shrink:0;text-align:center'
-          row.appendChild(dot)
-        }
-
-        var tagEl = h('span', null, '<' + tag + '>')
-        tagEl.style.cssText = 'color:#9a3412;font-weight:600;flex-shrink:0'
-        row.appendChild(tagEl)
-
-        if (node.id) {
-          var idEl = h('span', null, '#' + node.id)
-          idEl.style.cssText = 'color:#b54708;flex-shrink:0'
-          row.appendChild(idEl)
-        }
-
-        if (node.className && typeof node.className === 'string' && node.className.trim()) {
-          var cls = node.className.trim().split(/\s+/)
-          var clsText = '.' + cls.slice(0, 3).join('.')
-          if (cls.length > 3) clsText += ' +' + (cls.length - 3)
-          var clsEl = h('span', null, clsText)
-          clsEl.style.cssText = 'color:#0e7490;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0'
-          row.appendChild(clsEl)
-        } else {
-          var sp = h('span'); sp.style.flex = '1'
-          row.appendChild(sp)
-        }
-
-        var rect = node.getBoundingClientRect()
-        if (rect.width || rect.height) {
-          var size = h('span', null, Math.round(rect.width) + '×' + Math.round(rect.height))
-          size.style.cssText = 'color:#98a2b3;font-size:10px;flex-shrink:0'
-          row.appendChild(size)
-        }
-
-        var path = buildSelector(node)
-        row.appendChild(copyBtn(function () { return path }, ''))
-        row.onclick = function (e) {
-          if (e.target && e.target.closest && e.target.closest('.__xd-copy, .xd-copy')) return
-          highlightNode(node)
-        }
-        bodyEl.appendChild(row)
-
-        if (!collapsed) {
-          var kids = Array.prototype.slice.call(node.childNodes)
-          for (var i = 0; i < kids.length; i++) walk(kids[i], depth + 1, idx + i)
-        }
-      } else if (node.nodeType === 3) {
+      if (node.nodeType === 3) {
         var txt = node.textContent.trim()
-        if (txt) {
-          var tr = h('div', { class: '__xd_row anim' })
-          tr.style.paddingLeft = (26 + depth * 14) + 'px'
-          tr.style.color = '#98a2b3'
-          tr.style.fontStyle = 'italic'
-          tr.style.animationDelay = Math.min(idx * 0.008, 0.3) + 's'
-          tr.textContent = '"' + (txt.length > 50 ? txt.slice(0, 50) + '…' : txt) + '"'
-          bodyEl.appendChild(tr)
+        if (!txt) return
+        var tr = h('div', { class: '__xd_el-txt' })
+        tr.style.paddingLeft = (22 + depth * 14) + 'px'
+        tr.textContent = '"' + (txt.length > 50 ? txt.slice(0, 50) + '\u2026' : txt) + '"'
+        treeEl.appendChild(tr)
+        return
+      }
+      if (node.nodeType !== 1) return
+
+      var tag = node.tagName.toLowerCase()
+      var hasKids = false
+      for (var i = 0; i < node.childNodes.length; i++) {
+        var cn = node.childNodes[i]
+        if (cn.nodeType === 1 || (cn.nodeType === 3 && cn.textContent.trim())) { hasKids = true; break }
+      }
+      var collapsed = XD._collapsed.has(node)
+      var isSel = XD._selNode === node
+
+      var row = h('div', { class: '__xd_el-row' + (isSel ? ' on' : '') })
+      row.style.paddingLeft = (10 + depth * 14) + 'px'
+
+      var arrow = h('span', { class: '__xd_el-arrow' })
+      if (hasKids) {
+        arrow.textContent = collapsed ? '\u25B6' : '\u25BC'
+        arrow.onclick = function (e) {
+          e.stopPropagation()
+          if (collapsed) XD._collapsed.delete(node)
+          else XD._collapsed.add(node)
+          renderElements()
         }
+      } else {
+        arrow.textContent = '\u00B7'
+        arrow.style.opacity = '0.3'
+      }
+      row.appendChild(arrow)
+
+      var tagEl = h('span', { class: '__xd_el-tag' })
+      tagEl.textContent = '<' + tag + '>'
+      row.appendChild(tagEl)
+
+      if (node.id) {
+        var idEl = h('span', { class: '__xd_el-id' })
+        idEl.textContent = '#' + node.id
+        row.appendChild(idEl)
+      }
+
+      if (node.className && typeof node.className === 'string' && node.className.trim()) {
+        var cl = node.className.trim().split(/\s+/)
+        var ct = '.' + cl.slice(0, 2).join('.')
+        if (cl.length > 2) ct += ' +' + (cl.length - 2)
+        var clsEl = h('span', { class: '__xd_el-cls' })
+        clsEl.textContent = ct
+        row.appendChild(clsEl)
+      }
+
+      row.onmouseenter = function () { if (XD._selNode !== node) showHl(node, false) }
+      row.onmouseleave = function () { if (XD._selNode !== node) clearHl() }
+      row.onclick = function (e) {
+        e.stopPropagation()
+        if (e.target === arrow) return
+        if (XD._selNode === node) {
+          XD._selNode = null
+          clearHl()
+        } else {
+          XD._selNode = node
+          showHl(node, true)
+        }
+        renderElements()
+      }
+
+      treeEl.appendChild(row)
+
+      // ★ 关键：如果这行被选中，紧跟着插入详情块 ★
+      if (isSel) {
+        treeEl.appendChild(renderInlineDetail(node, depth))
+      }
+
+      if (!collapsed) {
+        var kids = Array.prototype.slice.call(node.childNodes)
+        var elemKids = []
+        for (var k = 0; k < kids.length; k++) {
+          var kk = kids[k]
+          if (kk.nodeType === 1 || (kk.nodeType === 3 && kk.textContent.trim())) elemKids.push(kk)
+        }
+        for (var k2 = 0; k2 < elemKids.length; k2++) walk(elemKids[k2], depth + 1)
       }
     }
-    walk(document.body, 0, 0)
+
+    walk(document.body, 0)
+  }
+
+  var treeElRef = null
+
+  var _hlTimer = null
+  function showHl(node, fixed) {
+    clearHl()
+    if (!node || node.nodeType !== 1 || node === document.body) return
+    var r = node.getBoundingClientRect()
+    var el = h('div', { class: '__xd_hl' })
+    el.style.left = r.left + 'px'
+    el.style.top = r.top + 'px'
+    el.style.width = r.width + 'px'
+    el.style.height = r.height + 'px'
+    document.body.appendChild(el)
+    hlEl = el
+    if (!fixed) {
+      _hlTimer = setTimeout(function () { if (!XD._selNode) clearHl() }, 2000)
+    }
+  }
+  function clearHl() {
+    if (_hlTimer) { clearTimeout(_hlTimer); _hlTimer = null }
+    if (hlEl && hlEl.parentNode) hlEl.parentNode.removeChild(hlEl)
+    hlEl = null
   }
 
   function buildSelector(node) {
@@ -715,23 +889,6 @@
   }
 
   var hlEl = null
-  function highlightNode(node) {
-    if (hlEl && hlEl.parentNode) hlEl.parentNode.removeChild(hlEl)
-    hlEl = null
-    if (!node || node.nodeType !== 1 || node === document.body) return
-    var r = node.getBoundingClientRect()
-    var el = h('div', { class: '__xd_hl' })
-    el.style.left = r.left + 'px'
-    el.style.top = r.top + 'px'
-    el.style.width = r.width + 'px'
-    el.style.height = r.height + 'px'
-    document.body.appendChild(el)
-    hlEl = el
-    setTimeout(function () {
-      if (hlEl === el && el.parentNode) el.parentNode.removeChild(el)
-      if (hlEl === el) hlEl = null
-    }, 1200)
-  }
 
   /* ============ 网络 ============ */
   function renderNetwork() {
@@ -791,14 +948,20 @@
         var u = h('span', null, n.url.replace(/^https?:\/\/[^/]+/, ''))
         u.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;color:#101828;min-width:0'
         row.appendChild(u)
-        if (n.size) {
+        if (n.isWS && n.messages) {
+          var mc = h('span', null, n.messages.length + ' 条')
+          mc.style.cssText = 'color:#6366f1;font-size:10.5px;font-weight:600;flex-shrink:0;background:rgba(99,102,241,.1);padding:2px 6px;border-radius:4px'
+          row.appendChild(mc)
+        } else if (n.size) {
           var sz = h('span', null, fmtBytes(n.size))
           sz.style.cssText = 'color:#98a2b3;font-size:10.5px;flex-shrink:0'
           row.appendChild(sz)
         }
-        var d = h('span', null, fmtMs(n.duration))
-        d.style.cssText = 'color:#475467;font-weight:600;flex-shrink:0;font-size:11px'
-        row.appendChild(d)
+        if (!n.isWS) {
+          var d = h('span', null, fmtMs(n.duration))
+          d.style.cssText = 'color:#475467;font-weight:600;flex-shrink:0;font-size:11px'
+          row.appendChild(d)
+        }
         row.appendChild(copyBtn(function () { return JSON.stringify(n, null, 2) }, ''))
         row.onclick = function () { showNetDetail(n) }
         bodyEl.appendChild(row)
@@ -839,7 +1002,13 @@
     bodyEl.appendChild(head)
 
     var subtabs = h('div', { class: '__xd_dtab' })
-    ;[['overview', '概览'], ['reqHeaders', '请求头'], ['reqBody', '请求体'], ['resHeaders', '响应头'], ['resBody', '响应体']].forEach(function (t) {
+    var tabsList = [['overview', '概览']]
+    if (n.isWS) tabsList.push(['messages', '消息 ' + ((n.messages && n.messages.length) || 0)])
+    tabsList.push(['reqHeaders', '请求头'])
+    if (!n.isWS) tabsList.push(['reqBody', '请求体'])
+    tabsList.push(['resHeaders', '响应头'])
+    if (!n.isWS) tabsList.push(['resBody', '响应体'])
+    tabsList.forEach(function (t) {
       var b = h('button', { class: netTab === t[0] ? 'on' : '' }, t[1])
       b.onclick = function () { netTab = t[0]; showNetDetail(n) }
       subtabs.appendChild(b)
@@ -855,7 +1024,8 @@
         kv.appendChild(row)
       })
       bodyEl.appendChild(kv)
-    } else if (netTab === 'reqHeaders') renderKv(n.reqHeaders || {}, '请求头')
+    } else if (netTab === 'messages') renderWSMessages(n.messages || [])
+    else if (netTab === 'reqHeaders') renderKv(n.reqHeaders || {}, '请求头')
     else if (netTab === 'reqBody') renderBodyTab(n.reqBody, '请求体')
     else if (netTab === 'resHeaders') renderKv(n.resHeaders || {}, '响应头')
     else if (netTab === 'resBody') renderBodyTab(n.resBody, '响应体')
@@ -863,6 +1033,25 @@
 
   function headersText(h) { var out = []; for (var k in h) out.push(k + ': ' + h[k]); return out.join('\n') }
   function pretty(t) { if (!t) return ''; try { return JSON.stringify(JSON.parse(t), null, 2) } catch (e) { return t } }
+
+  function renderWSMessages(msgs) {
+    var head = h('div', { class: '__xd_dtitle' })
+    head.appendChild(h('span', null, '消息（' + msgs.length + '）'))
+    head.appendChild(copyBtn(function () {
+      return msgs.map(function (m) { return m.dir + ' ' + m.data }).join('\n')
+    }))
+    bodyEl.appendChild(head)
+    if (!msgs.length) return bodyEl.appendChild(h('div', { class: '__xd_empty' }, '还没有消息'))
+    msgs.forEach(function (m) {
+      var row = h('div', { class: '__xd_row' })
+      var dir = h('span', { class: '__xd_tag ' + (m.dir === '\u2191' ? 'post' : 'get') }, m.dir)
+      row.appendChild(dir)
+      var d = h('span', null, m.data.length > 300 ? m.data.slice(0, 300) + '\u2026' : m.data)
+      d.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;color:#101828;min-width:0;font-family:ui-monospace,monospace;font-size:11px'
+      row.appendChild(d)
+      bodyEl.appendChild(row)
+    })
+  }
 
   function renderKv(obj, title) {
     var keys = Object.keys(obj)
@@ -1167,12 +1356,62 @@
   try { if (window.PerformanceObserver) { new PerformanceObserver(function (list) { var es = list.getEntries(); for (var i = 0; i < es.length; i++) { XD.longTasks.push({ start: es[i].startTime, duration: es[i].duration }); if (XD.longTasks.length > 100) XD.longTasks.shift() } }).observe({ entryTypes: ['longtask'] }) } } catch (e) {}
 
   /* ============ 打开/关闭 ============ */
+  function syncBodyPadding() {
+    if (!XD.open || !panel) return
+    // 手机：面板占底部，给 body 留出面板高度的空白
+    // 桌面：面板在右下角浮着，不影响文档流，不需要
+    if (isMobile()) {
+      var h = panel.offsetHeight
+      document.body.style.paddingBottom = (h + 16) + 'px'
+    } else {
+      document.body.style.paddingBottom = ''
+    }
+  }
+
   function open() {
     if (XD.open) return
     XD.open = true
     injectStyle()
-    startHooks()
     panel = h('div', { class: '__xd_panel ' + (isMobile() ? 'mobile' : 'desktop') })
+
+    // 拖动把手（顶边）
+    var rh = h('div', { class: '__xd_rh' })
+    var rhBar = h('span', { class: 'bar' })
+    rh.appendChild(rhBar)
+    ;(function () {
+      var drag = { on: false, sy: 0, h: 0 }
+      function onDown(e) {
+        e.preventDefault()
+        drag.on = true
+        drag.sy = e.touches ? e.touches[0].clientY : e.clientY
+        drag.h = panel.offsetHeight
+        rh.classList.add('active')
+        panel.style.animation = 'none'
+      }
+      function onMove(e) {
+        if (!drag.on) return
+        var y = e.touches ? e.touches[0].clientY : e.clientY
+        var delta = drag.sy - y
+        var nextH = drag.h + delta
+        var minH = isMobile() ? window.innerHeight * 0.36 : 280
+        var maxH = isMobile() ? window.innerHeight - 40 : window.innerHeight - 120
+        nextH = Math.max(minH, Math.min(maxH, nextH))
+        panel.style.height = nextH + 'px'
+        syncBodyPadding()
+      }
+      function onUp() {
+        if (!drag.on) return
+        drag.on = false
+        rh.classList.remove('active')
+      }
+      rh.addEventListener('mousedown', onDown)
+      rh.addEventListener('touchstart', onDown, { passive: false })
+      document.addEventListener('mousemove', onMove)
+      document.addEventListener('touchmove', onMove, { passive: false })
+      document.addEventListener('mouseup', onUp)
+      document.addEventListener('touchend', onUp)
+    })()
+    panel.appendChild(rh)
 
     var head = h('div', { class: '__xd_head' })
     head.appendChild(h('span', { class: '__xd_title' }, 'DevTools'))
@@ -1200,6 +1439,7 @@
 
     renderTabs()
     renderBody()
+    syncBodyPadding()
   }
 
   function close() {
@@ -1213,6 +1453,7 @@
     btn.innerHTML = ''
     btn.appendChild(svg(ICONS.dev, 22))
     btn.style.bottom = '20px'
+    document.body.style.paddingBottom = ''
   }
 
   btn.addEventListener('click', function () {
@@ -1270,8 +1511,22 @@
       }
     } catch (e) {}
     try {
-      var rt = window.__XUNAY_RUNTIME__
-      if (rt && rt.hooks && !rt.hooks.__xd) {
+      var G = typeof globalThis !== 'undefined' ? globalThis : window
+      var rt = G.__XUNAY_RUNTIME__
+      if (!rt) {
+        // devtools 先于 xunay 加载时，主动建 runtime
+        rt = G.__XUNAY_RUNTIME__ = {
+          currentEffect: null, effectStack: [],
+          currentScope: null, scopeStack: [],
+          batchDepth: 0, pendingEffects: new Set(),
+          hooks: {
+            onSignalCreate: null, onSignalSet: null,
+            onEffectCreate: null, onEffectRun: null,
+            onScopeCreate: null, onScopeDispose: null,
+          }
+        }
+      }
+      if (rt.hooks && !rt.hooks.__xd) {
         rt.hooks.__xd = true
         var origCreate = rt.hooks.onSignalCreate
         rt.hooks.onSignalCreate = function (s) {
@@ -1289,9 +1544,84 @@
         }
       }
     } catch (e) {}
+
+    // 监控 WebSocket
+    try {
+      if (window.WebSocket && !window.WebSocket.__xd) {
+        var OrigWS = window.WebSocket
+        var XDWS = function (url, protocols) {
+          var ws = protocols !== undefined ? new OrigWS(url, protocols) : new OrigWS(url)
+          var entry = {
+            url: String(url),
+            method: 'WS',
+            status: 0,
+            statusText: 'connecting',
+            duration: 0,
+            start: performance.now(),
+            isWS: true,
+            messages: [],
+            reqHeaders: { upgrade: 'websocket', connection: 'Upgrade' },
+            resHeaders: {},
+            reqBody: '',
+            resBody: '',
+            size: 0,
+            error: null,
+          }
+          XD.nets.push(entry)
+          if (XD.nets.length > 200) XD.nets.shift()
+          if (XD.open && XD.tab === 'network') { renderTabs(); renderBody() }
+
+          ws.addEventListener('open', function () {
+            entry.status = 101
+            entry.statusText = 'open'
+            entry.duration = performance.now() - entry.start
+            if (XD.open && XD.tab === 'network') { renderTabs(); renderBody() }
+          })
+          ws.addEventListener('close', function (e) {
+            entry.statusText = 'closed ' + (e && e.code ? e.code : '')
+            entry.duration = performance.now() - entry.start
+            if (XD.open && XD.tab === 'network') { renderTabs(); renderBody() }
+          })
+          ws.addEventListener('error', function () {
+            entry.error = 'WebSocket error'
+            entry.statusText = 'error'
+            if (XD.open && XD.tab === 'network') { renderTabs(); renderBody() }
+          })
+          ws.addEventListener('message', function (e) {
+            var data = typeof e.data === 'string' ? e.data : '[binary]'
+            entry.messages.push({ dir: '\u2193', data: data, t: performance.now() })
+            if (entry.messages.length > 500) entry.messages.shift()
+            entry.size += data.length
+            if (XD.open && XD.tab === 'network') { renderBody() }
+          })
+
+          var origSend = ws.send
+          ws.send = function (data) {
+            var d = typeof data === 'string' ? data : '[binary]'
+            entry.messages.push({ dir: '\u2191', data: d, t: performance.now() })
+            if (entry.messages.length > 500) entry.messages.shift()
+            entry.size += d.length
+            if (XD.open && XD.tab === 'network') { renderBody() }
+            return origSend.apply(ws, arguments)
+          }
+          return ws
+        }
+        XDWS.prototype = OrigWS.prototype
+        XDWS.CONNECTING = 0
+        XDWS.OPEN = 1
+        XDWS.CLOSING = 2
+        XDWS.CLOSED = 3
+        XDWS.__xd = true
+        window.WebSocket = XDWS
+      }
+    } catch (e) {}
   }
 
-  // hooks 延迟到 open() 时挂载 —— 页面加载零开销
+  // 页面加载就挂 hook，让打开前的 signal / effect 也被记录
+  // 成本极低（只包几个函数），面板 UI 才延迟到 open()
+  startHooks()
+
+  window.addEventListener('resize', function () { if (XD.open) syncBodyPadding() })
 
   window.openDevtools = open
   window.closeDevtools = close
