@@ -14,7 +14,7 @@ const routes = JSON.parse(fs.readFileSync(path.join(ROOT, 'shared/routes.json'),
 globalThis.checkToken = checkToken
 initDB()
 
-const PORT = cfg.ports.node
+const PORT = parseInt(process.env.XUNAY_PORT, 10) || cfg.ports.node
 
 for (const r of routes) {
   const fn = handlers[r.handler]

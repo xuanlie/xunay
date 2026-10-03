@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
 using json = nlohmann::json;
 
@@ -36,6 +37,9 @@ int main() {
 
     auto routes = loadRoutes();
     int port = loadPort();
+    if (const char* env = std::getenv("XUNAY_PORT")) {
+        try { port = std::stoi(env); } catch (...) {}
+    }
 
     httplib::Server svr;
     registerAll(svr, routes);

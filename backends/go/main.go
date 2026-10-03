@@ -62,6 +62,9 @@ func main() {
 		log.Fatal("解析配置失败:", err)
 	}
 	port := cfg.Ports["go"]
+	if p := os.Getenv("XUNAY_PORT"); p != "" {
+		if n, err := strconv.Atoi(p); err == nil { port = n }
+	}
 	addr := ":" + strconv.Itoa(port)
 
 	routesData, err := os.ReadFile(filepath.Join(root, "shared", "routes.json"))
