@@ -1,5 +1,8 @@
 XuNay
 
+[![npm version](https://badge.fury.io/js/xunay.svg)](https://www.npmjs.com/package/xunay)
+[![GitHub](https://img.shields.io/badge/github-xuanlie%2Fxunay-blue)](https://github.com/xuanlie/xunay)
+
 内存最少、速度最快的前端框架。gzip 5.0KB，零依赖，无 VDOM，无 Fiber。
 
 数字

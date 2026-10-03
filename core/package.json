@@ -1,6 +1,6 @@
 {
   "name": "xunay",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "内存最少、速度最快的前端框架",
   "type": "module",
   "main": "./src/index.js",
@@ -39,5 +39,13 @@
   },
   "bin": {
     "xuyc": "./bin/xuyc.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuanlie/xunay.git"
+  },
+  "homepage": "https://github.com/xuanlie/xunay#readme",
+  "bugs": {
+    "url": "https://github.com/xuanlie/xunay/issues"
   }
 }
