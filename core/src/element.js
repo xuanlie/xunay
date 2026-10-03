@@ -1,5 +1,5 @@
-export const ELEMENT = Symbol('xunay.element')
-export const FRAGMENT = Symbol('xunay.fragment')
+export const ELEMENT = Symbol.for('xunay.element')
+export const FRAGMENT = Symbol.for('xunay.fragment')
 
 export function createElement(type, props, ...children) { return { [ELEMENT]: true, type, props: props || {}, children } }
 export function createFragment(children) { return { [FRAGMENT]: true, children } }
