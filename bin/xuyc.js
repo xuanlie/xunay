@@ -32,6 +32,7 @@ const ALIAS = XUNAY_CFG.alias || {}
 const DEFINE = XUNAY_CFG.define || {}
 const TITLE_CFG = XUNAY_CFG.title || null
 const OPEN_BROWSER = XUNAY_CFG.open === true
+const PWA_CFG = XUNAY_CFG.pwa || null
 
 let DEVTOOLS_INJECTED = false
 console.log('[xuyc] devtools:', DEVTOOLS_ON ? 'on' : 'off')
@@ -62,10 +63,13 @@ const xunayPath = path.join(outDir, 'xunay.js')
 fs.copyFileSync(esm, xunayPath)
 
 // devtools 产物（如果配置开启）
+let dtFileName = 'xunay-devtools.js'
 if (DEVTOOLS_ON) {
   const dtSrc = path.join(ROOT, 'core/dist/xunay-devtools.min.js')
   if (fs.existsSync(dtSrc)) {
-    fs.copyFileSync(dtSrc, path.join(outDir, 'xunay-devtools.js'))
+    const hash = Math.floor(fs.statSync(dtSrc).mtimeMs).toString(36).slice(-6)
+    dtFileName = 'xunay-devtools.' + hash + '.js'
+    fs.copyFileSync(dtSrc, path.join(outDir, dtFileName))
   }
 }
 
@@ -205,10 +209,64 @@ const t = raw.match(/\/\/\s*title:\s*(.+)/)
 const title = TITLE_CFG || (t ? t[1].trim() : path.basename(entryPath, '.xuy'))
 
 const cssTag = cssLinks.map(l => '<link rel="stylesheet" href="' + l + '">').join('\n')
-const devtoolsScript = DEVTOOLS_ON ? '<script type="module" async src="./xunay-devtools.js"></script>' : ''
+const devtoolsScript = DEVTOOLS_ON ? '<script type="module" async src="./' + dtFileName + '"></script>' : ''
 const errScript = '<script>window.addEventListener("error",function(e){var m=(e.error&&e.error.stack)||e.message||"unknown";var l=(e.filename||"")+":"+(e.lineno||"")+":"+(e.colno||"");var d=document.getElementById("app");if(d)d.innerHTML="<pre style=\\"color:#d00;padding:20px;font-size:12px;white-space:pre-wrap;word-break:break-all\\">[ERROR]\\n\\n"+l+"\\n\\n"+m+"</pre>"},true);window.addEventListener("unhandledrejection",function(e){var r=e.reason;var d=document.getElementById("app");if(d)d.innerHTML="<pre style=\\"color:#d00;padding:20px;font-size:12px;white-space:pre-wrap\\">[REJECT]\\n\\n"+((r&&(r.stack||r.message))||r)+"</pre>"})</script>'
-const html = '<!DOCTYPE html>\n<html lang="zh">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>' + title + '</title>\n' + cssTag + '\n</head>\n<body>\n<div id="app"></div>\n' + errScript + devtoolsScript + '\n<script type="module" src="./app.js"></script>\n</body>\n</html>\n'
+let pwaHead = ''
+let pwaScript = ''
+if (PWA_CFG) {
+  const themeColor = PWA_CFG.themeColor || '#1f6feb'
+  pwaHead = '<link rel="manifest" href="./manifest.webmanifest">\n' +
+            '<meta name="theme-color" content="' + themeColor + '">\n' +
+            '<meta name="apple-mobile-web-app-capable" content="yes">\n' +
+            '<meta name="apple-mobile-web-app-status-bar-style" content="default">\n'
+  pwaScript = '\n<script>if("serviceWorker"in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})})}</script>'
+}
+
+const html = '<!DOCTYPE html>\n<html lang="zh">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<title>' + title + '</title>\n' + cssTag + '\n' + pwaHead + '</head>\n<body>\n<div id="app"></div>\n' + errScript + devtoolsScript + '\n<script type="module" src="./app.js"></script>' + pwaScript + '\n</body>\n</html>\n'
 fs.writeFileSync(path.join(outDir, 'index.html'), html)
+
+if (PWA_CFG) {
+  const themeColor = PWA_CFG.themeColor || '#1f6feb'
+  const icons = PWA_CFG.icon ? [{ src: PWA_CFG.icon, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] : []
+  const manifest = {
+    name: PWA_CFG.name || title,
+    short_name: PWA_CFG.shortName || PWA_CFG.name || title,
+    start_url: './',
+    scope: './',
+    display: PWA_CFG.display || 'standalone',
+    background_color: PWA_CFG.bgColor || '#ffffff',
+    theme_color: themeColor,
+    icons: icons,
+  }
+  fs.writeFileSync(path.join(outDir, 'manifest.webmanifest'), JSON.stringify(manifest, null, 2))
+
+  const sw = [
+    '// 自动生成 —— xuyc PWA',
+    "const CACHE = 'xunay-pwa-v1'",
+    "const ASSETS = ['./', './index.html', './app.js', './xunay.js']",
+    "self.addEventListener('install', function (e) {",
+    "  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS).catch(function () {}) }))",
+    "  self.skipWaiting()",
+    "})",
+    "self.addEventListener('activate', function (e) {",
+    "  e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== CACHE }).map(function (k) { return caches.delete(k) })) }))",
+    "  self.clients.claim()",
+    "})",
+    "self.addEventListener('fetch', function (e) {",
+    "  if (e.request.method !== 'GET') return",
+    "  e.respondWith(",
+    "    fetch(e.request).then(function (res) {",
+    "      var clone = res.clone()",
+    "      caches.open(CACHE).then(function (c) { c.put(e.request, clone) })",
+    "      return res",
+    "    }).catch(function () { return caches.match(e.request) })",
+    "  )",
+    "})",
+    '',
+  ].join('\n')
+  fs.writeFileSync(path.join(outDir, 'sw.js'), sw)
+  console.log('[xuyc] PWA: manifest.webmanifest + sw.js')
+}
 
 console.log('构建完成: ' + outDir)
 
