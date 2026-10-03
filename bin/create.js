@@ -101,8 +101,8 @@ write('app.xuy', `// title: ${name}
 import { div, mount } from 'xunay'
 import { route } from '@/router.xuy'
 import { Header } from '@/components/Header.xuy'
-import { Home } from '@/pages/Home.xuy'
-import { About } from '@/pages/About.xuy'
+import { Index } from '@/pages/index.xuy'
+import { About } from '@/pages/about.xuy'
 
 function NotFound() {
   return div({ class: 'not-found' },
@@ -117,7 +117,7 @@ function App() {
     Header(),
     div({ class: 'main' }, () => {
       const r = route()
-      if (r === '/') return Home()
+      if (r === '/') return Index()
       if (r === '/about') return About()
       return NotFound()
     })
@@ -128,7 +128,11 @@ mount(() => App(), '#app')
 `)
 
 // ==================== src/router.xuy ====================
+// 注意：跑 `xuyc build` 时会被 scan-pages 自动覆盖（源：src/pages/）
+// 下面是初始手写版，格式跟自动生成一致
 write('src/router.xuy', `import { signal } from 'xunay'
+import { Index } from './pages/index.xuy'
+import { About } from './pages/about.xuy'
 
 function norm(hash) {
   hash = (hash || '').replace(/^#/, '')
@@ -139,13 +143,44 @@ function norm(hash) {
 
 export const route = signal(norm(location.hash))
 
-window.addEventListener('hashchange', () => {
-  route(norm(location.hash))
-  window.scrollTo(0, 0)
-})
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', () => {
+    route(norm(location.hash))
+    window.scrollTo(0, 0)
+  })
+}
 
 export function go(path) {
   location.hash = path.startsWith('/') ? path : '/' + path
+}
+
+const TABLE = [
+  { url: '/', Comp: Index, params: [] },
+  { url: '/about', Comp: About, params: [] }
+]
+
+export function match(path) {
+  for (const r of TABLE) {
+    const m = parse(r, path)
+    if (m) return m
+  }
+  return null
+}
+
+function parse(r, path) {
+  if (r.params.length === 0) {
+    return r.url === path ? { Comp: r.Comp, params: {} } : null
+  }
+  const parts = path.split('/').filter(Boolean)
+  const tpl = r.url.split('/').filter(Boolean)
+  if (parts.length !== tpl.length) return null
+  const params = {}
+  for (let i = 0; i < tpl.length; i++) {
+    const t = tpl[i]
+    if (t.startsWith(':')) params[t.slice(1)] = decodeURIComponent(parts[i])
+    else if (t !== parts[i]) return null
+  }
+  return { Comp: r.Comp, params }
 }
 `)
 
@@ -233,15 +268,15 @@ export function Counter() {
 }
 `)
 
-// ==================== src/pages/Home.xuy ====================
-write('src/pages/Home.xuy', `import { div, h1, p } from 'xunay'
+// ==================== src/pages/index.xuy ====================
+write('src/pages/index.xuy', `import { div, h1, p } from 'xunay'
 import { Counter } from '@/components/Counter.xuy'
 import { isLoggedIn } from '@/store/app.xuy'
 
-export function Home() {
+export function Index() {
   return div({ class: 'page' },
     h1(null, '欢迎'),
-    p({ class: 'lead' }, '编辑 src/pages/Home.xuy 开始。'),
+    p({ class: 'lead' }, '编辑 src/pages/index.xuy 开始。'),
     div({ class: 'card' },
       div({ class: 'card-title' }, '计数器示例'),
       Counter()
@@ -254,8 +289,8 @@ export function Home() {
 }
 `)
 
-// ==================== src/pages/About.xuy ====================
-write('src/pages/About.xuy', `import { div, h1, p, a } from 'xunay'
+// ==================== src/pages/about.xuy ====================
+write('src/pages/about.xuy', `import { div, h1, p, a } from 'xunay'
 
 export function About() {
   return div({ class: 'page' },
@@ -473,8 +508,8 @@ console.log('      ├── components/')
 console.log('      │   ├── Header.xuy')
 console.log('      │   └── Counter.xuy')
 console.log('      └── pages/')
-console.log('          ├── Home.xuy')
-console.log('          └── About.xuy')
+console.log('          ├── index.xuy')
+console.log('          └── about.xuy')
 console.log('')
 console.log('下一步:')
 console.log('  cd ' + name)

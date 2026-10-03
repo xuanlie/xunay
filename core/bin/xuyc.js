@@ -38,8 +38,18 @@ let DEVTOOLS_INJECTED = false
 console.log('[xuyc] devtools:', DEVTOOLS_ON ? 'on' : 'off')
 const args = process.argv.slice(2)
 
+if (args[0] === 'scan') {
+  const { scanPages } = await import('./lib/scan-pages.js')
+  const r = scanPages(process.cwd())
+  if (!r.ok) { console.error('❌ ' + r.reason); process.exit(1) }
+  console.log('✅ 已扫描 ' + r.count + ' 个页面 → src/router.xuy')
+  for (const rt of r.routes) console.log('  ' + rt.url.padEnd(30) + ' → ' + rt.rel)
+  process.exit(0)
+}
+
 if (args[0] !== 'build' || !args[1]) {
   console.error('用法: node bin/xuyc.js build <入口.xuy> [--out dist]')
+  console.error('      node bin/xuyc.js scan')
   process.exit(1)
 }
 
@@ -54,7 +64,7 @@ const outIdx = args.indexOf('--out')
 const outDir = outIdx >= 0 ? path.resolve(args[outIdx + 1]) : path.resolve(XUNAY_CFG.outDir || 'dist')
 fs.mkdirSync(outDir, { recursive: true })
 
-const esm = path.join(ROOT, 'core/dist/xunay.esm.js')
+const esm = path.join(ROOT, 'dist/xunay.esm.js')
 if (!fs.existsSync(esm)) {
   console.error('缺少 core/dist/xunay.esm.js，先跑 node core/build.js')
   process.exit(1)
@@ -65,7 +75,7 @@ fs.copyFileSync(esm, xunayPath)
 // devtools 产物（如果配置开启）
 let dtFileName = 'xunay-devtools.js'
 if (DEVTOOLS_ON) {
-  const dtSrc = path.join(ROOT, 'core/dist/xunay-devtools.min.js')
+  const dtSrc = path.join(ROOT, 'dist/xunay-devtools.min.js')
   if (fs.existsSync(dtSrc)) {
     const hash = Math.floor(fs.statSync(dtSrc).mtimeMs).toString(36).slice(-6)
     dtFileName = 'xunay-devtools.' + hash + '.js'
@@ -77,7 +87,7 @@ if (DEVTOOLS_ON) {
 const optionals = ['kit', 'devtools', 'ssr', 'anim', 'dev']
 const optPaths = {}
 for (const name of optionals) {
-  const src = path.join(ROOT, 'core/dist/xunay-' + name + '.min.js')
+  const src = path.join(ROOT, 'dist/xunay-' + name + '.min.js')
   if (fs.existsSync(src)) {
     const dst = path.join(outDir, 'xunay-' + name + '.js')
     fs.copyFileSync(src, dst)
@@ -139,6 +149,17 @@ function processFile(file) {
   return out
 }
 
+// 自动扫描文件系统路由（src/pages/ 存在时）
+if (XUNAY_CFG.scan !== false) {
+  try {
+    const { scanPages } = await import('./lib/scan-pages.js')
+    const r = scanPages(process.cwd())
+    if (r.ok) console.log('[xuyc] 扫描 ' + r.count + ' 个页面 → src/router.xuy')
+  } catch (e) {
+    console.warn('[xuyc] scan-pages 失败:', e.message)
+  }
+}
+
 const processedEntry = processFile(entryPath)
 
 await esbuild.build({
@@ -180,7 +201,7 @@ collectCss(path.join(entryDir, 'src'), 'src')
 const builtinCss = Array.isArray(XUNAY_CFG.css) ? XUNAY_CFG.css : ['tw', 'ui']
 console.log('[xuyc] 内置 CSS:', builtinCss.length ? builtinCss.join(', ') : '(无)')
 for (const name of builtinCss) {
-  const src = path.join(ROOT, 'core/src/' + name + '.css')
+  const src = path.join(ROOT, 'src/' + name + '.css')
   if (fs.existsSync(src)) {
     fs.copyFileSync(src, path.join(outDir, name + '.css'))
     cssLinks.push('./' + name + '.css')
