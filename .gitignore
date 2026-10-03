@@ -23,3 +23,6 @@ site/dist/
 site/src/docs-index.xuy
 site/src/docs-nav.xuy
 site/__pycache__/
+backends/python/data.db
+backends/python/__pycache__/
+backends/*/data.db

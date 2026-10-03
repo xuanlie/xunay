@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head><body>
+<div id="app"></div>
+<pre id="out">跑测试中...</pre>
+<script type="module">
+const out = []
+function log(s) { out.push(s); document.getElementById('out').textContent = out.join('\n') }
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, div, span, mount, list } = X
+const host = document.getElementById('app')
+const N = 1000
+
+function measure(label, setup, mutate, runs) {
+  host.innerHTML = ''
+  const arr = signal(setup())
+  mount(() => div(null, list(arr, x => x.id, x => span(null, x.t))), host)
+  // 预热
+  for (let i = 0; i < 5; i++) mutate(arr, i)
+  // 清一下
+  arr(setup())
+  const t0 = performance.now()
+  for (let i = 0; i < runs; i++) mutate(arr, i)
+  const dt = performance.now() - t0
+  log(`${label}:  单次 ${(dt/runs*1000).toFixed(1)} µs   (${runs} 次共 ${dt.toFixed(1)}ms)`)
+}
+
+const setup = () => Array.from({length: N}, (_, i) => ({id: i, t: 'row ' + i}))
+const setupRuns = 100
+
+// 1. 改 1 项（改第一项的 t）
+measure('改 1 项 (fastUpdate)', setup, (arr, i) => {
+  arr(prev => prev.map((x, k) => k === 0 ? {...x, t: 'v' + i} : x))
+}, setupRuns)
+
+// 2. 增 1 项（末尾追加）
+measure('增 1 项 (末尾追加)', setup, (arr, i) => {
+  arr(prev => [...prev, {id: N + i, t: 'new' + i}])
+}, setupRuns)
+
+// 3. 删 1 项（删最后一项）
+measure('删 1 项 (末尾)', setup, (arr, i) => {
+  arr(prev => prev.slice(0, -1))
+}, setupRuns)
+
+// 4. 删 1 项（删第一项）
+measure('删 1 项 (头部)', setup, (arr, i) => {
+  arr(prev => prev.slice(1))
+}, setupRuns)
+
+// 5. 全排序（逆序）
+measure('排序 (逆序)', setup, (arr, i) => {
+  arr(prev => [...prev].reverse())
+}, 20)
+
+// 6. 全改（每个 t 改）
+measure('全改 1000 项', setup, (arr, i) => {
+  arr(prev => prev.map((x, k) => ({...x, t: 'v' + i + '_' + k})))
+}, 20)
+</script></body></html>
