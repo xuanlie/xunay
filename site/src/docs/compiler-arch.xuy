@@ -1,0 +1,32 @@
+// 编译架构
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("编译架构"),
+    P("compiler3 用 acorn 把源码解析成 ESTree AST，做三件事：收集变量绑定、找出标签调用、基于位置替换。没有自定义 AST，没有中间表示。"),
+    H2("三阶段"),
+    Table(["阶段","输入","输出"], [["解析",".xuy 源码字符串","ESTree AST"],["分析","AST","bound 集合 + tag 调用列表"],["生成","tag 调用列表 + 源码","替换后的 JS"]]),
+    H2("1. 解析"),
+    Code("import * as acorn from 'acorn'\n\nconst ast = acorn.parse(src, {\n  ecmaVersion: 2022,\n  sourceType: 'module',\n})", "js"),
+    P("acorn 是成熟的 JS parser，支持 ES2022 所有语法。不自己写 tokenizer。"),
+    H2("2. 作用域分析"),
+    Code("const bound = new Set()\ncollectBindings(ast, bound)\n// 遍历 AST，收集所有 const / let / var / import / 函数参数名\n// 后续找到的 tag 调用如果在 bound 里，跳过", "js"),
+    P("这解决了 compiler2 的核心问题。compiler2 里 const div = x; div() 会被误编译成 createElement('div')，因为字符串扫描看不出 div 是变量。"),
+    H2("3. 找标签调用"),
+    Code("const calls = []\nfindTagCalls(ast, bound, calls)\n// 递归遍历 AST，匹配:\n//   CallExpression\n//   callee.type === 'Identifier'\n//   TAGS.has(callee.name)\n//   !bound.has(callee.name)", "js"),
+    P("TAGS 是白名单，50 个标准 HTML 标签。只有白名单里的名字才会被当作标签。"),
+    H2("4. 取最外层"),
+    Code("// div(null, span(null, 'x'))\n// 两个都是 tag 调用，但只需要替换外层\n// 因为内层在外层的源码范围内\nconst outer = findOutermost(calls)\n// 排序 + 区间覆盖：a.start >= lastEnd", "js"),
+    H2("5. 从后往前替换"),
+    Code("// 关键：从后往前，位置不偏移\nconst sorted = outer.sort((a, b) => b.start - a.start)\nfor (const call of sorted) {\n  const code = genTag(call, src, bound)\n  out = out.slice(0, call.start) + code + out.slice(call.end)\n}", "js"),
+    P("如果从前往后，每次替换都改变后面位置。从后往前，前面的 start/end 不受影响。这是所有基于位置的文本编辑的标准技巧。"),
+    H2("为什么不用自定义 AST"),
+    Ul("acorn 已经处理了所有 JS 边界情况（模板字符串、正则、注释）","ESTree 是标准，工具链丰富","位置信息（start/end）比手写扫描更准确","作用域分析需要完整的 AST 遍历能力"),
+    H2("嵌套递归"),
+    P("对于 div(null, items.map(i => li(null, i))) 这种，map 回调里的 li 也会被编译。做法是：对每个 argument 先看是不是 CallExpression 是 TAGS，如果是就内联展开；否则把它的源码字符串丢进 compileExpr 递归处理。"),
+    Warn("递归时，把源码字符串重新 acorn.parseExpressionAt，再 findTagCalls。嵌套层数不受限，但每层都要重新解析。"),
+    H2("相关源码"),
+    Table(["文件","行数","职责"], [["compiler3/src/index.js","438","全部逻辑：解析 / 分析 / 生成"],["compiler3/src/tags.js","14","TAGS 白名单 + VOID 集合"],["compiler3/src/runtime.js","92","bindText / bindAttr / renderChild"]]),
+  )
+}

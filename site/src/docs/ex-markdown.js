@@ -1,0 +1,15 @@
+// Markdown 编辑器
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Markdown 编辑器"),
+    P("左侧输入，右侧实时预览。"),
+    H2("代码"),
+    Code("import { div, textarea, h1, signal, computed, effect, mount } from 'xunay'\n\nconst text = signal(localStorage.getItem('md') || '# 标题\\n\\n**加粗** 和 *斜体*\\n\\n- 项目 1\\n- 项目 2\\n')\n\neffect(() => localStorage.setItem('md', text()))\n\nfunction md(src) {\n  return src\n    .replace(/^### (.+)$/gm, '<h3>$1</h3>')\n    .replace(/^## (.+)$/gm, '<h2>$1</h2>')\n    .replace(/^# (.+)$/gm, '<h1>$1</h1>')\n    .replace(/\\*\\*(.+?)\\*\\*/g, '<strong>$1</strong>')\n    .replace(/\\*(.+?)\\*/g, '<em>$1</em>')\n    .replace(/^- (.+)$/gm, '<li>$1</li>')\n    .replace(/(<li>[\\s\\S]*?<\\/li>)/g, '<ul>$1</ul>')\n    .replace(/`([^`]+)`/g, '<code>$1</code>')\n    .replace(/\\n\\n/g, '</p><p>')\n    .replace(/^/, '<p>').replace(/$/, '</p>')\n}\n\nconst html = computed(() => md(text()))\n\nmount(() => div({ class: 'md-app' },\n  div({ class: 'md-pane' },\n    div({ class: 'md-header' }, '编辑'),\n    textarea({\n      class: 'md-input',\n      value: () => text(),\n      on: { input: e => text(e.target.value) }\n    })\n  ),\n  div({ class: 'md-pane' },\n    div({ class: 'md-header' }, '预览'),\n    div({ class: 'md-preview', html: () => html() })\n  )\n), '#app')", "xuy"),
+    H2("学习点"),
+    Ul("computed 做派生数据","html 属性渲染 HTML","effect 持久化到 localStorage"),
+    H2("注意"),
+    Warn("html 属性会直接写 innerHTML。真实项目必须先 sanitize 再渲染。"),
+  )
+}

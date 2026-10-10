@@ -1,0 +1,30 @@
+// 3D 纹理详解
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("3D 纹理详解"),
+    P("纹理支持用 triplanar 投影，不需要 UV 化顶点。"),
+    H2("用法"),
+    Code("cube({\\n  color: \"#ffffff\",\\n  size: 2,\\n  texture: \"examples/textures/checker.png\",\\n  texScale: 0.5\\n})", "xuy"),
+    H2("打包"),
+    Ul("1. CLI 读 scene.objects 找 obj.texture","2. 读图片文件到 Buffer","3. assets[\"checker.png\"] = Buffer","4. gen.js 生成 TEX_NAMES 数组","5. SceneRenderer.onSurfaceCreated 加载到 GL 纹理"),
+    H2("图片格式"),
+    P("用 Android 的 BitmapFactory.decodeStream，支持 PNG / JPG / WebP / GIF（单帧）等所有 Android 支持的格式。"),
+    H2("triplanar 原理"),
+    P("核心思想：不预先算每个顶点的 UV，而是在片元里根据法线方向临时选平面投影。"),
+    Code("vec3 triplanar(sampler2D t, vec3 p, vec3 n, float sc) {\\n    vec3 an = abs(n);\\n    vec3 tx = texture2D(t, p.yz * sc).rgb;  // 用 YZ 平面采样\\n    vec3 ty = texture2D(t, p.xz * sc).rgb;  // 用 XZ 平面\\n    vec3 tz = texture2D(t, p.xy * sc).rgb;  // 用 XY 平面\\n    float sum = an.x + an.y + an.z + 0.0001;\\n    return (tx * an.x + ty * an.y + tz * an.z) / sum;\\n}", "glsl"),
+    H2("优点"),
+    Ul("顶点格式不变（不用加 UV 属性）","8 种形状统一处理","ObjLoader 不改动","接缝处自动融合"),
+    H2("缺点"),
+    Ul("接缝处有拉伸（法线变化剧烈时）","复杂模型会有伪影","片元计算量比 UV 采样大 3 倍","细节纹理在高曲率处模糊"),
+    H2("texScale 调优"),
+    Table(["值","效果"], [["0.1","纹理放大，图案稀疏"],["0.5","中等，一般用这个"],["1.0","纹理原始尺寸"],["2.0+","纹理密集，像噪点"]]),
+    H2("平铺"),
+    P("GL_TEXTURE_WRAP_S/T 设成 GL_REPEAT，纹理会自动平铺。"),
+    H2("生成的 Java"),
+    Code("private int loadTexture(String name) {\\n    Bitmap bmp = BitmapFactory.decodeStream(assets.open(name));\\n    int[] id = new int[1];\\n    GLES20.glGenTextures(1, id, 0);\\n    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, id[0]);\\n    GLES20.glTexParameteri(..., GL_REPEAT);\\n    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);\\n    GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);\\n    return id[0];\\n}", "java"),
+    H2("多纹理"),
+    P("每个物体可以绑不同纹理。同一个纹理文件只加载一次（TEX_NAMES 去重）。"),
+  )
+}

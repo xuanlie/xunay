@@ -1,0 +1,31 @@
+﻿import { div, span, input, ul, li, a, button, signal, computed, mount, txt } from 'xunay'
+
+const text = s('')
+const focused = s(false)
+const key = s('')
+
+const len = computed(() => text().length)
+
+mount(() => div(null,
+  input({
+    placeholder: '打字测试',
+    value: () => text(),
+    on: {
+      input: e => text(e.target.value),
+      focus: () => focused(true),
+      blur: () => focused(false),
+      keydown: e => key('down'),
+      keyup: e => key('up')
+    }
+  }),
+  span(null, txt`文字: ${text}`),
+  span(null, txt`长度: ${len}`),
+  span(null, txt`聚焦: ${focused}`),
+  span(null, txt`按键: ${key}`),
+  ul(null,
+    li(null, '第一项'),
+    li(null, '第二项'),
+    li(null, '第三项')
+  ),
+  a(null, '链接文字')
+), '#app')

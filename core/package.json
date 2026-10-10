@@ -1,0 +1,104 @@
+{
+  "name": "xunay",
+  "version": "1.2.0",
+  "description": "内存最少、速度最快的前端框架",
+  "type": "module",
+  "main": "./src/index.js",
+  "unpkg": "./dist/xunay-full.min.js",
+  "jsdelivr": "./dist/xunay-full.min.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./tags": "./src/tags-entry.js",
+    "./advanced": "./src/advanced-entry.js",
+    "./alias": "./src/alias-entry.js",
+    "./kit": "./src/kit-entry.js",
+    "./kit/base": "./src/kit.js",
+    "./kit/form": "./src/kit-form.js",
+    "./kit/display": "./src/kit-display.js",
+    "./kit/nav": "./src/kit-nav.js",
+    "./kit/data": "./src/kit-data.js",
+    "./kit/upload": "./src/kit-upload.js",
+    "./kit/editor": "./src/kit-editor.js",
+    "./kit/overlay": "./src/kit-overlay.js",
+    "./kit/layout": "./src/kit-layout.js",
+    "./kit/charts": "./src/kit-charts.js",
+    "./kit/virtual": "./src/kit-virtual.js",
+    "./devtools": "./src/devtools-entry.js",
+    "./ssr": "./src/ssr-entry.js",
+    "./anim": "./src/anim-entry.js",
+    "./dev": "./src/dev-entry.js",
+    "./full": "./src/full-entry.js",
+    "./auth": "./src/auth-entry.js",
+    "./storage": "./src/storage-entry.js",
+    "./http": "./src/http-entry.js",
+    "./i18n": "./src/i18n-entry.js",
+    "./theme": "./src/theme-entry.js",
+    "./query": "./src/query-entry.js",
+    "./form": "./src/form-entry.js",
+    "./persist": "./src/persist-entry.js",
+    "./router": "./src/router-entry.js",
+    "./mobile": "./src/mobile-entry.js",
+    "./babylon": "./src/babylon-entry.js",
+    "./game": "./src/game-entry.js",
+    "./game-mobile": "./src/game-mobile-entry.js",
+    "./audio": "./src/audio-entry.js",
+    "./music": "./src/music-entry.js",
+    "./resource": "./src/resource-entry.js",
+    "./model": "./src/model-entry.js"
+  },
+  "files": [
+    "src",
+    "dist",
+    "bin",
+    "compiler2",
+    "types",
+    "README.md",
+    "LICENSE",
+    "compiler3"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "test": "node ../test/core.test.js"
+  },
+  "keywords": [
+    "xunay",
+    "framework",
+    "signal",
+    "reactive"
+  ],
+  "license": "MIT",
+  "author": "XuNay",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "xuyc": "./bin/xuyc.js",
+    "xunay": "./bin/create.js",
+    "xuyc3": "./bin/xuyc3.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuanlie/xunay.git"
+  },
+  "homepage": "https://github.com/xuanlie/xunay#readme",
+  "bugs": {
+    "url": "https://github.com/xuanlie/xunay/issues"
+  },
+  "types": "./types/index.d.ts",
+  "peerDependencies": {
+    "@babylonjs/core": ">=6.0.0",
+    "tonal": ">=6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@babylonjs/core": {
+      "optional": true
+    },
+    "tonal": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "esbuild": "^0.24.0",
+    "acorn": "^8.18.0"
+  }
+}

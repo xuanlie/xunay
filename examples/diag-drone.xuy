@@ -1,0 +1,5 @@
+﻿scene({ bg: '#0e1116',
+  camera: { distance: 500, fov: 45, center: [0, -47.5, 0] },
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+cube({ color: '#ff6600', size: 50, position: [0, -47.5, 0] })
+model({ src: 'examples/models/drone.gltf' })

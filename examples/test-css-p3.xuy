@@ -1,0 +1,11 @@
+﻿import { div, app } from 'xunay'
+
+const CSS = `
+.box { max-width: 80%; padding: 12px; margin: 8px; background: #2563eb; color: #fff; border-radius: 8px; }
+.shadow { text-shadow: 2px 2px 4px #000000; font-size: 28px; padding: 16px; color: #ffd700; }
+`
+
+app(() => div(null,
+  div({ 'class': 'box' }, 'max-width: 80%'),
+  div({ 'class': 'shadow' }, '阴影文字')
+), '#app')

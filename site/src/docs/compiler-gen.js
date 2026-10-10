@@ -1,0 +1,29 @@
+// 代码生成
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("代码生成"),
+    P("拿到最外层标签调用列表后，genTag 逐个把它们替换成创建 DOM 的 IIFE。"),
+    H2("genTag 主函数"),
+    Code("function genTag(node, src, bound) {\n  const lines = []\n  const elVar = genTagExpr(node, src, bound, lines)\n  let out = '(() => {\\n'\n  for (const line of lines) out += '  ' + line + '\\n'\n  out += '  return ' + elVar + '\\n})()'\n  return out\n}", "js"),
+    P("每个标签调用变成一个立即执行函数，内部按顺序压入语句，最后 return 根元素变量。"),
+    H2("genTagExpr —— 生成创建语句"),
+    Code("const _div0 = document.createElement('div')\n// 属性处理\n_div0.className = 'box'\n__rt__.bindAttr(_div0, 'value', () => n())\n_div0.addEventListener('click', () => count(1))\n// 子节点\n_div0.appendChild(document.createTextNode('text'))\n_div0.appendChild(__rt__.renderChild(() => String(n())))", "js"),
+    H2("genProps —— 属性分支"),
+    Table(["属性 key","生成代码"], [["on","addEventListener(evt, handler)"],["ref","if (typeof v === function) v(el)"],["style 对象","Object.assign(el.style, obj)"],["style 函数","bindStyle(el, fn)"],["class 静态","el.className = value"],["class 函数","bindAttr(el, class, fn)"],["class 对象","el.className = classNames(obj)"],["html / innerHTML","el.innerHTML = value"],["checked / disabled 等布尔","el[k] = value"],["value / textContent","el[k] = value"],["函数值","bindAttr(el, k, fn)"],["其他字面量","setAttribute(k, v)"]]),
+    P("这里的判断全部用 AST 节点类型，不是字符串匹配。value: () => n() 因为 valueNode.type 是 ArrowFunctionExpression 走 bindAttr 分支——compiler2 就错在这里。"),
+    H2("genChild —— 子节点分类"),
+    Ul("字符串字面量 → createTextNode","数字字面量 → createTextNode(String(n))","null / undefined / false → 跳过","嵌套标签调用 → 递归 genTagExpr，appendChild","函数 → bindText，响应式文本","其他表达式 → __rt__.renderChild(expr)"),
+    H2("compileExpr —— 嵌套标签"),
+    Code("// div(null, items.map(i => li(null, i.name)))\n// map 回调里的 li 也是标签\n\nfunction compileExpr(src, bound) {\n  const expr = acorn.parseExpressionAt(src, 0, { ecmaVersion: 2022 })\n  const calls = []\n  findTagCalls(expr, bound, calls)\n  const outer = findOutermost(calls)\n  // 从后往前替换，把 li(...) 变成 IIFE\n  ...\n}", "js"),
+    P("实现上和顶层一致：重新解析表达式、找标签、从后往前替换。"),
+    H2("替换策略"),
+    Code("// 关键：从后往前，位置不偏移\nconst sorted = outer.sort((a, b) => b.start - a.start)\nfor (const call of sorted) {\n  const code = genTag(call, src, bound)\n  out = out.slice(0, call.start) + code + out.slice(call.end)\n}", "js"),
+    H2("变量命名"),
+    Code("let _uid = 0\nconst uid = (prefix) => '_' + prefix + _uid++\n\n// 生成的名字: _div0, _span1, _button2, _t3, _t4 ...\n// 带序号，避免冲突", "js"),
+    P("每次 compile() 开始时重置 _uid = 0，保证每次输出确定性。"),
+    H2("相关源码"),
+    Table(["函数","职责"], [["genTag","包装成 IIFE"],["genTagExpr","生成 createElement + 属性 + 子节点"],["genProps","属性分支"],["genChild","子节点分类"],["compileExpr","嵌套表达式递归"],["isFn / getKey","小工具"]]),
+  )
+}

@@ -1,0 +1,20 @@
+// kit: CommandPalette
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("kit: CommandPalette"),
+    P("kit 里的 CommandPalette 组件。"),
+    H2("引入"),
+    Code("import { CommandPalette } from 'xunay/kit/editor'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["items","——","——","数据项"],["onSelect","——","——","回调"],["open","——","——","可传 signal（响应式）"],["placeholder","——","''","占位文字"]]),
+    H2("基础用法"),
+    Code("import { CommandPalette } from 'xunay/kit/editor'\n\nCommandPalette({ placeholder: 'example', items: [], open: mySignal })", "js"),
+    H2("响应式"),
+    P("这些参数可以直接传 signal，值变化时 DOM 会自动更新："),
+    Code("import { signal } from 'xunay'\nimport { CommandPalette } from 'xunay/kit/editor'\n\nconst v = signal(false)\n\nCommandPalette({ open: v })", "js"),
+    Tip("不要写成 open: v() —— 传函数给 render.js，让它挂 effect。"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

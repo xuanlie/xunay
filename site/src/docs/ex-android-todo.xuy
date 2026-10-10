@@ -1,0 +1,17 @@
+// 例子：待办清单
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("例子：待办清单"),
+    P("列表 + 增删。演示 list / signal 数组操作。"),
+    H2("源码"),
+    Code("const items = s([])\\nconst draft = s(\"\")\\n\\nconst add = () => {\\n  const t = draft().trim()\\n  if (!t) return\\n  items([...items(), { text: t, done: false }])\\n  draft(\"\")\\n}\\n\\nmount(() => div(null,\\n  input({\\n    value: () => draft(),\\n    on: { input: e => draft(e.target.value) },\\n    placeholder: \"新任务\"\\n  }),\\n  button({ on: { click: add } }, \"添加\"),\\n  list(() => items(), item => div(null,\\n    span(null, item.text)\\n  ))\\n), \"#app\")", "xuy"),
+    H2("要点"),
+    Ul("数组状态更新用 items([...items(), newItem])","list 第一个参数是函数，返回当前数组","item 是遍历变量，直接读 item.text"),
+    H2("限制"),
+    P("list 当前只支持固定 item 布局（TextView），不能自定义。要自定义列表项，得手写 RecyclerView adapter。"),
+    H2("跑起来"),
+    Code(".\\run.ps1 -Entry examples\\full-todo.xuy", "powershell"),
+  )
+}

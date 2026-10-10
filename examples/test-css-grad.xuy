@@ -1,0 +1,9 @@
+﻿import { div, span, signal, mount, txt } from 'xunay'
+
+mount(() => div(null,
+  div({ style: { width: 200, height: 100, background: 'linear-gradient(90deg, #ff0000, #ffff00, #00ff00)' } }, '三色红黄绿'),
+  div({ style: { width: 200, height: 100, background: 'linear-gradient(45deg, #1f6feb, #8c4, #fc0)' } }, '三色45度'),
+  div({ style: { width: 100, height: 100, background: '#333333', transform: 'rotate(20deg)' } }, '旋转20'),
+  div({ style: { width: 100, height: 100, background: '#e33', transform: 'scale(0.7, 1.3)' } }, '不等比缩放'),
+  div({ style: { width: 100, height: 100, background: '#2196F3', transform: 'skewX(15deg)' } }, '斜切')
+), '#app')

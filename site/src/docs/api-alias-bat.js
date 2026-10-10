@@ -1,0 +1,15 @@
+// bat 别名
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("bat 别名"),
+    P("batch(fn) 的短别名。"),
+    H2("等价"),
+    Code("batch(fn)", "js"),
+    H2("说明"),
+    P("batch 的短别名。"),
+    H2("示例"),
+    Code("import { s, bat, div } from 'xunay'\n\nconst a = s(0), b = s(0)\n\nbat(() => { a(1); b(2) })", "xuy"),
+  )
+}

@@ -1,0 +1,26 @@
+路线图
+
+已完成
+
+  [x] 核心信号
+  [x] 渲染
+  [x] 列表
+  [x] 事件
+  [x] 生命周期
+  [x] 后端
+  [x] WebSocket
+  [x] 编译器
+  [x] 迁移
+  [x] SSR
+  [x] 打包
+
+计划
+
+  [ ] npm 发布
+  [ ] benchmark 跑分
+  [ ] 官方文档站
+  [ ] Svelte / Angular 迁移
+  [ ] DevTools 扩展
+  [ ] 浏览器插件
+  [ ] 服务端组件
+  [ ] 流式 SSR

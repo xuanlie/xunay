@@ -1,0 +1,20 @@
+// 路由校验
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("路由校验"),
+    P("check-routes.js 检查四套后端的接口定义和 shared/routes.json 是否一致。"),
+    H2("使用"),
+    Code("node bin/check-routes.js", "bash"),
+    H2("输出"),
+    Code("检查 shared/routes.json...\n  ✓ 5 条路由\n\n检查 backends/node/handlers.js...\n  ✓ 5 个 handler\n\n检查 backends/python/handlers.py...\n  ✗ 缺少 handleUpdateTodo\n\n检查 backends/go/handlers.go...\n  ✓ 5 个 handler\n\n检查 backends/cpp/handlers.cpp...\n  ✗ 缺少 handleUpdateTodo\n\n结果: 2/4 通过", "txt"),
+    H2("检查项"),
+    Ul("JSON 格式合法","path 不重复","name 不重复","每条路由的 handler 在后端存在","handler 签名一致"),
+    H2("同步脚本"),
+    P("sync-routes.js 根据 routes.json 生成前端 RPC 客户端："),
+    Code("node bin/sync-routes.js\n# 生成 frontend/api/rpc.js\n\nexport const rpc = {\n  token: () => client.get('/rpc/token'),\n  getTodos: () => client.get('/rpc/getTodos'),\n  addTodo: (body) => client.post('/rpc/addTodo', body),\n  // ...\n}", "js"),
+    H2("CI 集成"),
+    Code("# .github/workflows/ci.yml\n- name: Check routes\n  run: node bin/check-routes.js", "yaml"),
+  )
+}

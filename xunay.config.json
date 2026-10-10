@@ -1,0 +1,10 @@
+{
+  "_comment": "当前项目配置。改 backend 切换后端，改 ports 改端口。",
+  "backend": "node",
+  "ports": {
+    "node": 12341,
+    "python": 12342,
+    "go": 12343,
+    "cpp": 12344
+  }
+}

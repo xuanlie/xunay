@@ -1,0 +1,60 @@
+{
+  "name": "xunay-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "core",
+    "compiler2"
+  ],
+  "xunay": {
+    "css": [
+      "tw",
+      "ui"
+    ],
+    "devtools": false,
+    "minify": true,
+    "sourcemap": false,
+    "target": "es2020",
+    "obfuscate": true,
+    "cssHash": false,
+    "filenameHash": "none",
+    "pwa": {
+      "name": "Xunay",
+      "themeColor": "#1f6feb"
+    },
+    "compileMode": "hybrid",
+    "_compileModeNote": "compiled | runtime | hybrid；文件内 // @runtime 或 // @compiled 可覆盖"
+  },
+  "scripts": {
+    "build": "cd core && node build.js",
+    "xuyc": "node bin/xuyc.js",
+    "create": "node bin/create.js",
+    "dev": "bash scripts/run-backend.sh",
+    "site:dev": "node site/mode.mjs dev  && node build-site.mjs && node site/serve.mjs 8081",
+    "site:prod": "node site/mode.mjs prod && node build-site.mjs",
+    "site:build": "node build-site.mjs",
+    "site:serve": "node site/serve.mjs 8081",
+    "site:mode": "node site/mode.mjs"
+  },
+  "bin": {
+    "xuyc": "./bin/xuyc.js",
+    "xunay": "./bin/create.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "javascript-obfuscator": "^5.9.0",
+    "jsdom": "^30.1.2"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@babylonjs/core": "^9.29.0",
+    "@babylonjs/loaders": "^9.29.0",
+    "@babylonjs/materials": "^9.29.0",
+    "acorn": "^8.18.0",
+    "css-tree": "^3.2.1",
+    "howler": "^2.2.4",
+    "ssh2": "^1.17.0",
+    "tonal": "^6.5.0"
+  }
+}

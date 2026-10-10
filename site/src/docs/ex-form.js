@@ -1,0 +1,13 @@
+// 表单验证
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("表单验证"),
+    P("多字段表单，实时校验，提交时全部检查。"),
+    H2("代码"),
+    Code("// app.xuy\nimport { div, h1, form, input, label, button, span, signal, computed, show, mount } from 'xunay'\n\nconst username = signal('')\nconst email = signal('')\nconst password = signal('')\nconst confirm = signal('')\nconst agree = signal(false)\nconst submitting = signal(false)\nconst result = signal('')\n\nconst errors = computed(() => {\n  const e = {}\n  if (username() && username().length < 2) e.username = '至少 2 个字符'\n  if (email() && !/^[^@]+@[^@]+\\.[^@]+$/.test(email())) e.email = '邮箱格式不正确'\n  if (password() && password().length < 6) e.password = '至少 6 位'\n  if (confirm() && confirm() !== password()) e.confirm = '两次密码不一致'\n  if (!agree()) e.agree = '必须同意条款'\n  return e\n})\n\nconst valid = computed(() => {\n  return username() && email() && password() && confirm() &&\n    Object.keys(errors()).filter(k => k !== 'agree').length === 0\n})\n\nasync function submit(e) {\n  e.preventDefault()\n  if (!valid()) return\n  submitting(true)\n  result('')\n  try {\n    // 模拟 API\n    await new Promise(r => setTimeout(r, 800))\n    result('注册成功！')\n  } finally {\n    submitting(false)\n  }\n}\n\nconst field = (labelText, sig, type, errorKey) => div({ class: 'field' },\n  label(null, labelText),\n  input({\n    type: type || 'text',\n    class: () => 'input' + (errors()[errorKey] ? ' error' : ''),\n    value: () => sig(),\n    on: { input: e => sig(e.target.value) }\n  }),\n  show(() => errors()[errorKey], () => div({ class: 'error-msg' }, () => errors()[errorKey]))\n)\n\nmount(() => div({ class: 'page' },\n  h1(null, '注册'),\n  form({ class: 'form', on: { submit: submit } },\n    field('用户名', username, 'text', 'username'),\n    field('邮箱', email, 'email', 'email'),\n    field('密码', password, 'password', 'password'),\n    field('确认密码', confirm, 'password', 'confirm'),\n    div({ class: 'field' },\n      label(null,\n        input({ type: 'checkbox', checked: () => agree(), on: { change: e => agree(e.target.checked) } }),\n        ' 我同意用户条款'\n      ),\n      show(() => errors().agree, () => div({ class: 'error-msg' }, '必须同意条款'))\n    ),\n    button({\n      type: 'submit',\n      class: 'btn-primary',\n      disabled: () => submitting()\n    }, () => submitting() ? '提交中...' : '注册'),\n    show(() => result(), () => div({ class: 'success' }, () => result()))\n  )\n), '#app')", "xuy"),
+    H2("学习点"),
+    Ul("computed 做实时校验","show 显示错误","表单提交用原生 submit 事件","disabled 用函数响应式"),
+  )
+}

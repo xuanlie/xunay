@@ -1,0 +1,21 @@
+// 基准测试
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("基准测试"),
+    P("xunay 的核心性能——每操作纳秒级。"),
+    H2("跑基准"),
+    Code("node scripts/bench-runtime.mjs", "bash"),
+    H2("实测结果"),
+    Table(["操作","耗时","ops/s"], [["signal 创建","~440 ns","2.3M"],["signal 读","~150 ns","6.8M"],["signal 写（无订阅）","~180 ns","5.4M"],["signal 写 → 触发 effect","~1.6 µs","0.62M"],["computed 读","~210 ns","4.8M"],["computed 写触发","~6.8 µs","0.15M"],["batch 两写合并","~2.6 µs","0.38M"]]),
+    H2("对比 React"),
+    Table(["操作","XuNay","React"], [["读状态","130ns","Hook 调度 ~50ns"],["写状态","180ns","调度 + Diff ~50µs"],["更新 1 个文本节点","1µs","~10µs ~ 5ms"]]),
+    H2("为什么快"),
+    Ul("无 VDOM——不创建 vnode 树","无 diff——直接改对应节点","精确订阅——一个 signal 变化只触发订阅它的 effect"),
+    H2("怎么写基准"),
+    Code("function bench(name, fn, n = 100000) {\n  for (let i = 0; i < 1000; i++) fn(i)   // 预热\n  const t0 = performance.now()\n  for (let i = 0; i < n; i++) fn(i)\n  const dt = performance.now() - t0\n  console.log(name, ((dt / n) * 1000).toFixed(3) + ' µs/op')\n}\n\nbench('signal 读', () => n())", "js"),
+    H2("注意"),
+    Warn("基准跑在单机单进程——真实浏览器里还有 DOM 开销。signal 本身极快，瓶颈通常在 DOM 操作。"),
+  )
+}

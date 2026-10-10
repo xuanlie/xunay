@@ -1,0 +1,28 @@
+// signal(init)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("signal(init)"),
+    P("创建一个响应式信号。"),
+    H2("签名"),
+    Code("const n = signal(init)", "js"),
+    H2("参数"),
+    Table(["参数","类型","说明"], [["init","T","初始值，可以是任意类型"]]),
+    H2("返回值"),
+    P("返回一个函数 s："),
+    Table(["调用","行为"], [["s()","读当前值"],["s(v)","写新值"],["s(fn)","函数式更新，fn(旧值) 返回新值"]]),
+    H2("示例"),
+    Code("const n = signal(0)\nn()                 // 0\nn(1)                // 1\nn(v => v + 1)       // 2\n\nconst user = signal({ name: 'x' })\nuser({ name: 'y' })                    // 整体替换\nuser(u => ({ ...u, age: 18 }))         // 函数式\n\nconst list = signal([1, 2, 3])\nlist(l => [...l, 4])                   // 追加", "xuy"),
+    H2("特性"),
+    Ul("Object.is 比较——新旧值相等不触发更新","自动依赖收集——在 effect 里读就订阅","batch 合并——batch(fn) 内的多次写只触发一次 effect"),
+    H2("扩展方法"),
+    P("signal 上挂两个辅助方法："),
+    Table(["方法","返回"], [["s.subsCount()","当前订阅者数量"],["s.writeCount()","累计写入次数"]]),
+    H2("陷阱"),
+    H3("读要加 ()"),
+    Code("n      // 是函数本身，不是值\nn()    // 值", "xuy"),
+    H3("深层对象不自动追踪"),
+    Code("const u = signal({ a: { b: 1 } })\nu().a.b = 2         // 不触发\nu(u => ({ ...u, a: { ...u.a, b: 2 } }))   // 触发", "xuy"),
+  )
+}

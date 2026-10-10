@@ -1,0 +1,17 @@
+# 备份
+*.bak
+*.bak-*
+*.bak.*
+*.manual-bak
+
+# 开发/工具
+.xai/
+test/
+tests/
+*.log
+.DS_Store
+node_modules/
+
+# 编辑器
+.vscode/
+.idea/

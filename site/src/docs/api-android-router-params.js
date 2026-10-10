@@ -1,0 +1,12 @@
+// 路由传参
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("路由传参"),
+    P("goto(page, {k: v}) 传参，目标页 param(k) 读取。"),
+    Code("page(\"home\", () => div(null,\n  button({ on: { click: () => goto(\"detail\", { id: 42, name: \"张三\" }) } }, \"查看详情\")\n))\n\npage(\"detail\", () => div(null,\n  span(null, \"ID: \" + param(\"id\")),\n  span(null, \"名字: \" + param(\"name\")),\n  button({ on: { click: () => back() } }, \"返回\")\n))", "xuy"),
+    Code("gotoPage2(\"detail\", new String[]{\"id\", \"name\"}, new String[]{String.valueOf(42), String.valueOf(\"张三\")});\n\nprivate String param(String key) {\n    String v = getIntent().getStringExtra(key);\n    return v == null ? \"\" : v;\n}", "java"),
+    Ul("参数值都是 String，数字用 parseInt / Number()","goto 只支持第一层 page（不嵌套 / 不守卫）"),
+  )
+}

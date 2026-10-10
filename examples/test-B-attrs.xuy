@@ -1,0 +1,15 @@
+﻿import { div, span, input, img, button, signal, mount, txt } from 'xunay'
+
+const agree = s(false)
+const clicks = s(0)
+
+mount(() => div(null,
+  input({ type: 'checkbox', checked: () => agree(), on: { change: e => agree(e.target.checked) }, name: 'agree' }),
+  span(null, txt`同意: ${agree}`),
+  input({ placeholder: '只读框', readonly: true, value: () => '只读内容' }),
+  input({ placeholder: '必填框', required: true }),
+  img({ src: 'https://www.baidu.com/favicon.ico', alt: '示例图' }),
+  button({ title: '按钮提示', on: { click: () => clicks(clicks() + 1) } }, '点我'),
+  span(null, txt`点击次数: ${clicks}`)
+), '#app')
+

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050508">
+<title>XuNay × Babylon.js · Kit HUD</title>
+<link rel="preconnect" href="https://cdn.babylonjs.com" crossorigin>
+<link rel="preload" href="https://cdn.babylonjs.com/babylon.js" as="script" crossorigin>
+<link rel="preload" href="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js" as="script" crossorigin>
+<link rel="stylesheet" href="../../core/src/ui.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100dvh; overflow: hidden; background: #050508; color: #e8e8f0;
+    font: 14px/1.6 -apple-system, "Segoe UI", "PingFang SC", sans-serif;
+    touch-action: none; overscroll-behavior: none;
+    -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;
+    -webkit-tap-highlight-color: transparent; }
+  #cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+
+  #hud {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    padding: 16px;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr auto;
+    gap: 12px;
+  }
+  #hud > * { pointer-events: auto; }
+  #hud-top { grid-column: 1; grid-row: 1; display: flex; gap: 12px; align-items: flex-start; }
+  #hud-title { grid-column: 2; grid-row: 1; align-self: start; }
+  #hud-ctrl { grid-column: 2; grid-row: 3; min-width: 240px; }
+  #hud-log { grid-column: 1; grid-row: 3; align-self: end; }
+
+  /* kit 组件在深色背景下的微调 */
+  #hud .card { background: rgba(14,14,22,.85); border-color: rgba(68,68,85,.5); backdrop-filter: blur(12px); }
+  #hud .card-header, #hud .card-title { color: #e8e8f0; }
+  #hud .text-dim { color: #888 !important; }
+  #hud .btn { background: rgba(26,26,36,.9); color: #e8e8f0; border-color: rgba(68,68,85,.6); }
+  #hud .btn:hover { border-color: #66ccff; color: #66ccff; }
+  #hud input[type=range] { accent-color: #66ccff; }
+
+  #boot {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #050508; z-index: 100; transition: opacity .4s; font-size: 14px; color: #666;
+  }
+  #boot.hide { opacity: 0; pointer-events: none; }
+
+  /* ============ 移动端 ============ */
+  @media (max-width: 768px) {
+    #hud {
+      padding: 10px;
+      padding-top: calc(10px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      gap: 8px;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr auto;
+    }
+    #hud-top { grid-column: 1; grid-row: 1; }
+    #hud-title { grid-column: 1; grid-row: 2; justify-self: end; }
+    #hud-ctrl { grid-column: 1; grid-row: 4; min-width: 0; width: 100%; }
+    #hud-log { grid-column: 1; grid-row: 3; align-self: end; }
+
+    /* 移动端: 统计卡紧凑 */
+    #hud-top .card { padding: 8px 12px; }
+    #hud-top [class*="text-xl"] { font-size: 18px !important; }
+
+    /* 移动端: 控制卡紧凑 */
+    #hud-ctrl .card { padding: 12px; }
+    #hud-ctrl input[type=range] {
+      height: 32px;  /* 触摸目标加大 */
+    }
+    #hud-ctrl .btn {
+      min-height: 44px;  /* iOS 触摸标准 */
+      font-size: 14px;
+    }
+  }
+
+  /* 触摸时禁用 hover 效果 (避免"粘住") */
+  @media (hover: none) {
+    #hud .btn:hover { border-color: rgba(68,68,85,.6); color: #e8e8f0; }
+    #hud .card-hover:hover { transform: none; }
+  }
+
+  /* 长按/滑动/缩放手势 */
+  #cv { -webkit-user-drag: none; user-select: none; }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="boot">
+  <div style="text-align:center">
+    <div style="margin-bottom:8px">加载中…</div>
+    <div style="font-size:11px;color:#444">Babylon CDN + kit HUD</div>
+  </div>
+</div>
+<div id="hud">
+  <div id="hud-top"></div>
+  <div id="hud-title"></div>
+  <div id="hud-log"></div>
+  <div id="hud-ctrl"></div>
+</div>
+
+<script>
+window.addEventListener('error', (e) => {
+  const b = document.getElementById('boot')
+  if (b && !b.classList.contains('hide')) {
+    b.innerHTML = '<div style="text-align:center;color:#f66;max-width:600px;padding:20px">' +
+      '<div style="font-size:16px;margin-bottom:8px">加载失败</div>' +
+      '<div style="font-size:12px;color:#888">' + (e.message || '未知') + '</div>' +
+      '<div style="font-size:11px;color:#666;margin-top:12px">' + (e.filename || '') + ':' + (e.lineno || '') + '</div></div>'
+  }
+})
+window.addEventListener('unhandledrejection', (e) => {
+  const b = document.getElementById('boot')
+  if (b && !b.classList.contains('hide')) {
+    b.innerHTML = '<div style="color:#f66;padding:20px">' + (e.reason?.message || String(e.reason)) + '</div>'
+  }
+})
+</script>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+<script type="module" src="./dist/bundle.js?v=1791113666"></script>
+</body>
+</html>

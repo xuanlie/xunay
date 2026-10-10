@@ -1,0 +1,30 @@
+// DevTools 总览
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("DevTools 总览"),
+    P("xunay 内置调试面板——右下角悬浮按钮，点击展开。不用装浏览器扩展。"),
+    H2("启动"),
+    Code("import 'xunay/devtools'", "xuy"),
+    P("页面加载后右下角出现悬浮按钮。点击打开面板。"),
+    H2("四个面板"),
+    Table(["面板","内容"], [["网络","所有 fetch / XHR 请求 + 详情"],["Signals","所有 signal 的值 + 写入历史"],["控制台","log / warn / error + 输入 JS 执行"],["性能","FCP / LCP / 请求分解 / 长任务"]]),
+    H2("按钮特性"),
+    Ul("可拖拽——按住拖到任意位置","位置记忆——刷新后停在原位","呼吸光晕——一眼能看见","打开时变红，图标变 ×"),
+    H2("面板特性"),
+    Ul("玻璃拟态——半透明磨砂","响应式——手机自动底部抽屉","过滤——输入框实时筛选","复制——每个区块一键复制"),
+    H2("打包控制"),
+    P("在 package.json 里控制是否包含 devtools："),
+    Code("{\n  \"xunay\": {\n    \"devtools\": true\n  }\n}", "json"),
+    Table(["值","行为"], [["true","打包并在页面显示"],["false","完全剔除——产物无按钮代码"]]),
+    H2("配置为 false 时"),
+    P("devtools 是独立 bundle——核心 4.86KB 从不包含它，按需加载 13.14KB。"),
+    H2("不打包也能用"),
+    P("用 CDN 或手动引入："),
+    Code("<script src=\"/xunay-devtools.js\"></script>\n<script>\n  window.openDevtools()\n</script>", "html"),
+    H2("下一步"),
+
+
+  )
+}

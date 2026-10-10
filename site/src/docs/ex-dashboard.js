@@ -1,0 +1,11 @@
+// 仪表盘
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("仪表盘"),
+    P("数据看板——卡片 + 图表 + 实时刷新。"),
+    H2("代码"),
+    Code("import { div, h1, span, canvas, signal, computed, onMount, onUnmount, mount } from 'xunay'\n\nconst revenue = signal([120, 200, 150, 300, 250, 400, 350])\nconst users = signal(1234)\nconst orders = signal(56)\nconst rate = signal(4.8)\n\nconst total = computed(() => revenue().reduce((a, b) => a + b, 0))\nconst avg = computed(() => Math.round(total() / revenue().length))\n\nlet ctx = null\nfunction drawChart() {\n  if (!ctx) return\n  const w = 400, h = 200\n  ctx.clearRect(0, 0, w, h)\n  const data = revenue()\n  const max = Math.max(...data)\n  const bw = w / data.length - 10\n  ctx.fillStyle = '#8b5cf6'\n  data.forEach((v, i) => {\n    const bh = (v / max) * (h - 30)\n    ctx.fillRect(i * (bw + 10) + 5, h - bh - 20, bw, bh)\n  })\n  ctx.fillStyle = '#666'\n  ctx.font = '10px sans-serif'\n  data.forEach((v, i) => ctx.fillText(String(v), i * (bw + 10) + 5, h - 6))\n}\n\nconst stat = (label, val, sub) => div({ class: 'stat' },\n  div({ class: 'stat-label' }, label),\n  div({ class: 'stat-value' }, () => String(val())),\n  sub && div({ class: 'stat-sub' }, sub)\n)\n\nonMount(() => {\n  drawChart()\n  const id = setInterval(() => {\n    revenue(r => [...r.slice(1), Math.round(Math.random() * 500)])\n    users(u => u + Math.round(Math.random() * 10 - 5))\n    orders(o => o + Math.round(Math.random() * 4 - 2))\n    rate(r => Math.round((r + (Math.random() - 0.5) * 0.1) * 10) / 10)\n    drawChart()\n  }, 2000)\n  onUnmount(() => clearInterval(id))\n})\n\nmount(() => div({ class: 'dashboard' },\n  h1(null, '数据看板'),\n  div({ class: 'stats' },\n    stat('总营收', total, '近 7 期'),\n    stat('平均', avg, '每期'),\n    stat('用户', users),\n    stat('订单', orders),\n    stat('评分', rate)\n  ),\n  div({ class: 'chart-wrap' },\n    canvas({ width: 400, height: 200, ref: el => ctx = el.getContext('2d') })\n  )\n), '#app')", "xuy"),
+  )
+}

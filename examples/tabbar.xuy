@@ -1,0 +1,36 @@
+const CSS = `
+  .tabbar { background: #f5f5f5; padding: 8 }
+  .tab { background: #e0e0e0; color: #333; padding: 16; font-size: 16 }
+  .tab.active { background: #2196F3; color: #ffffff }
+  .page { padding: 24; font-size: 24 }
+`
+
+const tab = s('home')
+
+const HomePage = () => div({ class: 'page' },
+  h2(null, '首页'),
+  button({ style: { background: '#4CAF50', color: '#fff', padding: 16 }, on: { click: () => notify('新消息', '你有一条未读消息') } }, '发通知')
+)
+
+const AboutPage = () => div({ class: 'page' },
+  h2(null, '关于'),
+  span(null, '这是关于页')
+)
+
+const MePage = () => div({ class: 'page' },
+  h2(null, '我的'),
+  span(null, '个人中心')
+)
+
+app(() => div(null,
+  div(null,
+    show(tab(v => v === 'home'), HomePage()),
+    show(tab(v => v === 'about'), AboutPage()),
+    show(tab(v => v === 'me'), MePage())
+  ),
+  div({ class: 'tabbar' },
+    button({ class: 'tab', on: { click: () => tab('home') } }, '首页'),
+    button({ class: 'tab', on: { click: () => tab('about') } }, '关于'),
+    button({ class: 'tab', on: { click: () => tab('me') } }, '我的')
+  )
+), '#app')

@@ -1,0 +1,71 @@
+// 速查 · Android 特有
+import { D, H1, H2, P, Code, Table, Tip } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1('速查 · Android 特有'),
+    P('Android 平台独有的 API：路由 / 存储 / 主题 / 网络 / 通知 / 文件。'),
+
+    H2('多页路由'),
+    Code(`page('home', () => div(null, '首页'))
+page('detail', () => div(null, 'ID: ' + param('id')))
+
+goto('home')
+goto('detail', { id: 42 })
+back()
+param('id')`, 'js'),
+
+    H2('本地存储'),
+    Code(`localStorage.setItem('key', 'value')
+localStorage.getItem('key')
+localStorage.removeItem('key')
+localStorage.clear()`, 'js'),
+
+    H2('主题'),
+    Code(`setTheme('dark')
+setTheme('light')`, 'js'),
+
+    H2('网络'),
+    Code(`// 回调式
+fetch('https://api.example.com/data', sig)
+
+// async / await
+const data = await fetch('https://api.example.com/data')`, 'js'),
+
+    H2('文件'),
+    Code(`readFile('a.txt', sig)
+writeFile('a.txt', sig)`, 'js'),
+
+    H2('通知'),
+    Code(`showNotification('标题', '内容')`, 'js'),
+
+    H2('弹窗'),
+    Code(`toast('提示')`, 'js'),
+
+    H2('i18n'),
+    Code(`setLang('zh')
+t('key')`, 'js'),
+
+    H2('事件（Android 特有）'),
+    Table(['事件', '转 Android'], [
+      ['on.change', 'OnCheckedChange / Spinner'],
+      ['on.submit', 'form 自动绑'],
+      ['on.blur / focus', 'OnFocusChangeListener'],
+      ['on.keydown / keyup', 'setOnKeyListener'],
+      ['on.scroll', 'setOnScrollChangeListener'],
+      ['on.mousedown / up', 'setOnTouchListener'],
+    ]),
+
+    H2('组件'),
+    Code(`select(null,
+  option({ value: 'a' }, 'A'),
+  option({ value: 'b' }, 'B')
+)
+
+img({ src: 'a.png', alt: '图' })
+progress({ value: 0.5 })
+slider({ value: 0.5, on: { change: e => setVol(e.target.value) } })`, 'js'),
+
+    Tip('Android 特有的 API 在 Web 端大多无效。看 tool-android-from-web 了解迁移。'),
+  )
+}

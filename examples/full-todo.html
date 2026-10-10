@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XuNay Todo</title>
+</head>
+<body>
+<div id="app"></div>
+<div id="err" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#f85149;color:#fff;padding:12px;font-family:monospace;font-size:12px;max-height:50vh;overflow:auto;white-space:pre-wrap;z-index:9999"></div>
+<script>
+window.addEventListener("error", function(e) {
+  var b = document.getElementById("err")
+  b.style.display = "block"
+  b.textContent += "[ERROR] " + e.message + "\n" + e.filename + ":" + e.lineno + "\n\n"
+})
+window.addEventListener("unhandledrejection", function(e) {
+  var b = document.getElementById("err")
+  b.style.display = "block"
+  b.textContent += "[PROMISE] " + (e.reason && e.reason.message ? e.reason.message : e.reason) + "\n\n"
+})
+</script>
+<script type="module" src="./full-todo.js"></script>
+</body>
+</html>

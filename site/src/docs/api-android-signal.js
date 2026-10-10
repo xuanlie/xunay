@@ -1,0 +1,28 @@
+// signal(init)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("signal(init)"),
+    P("创建一个响应式信号。signal 变化时，所有引用它的订阅者自动刷新。"),
+    H2("签名"),
+    Code("const n = signal(0)             // Signal<Integer>\\nconst name = signal(\"\")         // Signal<String>\\nconst flag = signal(false)      // Signal<Boolean>\\nconst list = signal([1, 2, 3])  // Signal<List<Object>>\\nconst obj = signal({a: 1, b: 2}) // Signal<Object>", "xuy"),
+    H2("读取"),
+    Code("n()         // 返回当前值", "xuy"),
+    H2("写入"),
+    Code("n(5)                // 直接设值\\nn(v => v + 1)       // 基于旧值更新", "xuy"),
+    P("第二种写法生成 Java：n.set(n.get() + 1)。"),
+    H2("生成的 Java"),
+    Code("private final Signal<Integer> n = new Signal<>(0);\\nprivate final Signal<String> name = new Signal<>(\"\");", "java"),
+    H2("订阅"),
+    P("用 txt 模板或 effect 自动订阅。signal 本身不直接暴露 subscribe —— 那是底层 API。"),
+    Code("span(null, txt`n = ${n}`)          // 生成 n.subscribe(...)\\n\\neffect(() => log(n()))            // 生成 n.subscribe(val -> ...)", "xuy"),
+    H2("类型推断"),
+    Table(["JS 值","Java 类型"], [["0","Integer"],["0.5","Double"],["\"\"","String"],["false","Boolean"],["[1,2,3]","java.util.List<Object>"],["{a:1}","Object（内部 JSObject 标记）"]]),
+    H2("主线程调度"),
+    P("Signal.set 内部检查当前线程。主线程直接执行订阅者；子线程 post 到主线程。所以 fetch / readFile 之后的 signal 更新自动安全。"),
+    Code("public void set(T v) {\\n    this.value = v;\\n    if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {\\n        for (Consumer<T> s : subs) s.accept(v);\\n    } else {\\n        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {\\n            for (Consumer<T> s : subs) s.accept(v);\\n        });\\n    }\\n}", "java"),
+    H2("注意事项"),
+    Ul("signal 类型在编译期确定，不能改变","Signal<Object> 装基本类型会装箱","signal 初值必须是字面量或数组/对象字面量，不能用表达式"),
+  )
+}

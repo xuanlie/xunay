@@ -1,0 +1,16 @@
+﻿import { div, span, mount } from 'xunay'
+
+const s = document.createElement('style')
+s.textContent = `
+.card { width: 200px; height: 150px; border-radius: 20px; overflow: hidden; background: #1f6feb; }
+.small { width: 80px; height: 60px; background: #ee3333; }
+.outline-test { width: 150px; height: 60px; outline: 3px solid #ff0000; background: #88cc44; padding: 10px; }
+`
+
+mount(() => div(null,
+  div({ class: 'card' },
+    div({ class: 'small' }, '小块')
+  ),
+  div({ class: 'outline-test' }, '有 outline'),
+  span(null, '测试完成')
+), '#app')

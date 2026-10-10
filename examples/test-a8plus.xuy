@@ -1,0 +1,28 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const obj  = signal({ name: 'Alice', age: 30 })
+const jsonStr = signal('{"a":1,"b":[2,3]}')
+
+const t1  = computed(() => JSON.stringify(obj()))
+const t2  = computed(() => JSON.parse(jsonStr()))
+const t3  = computed(() => Object.keys(obj()))
+const t4  = computed(() => Object.values(obj()))
+const t5  = computed(() => Array.from([1, 2, 3]))
+const t6  = computed(() => Math.PI)
+const t7  = computed(() => Number.MAX_VALUE)
+const t8  = computed(() => 'a1b2c3'.replace(/[0-9]/g, '#'))
+const t9  = computed(() => Date.now() > 0)
+const t10 = computed(() => 'Hello'.match(/^H/))
+
+mount(() => div(null,
+  span(null, txt`JSON.stringify: ${t1}`),
+  span(null, txt`JSON.parse: ${t2}`),
+  span(null, txt`Object.keys: ${t3}`),
+  span(null, txt`Object.values: ${t4}`),
+  span(null, txt`Array.from: ${t5}`),
+  span(null, txt`Math.PI: ${t6}`),
+  span(null, txt`Number.MAX_VALUE: ${t7}`),
+  span(null, txt`replace /[0-9]/g: ${t8}`),
+  span(null, txt`Date.now > 0: ${t9}`),
+  span(null, txt`match /^H/: ${t10}`)
+), '#app')

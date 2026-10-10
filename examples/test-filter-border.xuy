@@ -1,0 +1,17 @@
+﻿import { div, app } from 'xunay'
+
+const CSS = `
+.gray { filter: grayscale(100%); padding: 16px; margin: 8px; background: #ff6600; color: #ffffff; font-size: 24px; }
+.bright { filter: brightness(150%); padding: 16px; margin: 8px; background: #22ccff; color: #000000; font-size: 24px; }
+.hue { filter: hue-rotate(90deg); padding: 16px; margin: 8px; background: #ff00ff; color: #ffffff; font-size: 24px; }
+.dashed { border: 2px dashed #ff0000; padding: 16px; margin: 8px; font-size: 24px; }
+.dotted { border: 2px dotted #00ff00; padding: 16px; margin: 8px; font-size: 24px; }
+`
+
+app(() => div(null,
+  div({ 'class': 'gray' }, '灰度 100%'),
+  div({ 'class': 'bright' }, '亮度 150%'),
+  div({ 'class': 'hue' }, '色相 +90°'),
+  div({ 'class': 'dashed' }, '虚线边框'),
+  div({ 'class': 'dotted' }, '点线边框')
+), '#app')

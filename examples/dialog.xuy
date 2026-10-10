@@ -1,0 +1,5 @@
+app(() => div({ style: { padding: 24 } },
+  h1(null, '弹窗测试'),
+  button({ style: { background: '#2196F3', color: '#ffffff', padding: 16 }, on: { click: () => alert('提示', '这是弹窗内容') } }, '弹窗'),
+  button({ style: { background: '#4CAF50', color: '#ffffff', padding: 16 }, on: { click: () => toast('操作成功') } }, 'Toast')
+), '#app')

@@ -1,0 +1,21 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const user = signal({ name: 'Alice', age: 30, city: 'Beijing' })
+
+const name = computed(() => user().name)
+const age = computed(() => user().age)
+const greet = computed(() => 'Hi, ' + user().name + ' from ' + user().city)
+
+const config = computed(() => ({ theme: 'dark', size: 14, enabled: true }))
+const theme = computed(() => config().theme)
+const size = computed(() => config().size)
+const enabled = computed(() => config().enabled)
+
+mount(() => div(null,
+  span(null, txt`name: ${name}`),
+  span(null, txt`age: ${age}`),
+  span(null, txt`greet: ${greet}`),
+  span(null, txt`theme: ${theme}`),
+  span(null, txt`size: ${size}`),
+  span(null, txt`enabled: ${enabled}`)
+), '#app')

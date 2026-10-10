@@ -1,0 +1,5 @@
+app(() => div({ style: { padding: 24 } },
+  h1({ animate: { type: 'fadeIn', duration: 800 } }, '淡入标题'),
+  button({ animate: { type: 'scaleIn', duration: 600 }, style: { background: '#2196F3', color: '#ffffff', padding: 16 }, on: { click: () => toast('点了') } }, '缩放进入'),
+  button({ animate: { type: 'slideUp', duration: 1000 }, style: { background: '#4CAF50', color: '#ffffff', padding: 16 }, on: { click: () => alert('提示', '滑上来的按钮') } }, '滑入按钮')
+), '#app')

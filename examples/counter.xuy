@@ -1,0 +1,8 @@
+import { div, button, span, s, app, txt } from 'xunay'
+
+const n = s(0)
+
+app(() => div(null,
+  button({ on: { click: () => n(v => v + 1) } }, '+1'),
+  span(null, txt`n = ${n}`)
+), '#app')

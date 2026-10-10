@@ -1,0 +1,5 @@
+﻿.card { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #111; }
+img { width: 200px; height: 120px; }
+.cover { background-size: cover; }
+.contain { background-size: contain; }
+.fill { background-size: 100% 100%; }

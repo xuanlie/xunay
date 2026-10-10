@@ -1,0 +1,47 @@
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+*.bak
+*.bak.*
+*.bak.*.*
+site.bak.*
+.env
+.env.local
+.craft/backup/
+.craft/journal/
+.craft/trash/
+.craft/undo/
+.craft/lock
+backend/data.db
+backends/node/data.json
+site/dist/
+site/src/docs-index.xuy
+site/src/docs-nav.xuy
+site/__pycache__/
+backends/python/data.db
+backends/python/__pycache__/
+backends/*/data.db
+
+.xunay-cache/
+
+# ==== 大文件（3D 资源）====
+examples/models/
+examples/audios/
+examples/textures/
+android-3d-filament/
+android-3d/
+*.tgz
+
+# ==== 构建产物 ====
+core/dist/
+compiler3/dist/
+*.tsbuildinfo
+
+# ==== 编辑器 ====
+.vscode/
+.idea/
+*.swp
+*~

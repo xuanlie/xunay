@@ -1,0 +1,18 @@
+// 路线图
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("路线图"),
+    H2("v1.0 ✓"),
+    Ul("Signal 内核","元素渲染","列表 diff","事件委托","SSR",".xuy 编译器"),
+    H2("v1.0.x ✓（已完成）"),
+    Ul("sanitize——HTML 白名单","resource——异步三态","model——表单绑定","trans / 动画核心","hydration——SSR 校验","devtools 完整版","类型声明","测试（14 个）"),
+    H2("v1.0.4 ✓（当前版本，已完成）"),
+    Ul("核心瘦身：65 → 24 导出","untrack / onCleanup / registerTags / signal.equals","computed lazy + dirty + dispose","effect 死循环保护","多实例 mount 修复","SSR 并发隔离（createRuntime / withRuntime）","动画库 228 个导出","Kit 106 个组件，17 个文件，子路径按需","类型声明（3 个 .d.ts）","侧栏折叠 + 品牌区重设计"),
+    H2("接下来（可选）"),
+    Ul("96 个组件的独立文档","组件在线示例页","类型声明完善（覆盖每个组件）","GitHub 发布 + npm publish","CI/CD 自动构建","官网公网部署","真实项目验证"),
+    H2("不做"),
+    Ul("路由（20 行能写出来）","状态管理（signal 顶层即全局）","SSR 框架（renderToString 足够）","异步调度（batch 已覆盖）","生态工具堆数量"),
+  )
+}

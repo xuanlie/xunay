@@ -1,0 +1,15 @@
+// 待办清单
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("待办清单"),
+    P("最完整的 xunay 示例——状态、列表、过滤、持久化。"),
+    H2("代码"),
+    Code("// app.xuy\n// title: 待办\nimport { div, h1, p, ul, li, span, input, button, signal, computed, effect, list, show, mount } from 'xunay'\n\nconst stored = (() => {\n  try { return JSON.parse(localStorage.getItem('todos') || '[]') }\n  catch { return [] }\n})()\n\nconst todos = signal(stored)\nconst filter = signal('all')\nconst draft = signal('')\n\nconst filtered = computed(() => {\n  const t = todos(), f = filter()\n  if (f === 'active') return t.filter(x => !x.done)\n  if (f === 'done') return t.filter(x => x.done)\n  return t\n})\n\nconst count = computed(() => ({\n  total: todos().length,\n  active: todos().filter(t => !t.done).length\n}))\n\neffect(() => localStorage.setItem('todos', JSON.stringify(todos())))\n\nconst add = () => {\n  if (!draft().trim()) return\n  todos(l => [...l, { id: Date.now(), title: draft(), done: false }])\n  draft('')\n}\nconst toggle = id => todos(l => l.map(t => t.id === id ? { ...t, done: !t.done } : t))\nconst remove = id => todos(l => l.filter(t => t.id !== id))\n\nmount(() => div({ class: 'app' },\n  h1(null, '待办清单'),\n  p({ class: 'sub' }, () => `共 ${count().total} 条 · 未完成 ${count().active}`),\n\n  div({ class: 'row' },\n    input({\n      placeholder: '输入待办，回车添加…',\n      value: () => draft(),\n      on: {\n        input: e => draft(e.target.value),\n        keydown: e => { if (e.key === 'Enter') add() }\n      }\n    }),\n    button({ on: { click: add } }, '添加')\n  ),\n\n  div({ class: 'tabs' },\n    ['all', 'active', 'done'].map(k =>\n      span({\n        class: () => 'tab' + (filter() === k ? ' on' : ''),\n        on: { click: () => filter(k) }\n      }, k === 'all' ? '全部' : k === 'active' ? '未完成' : '已完成')\n    )\n  ),\n\n  show(() => filtered().length === 0, () => p({ class: 'empty' }, '暂无待办')),\n\n  ul({ class: 'list' },\n    list(filtered, t => t.id, t => li({ class: () => 'item' + (t.done ? ' done' : '') },\n      input({\n        type: 'checkbox',\n        checked: () => t.done,\n        on: { change: () => toggle(t.id) }\n      }),\n      span({ class: 'title' }, t.title),\n      button({ class: 'del', on: { click: () => remove(t.id) } }, '×')\n    ))\n  )\n), '#app')", "xuy"),
+    H2("学习点"),
+    Ul("signal + computed 状态管理","list 渲染列表","show 条件渲染","effect 持久化","onMount 自动聚焦"),
+    H2("扩展方向"),
+    Ul("加编辑功能","加优先级","加截止日期","加拖拽排序"),
+  )
+}

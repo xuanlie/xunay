@@ -1,0 +1,32 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const items = signal(['a', 'b', 'c'])
+const val = signal(42)
+const flag = signal(true)
+const obj = signal({ a: 1, b: 2 })
+
+const t1 = computed(() => typeof val())
+const t2 = computed(() => typeof flag())
+const t3 = computed(() => 'a' in obj())
+const t4 = computed(() => 0 in items())
+const t5 = computed(() => 5 & 3)
+const t6 = computed(() => 5 | 2)
+const t7 = computed(() => 5 ^ 1)
+const t8 = computed(() => 1 << 4)
+const t9 = computed(() => 16 >> 2)
+const t10 = computed(() => 2 ** 10)
+const t11 = computed(() => ~5)
+
+mount(() => div(null,
+  span(null, txt`typeof val(): ${t1}`),
+  span(null, txt`typeof flag(): ${t2}`),
+  span(null, txt`'a' in obj(): ${t3}`),
+  span(null, txt`0 in items(): ${t4}`),
+  span(null, txt`5 & 3: ${t5}`),
+  span(null, txt`5 | 2: ${t6}`),
+  span(null, txt`5 ^ 1: ${t7}`),
+  span(null, txt`1 << 4: ${t8}`),
+  span(null, txt`16 >> 2: ${t9}`),
+  span(null, txt`2 ** 10: ${t10}`),
+  span(null, txt`~5: ${t11}`)
+), '#app')

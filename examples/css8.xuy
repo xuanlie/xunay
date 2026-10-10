@@ -1,0 +1,17 @@
+const CSS = `
+  .card { background: #f0f0f0; padding: 16; color: #333333 }
+  @media (orientation: landscape) {
+    .card { padding: 4; background: #ffcc00 }
+  }
+  @media (min-width: 600px) {
+    .card { padding: 48; font-size: 24 }
+  }
+  @media (prefers-color-scheme: dark) {
+    .card { background: #333333; color: #ffffff }
+  }
+`
+
+app(() => div({ style: { padding: 24 } },
+  div({ class: 'card' }, '响应式卡片'),
+  div({ class: 'card' }, '竖屏 16dp / 横屏 4dp 黄 / 平板 48dp')
+), '#app')

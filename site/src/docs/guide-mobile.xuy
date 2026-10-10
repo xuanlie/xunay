@@ -1,0 +1,42 @@
+// 移动端适配
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("移动端适配"),
+    P("XuNay 全平台适配——同一个组件，桌面 / 移动端自动切换。"),
+    H2("设计原则"),
+    Quote("一个组件，自适应两种场景。不为移动端单独做一套组件。"),
+    Ul("触摸区最小 44×44px（iOS HIG 标准）","输入框 font-size 16px（防 iOS 自动缩放）","Modal 桌面居中 / 移动端底部弹出","Table 桌面表格 / 移动端横滑","Form 桌面两列 / 移动端单列","Tooltip 桌面 hover / 移动端点击"),
+    H2("三个层次"),
+    H3("第一层：全局 CSS"),
+    P("ui.css 里内置，无需配置："),
+    Table(["项","内容"], [["断点","6 个：xs(<375) / sm(≥375) / md(≥768) / lg(≥1024) / xl(≥1280)"],["触摸区","按钮 / 输入框最小 44×44px"],["安全区","--x-safe-top / bottom / left / right"],["触摸优化","touch-action: manipulation，去点击高亮"],["100vh 问题","用 100dvh 代替"],["触摸设备","@media (hover: none) 去 hover 效果"]]),
+    H3("第二层：组件自适应"),
+    P("kit 的组件已内置移动端行为，无需手动判断："),
+    Table(["组件","桌面","移动端"], [["Modal","居中弹窗","底部弹出 + 圆角"],["Drawer","右侧滑出","全宽 + 下滑关闭"],["Table","完整表格","横滑容器"],["Tabs","顶部横排","可横滑"],["Pagination","完整页码","上/下页 + 当前页"],["Form","两列布局","单列"],["Carousel","左右箭头","手指滑动"],["Calendar","箭头切月","手指左右滑"],["Sortable","鼠标拖拽","触摸拖拽"],["SplitPane","鼠标拖动","触摸拖动"],["Tooltip","hover 显示","点击显示"],["Popover","hover 显示","点击显示"],["Descriptions","两列","单列"],["Dropdown","下拉定位","左右占满"]]),
+    H3("第三层：手动控制"),
+    P("用 xunay/mobile 做设备检测和手势："),
+    Code("import { isMobile, isTouch, breakpoint, swipe, longpress, lockScroll } from 'xunay/mobile'\n\n// 设备检测\nisMobile()   // 小屏 / 移动 UA\nisTouch()    // 触摸设备\n\n// 响应式断点\nconst bp = breakpoint()\neffect(() => {\n  if (bp.value === 'xs') { /* 超小屏 */ }\n})\n\n// 手势\nswipe(el, { onSwipeLeft: () => next() })\nlongpress(el, () => showMenu())\n\n// 滚动锁定\nconst unlock = lockScroll()", "js"),
+    H2("断点系统"),
+    Table(["断点","宽度","典型设备"], [["xs","< 375px","iPhone SE"],["sm","≥ 375px","iPhone 14 / 大多数手机"],["md","≥ 768px","iPad 竖屏"],["lg","≥ 1024px","iPad 横屏 / 小笔记本"],["xl","≥ 1280px","桌面显示器"]]),
+    Code("import { breakpoint } from 'xunay/mobile'\n\nconst bp = breakpoint({ sm: 640, md: 768, lg: 1024, xl: 1280 })\n\n// CSS 里\n@media (max-width: 768px) {\n  /* 移动端样式 */\n}", "css"),
+    H2("安全区适配"),
+    P("iPhone 刘海屏 / 底部横条，用 CSS 变量："),
+    Code("/* 顶部留出刘海 */\n.header {\n  padding-top: env(safe-area-inset-top);\n}\n\n/* 底部留出横条 */\n.footer {\n  padding-bottom: calc(16px + env(safe-area-inset-bottom));\n}\n\n/* XuNay 提供的变量 */\n:root {\n  --x-safe-top: env(safe-area-inset-top, 0px);\n  --x-safe-bottom: env(safe-area-inset-bottom, 0px);\n}", "css"),
+    H2("辅助 class"),
+    Table(["class","作用"], [[".hide-mobile","移动端隐藏"],[".hide-desktop","桌面隐藏"],[".full-height","100vh / 100dvh 自适应"],[".x-swipe","横滑容器（scroll-snap）"],[".x-scroll-lock","滚动锁定（Modal 用）"]]),
+    H2("常见问题"),
+    H3("iOS 输入框自动放大"),
+    P("iOS 上 font-size < 16px 的输入框聚焦时会自动放大。XuNay 已把移动端输入框设为 16px。"),
+    H3("iOS 100vh 问题"),
+    P("Safari 地址栏导致 100vh 比实际大。XuNay 用 100dvh 解决。"),
+    H3("点击 300ms 延迟"),
+    P("老 iOS 有 300ms 点击延迟。XuNay 用 touch-action: manipulation 去掉。"),
+    H3("移动端 hover 效果残留"),
+    P("触摸设备上 hover 会一直保持。XuNay 用 @media (hover: none) 去掉 hover 效果。"),
+    H3("滚动穿透"),
+    P("Modal 打开时背景还能滚。用 lockScroll() 锁住。"),
+    Tip("用 isTouch() 检测触摸设备，比 window.innerWidth 更准。"),
+  )
+}

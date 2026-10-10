@@ -1,0 +1,20 @@
+// kit: Tour
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Tour"),
+    P("kit 里的 Tour 组件。"),
+    H2("引入"),
+    Code("import { Tour } from 'xunay/kit/overlay'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["current","——","——","可传 signal（响应式）"],["onChange","——","——","回调"],["onFinish","——","——","回调"],["steps","——","——",""]]),
+    H2("基础用法"),
+    Code("import { Tour } from 'xunay/kit/overlay'\n\nTour({ onChange: () => {}, onFinish: () => {}, current: mySignal })", "js"),
+    H2("响应式"),
+    P("这些参数可以直接传 signal，值变化时 DOM 会自动更新："),
+    Code("import { signal } from 'xunay'\nimport { Tour } from 'xunay/kit/overlay'\n\nconst v = signal(false)\n\nTour({ current: v })", "js"),
+    Tip("不要写成 current: v() —— 传函数给 render.js，让它挂 effect。"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

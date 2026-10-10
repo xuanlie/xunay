@@ -1,0 +1,23 @@
+const CSS = `
+  .italic { font-style: italic; font-size: 20 }
+  .bold-italic { font-weight: bold; font-style: italic; font-size: 20 }
+  .spaced { letter-spacing: 0.1em; line-height: 1.5; font-size: 18 }
+  .underlined { text-decoration: underline; color: #0066cc }
+  .struck { text-decoration: line-through; color: #999999 }
+  .rotated { transform: rotate(15deg); background: #ffcc00; padding: 16 }
+  .scaled { transform: scale(1.5); background: #66ccff; padding: 16; margin: 16 }
+  .shadowed { box-shadow: 0 8px 12px; background: #ffffff; padding: 16 }
+  .rounded { border-radius: 20; background: #e0e0e0; padding: 16 }
+`
+
+app(() => div({ style: { padding: 24 } },
+  span({ class: 'italic' }, '斜体文字'),
+  span({ class: 'bold-italic' }, '粗斜体'),
+  span({ class: 'spaced' }, '字间距 + 行高'),
+  span({ class: 'underlined' }, '下划线'),
+  span({ class: 'struck' }, '删除线'),
+  div({ class: 'rotated' }, '旋转 15 度'),
+  div({ class: 'scaled' }, '放大 1.5 倍'),
+  div({ class: 'shadowed' }, '阴影卡片'),
+  div({ class: 'rounded' }, '圆角卡片')
+), '#app')

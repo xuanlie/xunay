@@ -1,0 +1,29 @@
+// Node 后端
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Node 后端"),
+    P("最轻量的后端——零依赖，纯 Node 原生 http 模块。"),
+    H2("启动"),
+    Code("bash bin/start.sh\n# 或\nnode backends/node/server.js", "bash"),
+    H2("默认端口"),
+    Code("12341", "txt"),
+    H2("目录"),
+    Code("backends/node/\n├── server.js       HTTP 服务器 + 路由\n├── handlers.js     业务逻辑\n├── db.js           JSON 文件持久化\n├── schemas.js      参数校验\n├── mini.js         迷你 Web 框架\n└── data.json       数据文件", "txt"),
+    H2("handlers"),
+    Code("// handlers.js\nexport const handleGetTodos = async (ctx) => {\n  const todos = await db.getTodos()\n  return { ok: true, data: todos }\n}\n\nexport const handleAddTodo = async (ctx) => {\n  const { title } = ctx.body\n  if (!title) throw new Error('title 必填')\n  const todo = await db.addTodo({ title })\n  return { ok: true, data: todo }\n}", "js"),
+    H2("路由绑定"),
+    Code("// server.js\nconst routes = [\n  { path: '/rpc/token', method: 'GET', auth: false, handler: handleToken },\n  { path: '/rpc/getTodos', method: 'GET', auth: true, handler: handleGetTodos },\n  { path: '/rpc/addTodo', method: 'POST', auth: true, handler: handleAddTodo }\n]", "js"),
+    H2("数据持久化"),
+    P("用 JSON 文件存储——简单、好调试、零依赖。"),
+    Code("// db.js\nimport fs from 'node:fs'\nconst FILE = './data.json'\n\nexport const db = {\n  async getTodos() {\n    return JSON.parse(fs.readFileSync(FILE, 'utf8')).todos || []\n  },\n  async addTodo({ title }) {\n    const data = JSON.parse(fs.readFileSync(FILE, 'utf8'))\n    const todo = { id: Date.now(), title, done: false }\n    data.todos = [...(data.todos || []), todo]\n    fs.writeFileSync(FILE, JSON.stringify(data, null, 2))\n    return todo\n  }\n}", "js"),
+    H2("WebSocket"),
+    P("Node 原生不支持 WebSocket——用 ws 库或 SSE 替代。"),
+    Code("// 简易 SSE\nimport http from 'node:http'\n\nhttp.createServer((req, res) => {\n  if (req.url === '/ws') {\n    res.writeHead(200, { 'Content-Type': 'text/event-stream' })\n    const timer = setInterval(() => res.write('data: tick\\n\\n'), 1000)\n    req.on('close', () => clearInterval(timer))\n  }\n})", "js"),
+    H2("优点"),
+    Ul("零依赖——只用 Node 内置模块","启动快——100ms 内","调试简单——直接 console.log","适合原型和内部工具"),
+    H2("缺点"),
+    Ul("单线程——CPU 密集会阻塞","无内置 ORM","无中间件系统"),
+  )
+}

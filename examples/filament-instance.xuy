@@ -1,0 +1,5 @@
+﻿scene({ bg: '#0e1116', autoRotate: true,
+  camera: { distance: 30, fov: 45 },
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+plane({ color: '#333333', size: 40, position: [0, -3, 0] })
+model({ src: 'examples/models/BoxAnimated.gltf', count: 12, spread: 20, spreadY: 4 })

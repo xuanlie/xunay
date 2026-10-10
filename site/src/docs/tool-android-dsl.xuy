@@ -1,0 +1,40 @@
+// Android DSL 支持
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Android DSL 支持"),
+    P("Android 端支持的 .xuy 语法。写了没列出来的，会静默忽略或编译失败。"),
+    H2("信号"),
+    Code("const n = signal(0)              // Signal<Integer>\nconst name = signal(\"\")          // Signal<String>\nconst flag = signal(false)       // Signal<Boolean>\nconst list = signal([1,2,3])     // Signal<List<Object>>", "xuy"),
+    H2("派生值"),
+    Code("const double = computed(() => n() * 2)\nconst nameErr = computed(() => {\n  const v = name().trim()\n  if (!v) return \"\"\n  if (v.length < 2) return \"至少 2 个字符\"\n  return \"\"\n})", "xuy"),
+    P("支持 if / switch / for / while / try-catch / 正则 / 数组方法 / 对象属性访问。"),
+    H2("条件渲染"),
+    Code("show(() => submitted(), () => div(null, \"注册成功！\"))", "xuy"),
+    P("生成 FrameLayout + setVisibility。cond 引用 computed 时自动推导依赖的 signal，多个 signal 都触发刷新。"),
+    H2("列表"),
+    Code("list(() => items().filter(x => x.ok), item => li(null, item.name))", "xuy"),
+    P("生成 RecyclerView + Adapter。"),
+    H2("事件"),
+    Table(["事件","生成"], [["on.click","setOnClickListener"],["on.input","TextWatcher.afterTextChanged"],["on.change","OnCheckedChangeListener / OnSeekBarChangeListener"],["on.submit","form + button type=submit 自动绑定"],["on.blur / focus","setOnFocusChangeListener（合并处理）"],["on.keydown / keyup","setOnKeyListener"],["on.scroll","setOnScrollChangeListener"],["on.mousedown/up, touchstart/end","setOnTouchListener"]]),
+    H2("属性"),
+    Code("input({\n  type: \"password\",\n  placeholder: \"密码\",\n  value: () => password(),\n  disabled: () => !canSubmit(),\n  on: { input: e => password(e.target.value) }\n})", "xuy"),
+    H2("自定义组件"),
+    Code("function Field(label_, value, setter, err) {\n  return div({ class: \"field\" },\n    label(null, label_),\n    input({ value: () => value(), on: { input: e => setter(e.target.value) } }),\n    show(() => err() !== \"\", () => span(null, () => err()))\n  )\n}", "xuy"),
+    P("function 声明和箭头函数都支持。展开时替换参数。"),
+    H2("生命周期"),
+    Code("onMount(() => { /* 挂载时执行 */ })\nonUnmount(() => { /* 销毁时执行 */ })", "xuy"),
+    H2("副作用"),
+    Code("effect(() => {\n  log(\"n 变了: \" + n())\n})", "xuy"),
+    P("自动推导依赖的 signal，都触发刷新。"),
+    H2("持久化"),
+    Code("localStorage.getItem(\"userName\")\nlocalStorage.setItem(\"userName\", name())\nlocalStorage.removeItem(\"key\")\nlocalStorage.clear()", "xuy"),
+    P("映射到 SharedPreferences。"),
+    H2("路由"),
+    Code("page(\"home\", () => div(null, button({ on: { click: () => goto(\"about\") } }, \"去关于\")))\npage(\"about\", () => div(null, button({ on: { click: () => back() } }, \"返回\")))", "xuy"),
+    P("每个 page 生成独立 Activity，ROUTES 自动填映射。"),
+    H2("其它"),
+    Ul("ref() —— 获取原生 View","setTheme(\"dark\" / \"light\") —— 明暗切换","setTimeout / setInterval","Date.now() / new Date()","fetch(url, sig) —— 后台线程请求","toast() / alert() / notify()"),
+  )
+}

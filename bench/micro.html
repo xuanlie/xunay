@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>micro</title></head>
+<body>
+<div id="app"></div>
+<pre id="out"></pre>
+<script type="module">
+const out = []
+function log(s) { out.push(s); document.getElementById('out').textContent = out.join('\n') }
+
+// 1. createElement 纯成本
+{
+  const N = 100000
+  for (let i = 0; i < 1000; i++) document.createElement('span')  // warmup
+  const t0 = performance.now()
+  for (let i = 0; i < N; i++) document.createElement('span')
+  const dt = performance.now() - t0
+  log('createElement:      ' + ((dt / N) * 1000).toFixed(1) + ' ns  (' + dt.toFixed(1) + 'ms / ' + N + ')')
+}
+
+// 2. createTextNode 纯成本
+{
+  const N = 100000
+  for (let i = 0; i < 1000; i++) document.createTextNode('x')
+  const t0 = performance.now()
+  for (let i = 0; i < N; i++) document.createTextNode('x')
+  const dt = performance.now() - t0
+  log('createTextNode:     ' + ((dt / N) * 1000).toFixed(1) + ' ns')
+}
+
+// 3. appendChild 到游离节点 纯成本
+{
+  const N = 100000
+  const host = document.createElement('div')
+  const kids = []
+  for (let i = 0; i < 1000; i++) kids.push(document.createElement('span'))
+  for (let i = 0; i < 1000; i++) host.appendChild(kids[i])
+  const t0 = performance.now()
+  for (let i = 0; i < N; i++) {
+    const p = document.createElement('div')
+    p.appendChild(document.createElement('span'))
+  }
+  const dt = performance.now() - t0
+  log('createElement+appendChild: ' + ((dt / N) * 1000).toFixed(1) + ' ns')
+}
+
+// 4. textContent 写 纯成本
+{
+  const N = 100000
+  const t = document.createTextNode('')
+  for (let i = 0; i < 1000; i++) t.textContent = 'warm'
+  const t0 = performance.now()
+  for (let i = 0; i < N; i++) t.textContent = String(i)
+  const dt = performance.now() - t0
+  log('textContent = :     ' + ((dt / N) * 1000).toFixed(1) + ' ns')
+}
+
+// 5. 加载 xunay，测 signal / effect / scope 纯成本
+let X
+try { X = await import('../core/dist/xunay.esm.js') }
+catch (e) { log('xunay 加载失败: ' + e.message) }
+
+if (X) {
+  const { signal, effect } = X
+
+  // signal.read 无订阅者
+  {
+    const s = signal(0)
+    const N = 1000000
+    for (let i = 0; i < 1000; i++) s()
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) s()
+    const dt = performance.now() - t0
+    log('signal.read (0 sub): ' + ((dt / N) * 1000).toFixed(1) + ' ns')
+  }
+
+  // signal.read 在 effect 内（第一次会 push 到 subs）
+  {
+    const N = 100000
+    const s = signal(0)
+    let sink = 0
+    const d = effect(() => { sink = s() })
+    for (let i = 0; i < 1000; i++) { s(); s() }
+    // 现在 effect 已经订阅，再读不会重复 push
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) s()
+    const dt = performance.now() - t0
+    log('signal.read (1 sub): ' + ((dt / N) * 1000).toFixed(1) + ' ns  ← 但这是在 effect 外读')
+    d()
+  }
+
+  // effect.create + dispose（空函数）
+  {
+    const N = 10000
+    for (let i = 0; i < 500; i++) { const d = effect(() => {}); d() }
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) { const d = effect(() => {}); d() }
+    const dt = performance.now() - t0
+    log('effect() 空函数:     ' + ((dt / N) * 1000).toFixed(1) + ' ns')
+  }
+
+  // effect.create + 1 次 signal.read
+  {
+    const N = 10000
+    const s = signal(0)
+    for (let i = 0; i < 500; i++) { const d = effect(() => { s() }); d() }
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) {
+      const s2 = signal(0)
+      const d = effect(() => { s2() })
+      d()
+    }
+    const dt = performance.now() - t0
+    log('signal + effect + read: ' + ((dt / N) * 1000).toFixed(1) + ' ns')
+  }
+
+  // 完整场景：1000 个动态 span
+  {
+    const { div, span, render } = X
+    const N = 20
+    const n = signal(0)
+    const build = () => {
+      const kids = []
+      for (let i = 0; i < 1000; i++) kids.push(span(null, () => n() + i))
+      return div(null, ...kids)
+    }
+    for (let i = 0; i < 5; i++) render(build())
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) render(build())
+    const dt = performance.now() - t0
+    log('render(1000 动态):   ' + ((dt / N) * 1000).toFixed(1) + ' µs  ← 单次')
+  }
+
+  // 对照：1000 静态
+  {
+    const { div, span, render } = X
+    const N = 50
+    const build = () => {
+      const kids = []
+      for (let i = 0; i < 1000; i++) kids.push(span(null, 'x' + i))
+      return div(null, ...kids)
+    }
+    for (let i = 0; i < 10; i++) render(build())
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) render(build())
+    const dt = performance.now() - t0
+    log('render(1000 静态):   ' + ((dt / N) * 1000).toFixed(1) + ' µs  ← 单次')
+  }
+}
+</script>
+</body>
+</html>

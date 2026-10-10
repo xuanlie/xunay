@@ -1,0 +1,42 @@
+// computed
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("computed"),
+    P("computed 是从其他 signal 派生的只读值。它自动追踪依赖、缓存结果，只在依赖变化时重新计算。"),
+    H2("为什么要用它"),
+    P("假设你要显示\"总价\"——它由 items 列表算出来。你可以每次都重新算，也可以缓存起来只在 items 变化时算。computed 就是后者。"),
+    Code("import { signal, computed } from 'xunay'\n\nconst items = signal([{ price: 10, qty: 2 }, { price: 5, qty: 3 }])\n\n// 每次都算（不好）\nconst total1 = () => items().reduce((s, i) => s + i.price * i.qty, 0)\n\n// 缓存结果（好）\nconst total2 = computed(() => items().reduce((s, i) => s + i.price * i.qty, 0))", "xuy"),
+    H2("基础用法"),
+    Code("import { signal, computed } from 'xunay'\n\nconst a = signal(1)\nconst b = signal(2)\nconst sum = computed(() => a() + b())\n\nsum()   // → 3\na(10)\nsum()   // → 12\nb(20)\nsum()   // → 30", "xuy"),
+    P("读 computed 用 sum()（加括号），写不了——它是只读的。"),
+    H2("缓存机制"),
+    P("computed 会在第一次读时计算结果，之后如果依赖没变就直接返回缓存值，不会重算。如果依赖变了，下次读时才重算（惰性）。"),
+    Code("let runs = 0\nconst a = signal(1)\nconst double = computed(() => { runs++; return a() * 2 })\n\ndouble()   // 第一次，runs = 1\ndouble()   // 缓存，runs 还是 1\ndouble()   // 缓存\na(5)\ndouble()   // 依赖变，重算，runs = 2", "xuy"),
+    H2("依赖链"),
+    P("computed 可以依赖其他 computed，形成链条。链条上任意一环变化都会自动传播。"),
+    Code("const price = signal(100)\nconst qty = signal(3)\nconst subtotal = computed(() => price() * qty())\nconst tax = computed(() => subtotal() * 0.13)\nconst total = computed(() => subtotal() + tax())\n\ntotal()   // → 100*3 + 100*3*0.13 = 339\nprice(200)\ntotal()   // → 678", "xuy"),
+    H2("什么时候用 computed"),
+    Table(["场景","用 signal","用 computed"], [["计数器","✓",""],["输入框的值","✓",""],["从列表算总数","","✓"],["过滤后的列表","","✓"],["格式化后的字符串","","✓"],["多个 signal 的组合","","✓"]]),
+    P("规则：能写的用 signal，只读的用 computed。"),
+    H2("computed 与 React useMemo 对比"),
+    Table(["","XuNay computed","React useMemo"], [["依赖","自动追踪","手写数组 [a, b]"],["忘记依赖","不存在","常见 bug"],["缓存","自动","自动"],["响应式","是，会触发更新","否，只是避免重算"],["返回值","可以直接调用","是普通值"]]),
+    H2("常见陷阱"),
+    H3("陷阱 1：在 computed 里写 signal"),
+    Code("const n = signal(0)\nconst bad = computed(() => {\n  n(5)   // ✗ 副作用！computed 应该只读\n  return n()\n})", "xuy"),
+    P("computed 只应该纯计算——读信号，返回结果，不要写。写操作放事件回调里。"),
+    H3("陷阱 2：忘了调用"),
+    Code("const double = computed(() => n() * 2)\ndouble        // ✗ 是函数本身\ndouble()      // ✓ 是值", "xuy"),
+    P("这是从 React / Vue 过来最容易犯的错。signal 和 computed 都必须加 () 才是值。"),
+    H3("陷阱 3：依赖不确定"),
+    Code("const showA = signal(true)\nconst a = signal(1)\nconst b = signal(2)\nconst val = computed(() => {\n  if (showA()) return a()\n  return b()\n})\n\n// 现在依赖是 [showA, a]\nshowA(false)\n// 依赖变成 [showA, b]，a 不再触发它", "xuy"),
+    P("运行时动态切换依赖是支持的——computed 每次重算都会重新收集依赖。但如果依赖集合不稳定，性能会有波动。"),
+    H2("与 effect 的区别"),
+    Table(["","computed","effect"], [["返回值","有","没有"],["触发","读时惰性计算","依赖一变就立即跑"],["缓存","有","无"],["用途","派生值","副作用"],["能在 JSX 里读","✓","✗"]]),
+    H2("完整示例：过滤 + 排序 + 统计"),
+    Code("import { signal, computed } from 'xunay'\n\nconst todos = signal([\n  { id: 1, title: '写文档', done: false, priority: 1 },\n  { id: 2, title: '修 bug', done: true, priority: 3 },\n  { id: 3, title: '开会', done: false, priority: 2 }\n])\n\nconst filter = signal('all')      // all / active / done\nconst sortBy = signal('priority')  // priority / title\n\n// 第一步：过滤\nconst filtered = computed(() => {\n  const list = todos()\n  const f = filter()\n  if (f === 'active') return list.filter(t => !t.done)\n  if (f === 'done') return list.filter(t => t.done)\n  return list\n})\n\n// 第二步：排序\nconst sorted = computed(() => {\n  const list = [...filtered()]\n  if (sortBy() === 'priority') list.sort((a, b) => a.priority - b.priority)\n  else list.sort((a, b) => a.title.localeCompare(b.title))\n  return list\n})\n\n// 第三步：统计\nconst stats = computed(() => {\n  const list = todos()\n  return {\n    total: list.length,\n    active: list.filter(t => !t.done).length,\n    done: list.filter(t => t.done).length\n  }\n})\n\n// 完整链条：todos / filter / sortBy → filtered → sorted\n// 改 filter，只有 sorted 会重算，stats 不变\n// 改 sortBy，只有 sorted 重算\n// 改 todos，全部重算", "xuy"),
+    H2("下一步"),
+    P("读 effect 理解副作用和生命周期，或看 batch 了解如何合并多次更新。"),
+  )
+}

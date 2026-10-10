@@ -1,0 +1,29 @@
+// Android 故障排查
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("故障排查"),
+    P("常见问题及解决办法。"),
+    H2("生成成功但编译失败"),
+    Ul("1. 看 Gradle 第一段报错（不是最后一段）","2. 常见：XML 属性重复 / 类型不匹配 / 符号找不到","3. 贴报错给 AI 或人工分析"),
+    H2("编译过但界面空白"),
+    Ul("1. 检查 AST 数量（如果是 0，parser 没识别）","2. 检查 XML 里有没有内容","3. 检查 MainActivity 的 onCreate 里有没有绑定代码","4. 检查 setContentView 指向的 layout 存在"),
+    H2("界面出来了但交互无效"),
+    Ul("1. 检查事件绑定（MainActivity 里应该有 setOnClickListener 等）","2. 检查 signal 提取（字段里应该有对应 Signal<> 定义）","3. 检查 subscribe 调用（signal 变化时应该触发）","4. 打 logcat 看有没有崩溃"),
+    H2("App 闪退"),
+    Code("adb logcat -b crash -d", "bash"),
+    P("看 Caused by 那一行。常见：颜色非法 / 空指针 / 类型转换。"),
+    H2("装不上"),
+    Table(["报错","解决"], [["INSTALL_FAILED_USER_RESTRICTED","国产 ROM 权限限制（见环境准备）"],["INSTALL_FAILED_OLDER_SDK","minSdk 高于设备"],["INSTALL_FAILED_VERSION_DOWNGRADE","版本号比已装的低，先卸载"],["INSTALL_FAILED_INSUFFICIENT_STORAGE","设备存储满"]]),
+    H2("编译慢"),
+    Ul("首次编译要下载依赖（Glide / RecyclerView / Flexbox），约 1-3 分钟","之后增量编译只要几秒","--no-daemon 会慢一点（但省内存）"),
+    H2("找不到 gradle wrapper"),
+    P("第一次生成工程后要跑一次 gradlew wrapper，或者用 Android Studio 打开 build/android 自动生成。CLI 已会自动尝试。"),
+    H2("adb 没反应"),
+    Ul("adb kill-server && adb start-server","手机上重新确认\"允许 USB 调试\"","换 USB 口 / 数据线","USB 3.0 口有时不稳定，试 2.0"),
+    H2("逻辑跟 Web 端不一致"),
+    P("Android 端不是 Web 端移植，是独立翻译。有语义差异："),
+    Table(["概念","Web 端","Android 端"], [["DOM","真实 DOM","无，直接生成 View 树"],["CSS 布局","浏览器排版","手动映射到 LinearLayout / FlexboxLayout"],["事件冒泡","有","无"],["异步","Promise 微任务","Thread + Handler"]]),
+  )
+}

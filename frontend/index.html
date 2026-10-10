@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XuNay Todo</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+  h1 { font-size: 1.4rem; }
+  .row { display: flex; gap: .5rem; margin-bottom: 1rem; }
+  input[type=text] { flex: 1; padding: .6rem .8rem; font-size: 1rem; border: 1px solid #ddd; border-radius: 6px; }
+  button { padding: .6rem 1rem; font-size: 1rem; cursor: pointer; border: none; border-radius: 6px; background: #333; color: #fff; }
+  button:hover { background: #555; }
+  ul { list-style: none; padding: 0; margin: 1rem 0 0; }
+  li { display: flex; align-items: center; gap: .5rem; padding: .6rem .2rem; border-bottom: 1px solid #f0f0f0; }
+  li .title { flex: 1; cursor: pointer; padding: .2rem 0; }
+  li .title.done { text-decoration: line-through; color: #999; }
+  li button { background: #e33; padding: .3rem .6rem; font-size: .8rem; }
+  li button:hover { background: #c22; }
+  .status { color: #888; font-size: .85rem; margin-top: .5rem; }
+</style>
+</head>
+<body>
+  <h1>XuNay Todo</h1>
+  <div id="app"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

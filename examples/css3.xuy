@@ -1,0 +1,22 @@
+const CSS = `
+  .card { background: #f0f0f0; padding: 24 }
+  .card .title { color: #ff0000; font-size: 28 }
+  .card > .sub { color: #00ff00; font-size: 20 }
+  .row { padding: 8 }
+  .row.first { background: #ffff00 }
+  .row.last { background: #00ffff }
+  button[type=submit] { background: #4CAF50; color: white }
+  #special { color: #ff00ff }
+`
+
+app(() => div({ style: { padding: 24 } },
+  div({ class: 'card' },
+    h1({ class: 'title' }, '红标题'),
+    h2({ class: 'sub' }, '绿副标题')
+  ),
+  div({ class: 'row first' }, '第一行'),
+  div({ class: 'row' }, '中间行'),
+  div({ class: 'row last' }, '最后一行'),
+  button({ type: 'submit' }, '提交按钮'),
+  span({ id: 'special' }, '紫色特殊文本')
+), '#app')

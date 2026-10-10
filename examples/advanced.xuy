@@ -1,0 +1,15 @@
+const n = s(0)
+const items = s([1, 2, 3, 4, 5])
+
+const Card = (title, val) => div({ style: { background: '#f0f0f0', padding: 12 } },
+  h3(null, title),
+  span({ style: { color: '#ff6600' } }, txt`值: ${val}`)
+)
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '带参组件 + Filter'),
+  button({ style: { background: '#4CAF50', color: '#ffffff', padding: 16 }, on: { click: () => n(v => v + 1) } }, '+1'),
+  Card('计数器', txt`${n}`),
+  Card('翻倍', txt`${n * 2}`),
+  list(items.filter(x => x > 2), (item) => span({ style: { padding: 8 } }, txt`项: ${item}`))
+), '#app')

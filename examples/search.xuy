@@ -1,0 +1,9 @@
+const keyword = s('')
+const allItems = s(['苹果', '香蕉', '橘子', '葡萄', '西瓜', '草莓'])
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '搜索过滤'),
+  input({ placeholder: '搜索水果', on: { input: (e) => keyword(e) } }),
+  span({ style: { color: '#888888' } }, txt`搜索: ${keyword}`),
+  list(allItems.filter(x => x.includes(keyword)), (item) => span({ style: { padding: 12, fontSize: 18 } }, item))
+), '#app')

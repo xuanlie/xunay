@@ -1,0 +1,4 @@
+﻿import { signal } from 'xunay'
+export const posts = signal([])
+export const currentPost = signal(null)
+export const comments = signal([])

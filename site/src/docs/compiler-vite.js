@@ -1,0 +1,20 @@
+// Vite 集成
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Vite 集成"),
+    P("一个最小的 vite plugin 让 Vite 认识 .xuy 文件。"),
+    H2("vite-plugin-xunay"),
+    Code("// vite-plugin-xunay.js\nimport { readFileSync } from 'node:fs'\nimport { compile } from 'compiler3/src/index.js'\n\nconst XUY = /\\.xuy$/\n\nexport default function xunay() {\n  return {\n    name: 'vite-plugin-xunay',\n    enforce: 'pre',\n    transform(src, id) {\n      if (!XUY.test(id)) return null\n      const raw = src || readFileSync(id, 'utf8')\n      const code = compile(raw)\n      return { code, map: null }\n    },\n  }\n}", "js"),
+    H2("vite.config.js"),
+    Code("import { defineConfig } from 'vite'\nimport xunay from './vite-plugin-xunay.js'\n\nexport default defineConfig({\n  plugins: [xunay()],\n  esbuild: {\n    target: 'es2020',\n  },\n})", "js"),
+    H2("runtime 模式"),
+    Code("// vite-plugin-xunay.js\nimport { compile } from 'compiler3/src/index.js'\nimport path from 'node:path'\n\nconst ROOT = process.cwd()\nconst tagModule = path.join(ROOT, 'core/src/element.js')\n\nexport default function xunay({ mode = 'compiled' } = {}) {\n  return {\n    name: 'vite-plugin-xunay',\n    enforce: 'pre',\n    transform(src, id) {\n      if (!/\\.xuy$/.test(id)) return null\n      return { code: compile(src, { mode, tagModule }), map: null }\n    },\n  }\n}", "js"),
+    H2("相对 compiler2 的改进"),
+    Table(["项","compiler2 plugin","compiler3 plugin"], [["parse 导入","compiler2/src/parser","acorn 内置"],["parser 出错","容易死循环","acorn 抛 SyntaxError"],["模式切换","环境变量 XUYC_NO_COMPILE","opts.mode 参数"],["类型支持","无","@runtime 头注释"]]),
+    H2("注意"),
+    Ul("compiler3 用 ESM，vite 的 plugin 也要 ESM","transform 的返回值 map 用 null 表示不需要 sourcemap","需要在 vite.config.js 里加 resolve.alias 让 xunay 指向 core/src/index.js"),
+    Tip("compiler3 的 compile 是纯函数，接任何构建工具都不难。"),
+  )
+}

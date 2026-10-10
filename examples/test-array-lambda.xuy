@@ -1,0 +1,21 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const arr = s([1, 2, 3, 4, 5])
+
+const doubled = computed(() => arr().map(x => x * 2))
+const evens   = computed(() => arr().filter(x => x % 2 === 0))
+const sum     = computed(() => arr().reduce((acc, x) => acc + x, 0))
+const firstBig = computed(() => arr().find(x => x > 3))
+const anyBig  = computed(() => arr().some(x => x > 4))
+const allPos  = computed(() => arr().every(x => x > 0))
+const joined  = computed(() => arr().map(x => x * 10).join(','))
+
+mount(() => div(null,
+  span(null, txt`doubled: ${doubled}`),
+  span(null, txt`evens: ${evens}`),
+  span(null, txt`sum: ${sum}`),
+  span(null, txt`firstBig: ${firstBig}`),
+  span(null, txt`anyBig: ${anyBig}`),
+  span(null, txt`allPos: ${allPos}`),
+  span(null, txt`joined: ${joined}`)
+), '#app')

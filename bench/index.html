@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XuNay Benchmark</title>
+<style>
+  :root { --fg:#1a1a1a; --muted:#888; --border:#eee; --code:#f6f8fa; --accent:#0066cc; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; color: var(--fg); line-height: 1.5; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  h1 small { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 12px; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; min-height: 18px; }
+  .env { color: var(--muted); font-size: 12px; margin-bottom: 20px; word-break: break-all; }
+  .bar { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+  button { padding: 8px 16px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; background: #fff; font-size: 14px; color: var(--fg); }
+  button:hover:not(:disabled) { background: #f5f5f5; border-color: #999; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover:not(:disabled) { background: #0055aa; border-color: #0055aa; }
+  #results { margin-top: 24px; }
+  table { width: 100%; border-collapse: collapse; margin: 0; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  th { background: #fafafa; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+  tr.group td { background: #f9f9f9; font-weight: 600; color: #555; padding: 6px 12px; font-size: 12px; letter-spacing: 0.5px; }
+  tr.err td { color: #c00; }
+  pre { background: var(--code); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px; max-height: 480px; line-height: 1.5; border: 1px solid var(--border); }
+  .hint { background: #fffbea; border: 1px solid #ffe58f; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin: 16px 0; display: none; }
+  .hint code { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 3px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  #jsonWrap { margin-top: 24px; }
+  #jsonWrap summary { cursor: pointer; font-weight: 600; font-size: 14px; padding: 8px 0; }
+</style>
+</head>
+<body>
+<h1>XuNay Benchmark <small id="version"></small></h1>
+<div class="meta" id="meta">准备就绪 · 点"跑测试"开始</div>
+<div class="env" id="env"></div>
+
+<div class="hint" id="hint">
+  <strong>模块加载失败。</strong>浏览器禁止 file:// 下加载 ESM。请用 HTTP 打开：
+  <code>cd /root/xunay &amp;&amp; python3 -m http.server 8080</code>
+  然后访问 <code>http://localhost:8080/bench/</code>
+</div>
+
+<div class="bar">
+  <button id="run" class="primary">跑测试</button>
+  <button id="download" disabled>下载 JSON</button>
+  <button id="copy" disabled>复制 JSON</button>
+</div>
+
+<div style="background:#fffbea;border:1px solid #ffe58f;padding:12px 16px;border-radius:8px;font-size:13px;margin:16px 0;line-height:1.7">
+<strong>⚠️ 读法提示：</strong><br>
+&nbsp;&nbsp;<code>render(1000 动态节点)</code> 是<strong>反模式</strong>——它每次 render 都新建 1000 个 effect，累积不销毁。<br>
+&nbsp;&nbsp;真实场景该用 <code>list()</code> 做 keyed 复用（见 <code>list.create (1000 项)</code> 那行）。<br>
+&nbsp;&nbsp;<strong>会看两个数：</strong>单次延迟（毫秒），不是总耗时。
+</div>
+<div id="results"></div>
+
+<details id="jsonWrap" style="display:none">
+  <summary>查看 JSON</summary>
+  <pre id="json"></pre>
+</details>
+
+<div id="sandbox" style="position:fixed;left:-99999px;top:0;width:800px;height:600px;overflow:hidden"></div>
+
+<script type="module">
+let X
+let SSR = null
+try {
+  X = await import('../core/dist/xunay.esm.js')
+try { SSR = await import('../core/dist/xunay-ssr.min.js') } catch (e) { console.warn('SSR 模块加载失败:', e.message) }
+} catch (e) {
+  document.getElementById('hint').style.display = 'block'
+  document.getElementById('meta').textContent = '模块加载失败: ' + (e && e.message ? e.message : String(e))
+  throw e
+}
+
+const { signal, computed, effect, batch, createElement, render, mount, list } = X
+
+const TAGS = ['div','span','p','a','button','input','form','label','ul','ol','li',
+              'h1','h2','h3','h4','h5','h6','img','br','hr','table','thead','tbody',
+              'tr','td','th','pre','code','blockquote']
+const tag = {}
+for (const t of TAGS) tag[t] = X[t]
+
+const envEl = document.getElementById('env')
+envEl.textContent = (navigator.userAgent || '') + ' · ' +
+  (navigator.hardwareConcurrency || '?') + ' cores' +
+  (navigator.deviceMemory ? ' · ' + navigator.deviceMemory + ' GB' : '')
+
+const sandbox = document.getElementById('sandbox')
+
+function bench(name, fn, opts) {
+  opts = opts || {}
+  const iters = opts.iters || 10000
+  const warmup = opts.warmup || 1000
+  try { fn(0) } catch (e) {
+    return { name, error: e && e.message ? e.message : String(e) }
+  }
+  for (let i = 0; i < warmup; i++) fn(i)
+  const t0 = performance.now()
+  for (let i = 0; i < iters; i++) fn(i)
+  const ms = performance.now() - t0
+  return {
+    name,
+    iters,
+    ms: +ms.toFixed(3),
+    usPerOp: +((ms / iters) * 1000).toFixed(4),
+    opsPerSec: Math.round(iters / (ms / 1000))
+  }
+}
+
+function memoryMB() {
+  if (performance.memory && performance.memory.usedJSHeapSize) {
+    return +(performance.memory.usedJSHeapSize / 1048576).toFixed(2)
+  }
+  return null
+}
+
+async function fetchSizes() {
+  const files = ['xunay.min.js', 'xunay.esm.js', 'xunay-kit.min.js',
+                 'xunay-devtools.min.js', 'xunay-full.min.js',
+                 'xunay-ssr.min.js', 'xunay-anim.min.js']
+  const out = []
+  for (const f of files) {
+    try {
+      const r = await fetch('../core/dist/' + f, { method: 'HEAD' })
+      const n = parseInt(r.headers.get('content-length') || '0', 10)
+      out.push({ name: f, bytes: n, kb: +(n / 1024).toFixed(2) })
+    } catch (e) {
+      out.push({ name: f, error: 'fetch 失败' })
+    }
+  }
+  return out
+}
+
+async function runAll() {
+  sandbox.innerHTML = ''
+  const groups = []
+
+  // 1. Signal
+  {
+    const items = []
+    items.push(bench('signal.create', (i) => signal(i), { iters: 100000 }))
+    {
+      const s = signal(0)
+      items.push(bench('signal.read', () => s(), { iters: 100000 }))
+    }
+    {
+      const s = signal(0)
+      items.push(bench('signal.write (无订阅)', (i) => s(i), { iters: 100000 }))
+    }
+    {
+      const s = signal(0)
+      let sink = 0
+      const d = effect(() => { sink = s() })
+      items.push(bench('signal.write (1 effect)', (i) => s(i), { iters: 100000 }))
+      d()
+    }
+    groups.push({ group: 'Signal', items })
+  }
+
+  // 2. Computed
+  {
+    const items = []
+    {
+      const a = signal(0)
+      const c = computed(() => a() + 1)
+      c()
+      items.push(bench('computed.read (缓存命中)', () => c(), { iters: 100000 }))
+    }
+    {
+      const a = signal(0)
+      const c = computed(() => a() + 1)
+      c()
+      items.push(bench('computed.recompute', (i) => { a(i); c() }, { iters: 10000, warmup: 500 }))
+    }
+    groups.push({ group: 'Computed', items })
+  }
+
+  // 3. Effect
+  {
+    const items = []
+    items.push(bench('effect.create + dispose', (i) => {
+      const s = signal(i)
+      const d = effect(() => { s() })
+      d()
+    }, { iters: 10000, warmup: 500 }))
+    groups.push({ group: 'Effect', items })
+  }
+
+  // 4. Batch
+  {
+    const items = []
+    const a = signal(0), b = signal(0)
+    let sink = 0
+    const d = effect(() => { sink = a() + b() })
+    items.push(bench('batch (2 写合并)', (i) => batch(() => { a(i); b(i) }), { iters: 10000, warmup: 500 }))
+    d()
+    groups.push({ group: 'Batch', items })
+  }
+
+  // 5. 1000 signal
+  {
+    const items = []
+    const sigs = Array.from({ length: 1000 }, (_, i) => signal(i))
+    let sink = 0
+    const ds = []
+    for (const s of sigs) ds.push(effect(() => { sink += s() }))
+    items.push(bench('1000 signal × 100 轮全量更新', (round) => {
+      for (let i = 0; i < 1000; i++) sigs[i](round)
+    }, { iters: 100, warmup: 5 }))
+    for (const d of ds) d()
+    groups.push({ group: '1000 Signals', items })
+  }
+
+  // 6. Element
+  {
+    const items = []
+    items.push(bench('createElement (静态)', () => createElement('div', null, 'x'), { iters: 100000 }))
+    const n = signal(0)
+    items.push(bench('createElement (动态函数子)', () => createElement('div', null, () => n()), { iters: 100000 }))
+    groups.push({ group: 'Element', items })
+  }
+
+  // 7. Render
+  {
+    const items = []
+    items.push(bench('render(文本)', () => render('hello'), { iters: 100000 }))
+    {
+      const vnode = tag.div(null, ...Array.from({ length: 1000 }, (_, i) => tag.span(null, 'x' + i)))
+      items.push(bench('render(1000 静态节点)', () => render(vnode), { iters: 200, warmup: 20 }))
+    }
+    {
+      const n = signal(0)
+      const vnode = tag.div(null, ...Array.from({ length: 1000 }, (_, i) => tag.span(null, () => n() + i)))
+      items.push(bench('render(1000 动态节点)', () => render(vnode), { iters: 200, warmup: 20 }))
+    }
+    groups.push({ group: 'Render', items })
+  }
+
+  // 8. Mount
+  {
+    const items = []
+    items.push(bench('mount(简单)', () => {
+      sandbox.innerHTML = ''
+      const el = document.createElement('div')
+      sandbox.appendChild(el)
+      mount(() => tag.div(null, 'hello'), el)
+    }, { iters: 1000, warmup: 50 }))
+
+    {
+      const n = signal(0)
+      items.push(bench('mount(计数器应用)', () => {
+        sandbox.innerHTML = ''
+        const el = document.createElement('div')
+        sandbox.appendChild(el)
+        mount(() => tag.div(null,
+          tag.h1(null, 'Counter'),
+          tag.p(null, () => 'n = ' + n()),
+          tag.button({ on: { click: () => n(v => v + 1) } }, '+'),
+          tag.button({ on: { click: () => n(v => v - 1) } }, '-')
+        ), el)
+      }, { iters: 500, warmup: 30 }))
+    }
+    groups.push({ group: 'Mount', items })
+  }
+
+  // 9. List
+  {
+    const items = []
+    const arr = Array.from({ length: 1000 }, (_, i) => ({ id: i, t: 'row ' + i }))
+    items.push(bench('list.create (1000 项)', () => {
+      sandbox.innerHTML = ''
+      const el = document.createElement('div')
+      sandbox.appendChild(el)
+      mount(() => tag.ul(null, list(arr, x => x.id, x => tag.li(null, x.t))), el)
+    }, { iters: 50, warmup: 5 }))
+    groups.push({ group: 'List (keyed)', items })
+  }
+
+  // 10. SSR
+  {
+    const items = []
+    if (SSR && typeof SSR.renderToString === 'function') {
+      const vnode = tag.div(null, ...Array.from({ length: 1000 }, (_, i) => tag.span(null, 'n' + i)))
+      items.push(bench('renderToString(1000 节点)', () => SSR.renderToString(vnode), { iters: 200, warmup: 20 }))
+    } else {
+      items.push({ name: 'renderToString', error: 'xunay-ssr.min.js 未加载' })
+    }
+    groups.push({ group: 'SSR', items })
+  }
+
+  // 11. 包体积
+  {
+    const items = []
+    const sizes = await fetchSizes()
+    for (const s of sizes) {
+      if (s.error) items.push({ name: s.name, error: s.error })
+      else items.push({ name: s.name, kb: s.kb, bytes: s.bytes })
+    }
+    groups.push({ group: '包体积（未 gzip）', items })
+  }
+
+  // 12. 内存
+  {
+    const items = []
+    const m = memoryMB()
+    if (m !== null) items.push({ name: 'usedJSHeapSize', mb: m })
+    else items.push({ name: 'usedJSHeapSize', error: 'performance.memory 不可用（仅 Chromium）' })
+    groups.push({ group: '内存', items })
+  }
+
+  sandbox.innerHTML = ''
+  return {
+    meta: {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      hardwareConcurrency: navigator.hardwareConcurrency || null,
+      deviceMemory: navigator.deviceMemory || null,
+      url: location.href
+    },
+    results: groups
+  }
+}
+
+function renderTable(groups) {
+  let html = '<table><thead><tr>'
+  html += '<th>测试</th><th class="num">迭代</th><th class="num">单次</th><th class="num">总耗时</th><th class="num">µs/op</th><th class="num">ops/s</th>'
+  html += '</tr></thead><tbody>'
+  for (const g of groups) {
+    html += '<tr class="group"><td colspan="5">' + g.group + '</td></tr>'
+    for (const it of g.items) {
+      if (it.error) {
+        html += '<tr class="err"><td>' + it.name + '</td><td colspan="4">' + it.error + '</td></tr>'
+        continue
+      }
+      if (it.mb !== undefined) {
+        html += '<tr><td>' + it.name + '</td><td colspan="4" class="num">' + it.mb + ' MB</td></tr>'
+        continue
+      }
+      if (it.kb !== undefined) {
+        html += '<tr><td>' + it.name + '</td><td colspan="4" class="num">' + it.kb + ' KB</td></tr>'
+        continue
+      }
+      html += '<tr>'
+      html += '<td>' + it.name + '</td>'
+      html += '<td class="num">' + it.iters.toLocaleString() + '</td>'
+      html += '<td class="num">' + (it.ms / it.iters).toFixed(4) + ' ms</td>'
+      html += '<td class="num">' + it.ms.toFixed(2) + ' ms</td>'
+      html += '<td class="num">' + it.usPerOp.toFixed(4) + '</td>'
+      html += '<td class="num">' + it.opsPerSec.toLocaleString() + '</td>'
+      html += '</tr>'
+    }
+  }
+  html += '</tbody></table>'
+  return html
+}
+
+let last = null
+
+document.getElementById('run').addEventListener('click', async () => {
+  const btn = document.getElementById('run')
+  const meta = document.getElementById('meta')
+  const results = document.getElementById('results')
+  btn.disabled = true
+  btn.textContent = '跑测试中...'
+  meta.textContent = '跑测试中...'
+  results.innerHTML = '<p style="color:#888">正在跑测试，请稍候（约 10-30 秒）...</p>'
+  await new Promise(r => setTimeout(r, 50))
+  try {
+    const t0 = performance.now()
+    last = await runAll()
+    const total = (performance.now() - t0).toFixed(1)
+    results.innerHTML = renderTable(last.results)
+    document.getElementById('json').textContent = JSON.stringify(last, null, 2)
+    document.getElementById('jsonWrap').style.display = 'block'
+    meta.textContent = '完成 · 总耗时 ' + total + ' ms · ' + new Date().toLocaleTimeString()
+    document.getElementById('download').disabled = false
+    document.getElementById('copy').disabled = false
+  } catch (e) {
+    results.innerHTML = '<pre style="color:#c00">' + (e && e.stack ? e.stack : String(e)) + '</pre>'
+    meta.textContent = '出错: ' + (e && e.message ? e.message : String(e))
+  } finally {
+    btn.disabled = false
+    btn.textContent = '跑测试'
+  }
+})
+
+document.getElementById('download').addEventListener('click', () => {
+  if (!last) return
+  const blob = new Blob([JSON.stringify(last, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+  a.href = url
+  a.download = 'xunay-bench-' + ts + '.json'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+})
+
+document.getElementById('copy').addEventListener('click', async () => {
+  if (!last) return
+  const btn = document.getElementById('copy')
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(last, null, 2))
+    btn.textContent = '已复制'
+    setTimeout(() => { btn.textContent = '复制 JSON' }, 1500)
+  } catch (e) {
+    alert('复制失败: ' + e.message)
+  }
+})
+</script>
+</body>
+</html>

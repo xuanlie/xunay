@@ -1,0 +1,29 @@
+快速开始
+
+安装
+
+    npm install xunay
+
+计数器
+
+    import { div, button, span, sig, app, txt } from 'xunay'
+
+    const n = sig(0)
+
+    app(() => div(null,
+      button({ on: { click: () => n(v => v + 1) } }, '+1'),
+      span(null, txtn = ${n})
+    ), '#app')
+
+列表
+
+    list(todos, t => t.id, t => li(null, t.title))
+
+条件
+
+    show(() => n() > 5, () => span(null, '太多了'))
+
+生命周期
+
+    onMount(() => console.log('挂载'))
+    onUnmount(() => console.log('卸载'))

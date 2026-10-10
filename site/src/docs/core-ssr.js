@@ -1,0 +1,33 @@
+// SSR
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("SSR"),
+    Tip("从 xunay/ssr 引入：import { renderToString } from 'xunay/ssr'"),
+    P("服务端渲染——在服务器把 vnode 转成 HTML 字符串，直接送到浏览器。首屏不用等 JS 加载，内容立刻显示。"),
+    H2("两个 API"),
+    Table(["API","运行环境","作用"], [["renderToString(vnode)","Node / 服务器","vnode 转 HTML 字符串"],["hydrate(vnode, target)","浏览器","接管已有的 HTML"]]),
+    H2("renderToString"),
+    Code("import { renderToString, div, h1, p } from 'xunay'\n\nconst html = renderToString(\n  div({ class: 'app' },\n    h1(null, '标题'),\n    p(null, '正文')\n  )\n)\n// html = '<div class=\"app\"><h1>标题</h1><p>正文</p></div>'", "xuy"),
+    H2("hydrate"),
+    P("客户端拿服务端渲染好的 HTML，不重新创建 DOM，而是\"接管\"——绑定事件、建立 effect、恢复响应式。"),
+    Code("import { hydrate, div, h1, p } from 'xunay'\n\nhydrate(\n  div({ class: 'app' },\n    h1(null, '标题'),\n    p(null, '正文')\n  ),\n  '#app'   // 已有的 DOM 容器\n)", "xuy"),
+    H2("完整流程"),
+    Code("// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\napp.get('/', (req, res) => {\n  const html = renderToString(App())\n  res.send(`<!DOCTYPE html>\n<html><body>\n  <div id=\"app\">${html}</div>\n  <script src=\"/app.js\"></script>\n</body></html>`)\n})\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')", "xuy"),
+    H2("服务端能做和不能做的"),
+    Table(["能做","不能做"], [["创建 vnode","访问 document"],["拼 HTML 字符串","访问 window"],["计算 initial 状态","绑定事件"],["读写数据","使用定时器"]]),
+    Warn("服务端渲染时不要写 onMount、effect、setTimeout——环境里没有 DOM。用 if (typeof window !== \"undefined\") 判断。"),
+    H2("hydration 不匹配"),
+    P("服务端和客户端渲染的内容不一致时，xunay 会报警告。原因通常是："),
+    Ul("服务端和客户端的初始 signal 不同","用了 Date.now() / Math.random()","用了 typeof window 分支"),
+    Code("// 错误：不一致，服务端渲染的是 server\ndiv(null, () => typeof window !== 'undefined' ? 'browser' : 'server')\n\n// 正确：用 onMount 之后才更新\nconst isBrowser = signal(false)\nonMount(() => isBrowser(true))\ndiv(null, () => isBrowser() ? 'browser' : 'server')", "xuy"),
+    H2("性能"),
+    Table(["","CSR","SSR + hydrate"], [["首屏内容","等 JS 加载后显示","HTML 到达立即显示"],["交互","立即可用","hydrate 后可用"],["服务器成本","低","高"],["SEO","差","好"]]),
+    H2("什么时候用 SSR"),
+    Ul("SEO 重要（博客、电商、新闻）","首屏速度关键","有服务端渲染能力"),
+    P("纯后台 / 内部工具不需要 SSR——CSR 更快更简单。"),
+    H2("完整示例"),
+    Code("// ===== 共享 App =====\n// App.js\nimport { div, h1, p, button, signal } from 'xunay'\n\nexport function App() {\n  const n = signal(0)\n  return div({ class: 'app' },\n    h1(null, 'SSR 演示'),\n    p(null, () => '计数: ' + n()),\n    button({ on: { click: () => n(v => v + 1) } }, '+1')\n  )\n}\n\n// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\nconst html = renderToString(App())\n// <div class=\"app\"><h1>SSR 演示</h1><p>计数: 0</p><button>+1</button></div>\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')", "xuy"),
+  )
+}

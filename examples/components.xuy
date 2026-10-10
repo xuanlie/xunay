@@ -1,0 +1,9 @@
+const n = s(0)
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '组件演示'),
+  span(null, txt`当前进度: ${n}%`),
+  progress({ value: 0, max: 100 }, txt`${n}`),
+  span(null, '拖动滑条同步改变进度'),
+  slider({ value: 0, max: 100, on: { change: (v) => n(v) } })
+), '#app')

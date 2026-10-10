@@ -1,0 +1,13 @@
+﻿import { div, app } from 'xunay'
+const CSS = `
+.a { background-position: top left; padding: 12px; background: #ff6600; color: #fff; }
+.b { background-position: top right; padding: 12px; background: #22ccff; }
+.c { background-position: bottom center; padding: 12px; background: #ff00ff; color: #fff; }
+.d { background-position: 100% 0%; padding: 12px; background: #00ff88; }
+`
+app(() => div(null,
+  div({ 'class': 'a' }, 'top left'),
+  div({ 'class': 'b' }, 'top right'),
+  div({ 'class': 'c' }, 'bottom center'),
+  div({ 'class': 'd' }, '100% 0%')
+), '#app')

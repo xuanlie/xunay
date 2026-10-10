@@ -1,0 +1,13 @@
+﻿import { div, span, button, signal, mount, txt, goto, page, back } from 'xunay'
+
+page('home', () => div(null,
+  span(null, '首页'),
+  button({ on: { click: () => goto('about') } }, '去关于')
+))
+
+page('about', () => div(null,
+  span(null, '关于页'),
+  button({ on: { click: () => back() } }, '返回')
+))
+
+mount(() => div(null, '启动'), '#app')

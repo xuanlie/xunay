@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a12">
+<title>XuNay · Music</title>
+<link rel="stylesheet" href="../../core/src/ui.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100dvh; overflow: hidden; background: #0a0a12; color: #e8e8f0;
+    font: 14px/1.6 -apple-system, "Segoe UI", "PingFang SC", sans-serif;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  #app { padding: 20px; max-width: 900px; margin: 0 auto;
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .section { background: rgba(20,20,30,.7); border: 1px solid #1c1c24;
+    border-radius: 14px; padding: 16px; }
+  .section h3 { font-size: 11px; color: #666; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 10px; font-weight: 600; }
+  .full { grid-column: 1 / -1; }
+
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    padding: 8px 14px; border-radius: 10px;
+    background: rgba(30,30,44,.8); border: 1px solid #333;
+    cursor: pointer; font-size: 13px; color: #ccc;
+    transition: all .15s; user-select: none;
+  }
+  .chip:hover { border-color: #66ccff; color: #66ccff; }
+  .chip.on { background: rgba(102,204,255,.15); border-color: #66ccff;
+    color: #66ccff; font-weight: 600; }
+
+  /* 和弦卡片 */
+  #progression { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chord {
+    flex: 1; min-width: 100px;
+    padding: 16px; border-radius: 12px;
+    background: rgba(30,30,44,.8); border: 2px solid #333;
+    cursor: pointer; text-align: center;
+    transition: all .2s;
+  }
+  .chord:hover { border-color: #66ccff; }
+  .chord.active {
+    border-color: #66ccff; background: rgba(102,204,255,.15);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(102,204,255,.3);
+  }
+  .chord .numeral { font-size: 11px; color: #666; }
+  .chord .symbol { font-size: 22px; font-weight: 700; color: #fff;
+    margin: 4px 0; font-family: ui-monospace, monospace; }
+  .chord .notes { font-size: 10px; color: #66ccff;
+    font-family: ui-monospace, monospace; }
+
+  /* 播放按钮 */
+  #play-btn {
+    padding: 14px 32px; font-size: 16px; font-weight: 600;
+    background: #66ccff; color: #0a0a12; border: 0; border-radius: 12px;
+    cursor: pointer; transition: transform .1s;
+    min-height: 48px; min-width: 140px;
+  }
+  #play-btn:active { transform: scale(0.96); }
+
+  /* 音符可视化 */
+  #piano { display: flex; gap: 2px; height: 60px; align-items: flex-end; }
+  .key {
+    flex: 1; background: linear-gradient(180deg, #334, #223);
+    border-radius: 0 0 6px 6px; min-height: 30px;
+    transition: all .1s;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 4px; font-size: 9px; color: #666;
+  }
+  .key.on {
+    background: linear-gradient(180deg, #66ccff, #4488cc);
+    min-height: 54px; color: #0a0a12; font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    #app { grid-template-columns: 1fr; padding: 12px; }
+    .chord { min-width: 70px; padding: 12px 8px; }
+    .chord .symbol { font-size: 18px; }
+    .chord .notes { font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="section" style="grid-column: 1/-1">
+    <h3>Key</h3>
+    <div class="row" id="keys"></div>
+  </div>
+
+  <div class="section" style="grid-column: 1/-1">
+    <h3>Mode</h3>
+    <div class="row" id="modes"></div>
+  </div>
+
+  <div class="section" style="grid-column: 1/-1">
+    <h3>Progression</h3>
+    <div class="row" id="progressions"></div>
+  </div>
+
+  <div class="section" style="grid-column: 1/-1">
+    <h3>Chords</h3>
+    <div id="progression"></div>
+  </div>
+
+  <div class="section" style="grid-column: 1/-1">
+    <h3>Notes</h3>
+    <div id="piano"></div>
+  </div>
+
+  <div class="section full" style="text-align: center">
+    <button id="play-btn">▶ 播放</button>
+    <button id="rand-btn" style="margin-left: 10px; padding: 12px 20px; background: rgba(30,30,44,.8);
+      border: 1px solid #333; border-radius: 10px; color: #ccc; cursor: pointer; font-size: 14px;">
+      🎲 随机
+    </button>
+  </div>
+</div>
+<script type="module" src="./dist/bundle.js?v=1791116559"></script>
+</body>
+</html>

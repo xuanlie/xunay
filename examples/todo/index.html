@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8"><title>XuNay Todo</title>
+<style>body{font-family:sans-serif;padding:2rem;max-width:400px}input{padding:.5rem;width:70%}button{padding:.5rem 1rem;margin-left:.5rem}ul{list-style:none;padding:0}li{padding:.5rem;border-bottom:1px solid #eee;display:flex;justify-content:space-between}</style>
+</head><body><div id="app"></div>
+<script type="module">
+import { div, input, button, ul, li, span, sig, app, list } from '../../core/src/all.js'
+const todos = sig([])
+const inputVal = sig('')
+const add = () => { if (!inputVal().trim()) return; todos([...todos(), { id: Date.now(), title: inputVal(), done: false }]); inputVal('') }
+const remove = id => todos(todos().filter(t => t.id !== id))
+const toggle = id => todos(todos().map(t => t.id === id ? { ...t, done: !t.done } : t))
+app(() => div(null,
+  div(null,
+    input({ value: () => inputVal(), on: { input: e => inputVal(e.target.value), keydown: e => { if (e.key === 'Enter') add() } } }),
+    button({ on: { click: add } }, '添加'),
+  ),
+  ul(null, list(todos, t => t.id, t => li(null,
+    span({ style: { textDecoration: t.done ? 'line-through' : 'none', cursor: 'pointer' }, on: { click: () => toggle(t.id) } }, t.title),
+    button({ on: { click: () => remove(t.id) } }, 'x')
+  )))
+), '#app')
+</script></body></html>

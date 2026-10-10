@@ -1,0 +1,20 @@
+// onMount(fn)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("onMount(fn)"),
+    P("注册\"元素挂载到文档后\"的回调。"),
+    H2("签名"),
+    Code("onMount(fn)", "js"),
+    H2("示例"),
+    Code("import { onMount, ref, input } from 'xunay'\n\nconst el = ref()\ninput({ ref: e => el(e) })\n\nonMount(() => {\n  el().focus()\n})", "xuy"),
+    H2("特性"),
+    Ul("只能在组件内部调用（需要 scope）","父 scope 的 onMount 先于子 scope","同一 scope 可多次调用，按注册顺序执行","访问 DOM 安全（元素已在文档里）"),
+    H2("执行时机"),
+    Code("// 1. 元素创建（ref 回调触发）\n// 2. 元素挂载到文档\n// 3. onMount 回调触发", "js"),
+    H2("陷阱"),
+    H3("模块顶层不生效"),
+    Code("// 错误：模块顶层\nonMount(() => { ... })\n\n// 正确：组件函数体内\nfunction Home() {\n  onMount(() => { ... })\n  return div(null, 'x')\n}", "xuy"),
+  )
+}

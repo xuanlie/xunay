@@ -1,0 +1,25 @@
+// Godot 总览
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Godot 集成：总览"),
+    P("XuNay 与 Godot Web 导出双向通信。JS 侧管 UI 与状态，Godot 管渲染与游戏循环，两边通过桥接层共享数据。"),
+    H2("定位"),
+    Ul("JS 侧：XuNay signal 是唯一状态源，UI 用 kit 组件覆盖在 canvas 上","Godot 侧：接收状态更新，渲染画面，回推游戏事件","桥接：队列 + 事件总线，不轮询，变更驱动"),
+    H2("通信模型"),
+    Table(["方向","机制","开销"], [["JS → Godot","写队列，Godot 每帧 drain 一次","空队列 < 10 µs"],["Godot → JS","直接调 window.__xunayBridge.recv()","单次函数调用"],["双向绑定","bindTwoWay(sig, path)","=== 严格比较断回环"]]),
+    H2("快速上手"),
+    Code("import { signal } from 'xunay'\nimport { createGame, send } from 'xunay/godot'\n\nconst score = signal(0)\n\nconst { game } = createGame(\n  document.getElementById('game'),\n  './game/index.html',\n  { readyTimeout: 8000 }\n)\n\n// 双向绑定\ngame.bindTwoWay(score, 'game.score')\n\n// 发事件\nsend('ui:setText', { text: 'Hello' })\n\n// 收事件\ngame.on('game:ready', (p) => {\n  if (p && typeof p.score === 'number') score(p.score)\n})\n\nawait game.ready\nconsole.log('Godot 已就绪, score =', score())", "js"),
+    H2("Godot 侧对应代码"),
+    Code("# XunayBridge 是 Autoload 单例\nfunc _ready() -> void:\n    XunayBridge.bind(\"game.score\", self, \"score\")\n    XunayBridge.on(\"ui:setText\", _on_set_text)\n    XunayBridge.send(\"game:ready\", {\"score\": score})\n\nfunc _on_set_text(p) -> void:\n    if p is Dictionary and p.has(\"text\"):\n        label.text = str(p[\"text\"])\n\nfunc add_score(n: int) -> void:\n    score += n\n    XunayBridge.push_bound(\"game.score\")", "gdscript"),
+    Tip("完整 demo 见 examples/godot-demo/，Godot 项目源码在 examples/godot-demo/godot/。"),
+    H2("序列化边界"),
+    P("只允许 JSON-safe 值：number / string / boolean / null / array / plain-object。"),
+    P("signal 里放函数、class 实例、Date、Map 等，bindSignal / send 会直接抛 TypeError，不静默丢。"),
+    Warn("双向绑定的值建议用原始类型。含对象引用时 === 比较失效，可能反复推。"),
+    H2("子路径"),
+    Code("import { createGame, send, on, off, bindSignal, pushSignal, bindTwoWay } from 'xunay/godot'", "js"),
+    Table(["导出","说明"], [["createGame","挂载 iframe，返回 { iframe, game }"],["send","发事件给 Godot（同 tick 合并）"],["on / off","订阅 Godot 事件"],["bindSignal","signal → Godot（持续订阅）"],["pushSignal","signal → Godot（推一次）"],["bindTwoWay","signal ↔ Godot（带回环保护）"]]),
+  )
+}

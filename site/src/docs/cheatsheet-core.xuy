@@ -1,0 +1,89 @@
+// 速查 · 核心
+import { D, H1, H2, P, Code, Table, Tip } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1('速查 · 核心'),
+    P('signal / computed / effect / show / list / 路由 / mount 的最小用法。'),
+
+    H2('signal —— 响应式状态'),
+    Code(`const n = s(0)          // 或 signal(0)
+n()                     // 读
+n(1)                    // 写
+n(v => v + 1)           // 函数式更新`, 'js'),
+
+    H2('computed —— 派生值'),
+    Code(`const dbl = computed(() => n() * 2)
+dbl()                   // 读，自动追踪依赖`, 'js'),
+
+    H2('effect —— 副作用'),
+    Code(`effect(() => {
+  console.log('n 变了:', n())
+})`, 'js'),
+
+    H2('mount / app —— 挂载'),
+    Code(`mount(() => div(null, '内容'))          // 默认
+app(() => div(null, '内容'), '#app')         // 指定容器`, 'js'),
+
+    H2('show —— 条件渲染'),
+    Code(`show(() => n() > 0, () => div(null, '正数'))`, 'js'),
+
+    H2('list —— 列表渲染'),
+    Code(`list(() => items(), item => li(null, item))`, 'js'),
+
+    H2('生命周期'),
+    Code(`onMount(() => { /* 挂载 */ })
+onUnmount(() => { /* 卸载 */ })`, 'js'),
+
+    H2('ref —— 拿到原生引用'),
+    Code(`const input = ref()
+input({ ref: input })
+// input.requestFocus()`, 'js'),
+
+    H2('txt 模板'),
+    Code(`span(null, txt\`n = \${n}\`)`, 'js'),
+
+    H2('路由'),
+    Code(`page('home', () => div(null, '首页'))
+page('detail', () => div(null, 'ID: ' + param('id')))
+
+goto('home')                          // 跳转
+goto('detail', { id: 42 })            // 带参数
+back()                                // 返回
+param('id')                           // 读参数`, 'js'),
+
+    H2('JS 语句'),
+    Table(['语法', '例子'], [
+      ['变量', 'const x = 1 / let y = 2'],
+      ['if / else', 'if (n() > 0) { ... } else { ... }'],
+      ['for', 'for (let i = 0; i < 10; i++) { ... }'],
+      ['for...of', 'for (const x of arr) { ... }'],
+      ['while', 'while (n() < 10) { n(n() + 1) }'],
+      ['try/catch', 'try { ... } catch (e) { ... }'],
+      ['switch', 'switch (x) { case 1: break }'],
+      ['三元', 'n() > 0 ? +1 : -1'],
+      ['模板串', '\`共 \${n()} 个\`'],
+      ['箭头', 'x => x + 1'],
+      ['可选链', 'obj?.a?.b'],
+      ['空值合并', 'x ?? 0'],
+      ['展开（未支持）', '...arr'],
+      ['解构（未支持）', 'const { a } = obj'],
+    ]),
+
+    H2('内置对象'),
+    Table(['类', '方法'], [
+      ['Math', 'abs / floor / ceil / round / min / max / pow / sqrt / random'],
+      ['Number', 'parseInt / parseFloat / isNaN'],
+      ['String', 'trim / slice / split / includes / replace / toUpperCase'],
+      ['Array', 'map / filter / forEach / reduce / find / some / every / join'],
+      ['Object', 'keys / values / entries'],
+      ['JSON', 'parse / stringify'],
+      ['Date', 'new Date() / Date.now() / getFullYear / ...'],
+      ['定时', 'setTimeout / setInterval / clearInterval'],
+      ['网络', 'fetch(url) / await fetch(url)'],
+      ['控制台', 'console.log / warn / error'],
+    ]),
+
+    Tip('未支持的语法：class / extends / 生成器 / Promise.then / 解构 / 展开 / 动态 import。'),
+  )
+}

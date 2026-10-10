@@ -1,0 +1,62 @@
+﻿// @title 工具类（tw.css）
+// @group CSS
+// @order 1
+// @slug tool-css-tw
+
+import { D, H1, H2, H3, P, Code, Ul, Ol, Tip, Warn, Note, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1('工具类（tw.css）'),
+    P('xunay 内置一套工具类，5 分钟上手，覆盖 90% 常用场景。跟 Tailwind 一样的命名，但有取舍（删掉了 Android 上无意义的）。'),
+
+    H2('引入'),
+    P('package.json 的 xunay.css 默认包含 tw 和 ui，页面自动带上。'),
+    Code('"xunay": { "css": ["tw", "ui"] }', 'json'),
+
+    H2('display / flex'),
+    Code('.flex { display: flex }\n.grid { display: grid }\n.block { display: block }\n.hidden { display: none }\n.items-center { align-items: center }\n.justify-between { justify-content: space-between }\n.flex-col { flex-direction: column }\n.flex-1 { flex: 1 1 0% }', 'css'),
+
+    H2('间距'),
+    P('p / px / py / pt / pr / pb / pl 和 m / mx / my / mt / mr / mb / ml / gap。数字 × 4 = px（p-4 = 16px）。'),
+    Table(['类', '效果'], [
+      ['p-0 / p-1 / p-2 / p-4 / p-6 / p-8', 'padding: 0 / 4 / 8 / 16 / 24 / 32px'],
+      ['px-4 / py-2', '水平 / 垂直 padding'],
+      ['m-4 / mx-auto / my-2', 'margin'],
+      ['gap-2 / gap-4 / gap-x-2 / gap-y-2', 'flex / grid 间距'],
+    ]),
+    Code('.card { @apply p-4 mx-auto }   ← 假想写法\n// 实际：\ndiv({ class: "p-4 mx-auto" }, "内容")', 'xuy'),
+
+    H2('尺寸'),
+    Code('.w-full { width: 100% }\n.w-screen { width: 100vw }\n.w-1-2 { width: 50% }\n.w-64 { width: 256px }\n.h-full { height: 100% }\n.max-w-md { max-width: 448px }\n.size-8 { width: 32px; height: 32px }', 'css'),
+
+    H2('颜色'),
+    P('18 个色系 × 11 个色阶（50~950）。跟 Tailwind 完全一致。'),
+    Code('.bg-red-500 { background-color: #ef4444 }\n.text-blue-600 { color: #2563eb }\n.border-gray-200 { border-color: #e5e7eb }\n\n// 18 色：slate gray red orange amber yellow lime green emerald\nteal cyan sky blue indigo violet purple fuchsia pink rose', 'css'),
+
+    H2('字体'),
+    Code('.text-xs { font-size: 12px }\n.text-base { font-size: 16px }\n.text-2xl { font-size: 24px }\n.font-bold { font-weight: 700 }\n.italic { font-style: italic }\n.text-center { text-align: center }\n.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }', 'css'),
+
+    H2('边框 / 圆角 / 阴影'),
+    Code('.border { border: 1px solid }\n.border-2 { border-width: 2px }\n.border-dashed { border-style: dashed }\n.rounded { border-radius: 4px }\n.rounded-lg { border-radius: 8px }\n.rounded-full { border-radius: 9999px }\n.shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) }', 'css'),
+
+    H2('响应式'),
+    P('5 个断点：sm(640) / md(768) / lg(1024) / xl(1280) / 2xl(1536)。前缀加冒号。'),
+    Code('div({ class: "block md:flex lg:grid" })\ndiv({ class: "w-full md:w-1-2 lg:w-1-3" })', 'xuy'),
+
+    H2('状态'),
+    Code('div({ class: "bg-white hover:bg-gray-100" })\nbutton({ class: "opacity-100 active:opacity-50" })\ninput({ class: "border focus:border-blue-500" })', 'xuy'),
+
+    H2('暗色模式'),
+    Code('// 父级加 .dark\nbody({ class: "dark" },\n  div({ class: "bg-white dark:bg-gray-900 text-black dark:text-white" }, "内容")\n)', 'xuy'),
+
+    H2('动画'),
+    Code('.animate-spin { animation: spin 1s linear infinite }\n.animate-pulse { animation: pulse 2s infinite }\n.animate-bounce { animation: bounce 1s infinite }\n.animate-fade-in { animation: fade-in 0.3s ease-out }', 'css'),
+
+    H2('跟原生 CSS 混用'),
+    P('tw.css 只是预置类。需要自定义时，在 .xuy 里写 const CSS，两者不冲突。'),
+    Code('const CSS = `\n.my-thing { background: linear-gradient(...) }\n`\n\ndiv({ class: "p-4 rounded-lg my-thing" })', 'xuy'),
+
+    Tip('完整类清单见 core/src/tw.css（约 25000 行，自动生成，勿手改）。'),
+  )
+}

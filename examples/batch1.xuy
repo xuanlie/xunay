@@ -1,0 +1,13 @@
+const keyword = s('')
+const items = s([1, 2, 3, 4, 5])
+
+const Badge = (txt) => span({ style: { background: '#ff6600', color: '#ffffff', padding: 8 } }, txt)
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, 'map + 组件嵌套 + Toast'),
+  button({ on: { click: () => toast('按钮被点了') } }, '点我弹 Toast'),
+  input({ placeholder: '搜索数字', on: { input: (e) => keyword(e) } }),
+  span({ style: { color: '#888888' } }, txt`搜索: ${keyword}`),
+  list(items.filter(x => x > 2).map(x => x * 10), (item) => span({ style: { padding: 8 } }, item)),
+  Badge('标签组件')
+), '#app')

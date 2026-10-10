@@ -1,0 +1,28 @@
+// txt 模板
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("txt 模板"),
+    P("模板字符串插值。生成 setText + subscribe。"),
+    H2("签名"),
+    Code("txt`前缀 ${signal} 后缀`", "xuy"),
+    H2("示例"),
+    Code("span(null, txt`n = ${n}`)\\nspan(null, txt`名字: ${name}`)\\nspan(null, txt`状态: ${loading}`)", "xuy"),
+    H2("多 signal"),
+    Code("span(null, txt`${a} + ${b} = ${c}`)", "xuy"),
+    P("生成多条 subscribe（每个 signal 一条）。"),
+    H2("生成的 Java"),
+    Code("n.subscribe(val -> ((TextView) findViewById(R.id.v2)).setText(\\n    \"n = \" + numStr(n.get())\\n));", "java"),
+    H2("表达式"),
+    P("`${}` 里可以写表达式，自动翻译成 Java："),
+    Code("txt`总数: ${a() + b()}`\\ntxt`大写: ${name().toUpperCase()}`\\ntxt`状态: ${n() > 0 ? \"正数\" : \"零或负\"}`\\ntxt`长度: ${name().length}`", "xuy"),
+    H2("数字格式化"),
+    P("整数不带 .0。numStr 助手判断 Double 是否整数值："),
+    Code("numStr(5.0)   // \"5\"\\nnumStr(5.5)   // \"5.5\"\\nnumStr(\"x\")   // \"x\"", "java"),
+    H2("和 computed 组合"),
+    Code("const double = computed(() => n() * 2)\\nspan(null, txt`双倍: ${double}`)", "xuy"),
+    H2("注意事项"),
+    Ul("不支持嵌套模板","不支持对象直接插值（先 JSON.stringify）","数组用 join 转字符串"),
+  )
+}

@@ -1,0 +1,9 @@
+﻿import { div, select, option, app } from 'xunay'
+
+app(() => div(null,
+  select(null,
+    option({ value: 'a' }, '选项 A'),
+    option({ value: 'b', selected: true }, '选项 B'),
+    option({ value: 'c' }, '选项 C')
+  )
+), '#app')

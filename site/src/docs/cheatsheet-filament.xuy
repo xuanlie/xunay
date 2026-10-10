@@ -1,0 +1,105 @@
+// 速查 · Filament
+import { D, H1, H2, P, Code, Table, Tip } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1('速查 · Filament'),
+    P('Filament 1.51.6 路，glTF 2.0 + PBR + 骨骼动画 + 粒子 + 音效。'),
+
+    H2('scene（全选项）'),
+    Code(`scene({
+  bg: '#0e1116',
+  autoRotate: true,
+  ibl: 50000,
+  shadows: true,
+  bloom: { strength: 0.5 },
+  ssao: { radius: 0.5, intensity: 1.5 },
+  aa: 'fxaa',
+  tonemap: 'filmic',
+  camera: { distance: 10, fov: 45 },
+  lights: [
+    { dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }
+  ]
+})`, 'xuy'),
+
+    H2('7 种几何体'),
+    Code(`cube({ color: '#f60', size: 1, position: [0, 0, 0] })
+sphere({ color: '#0cf', size: 1, metalness: 0.9, roughness: 0.1 })
+plane({ color: '#888', size: 8 })
+cylinder({ color: '#fc0', size: 0.8, height: 1.5 })
+cone({ color: '#ff0', size: 1, height: 1.5 })
+torus({ color: '#0f8', radius: 0.8, tube: 0.3 })
+pyramid({ color: '#f36', size: 1, height: 1.5 })`, 'xuy'),
+
+    H2('动画'),
+    Code(`cube({ spin: { axis: [0, 1, 0], speed: 2 } })
+sphere({ bob: { amp: 0.5, speed: 0.1 } })
+cone({ rotate: [0, 0, 30] })`, 'xuy'),
+
+    H2('纹理'),
+    Code(`cube({ texture: 'examples/assets/textures/checker.png', texScale: 0.5 })`, 'xuy'),
+
+    H2('外部 glTF / glb'),
+    Code(`// 本地
+model({ src: 'examples/assets/models/drone.gltf' })
+model({ src: 'examples/assets/models/box.glb' })
+
+// 远程（自动下载依赖）
+model({ src: 'https://example.com/scene.gltf' })`, 'xuy'),
+
+    H2('模型选项'),
+    Code(`model({
+  src: 'x.gltf',
+  position: [0, 0, 0],
+  rotate: [0, 1.57, 0],
+  scale: [1, 1, 1],
+  normalize: true,
+  targetSize: 3,
+  count: 12,
+  spread: 20, spreadY: 4,
+  anim: 0,
+  animSpeed: 1.5
+})`, 'xuy'),
+
+    H2('粒子系统'),
+    Code(`particles({
+  count: 200,
+  spread: 10, spreadY: 8,
+  size: 0.15,
+  color: '#ffcc00',
+  gravity: -3,
+  speed: 4,
+  life: 4,
+  position: [0, 0, 0]
+})`, 'xuy'),
+
+    H2('音效'),
+    Code(`audio({
+  name: 'ding',
+  src: 'examples/assets/audios/ding.wav',
+  autoplay: true,
+  loop: false,
+  volume: 0.8
+})
+
+// 运行时
+playAudio('ding')
+pauseAudio('ding')
+stopAudio('ding')
+setAudioVolume('ding', 0.5)`, 'xuy'),
+
+    H2('运行'),
+    Code(`node bin/xuyc.js scene.xuy --target=filament --build --install
+# 或
+node bin/xuyc-filament.js scene.xuy --out build/filament --build`, 'bash'),
+
+    H2('限制'),
+    Table(['项', '状态'], [
+      ['KTX2 / webp 纹理', '❌ 只支持 jpg / png'],
+      ['KHR_materials_clearcoat / transmission', '⚠️ 忽略'],
+      ['glTF 带 Draco 压缩', '✅'],
+      ['多相机 / 分屏', '❌'],
+      ['光照烘焙', '❌'],
+    ]),
+  )
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XuNay Playground</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0d1117; color: #e6edf3; height: 100vh; display: flex; flex-direction: column; }
+.topbar { padding: 12px 20px; background: #161b22; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+.brand { font-size: 18px; font-weight: 700; color: #58a6ff; }
+.actions { display: flex; gap: 8px; }
+.actions button { padding: 6px 14px; font-size: 13px; border: 1px solid #30363d; background: #21262d; color: #e6edf3; border-radius: 6px; cursor: pointer; }
+.actions button:hover { background: #30363d; }
+.actions button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+.main { flex: 1; display: flex; overflow: hidden; }
+.pane { flex: 1; display: flex; flex-direction: column; }
+.pane + .pane { border-left: 1px solid #30363d; }
+.pane-head { padding: 8px 14px; background: #161b22; border-bottom: 1px solid #30363d; font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+.editor { flex: 1; padding: 14px; background: #0d1117; color: #e6edf3; border: none; outline: none; font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.6; resize: none; }
+.preview { flex: 1; background: #fff; border: none; }
+@media (max-width: 768px) {
+  .main { flex-direction: column; }
+  .pane + .pane { border-left: none; border-top: 1px solid #30363d; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">XuNay Playground</div>
+  <div class="actions">
+    <button id="reset">重置</button>
+    <button id="share">分享</button>
+    <button id="run" class="primary">运行 ▶</button>
+  </div>
+</div>
+<div class="main">
+  <div class="pane">
+    <div class="pane-head">代码</div>
+    <textarea id="code" class="editor" spellcheck="false"></textarea>
+  </div>
+  <div class="pane">
+    <div class="pane-head">预览</div>
+    <iframe id="preview" class="preview"></iframe>
+  </div>
+</div>
+<script src="./runner.js"></script>
+
+<select id="component-picker" style="position:fixed;top:8px;right:8px;z-index:999;padding:6px 10px;background:#161b22;color:#e6edf3;border:1px solid #30363d;border-radius:6px;font:inherit;font-size:12px">
+<option value="">插入组件...</option>
+<option value="Btn">Btn 按钮</option>
+<option value="Input">Input 输入框</option>
+<option value="Modal">Modal 模态框</option>
+<option value="Tabs">Tabs 标签页</option>
+<option value="Table">Table 表格</option>
+<option value="Card">Card 卡片</option>
+<option value="Badge">Badge 徽章</option>
+<option value="BarChart">BarChart 柱状图</option>
+<option value="Calendar">Calendar 日历</option>
+<option value="Counter">Counter 计数</option>
+<option value="Ripple">Ripple 涟漪</option>
+</select>
+<script>
+const cp = document.getElementById('component-picker')
+cp.onchange = () => {
+  if (!cp.value) return
+  const snippets = {
+    Btn: `import { Btn } from 'xunay/kit/base'\nBtn({ type: 'primary', onClick: () => alert('click') }, '按钮')`,
+    Input: `import { Input } from 'xunay/kit/form'\nInput({ label: '用户名', placeholder: '请输入' })`,
+    Modal: `import { Modal } from 'xunay/kit/display'\nModal({ open: true, title: '标题', onClose: () => {} }, '内容')`,
+    Tabs: `import { Tabs } from 'xunay/kit/nav'\nTabs({ items: [{key:'a',title:'A'},{key:'b',title:'B'}], active: 'a' })`,
+    Table: `import { Table } from 'xunay/kit/data'\nTable({ columns: [{title:'姓名',key:'name'}], data: [{name:'张三'}] })`,
+    Card: `import { Card } from 'xunay/kit/base'\nCard({ title: '标题', desc: '描述' }, '内容')`,
+    Badge: `import { Badge } from 'xunay/kit/base'\nBadge({ type: 'success' }, '成功')`,
+    BarChart: `import { BarChart } from 'xunay/kit/charts'\nBarChart({ data: [10,20,15,30], labels: ['A','B','C','D'], height: 200 })`,
+    Calendar: `import { Calendar } from 'xunay/kit/data'\nCalendar({ value: '2026-10-15' })`,
+    Counter: `import { Counter } from 'xunay/anim'\nCounter({ value: 12345, duration: 1000 })`,
+    Ripple: `import { Ripple } from 'xunay/anim'\nRipple(null, button(null, '点我'))`,
+  }
+  const ed = document.getElementById('code') || document.querySelector('textarea')
+  if (ed) ed.value = snippets[cp.value] || ''
+  cp.value = ''
+}
+</script>
+
+</body>
+</html>

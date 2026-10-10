@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8"><title>XuNay 1000 行</title>
+<style>
+body{font-family:monospace;padding:1rem;margin:0}
+.bar{margin-bottom:1rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.bar button{padding:.5rem 1rem;cursor:pointer}
+.bar .info{color:#c00;font-weight:bold}
+ul{list-style:none;padding:0;margin:0}
+li{padding:3px 6px;border-bottom:1px solid #eee;display:flex;gap:1rem}
+li .id{color:#888;width:80px}
+li .label{flex:1}
+li .ts{color:#0a0;font-size:.85em}
+li.changed{background:#ffe;transition:background .5s}
+</style>
+</head><body><div id="app"></div>
+<script type="module">
+import { div, button, span, ul, li, sig, app, list } from '../../core/src/all.js'
+
+const makeRows = (prefix) => Array.from({ length: 1000 }, (_, i) => ({
+  id: i,
+  label: `${prefix} 行 ${i}`,
+  ts: Date.now()
+}))
+
+const rows = sig(makeRows('初始'))
+const msg = sig('还没操作')
+
+let round = 0
+
+const update = () => {
+  const cur = rows()
+  const idx = Math.floor(Math.random() * cur.length)
+  const before = cur[idx].label
+  const next = cur.slice()
+  next[idx] = { ...next[idx], label: `第 ${idx} 行 (第 ${++round} 次改)`, ts: Date.now() }
+  rows(next)
+  msg(`更新了第 ${idx} 行：从 "${before}" → "${next[idx].label}"`)
+}
+
+const replace = () => {
+  const stamp = new Date().toLocaleTimeString()
+  rows(makeRows(`替换@${stamp}`))
+  msg(`全部 1000 行已替换为 @${stamp}`)
+}
+
+app(() => div(null,
+  div({ class: 'bar' },
+    button({ on: { click: update } }, '随机更新一行'),
+    button({ on: { click: replace } }, '替换全部'),
+    span({ class: 'info' }, () => msg())
+  ),
+  ul(null, list(rows, r => r.id, r => li({ class: 'row' },
+    span({ class: 'id' }, `#${r.id}`),
+    span({ class: 'label' }, r.label),
+    span({ class: 'ts' }, new Date(r.ts).toLocaleTimeString())
+  )))
+), '#app')
+</script></body></html>

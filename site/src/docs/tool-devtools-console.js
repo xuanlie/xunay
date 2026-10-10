@@ -1,0 +1,32 @@
+// 控制台
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("控制台"),
+    P("显示所有 console.log / warn / error，可以在页面里直接执行 JS。"),
+    H2("捕获的日志"),
+    Ul("console.log —— 白色","console.warn —— 黄色 + 左侧色条","console.error —— 红色 + 左侧色条","window.onerror —— 未捕获异常","unhandledrejection —— Promise 拒绝"),
+    H2("输入框"),
+    P("顶部输入框——输入 JS 表达式，回车执行："),
+    Code("> 1 + 2\n3\n\n> location.href\n\"http://example.com/\"\n\n> localStorage.getItem('token')\n\"abc123\"\n\n> window.__XD__.nets.length\n3", "txt"),
+    H2("执行结果"),
+    Ul("原始表达式回显（带 > 前缀）","结果美化：字符串原样，对象 JSON，函数显示 ƒ name"),
+    H2("常见用途"),
+    H3("调试 signal"),
+    Code("> window.__XUNAY_RUNTIME__\n\n> document.querySelector('#app').__xunay_scope", "js"),
+    H3("读 localStorage"),
+    Code("> JSON.parse(localStorage.getItem('myapp-todos'))", "js"),
+    H3("手动触发事件"),
+    Code("> document.querySelector('button').click()", "js"),
+    H3("测试接口"),
+    Code("> fetch('/rpc/token').then(r => r.json()).then(console.log)", "js"),
+    H2("清空"),
+    P("顶栏 🗑 按钮清空所有日志。"),
+    H2("详情页"),
+    P("点任一条日志——进入详情页，有："),
+    Ul("序号、时间、长度、级别","完整内容","一键复制"),
+    H2("和浏览器控制台的区别"),
+    Table(["","DevTools 控制台","浏览器控制台"], [["在手机上","✓ 能用","✗ 难开"],["历史保留","sessionStorage","仅当前页面"],["可复制","一键","手动"],["跨刷新","保留","清空"]]),
+  )
+}

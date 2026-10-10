@@ -1,0 +1,28 @@
+// 语法分析
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("语法分析"),
+    P("compiler3 的解析全部交给 acorn。自己只做两件事：收集作用域、找标签调用。"),
+    H2("acorn.parse"),
+    Code("import * as acorn from 'acorn'\n\nconst ast = acorn.parse(src, {\n  ecmaVersion: 2022,\n  sourceType: 'module',\n})", "js"),
+    P("得到的 ast 是 ESTree 标准的 AST。每个节点有 type / start / end 三个关键字段。"),
+    H2("collectBindings —— 收集所有绑定名"),
+    Code("const bound = new Set()\ncollectBindings(ast, bound)\n\n// 遍历所有节点，处理这些类型：\n//   VariableDeclarator       const / let / var\n//   FunctionDeclaration      函数名 + 参数\n//   FunctionExpression       参数\n//   ArrowFunctionExpression  参数\n//   ClassDeclaration         类名\n//   Import*Specifier         import 引入的名字\n//   CatchClause              catch (e)", "js"),
+    P("递归遍历，凡是会引入新名字的节点都登记。用 collectPatternNames 处理解构："),
+    Code("// 这些都算绑定\nconst { a, b } = obj\nconst [x, y] = arr\nfunction f(p1, { p2 }, ...rest) {}", "js"),
+    H2("findTagCalls —— 找标签调用"),
+    Code("const calls = []\nfindTagCalls(ast, bound, calls)\n\n// 递归遍历，匹配:\nif (node.type === 'CallExpression' &&\n    node.callee.type === 'Identifier' &&\n    TAGS.has(node.callee.name) &&\n    !bound.has(node.callee.name)) {\n  calls.push(node)\n}", "js"),
+    P("四个条件全满足才算标签调用：是函数调用、callee 是标识符、名字在 TAGS 里、名字没被变量遮蔽。"),
+    H2("为什么这个顺序重要"),
+    Code("const div = x\ndiv(null, 'text')   // ← bound.has('div') === true，不算标签", "js"),
+    P("compiler2 做不到这点。它用字符扫描，看到 div( 就当标签，不管 div 是不是变量。"),
+    H2("findOutermost —— 只取最外层"),
+    Code("// div(null, span(null, 'x'))\n// 两个都是 tag 调用，位置重叠\n// calls = [{ div }, { span }]\n// 但 span 在 div 的 start/end 范围内\n\nfunction findOutermost(calls) {\n  const sorted = calls.sort((a, b) => a.start - b.start || b.end - a.end)\n  const result = []\n  let lastEnd = -1\n  for (const c of sorted) {\n    if (c.start >= lastEnd) { result.push(c); lastEnd = c.end }\n  }\n  return result\n}", "js"),
+    P("排序后从左到右扫，前一个的 end 超过后一个的 start 就跳过——因为后者在前者里面，会被前者的替换顺带处理。"),
+    H2("生成的标签列表"),
+    Table(["方法","输入","输出"], [["parse","源码"],["collectBindings","AST","bound Set"],["findTagCalls","AST + bound","calls 数组"],["findOutermost","calls","只留最外层"]]),
+    Tip("整个解析逻辑不到 150 行，因为难的部分（JS 语法）acorn 已经做了。"),
+  )
+}

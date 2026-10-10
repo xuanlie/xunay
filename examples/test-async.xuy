@@ -1,0 +1,16 @@
+﻿import { div, span, button, signal, mount, txt } from 'xunay'
+
+const data = s('点按钮加载')
+const loading = s(false)
+
+mount(() => div(null,
+  button({ on: { click: async () => {
+    loading(true)
+    data('加载中...')
+    const r = await fetch('https://api.github.com/repos/xuanlie/xunay')
+    data(r)
+    loading(false)
+  } } }, '加载'),
+  span(null, txt`loading: ${loading}`),
+  span(null, txt`data: ${data}`)
+), '#app')

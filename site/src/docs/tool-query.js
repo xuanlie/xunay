@@ -1,0 +1,16 @@
+// query 数据请求
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("query 数据请求"),
+    P("数据请求 + 缓存 + 失效。类似 TanStack Query 的轻量版。"),
+    H2("引入"),
+    Code("import { query, invalidateQueries } from 'xunay/query'", "js"),
+    H2("基础用法"),
+    Code("const users = query({\n  key: 'users',\n  fetcher: () => http.get('/api/users').then(r => r.data),\n  staleTime: 30000,\n  retry: 3,\n})\n\nusers.data()       // 数据\nusers.loading()    // 加载中\nusers.error()      // 错误\nusers.refetch()    // 手动刷新\nusers.invalidate() // 清除缓存", "js"),
+    H2("高级"),
+    Code("invalidateQueries('users')  // 失效所有 users: 开头的\ninvalidateQueries()          // 失效全部", "js"),
+    Tip("内置超时、重试、并发控制、跨标签页缓存。"),
+  )
+}

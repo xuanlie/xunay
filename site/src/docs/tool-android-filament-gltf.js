@@ -1,0 +1,19 @@
+// Filament 加载外部 glTF
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Filament 加载外部 glTF"),
+    P("model() 加载外部 .gltf 文件。编译时扫描 .gltf 里的 buffers / images，把 .bin 和贴图打进 assets，再把整个 glTF 树合并到生成场景。"),
+    H2("用法"),
+    Code("scene({ bg: \"#0e1116\", autoRotate: true,\n  lights: [{ dir: [0.5, -1, -0.3], color: \"#ffffff\", intensity: 3.0 }] })\n\nmodel({ src: \"examples/models/drone.gltf\" })", "xuy"),
+    H2("支持的扩展"),
+    Table(["扩展","状态"], [["KHR_draco_mesh_compression","✅ 保留扩展，Filament gltfio 自动解码"],["KHR_texture_transform","✅"],["KHR_materials_*（clearcoat / transmission）","⚠️ 忽略，当普通材质"],["KTX2 纹理","❌ 只支持 jpg / png"],["glTF 骨骼动画 / 节点动画","✅ 播第 0 个"]]),
+    H2("编译时做的事"),
+    Ul("扫 model({ src }) 找 .gltf 文件","解析 JSON 找 buffers[0].uri → 读 .bin","扫 images[].uri → 读贴图，改名 textures/extN_xxx.jpg 打进 assets","合并 mesh / node / material / accessor / bufferView / animation 到生成场景","channels / samplers 里的 node / accessor 引用自动加 offset","保留 primitive 的 extensions（Draco / 其它）"),
+    H2("屏幕效果"),
+    Code("[filament] model: examples/models/drone.gltf -> 39 meshes, 93 nodes\n[filament] model 纹理: textures/body_baseColor.jpg -> textures/ext0_body_baseColor.jpg\n...", "txt"),
+    H2("限制"),
+    Ul("只支持 .gltf + 外部 .bin，不支持 .glb 单文件","KHR_draco 保留但不重压；Draco 解码由 Filament 运行时处理","KTX2 / webp 纹理不支持","KHR_materials_clearcoat / transmission 等高级材质忽略","只播 glTF 第 0 个动画"),
+  )
+}

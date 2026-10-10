@@ -1,0 +1,17 @@
+// Godot 限制与路线
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Godot 集成：已知限制与路线"),
+    H2("当前限制"),
+    Ul("Godot 每帧调一次 eval 读队列。空队列 < 10 µs，但对高帧率场景仍是开销","bindTwoWay 回环用 === 严格比较。值含对象引用可能反复推，建议用原始类型","未处理 SharedArrayBuffer / COOP-COEP。用无线程导出即可绕开","未做输入事件穿透：DOM 覆盖层会挡住 canvas 的鼠标/触摸","未做坐标映射：DOM 元素位置与 Godot 视口坐标无对应关系"),
+    H2("路线图"),
+    Table(["阶段","目标","状态"], [["0+1","桥接骨架 + demo","已完成"],["2","共享状态（signal ↔ GDScript）","已完成"],["3","UI 融合：DOM 组件覆盖 canvas","已完成"],["4","性能：create_callback 零轮询","受 Godot API 限制，放弃"]]),
+    H2("阶段 3 计划"),
+    Ul("输入穿透：用 CSS pointer-events 与坐标系对齐","坐标映射：Godot get_viewport().get_canvas_transform() 与 DOM 坐标换算","层级管理：多个覆盖层按 z-index 分层","共享 UI 组件：把 kit 常用组件做成「桥接感知」版本，自动避开 Godot 交互区"),
+    H2("阶段 4 计划"),
+    Ul("改用 JavaScriptBridge.create_callback 注册反向通道，彻底去掉每帧 eval","SharedArrayBuffer 共享内存（需 COOP/COEP 头）","批量提交：一帧内的多次 signal 变更合并为单次跨语言调用"),
+    Warn("当前 Godot 集成为阶段 2 状态，适合原型验证，不建议直接上生产。"),
+  )
+}

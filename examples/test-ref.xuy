@@ -1,0 +1,17 @@
+﻿import { div, span, input, button, signal, mount, txt, ref } from 'xunay'
+
+const inputRef = ref()
+const status = s('未聚焦')
+
+const focusIt = () => {
+  if (inputRef) {
+    inputRef.requestFocus()
+    status('已聚焦')
+  }
+}
+
+mount(() => div(null,
+  input({ ref: inputRef, placeholder: '点下面按钮聚焦' }),
+  button({ on: { click: () => focusIt() } }, '聚焦输入框'),
+  span(null, txt`状态: ${status}`)
+), '#app')

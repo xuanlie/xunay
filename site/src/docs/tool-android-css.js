@@ -1,0 +1,32 @@
+// Android CSS 映射
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("CSS → Android 映射"),
+    P("css-android.js 负责把 CSS 属性翻译成 Android 布局属性。这里列出完整映射表。"),
+    H2("尺寸"),
+    Table(["CSS","Android","说明"], [["width: 100px","layout_width=\"100dp\"",""],["width: 100%","layout_width=\"match_parent\"",""],["width: wrap","layout_width=\"wrap_content\"",""],["height: 50vh","layout_height=0dp + Java 动态算","用屏幕高度的百分比"],["min-width: 100px","setMinimumWidth(100 * density)","单位换 dp"],["max-width: 100px","setMaxWidth(100 * density)","只支持 TextView"]]),
+    H2("内外边距"),
+    Table(["CSS","Android"], [["padding: 8px","paddingTop/Bottom/Left/Right=\"8dp\""],["padding-top: 8px","paddingTop=\"8dp\""],["margin: 8px","layout_marginTop/Bottom/Left/Right=\"8dp\""],["gap: 8px","子元素 margin 半分 + 容器 padding 抵消"],["row-gap / column-gap","同上，按方向选轴"]]),
+    H2("颜色与背景"),
+    Table(["CSS","Android"], [["color: #fff","textColor=\"#ffffff\""],["background: #1f6feb","GradientDrawable.setColor(0xFF1F6FEB)"],["background: linear-gradient(...)","GradientDrawable + Orientation 常量"],["border-radius: 8px","GradientDrawable.setCornerRadius(8f)"],["border: 1px solid #000","GradientDrawable.setStroke(1, 0xFF000000)"],["outline: 3px solid #f00","先 setColor 再 setStroke（保持底色）"]]),
+    H2("字体"),
+    Table(["CSS","Android"], [["font-size: 14px","setTextSize(14f)"],["font-size: 1rem","setTextSize(16f)"],["font-weight: bold","textStyle=\"bold\""],["font-style: italic","textStyle=\"italic\""],["font-family: monospace","Typeface.MONOSPACE"],["line-height: 1.5","lineSpacingMultiplier=\"1.5\""],["letter-spacing: 0.1em","letterSpacing=\"0.1\""]]),
+    H2("文本"),
+    Table(["CSS","Android"], [["text-align: center","gravity=\"center\""],["text-overflow: ellipsis","setEllipsize(END)"],["white-space: nowrap","setSingleLine(true)"],["text-decoration: underline","setPaintFlags(UNDERLINE_TEXT_FLAG)"],["text-transform: uppercase","setText 后 toUpperCase()"],["word-break: break-all","setSingleLine(false) + setMaxLines(100)"]]),
+    H2("布局"),
+    Table(["CSS","Android"], [["display: flex","FlexboxLayout 或 LinearLayout"],["display: none","visibility=\"gone\""],["visibility: hidden","visibility=\"invisible\""],["flex-direction: row","orientation=\"horizontal\""],["flex-direction: column","orientation=\"vertical\""],["justify-content: center","gravity=\"center\" 或 app:justifyContent=\"center\""],["align-items: center","childCommon 加 layout_gravity=\"center\""],["flex-wrap: wrap","FlexboxLayout app:flexWrap=\"wrap\""],["flex: 1","layout_weight=\"1\" + layout_width=\"0dp\""],["align-self: center","layout_gravity=\"center\""],["display: grid","FlexboxLayout 模拟"],["grid-template-columns: repeat(3, 1fr)","flexBasisPercent=\"33.33%\""]]),
+    H2("定位"),
+    Table(["CSS","Android"], [["position: relative","setTranslationX/Y"],["position: absolute","父容器切 FrameLayout + layout_gravity"],["top / right / bottom / left","layout_margin + layout_gravity"],["inset: 8px","同上，简写"],["z-index: 5","setElevation(5f)"]]),
+    H2("视觉"),
+    Table(["CSS","Android"], [["opacity: 0.5","alpha=\"0.5\""],["transform: rotate(20deg)","setRotation(20f)"],["transform: scale(0.7, 1.3)","setScaleX/Y"],["transform: translate(10px, 20px)","setTranslationX/Y"],["transform: skewX(15deg)","Matrix.setSkew + 软件层"],["box-shadow: 0 4px 8px","setElevation(4f)"],["overflow: hidden","setClipToOutline(true)（SDK 21+）"]]),
+    H2("媒体查询"),
+    Table(["CSS","Android"], [["(orientation: landscape)","Configuration.ORIENTATION_LANDSCAPE"],["(min-width: 600px)","screenWidthDp >= 600"],["(max-width: 400px)","screenWidthDp <= 400"],["(prefers-color-scheme: dark)","uiMode & UI_MODE_NIGHT_YES"],["(prefers-color-scheme: light)","uiMode & UI_MODE_NIGHT_NO"]]),
+    H2("选择器"),
+    Table(["选择器","状态"], [[".class","✅"],["#id","✅"],["tag","✅"],["[attr=value]","✅ type 属性"],[":first-child / :last-child","✅"],["::before / ::after","✅ 生成独立 View"],[":hover / :active / :focus","❌"],["a + b / a ~ b","❌"]]),
+    H2("CSS 变量"),
+    P("支持 :root 变量和 var() 展开、calc() 简单计算。"),
+    Code(":root { --gap: 8px; }\\n.foo { padding: var(--gap); }\\n.bar { width: calc(100px + 20px); }", "css"),
+  )
+}

@@ -1,0 +1,12 @@
+const CSS = `
+  :root { --base: 16; --primary: #4CAF50 }
+  .card { background: linear-gradient(90deg, #ff6600, #ffcc00); padding: calc(var(--base) * 2); color: white }
+  .half { padding: calc(var(--base) / 2); background: #2196F3; color: white }
+  .right { background: linear-gradient(90deg, #e91e63, #9c27b0); padding: 16; color: white }
+`
+
+app(() => div({ style: { padding: 24 } },
+  div({ class: 'card' }, '橙黄渐变 + 32dp padding'),
+  div({ class: 'half' }, '8dp padding + 蓝色'),
+  div({ class: 'right' }, '粉紫渐变')
+), '#app')

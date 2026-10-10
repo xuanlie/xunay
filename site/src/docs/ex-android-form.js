@@ -1,0 +1,31 @@
+// 例子：表单验证
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("例子：表单验证"),
+    P("4 个输入框 + 实时校验 + 密码强度条 + 提交按钮禁用。这是最完整的例子。"),
+    H2("源码结构"),
+    Code("import { div, h1, form, input, button, label, span, signal, computed, mount, show } from \"xunay\"\\n\\nconst name = signal(\"\")\\nconst email = signal(\"\")\\nconst password = signal(\"\")\\nconst confirm = signal(\"\")\\nconst agree = signal(false)\\nconst submitted = signal(false)\\n\\nconst nameErr = computed(() => {\\n  const v = name().trim()\\n  if (!v) return \"\"\\n  if (v.length < 2) return \"至少 2 个字符\"\\n  if (v.length > 20) return \"最多 20 个字符\"\\n  return \"\"\\n})\\n\\nconst canSubmit = computed(() => {\\n  return name() && !nameErr() && ... && agree()\\n})", "xuy"),
+    H2("要点一：computed 里的多分支"),
+    P("nameErr 有多条 if 和 return。js-to-java 把它们翻译成 Java 方法："),
+    Code("private String nameErr() {\\n    String v = name.get().trim();\\n    if ((v == null || v.isEmpty())) {\\n        return \"\";\\n    }\\n    if ((v.length() < 2)) {\\n        return \"至少 2 个字符\";\\n    }\\n    if ((v.length() > 20)) {\\n        return \"最多 20 个字符\";\\n    }\\n    return \"\";\\n}", "java"),
+    H2("要点二：show 里的 computed"),
+    Code("show(() => nameErr() !== \"\", () => span({ class: \"err-msg\" }, () => nameErr()))", "xuy"),
+    P("生成：frameLayout + setVisibility。cond 是 computed，自动展开到依赖的 signal（name）。"),
+    Code("findViewById(R.id.v5).setVisibility(GONE);\\nname.subscribe(val -> findViewById(R.id.v5).setVisibility(!nameErr().equals(\"\") ? VISIBLE : GONE));", "java"),
+    H2("要点三：动态 class"),
+    Code("input({\\n  class: () => `inp ${nameErr() ? \"err\" : \"\"}`,\\n  value: () => name(),\\n  on: { input: e => name(e.target.value) }\\n})", "xuy"),
+    P("模板拼接的 class 会生成运行时切换背景的代码。"),
+    H2("要点四：submit"),
+    Code("form({\\n  on: { submit: { fn: submit, prevent: true } }\\n},\\n  ...,\\n  button({ type: \"submit\" }, \"注册\")\\n)", "xuy"),
+    P("form 的 submit 事件绑到 submit 函数，button type=submit 自动触发。"),
+    H2("要点五：disabled"),
+    Code("button({\\n  disabled: () => !canSubmit()\\n}, \"注册\")", "xuy"),
+    P("生成 setEnabled + 依赖信号的 subscribe。所有依赖（name/email/password/confirm/agree）变化都会刷新。"),
+    H2("跑起来"),
+    Code(".\\run.ps1 -Entry examples/form-validation.xuy", "powershell"),
+    H2("界面"),
+    Ul("4 个输入框 + 实时错误提示","密码强度条（颜色随强度变化）","提交按钮禁用/启用","提交后显示 3 秒\"注册成功！\""),
+  )
+}

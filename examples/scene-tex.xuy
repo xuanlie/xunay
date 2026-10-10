@@ -1,0 +1,7 @@
+﻿scene({ bg: '#0a0a1a', autoRotate: true, camera: { distance: 10, fov: 45 },
+  lights: [{ dir: [0.7, 1.0, 0.5], color: '#ffddaa', intensity: 1.2 }] })
+
+cube({ color: '#ffffff', size: 2, position: [-2.5, 0, 0], spin: { axis: [0, 1, 0], speed: 1 }, texture: 'examples/textures/checker.png', texScale: 0.5 })
+sphere({ color: '#ffffff', size: 1.5, position: [0, 0, 0], bob: { amp: 0.3, speed: 0.1 }, metalness: 0.5, roughness: 0.3, texture: 'examples/textures/wood.png', texScale: 0.8 })
+cylinder({ color: '#ffffff', size: 1, height: 1.5, position: [2.5, 0, 0], spin: { axis: [0, 1, 0], speed: -2 }, texture: 'examples/textures/tile.png', texScale: 0.6 })
+plane({ color: '#ffffff', size: 8, position: [0, -2, 0], texture: 'examples/textures/tile.png', texScale: 0.5 })

@@ -1,0 +1,22 @@
+// batch(fn)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("batch(fn)"),
+    P("把 fn 里的多次 signal 写合并成一次更新。"),
+    H2("签名"),
+    Code("batch(fn)", "js"),
+    H2("示例"),
+    Code("const a = signal(0)\nconst b = signal(0)\n\neffect(() => console.log(a(), b()))\n\n// 不 batch：2 次\na(1)   // 打印 1 0\nb(2)   // 打印 1 2\n\n// 用 batch：1 次\nbatch(() => {\n  a(10)\n  b(20)\n})\n// 只打印一次: 10 20", "xuy"),
+    H2("嵌套"),
+    Code("batch(() => {\n  a(1)\n  batch(() => {\n    b(2)\n  })\n  c(3)\n})\n// 全部改完才更新一次", "xuy"),
+    H2("特性"),
+    Ul("可嵌套——只有最外层结束时才真正 flush","只合并\"触发\"，不合并\"值\"——中间值写入后立刻可读","不影响 effect 内部——effect 重跑期间的写会自动进队列"),
+    H2("何时使用"),
+    Table(["场景","建议"], [["同一事件里改多个 signal","用"],["只改一个 signal","不需要"],["循环里改 signal","用"],["初始化状态","用"]]),
+    H2("陷阱"),
+    H3("async 里失效"),
+    Code("batch(async () => {\n  a(1)\n  await sleep()\n  b(2)   // await 后已经退出 batch\n})", "xuy"),
+  )
+}

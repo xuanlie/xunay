@@ -1,0 +1,32 @@
+// Godot 导出与配置
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Godot 集成：导出与配置"),
+    H2("一、Godot 项目结构"),
+    Code("examples/godot-demo/\n├── index.html           XuNay 宿主页\n├── game/                Godot Web 导出（生成）\n└── godot/               Godot 项目源码\n    ├── project.godot\n    ├── XunayBridge.gd   Autoload\n    ├── Main.gd\n    └── Main.tscn", "text"),
+    H2("二、导出为 Web"),
+    Ol("Godot 4.3+ 打开 examples/godot-demo/godot/","项目 → 导出 → 添加 Web 预设","Thread Support：关闭（避免 COOP/COEP 头需求）","Export Path：../game/index.html","点导出项目"),
+    P("导出后 game/ 里应有：index.html + *.wasm + *.pck + *.js"),
+    H2("三、起服务"),
+    Code("cd /root/xunay\npython3 -m http.server 12343 --bind 0.0.0.0\n# 访问 http://<服务器IP>:12343/examples/godot-demo/", "bash"),
+    Warn("浏览器必须走 HTTP，不能 file:// 直接开。"),
+    H2("四、XunayBridge Autoload 配置"),
+    P("在 project.godot 的 [autoload] 段注册："),
+    Code("[autoload]\n\nXunayBridge=\"*res://XunayBridge.gd\"", "text"),
+    P("星号前缀表示单例（singleton），全局可访问。"),
+    H2("五、XunayBridge API（GDScript 侧）"),
+    Table(["方法","说明"], [["bind(path, obj, prop)","绑定 GDScript 属性到路径"],["push_bound(path)","主动推当前值给 JS"],["unbind(path)","解绑"],["on(event, cb)","订阅 JS 事件"],["off(event)","取消订阅"],["send(event, payload)","发事件给 JS"]]),
+    H3("示例"),
+    Code("# 绑定 self.score 到路径 game.score\nXunayBridge.bind(\"game.score\", self, \"score\")\n\n# 改完后主动推回 JS\nscore += 1\nXunayBridge.push_bound(\"game.score\")\n\n# 收 JS 事件\nXunayBridge.on(\"ui:setText\", func(p):\n    label.text = str(p.get(\"text\", \"\"))\n)\n\n# 发事件给 JS\nXunayBridge.send(\"game:ready\", {\"score\": score})", "gdscript"),
+    H2("六、验证清单"),
+    Ul("左上角状态栏：godot: ready / score: 0","Godot 里标签缓慢上下浮动（Godot 侧 _process 动画）","点「改 Godot 文字」→ Godot 画面文字变化（JS → Godot）","点「换 Godot 颜色」→ 颜色切换（JS → Godot）","点「+1 分」→ 状态栏 score 递增（Godot → JS）"),
+    H2("七、协议细节"),
+    H3("JS → Godot（队列）"),
+    Code("// JS 侧 push 到队列，同 tick 合并\n[{ event: \"ui:setText\", payload: { text: \"...\" } }, ...]", "js"),
+    P("Godot 侧 _process 每帧调一次 drain()，拿数组，逐条分发。"),
+    H3("Godot → JS（直接调用）"),
+    Code("// Godot 侧\nvar msg_json = JSON.stringify({\"event\": \"game:ready\", \"payload\": {...}})\nJavaScriptBridge.eval(\n  \"window.__xunayBridge && window.__xunayBridge.recv(%s)\" % msg_json,\n  true\n)", "gdscript"),
+  )
+}

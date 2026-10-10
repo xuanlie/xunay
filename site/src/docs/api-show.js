@@ -1,0 +1,27 @@
+// show(cond, fn)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("show(cond, fn)"),
+    P("按条件挂载/卸载 DOM。"),
+    H2("签名"),
+    Code("show(cond, renderFn)", "js"),
+    H2("参数"),
+    Table(["参数","类型","说明"], [["cond","() => boolean","条件函数"],["renderFn","() => VNode","为真时渲染"]]),
+    H2("示例"),
+    Code("import { show, signal, div } from 'xunay'\n\nconst open = signal(false)\n\ndiv(null,\n  show(() => open(), () => div(null, '内容'))\n)", "xuy"),
+    H2("生命周期"),
+    Table(["切换","行为"], [["假 → 真","createScope + render + appendChild"],["真 → 假","disposeScope + removeChild"]]),
+    H2("vs 三目"),
+    Table(["","show","三目"], [["切换成本","scope 管理","整块重建"],["onMount","自动触发","随父处理"],["适合","复杂子树","简短内容"]]),
+    H2("特性"),
+    Ul("cond 变化才切换","每次切换都重建子树——内部 signal 状态会重置","支持嵌套"),
+    H2("陷阱"),
+    H3("传值而非函数"),
+    Code("show(open(), () => div())         // 错误：立即求值\nshow(() => open(), () => div())   // 正确", "xuy"),
+    H3("cond 里有副作用"),
+    Code("show(() => { fetch('/api'); return n() > 0 }, () => div())   // 错误", "xuy"),
+    H3("内部 signal 状态会丢"),
+  )
+}

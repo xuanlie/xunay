@@ -1,0 +1,17 @@
+﻿scene({ bg: '#0e1116', autoRotate: true,
+  camera: { distance: 20, fov: 45 },
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+
+plane({ color: '#222222', size: 20, position: [0, -3, 0] })
+
+particles({
+  count: 200,
+  spread: 10,
+  spreadY: 8,
+  size: 0.15,
+  color: '#ffcc00',
+  gravity: -3,
+  speed: 4,
+  life: 4,
+  position: [0, 0, 0]
+})

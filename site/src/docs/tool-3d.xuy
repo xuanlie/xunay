@@ -1,0 +1,34 @@
+// Android 3D（老路）
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Android 3D 场景（老路：OpenGL ES 2.0）"),
+    P("xunay 有两条 3D 路线，共用同一套 .xuy DSL。本页讲老路 android-3d/，走手写 OpenGL ES 2.0，零外部库，只吃 .obj。"),
+    Tip("需要 glTF 2.0 / PBR / 骨骼动画 / Draco 压缩 → 看 tool-android-filament（新路）。两条路怎么选 → 看 tool-android-3d-choose。"),
+    H2("入口"),
+    Code("node bin/xuyc-3d.js examples/scene3d.xuy --out build/android-3d", "bash"),
+    H2("DSL"),
+    P("3D 的 .xuy 只有 9 个顶层函数，没有 signal / computed / 事件。"),
+    H2("scene"),
+    Code("scene({\n  bg: \"#0a0a1a\",\n  autoRotate: true,\n  camera: { distance: 6, fov: 45 },\n  lights: [\n    { dir: [0.7, 1.0, 0.5], color: \"#ffddaa\", intensity: 1.2 },\n    { dir: [-0.5, 0.3, -1.0], color: \"#6699ff\", intensity: 1.0 }\n  ]\n})", "xuy"),
+    P("全局配置。最多支持 8 个光源。"),
+    H2("八种形状"),
+    Table(["函数","参数"], [["cube","color / size / position"],["sphere","color / size / position / segments"],["plane","color / size / position"],["cylinder","color / size / height / position / segments"],["cone","color / size / height / position / segments"],["torus","color / radius / tube / position / segments"],["pyramid","color / size / height / position"],["model","src(.obj) / color / position / scale"]]),
+    H2("逐物体变换"),
+    Code("cube({\n  color: \"#ff6600\",\n  size: 1.2,\n  position: [-3, 0, 0],\n  spin: { axis: [0, 1, 0], speed: 2 },\n  bob: { amp: 0.5, speed: 0.1 },\n  rotate: [0, 0, 30]\n})", "xuy"),
+    Ul("position —— 世界坐标 [x, y, z]","rotate —— 固定旋转角度 [x, y, z]","spin —— 持续旋转 { axis: [x,y,z], speed: 度/帧 }","bob —— 上下浮动 { amp: 幅度, speed: 频率 }"),
+    H2("PBR 材质"),
+    Code("sphere({\n  color: \"#00ccff\",\n  size: 1.5,\n  metalness: 0.9,\n  roughness: 0.1\n})", "xuy"),
+    Ul("metalness 0~1 —— 0 是绝缘体（漫反射），1 是金属（强反射）","roughness 0~1 —— 0 镜面锐利，1 完全散射"),
+    H2("纹理"),
+    Code("cube({\n  texture: \"examples/textures/checker.png\",\n  texScale: 0.5\n})", "xuy"),
+    P("triplanar 投影：根据法线方向选平面，从世界坐标算 UV。不需要 UV 化顶点。"),
+    H2("相机"),
+    P("固定距离 + FOV，手指拖拽旋转（MainActivity 已接 onTouchEvent）。"),
+    H2("OBJ 加载"),
+    Code("model({ src: \"cube.obj\", color: \"#ff6600\", scale: 2, position: [0, 0, 0] })", "xuy"),
+    H2("能力边界"),
+    Table(["能力","状态"], [["多光源","✅ 最多 8 个"],["PBR 材质","✅ metalness / roughness"],["纹理","✅ triplanar 投影"],["拖拽旋转","✅"],["双指缩放","❌"],["阴影 / 透明","❌"],["gltf / fbx / stl","❌ 只支持 .obj"],["逐物体独立变换","✅"]]),
+  )
+}

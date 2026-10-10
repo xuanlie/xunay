@@ -1,0 +1,25 @@
+// 插件
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("插件"),
+    P("compiler3 没有正式插件系统。三种扩展方式：预处理、直接改源码、包装 compile。"),
+    H2("为什么没插件系统"),
+    P("compiler3 只做一件事——标签名替换。加插件系统本身会变成额外的复杂度。"),
+    H2("1. 预处理脚本"),
+    Code("// preprocess.js\nimport fs from 'node:fs'\n\nconst files = ['app.xuy', 'src/Home.xuy']\nfor (const f of files) {\n  let s = fs.readFileSync(f, 'utf8')\n  s = s.replace(/@(\\w+):/g, 'on: { $1:')\n  fs.writeFileSync(f, s)\n}\n\n// 然后跑 xuyc3\nnode preprocess.js && node bin/xuyc3.js build app.xuy", "js"),
+    H2("2. 直接改编译器"),
+    P("compiler3 只有 438 行——fork 后直接改。"),
+    Code("// compiler3/src/index.js genProps 里加分支\nif (key === 'myCustomProp') {\n  lines.push(elVar + '.setAttribute(\"data-custom\", ' + valueSrc + ')')\n  continue\n}", "js"),
+    H2("3. 包一层 compile"),
+    Code("import { compile as base } from './compiler3/src/index.js'\n\nexport function compile(src, opts) {\n  // 预处理\n  src = src.replace(/console\\.log\\(/g, '// console.log(')\n  // 后处理编译产物\n  let out = base(src, opts)\n  return out.replace(/__DEV__/g, 'false')\n}", "js"),
+    H2("和 esbuild plugin 配合"),
+    P("如果要接入 esbuild，写 onLoad 钩子："),
+    Code("export const xunayPlugin = {\n  name: 'xunay',\n  setup(build) {\n    build.onLoad({ filter: /\\.xuy$/ }, async (args) => {\n      const src = fs.readFileSync(args.path, 'utf8')\n      const js = compile(src)\n      return { contents: js, loader: 'js' }\n    })\n  }\n}", "js"),
+    H2("常见的扩展"),
+    Table(["需求","方式"], [["加新标签","改 compiler3/src/tags.js"],["加语法糖","预处理脚本改写源码"],["改生成代码","改 compiler3/src/index.js"],["加后处理","包一层 compile"],["接入构建工具","写 esbuild / vite plugin"]]),
+    H2("相关源码"),
+    Table(["文件","职责"], [["compiler3/src/index.js","compile() 入口"],["bin/xuyc3.js","构建流程"]]),
+  )
+}

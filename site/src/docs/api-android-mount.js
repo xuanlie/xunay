@@ -1,0 +1,18 @@
+// mount / app
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("mount / app"),
+    P("挂载入口。把组件树挂到 Android 根布局。"),
+    H2("签名"),
+    Code("app(() => tag(...))              // 老写法\\nmount(() => tag(...), \"#app\")   // 新写法", "xuy"),
+    H2("示例"),
+    Code("app(() => div(null,\\n  h1(null, \"标题\"),\\n  span(null, \"内容\")\\n), \"#app\")", "xuy"),
+    P("第二参数 \"#app\" 在 Android 端被忽略（没有 id 概念），只为兼容 Web 端写法。"),
+    H2("生成的 Java"),
+    P("组件树展开成 XML 布局，代码在 onCreate 里 setContentView(R.layout.activity_main)。"),
+    H2("多个 mount"),
+    P("只认第一个 mount / app。多个会叠加（不推荐）。"),
+  )
+}

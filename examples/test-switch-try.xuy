@@ -1,0 +1,39 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const n = s(3)
+
+const dayName = computed(() => {
+  switch (n()) {
+    case 1: return '周一'
+    case 2: return '周二'
+    case 3: return '周三'
+    case 4: return '周四'
+    case 5: return '周五'
+    default: return '周末'
+  }
+})
+
+const safeDiv = computed(() => {
+  try {
+    if (n() === 0) throw '除零'
+    return 100 / n()
+  } catch (e) {
+    return 0
+  }
+})
+
+const tryFinally = computed(() => {
+  let r = 0
+  try {
+    r = n() * 2
+  } finally {
+    r = r + 1
+  }
+  return r
+})
+
+mount(() => div(null,
+  span(null, txt`dayName(3): ${dayName}`),
+  span(null, txt`safeDiv(3): ${safeDiv}`),
+  span(null, txt`tryFinally: ${tryFinally}`)
+), '#app')

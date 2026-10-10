@@ -1,0 +1,22 @@
+// list(arr, render)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("list(arr, render)"),
+    P("列表渲染。生成 RecyclerView + Adapter。"),
+    H2("签名"),
+    Code("list(() => arr(), item => tag(...))", "xuy"),
+    H2("简单用法"),
+    Code("list(() => items(), item => li(null, item.name))", "xuy"),
+    H2("过滤"),
+    Code("list(() => items().filter(x => x.ok), item => li(null, item.name))", "xuy"),
+    P("filter 会内联到 Java 循环里。"),
+    H2("生成的 Java"),
+    Code("private void renderList_v5() {\\n    java.util.List<Object> __f = new java.util.ArrayList<>();\\n    java.util.List<?> __val = items.get();\\n    if (__val != null) for (Object __it : __val) {\\n        if (((Boolean) __it).ok) { __f.add(__it); }\\n    }\\n    ListAdapter a = new ListAdapter(__f);\\n    RecyclerView rv = (RecyclerView) findViewById(R.id.v5);\\n    rv.setLayoutManager(new LinearLayoutManager(this));\\n    rv.setAdapter(a);\\n}\\n\\nitems.subscribe(val -> renderList_v5());", "java"),
+    H2("ListAdapter"),
+    P("固定用 TextView 显示每一项的 String 值。当前不支持自定义 item 布局。"),
+    H2("注意事项"),
+    Ul("只支持一维列表，不支持分组 / 嵌套","item 布局不可定制","只读，不支持拖拽排序 / 删除","大数据量性能依赖 RecyclerView 自身"),
+  )
+}

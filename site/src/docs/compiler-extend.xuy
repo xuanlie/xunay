@@ -1,0 +1,26 @@
+// 扩展编译器
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("扩展编译器"),
+    P("compiler3 只有 438 行，改起来成本低。三种扩展方式：加标签、改生成逻辑、包一层。"),
+    H2("1. 加新标签"),
+    Code("// compiler3/src/tags.js\nexport const TAGS = new Set([\n  // ... 现有的\n  'my-component',\n  'x-foo',\n])", "js"),
+    P("加进 TAGS，编译器就会把 myComponent(...) 当成标签编译。不加就原样透传——可以用 createElement 或 tag() 手动创建。"),
+    H2("2. 改生成逻辑"),
+    P("比如加一个 property 分支："),
+    Code("// compiler3/src/index.js 里的 genProps\nif (key === 'model') {\n  lines.push(elVar + '.value = ' + valueSrc)\n  lines.push(elVar + \".addEventListener('input', e => (\" + valueSrc + ')(e.target.value))')\n  continue\n}", "js"),
+    H2("3. 包一层 compile"),
+    P("不改 compiler3 源码，包装："),
+    Code("import { compile as rawCompile } from './compiler3/src/index.js'\n\nexport function compile(src, opts) {\n  src = src.replace(/@click:(\\w+)/g, 'on: { click: $1 }')\n  return rawCompile(src, opts)\n}", "js"),
+    H2("从 compiler2 迁移"),
+    Table(["原位置","新位置"], [["compiler2/src/tokenizer.js 的 TAGS","compiler3/src/tags.js 的 TAGS"],["compiler2/src/parser.js","不存在，用 acorn"],["compiler2/src/gen.js","compiler3/src/index.js 的 genProps / genChild"],["compiler2/src/index.js","compiler3/src/index.js 的 compile"]]),
+    H2("测试"),
+    P("compiler3 有 1391 个测试，改完跑一遍："),
+    Code("node --test compiler3/test/*.test.js", "bash"),
+    H2("相关源码"),
+    Table(["文件","职责"], [["compiler3/src/tags.js","标签白名单"],["compiler3/src/index.js","全部逻辑"],["compiler3/test/*.test.js","测试套件"]]),
+    Tip("改编译器前先跑一遍测试，改完再跑一遍。任何破坏都会立刻暴露。"),
+  )
+}

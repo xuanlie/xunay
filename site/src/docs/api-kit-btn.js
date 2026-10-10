@@ -1,0 +1,18 @@
+// kit: Btn
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("kit: Btn"),
+    P("kit 里的 Btn 组件。"),
+    H2("引入"),
+    Code("import { Btn } from 'xunay/kit/base'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["block","——","——",""],["disabled","——","false","禁用"],["icon","——","——",""],["onClick","——","——","回调"],["size","——","'md'","尺寸"],["type","——","'text'","类型"]]),
+    H2("移动端"),
+    P("最小高度 44px + font-size 15px。"),
+    H2("基础用法"),
+    Code("import { Btn } from 'xunay/kit/base'\n\nBtn({ type: 'text', size: 'md', onClick: () => {} })", "js"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

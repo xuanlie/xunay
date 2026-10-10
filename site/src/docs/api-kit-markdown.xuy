@@ -1,0 +1,20 @@
+// kit: Markdown
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Markdown"),
+    P("kit 里的 Markdown 组件。"),
+    H2("引入"),
+    Code("import { Markdown } from 'xunay/kit/editor'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["height","——","——","高度"],["onChange","——","——","回调"],["preview","——","——",""],["value","——","——","可传 signal（响应式）"]]),
+    H2("基础用法"),
+    Code("import { Markdown } from 'xunay/kit/editor'\n\nMarkdown({ value: mySignal, onChange: () => {} })", "js"),
+    H2("响应式"),
+    P("这些参数可以直接传 signal，值变化时 DOM 会自动更新："),
+    Code("import { signal } from 'xunay'\nimport { Markdown } from 'xunay/kit/editor'\n\nconst v = signal('')\n\nMarkdown({ value: v })", "js"),
+    Tip("不要写成 value: v() —— 传函数给 render.js，让它挂 effect。"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

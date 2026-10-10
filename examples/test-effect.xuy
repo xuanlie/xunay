@@ -1,0 +1,14 @@
+﻿import { div, span, input, button, signal, computed, mount, txt, effect } from 'xunay'
+
+const n = s(0)
+const log = s('')
+
+effect(() => {
+  log('n 变了: ' + n())
+})
+
+mount(() => div(null,
+  button({ on: { click: () => n(n() + 1) } }, '+1'),
+  span(null, txt`n: ${n}`),
+  span(null, txt`log: ${log}`)
+), '#app')

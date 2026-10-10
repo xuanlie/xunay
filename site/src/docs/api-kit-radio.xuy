@@ -1,0 +1,22 @@
+// kit: Radio
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Radio"),
+    P("kit 里的 Radio 组件。"),
+    H2("引入"),
+    Code("import { Radio } from 'xunay/kit/form'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["checked","——","——","可传 signal（响应式）"],["disabled","——","false","禁用"],["label","——","——","标签"],["name","——","——","名称"],["onChange","——","——","回调"]]),
+    H2("移动端"),
+    P("触摸区 44px + 单选框 20px。"),
+    H2("基础用法"),
+    Code("import { Radio } from 'xunay/kit/form'\n\nRadio({ checked: mySignal, label: 'example', onChange: () => {} })", "js"),
+    H2("响应式"),
+    P("这些参数可以直接传 signal，值变化时 DOM 会自动更新："),
+    Code("import { signal } from 'xunay'\nimport { Radio } from 'xunay/kit/form'\n\nconst v = signal(false)\n\nRadio({ checked: v })", "js"),
+    Tip("不要写成 checked: v() —— 传函数给 render.js，让它挂 effect。"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

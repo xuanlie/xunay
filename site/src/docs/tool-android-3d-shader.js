@@ -1,0 +1,25 @@
+// 3D 着色器详解
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("3D 着色器详解"),
+    P("内置一个 PBR-lite 着色器。源码在 gen.js 里的 VS / FS 常量。"),
+    H2("顶点着色器 VS"),
+    Code("uniform mat4 uMVP;\nuniform mat4 uModel;\nattribute vec3 aPos;\nattribute vec3 aNormal;\nattribute vec3 aColor;\nvarying vec3 vColor;\nvarying vec3 vNormal;\nvarying vec3 vWorldPos;\nvoid main() {\n    vColor = aColor;\n    vNormal = normalize(mat3(uModel) * aNormal);\n    vWorldPos = (uModel * vec4(aPos, 1.0)).xyz;\n    gl_Position = uMVP * vec4(aPos, 1.0);\n}", "glsl"),
+    Ul("aPos —— 顶点位置","aNormal —— 顶点法线","aColor —— 顶点颜色（RGB）","uMVP —— model × view × projection","uModel —— 世界矩阵（用于法线和世界坐标）"),
+    H2("片元着色器 FS"),
+    Code("precision mediump float;\nvarying vec3 vColor;\nvarying vec3 vNormal;\nvarying vec3 vWorldPos;\nuniform vec3 uLightDir[8];\nuniform vec3 uLightColor[8];\nuniform float uLightIntensity[8];\nuniform int uLightCount;\nuniform float uMetalness;\nuniform float uRoughness;\nuniform vec3 uCamPos;\nuniform sampler2D uTex;\nuniform float uUseTex;\nuniform float uTexScale;", "glsl"),
+    H2("triplanar 纹理采样"),
+    P("不 UV 化顶点，根据法线方向选三个平面投影，加权平均。"),
+    Code("vec3 triplanar(sampler2D t, vec3 p, vec3 n, float sc) {\n    vec3 an = abs(n);\n    vec3 tx = texture2D(t, p.yz * sc).rgb;\n    vec3 ty = texture2D(t, p.xz * sc).rgb;\n    vec3 tz = texture2D(t, p.xy * sc).rgb;\n    float sum = an.x + an.y + an.z + 0.0001;\n    return (tx * an.x + ty * an.y + tz * an.z) / sum;\n}", "glsl"),
+    Ul("法线朝 X 轴 → 用 YZ 平面采样","法线朝 Y 轴 → 用 XZ 平面","法线朝 Z 轴 → 用 XY 平面","三方向按法线分量加权"),
+    H2("PBR 公式"),
+    Code("float shininess = mix(128.0, 4.0, rough);       // roughness 越大高光越散\nvec3 F0 = mix(vec3(0.04), albedo, metal);          // metalness 越大反射越强\nvec3 diffuse = albedo * (1.0 - metal) * NdotL;    // 金属漫反射弱\nvec3 specular = F0 * spec * NdotL * (1.0 - rough * 0.7);", "glsl"),
+    H2("色调映射 + Gamma"),
+    Code("col = col / (col + vec3(1.0));         // Reinhard 色调映射\ngl_FragColor = vec4(pow(col, vec3(0.4545)), 1.0);  // gamma 2.2 校正", "glsl"),
+    H2("多光源循环"),
+    P("GLSL ES 2.0 不允许动态数组长度，用固定 8 长度 + break 提前退出："),
+    Code("for (int i = 0; i < 8; i++) {\n    if (i >= uLightCount) break;\n    ...\n}", "glsl"),
+  )
+}

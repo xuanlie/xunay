@@ -1,0 +1,23 @@
+// frag(...children)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("frag(...children)"),
+    P("返回一组并列节点，不产生包裹层。"),
+    H2("签名"),
+    Code("frag(...children)", "js"),
+    H2("示例"),
+    Code("import { frag, h1, p } from 'xunay'\n\nfrag(\n  h1(null, '标题'),\n  p(null, '正文')\n)", "xuy"),
+    H2("别名"),
+    P("F 是 frag 的别名。"),
+    Code("import { F } from 'xunay'\nF(h1(null, 'a'), p(null, 'b'))", "xuy"),
+    H2("内部"),
+    P("返回一个 { [FRAGMENT]: true, children: [...] } 对象。render 时创建一个 display:contents 的 span 作为容器。"),
+    H2("特性"),
+    Ul("不产生额外 DOM 层（display:contents）","接受任意数量子节点","可嵌套"),
+    H2("陷阱"),
+    H3("不接受 props"),
+    Code("frag({ class: 'x' }, a, b)   // 错误\nfrag(a, b)                    // 正确", "xuy"),
+  )
+}

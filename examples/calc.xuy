@@ -1,0 +1,13 @@
+const n = s(0)
+const name = s('')
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '运算演示'),
+  button({ style: { background: '#4CAF50', color: '#ffffff', padding: 16 }, on: { click: () => n(v => v + 1) } }, '+1'),
+  button({ style: { background: '#2196F3', color: '#ffffff', padding: 16 }, on: { click: () => n(0) } }, '归零'),
+  span({ style: { fontSize: 20 } }, txt`计数: ${n}`),
+  span({ style: { color: '#0077cc', fontSize: 20 } }, txt`翻倍: ${n * 2}`),
+  span({ style: { color: '#ff6600', fontSize: 20 } }, txt`加十: ${n + 10}`),
+  input({ placeholder: '输入名字', on: { input: (e) => name(e) } }),
+  span({ style: { color: '#0077cc' } }, txt`你好, ${name}`)
+), '#app')

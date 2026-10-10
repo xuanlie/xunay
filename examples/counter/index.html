@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8"><title>XuNay 计数器</title>
+<style>body{font-family:sans-serif;padding:2rem}.box{display:flex;gap:1rem;align-items:center}button{padding:.5rem 1rem;font-size:1.2rem;cursor:pointer}span{font-size:1.5rem}</style>
+</head><body><div id="app"></div>
+<script type="module">
+import { div, button, span, sig, app, txt, show } from '../../core/src/all.js'
+const n = sig(0)
+app(() => div({ class: 'box' },
+  button({ on: { click: () => n(v => v - 1) } }, '-'),
+  span(null, txt`n = ${n}`),
+  button({ on: { click: () => n(v => v + 1) } }, '+'),
+  show(() => n() > 5, () => span({ style: { color: 'red' } }, ' 太多了'))
+), '#app')
+</script></body></html>

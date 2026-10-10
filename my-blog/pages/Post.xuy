@@ -1,0 +1,1 @@
+﻿export function Doc() { return div(null, "Post") }

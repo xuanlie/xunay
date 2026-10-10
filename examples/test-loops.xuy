@@ -1,0 +1,56 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const n = s(5)
+
+const sumFor = computed(() => {
+  let total = 0
+  for (let i = 1; i <= n(); i++) total = total + i
+  return total
+})
+
+const sumWhile = computed(() => {
+  let total = 0
+  let i = 0
+  while (i < n()) { total = total + i; i++ }
+  return total
+})
+
+const sumDo = computed(() => {
+  let total = 0
+  let i = 1
+  do { total = total + i; i++ } while (i <= n())
+  return total
+})
+
+const fact = computed(() => {
+  let r = 1
+  for (let i = 1; i <= n(); i++) r = r * i
+  return r
+})
+
+const skipEven = computed(() => {
+  let total = 0
+  for (let i = 1; i <= n(); i++) {
+    if (i % 2 === 0) continue
+    total = total + i
+  }
+  return total
+})
+
+const breakAt = computed(() => {
+  let i = 0
+  while (true) {
+    i = i + 1
+    if (i >= 3) break
+  }
+  return i
+})
+
+mount(() => div(null,
+  span(null, txt`sumFor(1..5): ${sumFor}`),
+  span(null, txt`sumWhile(0..4): ${sumWhile}`),
+  span(null, txt`sumDo(1..5): ${sumDo}`),
+  span(null, txt`fact(5): ${fact}`),
+  span(null, txt`skipEven: ${skipEven}`),
+  span(null, txt`breakAt: ${breakAt}`)
+), '#app')

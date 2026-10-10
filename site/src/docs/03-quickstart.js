@@ -1,0 +1,24 @@
+// 快速开始
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("快速开始"),
+    P("从空目录到可运行应用。分两种方式——纯 HTML（30 秒）和 xuyc 项目（推荐）。"),
+    H2("方式 1：纯 HTML"),
+    Code("<!DOCTYPE html>\n<html>\n<body>\n  <div id=\"app\"></div>\n  <script src=\"https://unpkg.com/xunay/dist/xunay.min.js\"></script>\n  <script>\n    const { div, h1, button, span, signal, mount } = XuNay\n    const n = signal(0)\n    mount(() => div(null,\n      h1(null, \"计数器\"),\n      button({ on: { click: () => n(v => v - 1) } }, \"-\"),\n      span(null, () => \" \" + n() + \" \"),\n      button({ on: { click: () => n(v => v + 1) } }, \"+\")\n    ), \"#app\")\n  </script>\n</body>\n</html>", "html"),
+    P("保存为 index.html，浏览器打开即可。"),
+    H2("方式 2：xuyc 项目（推荐）"),
+    H3("1. 初始化"),
+    Code("npm install -g xunay\nxunay create myapp\ncd myapp", "bash"),
+    H3("2. 写 app.xuy"),
+    Code("// app.xuy\nimport { signal } from 'xunay'\n\nconst n = signal(0)\n\nmount(() => div({ class: 'app' },\n  h1(null, '计数器'),\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\n  span(null, () => ' ' + n() + ' '),\n  button({ on: { click: () => n(v => v + 1) } }, '+')\n), '#app')", "xuy"),
+    Tip(".xuy 里标签名（div / h1 / button / span）不用 import，编译器自动处理。"),
+    H3("3. 编译"),
+    Code("xuyc build app.xuy --out dist\n\n# 开发模式（监听改动）\nxuyc dev app.xuy", "bash"),
+    H3("4. 打开"),
+    Code("python3 -m http.server 8080 --directory dist\n# 浏览器打开 http://localhost:8080", "bash"),
+    H2("下一步"),
+    Ul("看「模板语法」学怎么写 UI","看「第一个应用」写待办清单","从 React / Vue 过来看「概念对照」"),
+  )
+}

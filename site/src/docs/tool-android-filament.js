@@ -1,0 +1,22 @@
+// Android Filament 总览
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Android Filament 总览"),
+    P("xunay 有两条 3D 路：老路 android-3d/ 走手写 OpenGL ES 2.0；新路 android-3d-filament/ 走 Google Filament 引擎，支持 glTF 2.0 + PBR + 骨骼动画 + Draco 压缩。两条路的 .xuy 语法完全一样，只是后端不同。"),
+    Table(["","android-3d/","android-3d-filament/"], [["渲染","手写 OpenGL ES 2.0","Filament 1.51.6"],["模型","只 .obj","glTF 2.0（含 Draco）"],["纹理","triplanar 近似","真 UV"],["材质","Lambert + Blinn-Phong","metallicRoughness PBR"],["光照","固定 8 光源","DIRECTIONAL + IBL"],["骨骼动画","❌","✅"],["触摸","手写 onTouchEvent","Manipulator ORBIT"],["依赖","零外部库","4 个 Filament jni"]]),
+    H2("入口"),
+    Code("node bin/xuyc-filament.js examples/scene-anim.xuy --out build/filament --build --install", "bash"),
+    H2("CLI 选项"),
+    Table(["选项","说明"], [["--out <dir>","输出目录，默认 build/filament"],["--build","生成后立即 gradlew assembleDebug"],["--install","生成 + 编译 + adb install --no-streaming + am start（90s 超时）"]]),
+    H2("编译链"),
+    Code(".xuy → parser.js → IR → gen-gltf.js → glTF 2.0 (JSON + scene.bin)\n                                   ↓\n                           gen.js + MainActivity.java.tpl\n                                   ↓\n                Java + glTF + scene.bin + 纹理 + gradle wrapper + envs\n                                   ↓\n                           gradlew assembleDebug\n                                   ↓\n                                 APK", "txt"),
+    H2("生成的文件"),
+    Code("app/src/main/java/com/xunay/filament/MainActivity.java\napp/src/main/assets/scene.gltf\napp/src/main/assets/scene.bin\napp/src/main/assets/textures/*.png\napp/src/main/AndroidManifest.xml\napp/build.gradle / settings.gradle / gradle.properties\nbuild.gradle（根，声明 AGP 8.6.0）\nlocal.properties（sdk.dir）\ngradle/（wrapper）\napp/src/main/assets/envs/（default_env ibl）", "txt"),
+    H2("核心模块"),
+    Table(["文件","职责"], [["bin/xuyc-filament.js","CLI + 纹理扫描 + model 扫描 + assets 打包"],["android-3d-filament/src/parser.js",".xuy → IR（含 7 形状 / model / spin / bob / texture / ibl / camera.center）"],["android-3d-filament/src/gen-gltf.js","IR → glTF 2.0（7 形状 + UV + 法线 + 四元数 + PBR + KHR_draco 保留 + animations 合并）"],["android-3d-filament/src/gen.js","IR + glTF → MainActivity.java + 资源清单"],["android-3d-filament/src/templates/MainActivity.java.tpl","ModelViewer 模板"]]),
+    H2("包名"),
+    Table(["CLI","包名","输出目录"], [["xuyc-android.js","com.xunay.app","build/android"],["xuyc-3d.js","com.xunay.gl","build/android-3d"],["xuyc-filament.js","com.xunay.filament","build/filament"]]),
+  )
+}

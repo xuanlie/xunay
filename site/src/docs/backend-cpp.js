@@ -1,0 +1,29 @@
+// C++ 后端
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("C++ 后端"),
+    P("极致性能——httplib 单头文件 HTTP 库，编译后 ~1MB 二进制。"),
+    H2("启动"),
+    Code("cd backends/cpp\nmkdir -p build && cd build\ncmake .. && make\n./server", "bash"),
+    H2("默认端口"),
+    Code("12344", "txt"),
+    H2("目录"),
+    Code("backends/cpp/\n├── CMakeLists.txt\n├── main.cpp        入口\n├── handlers.cpp    路由处理\n├── handlers.h\n├── db.cpp          数据\n├── db.h\n└── schemas.h       结构体", "txt"),
+    H2("handler"),
+    Code("// handlers.cpp\nvoid handleGetTodos(const Request& req, Response& res) {\n    auto todos = db.getTodos();\n    res.set_content(toJson({\n        { \"ok\", true },\n        { \"data\", todos }\n    }), \"application/json\");\n}", "cpp"),
+    H2("路由"),
+    Code("// main.cpp\nint main() {\n    httplib::Server svr;\n\n    svr.Get(\"/rpc/token\", handleToken);\n    svr.Get(\"/rpc/getTodos\", [](auto& req, auto& res) {\n        if (!checkAuth(req)) return unauthorized(res);\n        handleGetTodos(req, res);\n    });\n\n    std::cout << \"XuNay C++ 后端 :12344\" << std::endl;\n    svr.listen(\"0.0.0.0\", 12344);\n}", "cpp"),
+    H2("CMake 构建"),
+    Code("cmake_minimum_required(VERSION 3.10)\nproject(xunay-backend)\n\nset(CMAKE_CXX_STANDARD 17)\n\nadd_executable(server main.cpp handlers.cpp db.cpp)\ntarget_include_directories(server PRIVATE .)", "cmake"),
+    H2("性能"),
+    Table(["指标","C++","Node","Python"], [["启动","5ms","100ms","1s"],["内存","~5MB","~40MB","~80MB"],["QPS","~80000","~15000","~8000"],["编译时间","~5s","—","—"]]),
+    H2("优点"),
+    Ul("最快——QPS 是 Node 的 5 倍","内存最小","无运行时依赖","单文件二进制"),
+    H2("缺点"),
+    Ul("开发慢——重编译要几秒","调试难——要 gdb","写 JSON 处理麻烦","不适合快速迭代"),
+    H2("什么时候用"),
+    P("CPU 密集 + 高并发 + 低延迟——比如实时游戏服务器、量化交易。日常 Web 应用没必要。"),
+  )
+}

@@ -1,0 +1,13 @@
+﻿scene({
+  bg: '#0e1116',
+  camera: { distance: 10, fov: 45 },
+  ssao: { radius: 0.5, intensity: 1.5 },
+  aa: 'fxaa',
+  tonemap: 'filmic',
+  bloom: { strength: 0.5 },
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }]
+})
+plane({ color: '#888888', size: 12, position: [0, -1.5, 0] })
+cube({ color: '#ff6600', size: 1.5, position: [0, 0, 0], spin: { axis: [0, 1, 0], speed: 0.5 } })
+sphere({ color: '#22ccff', size: 1, position: [-2, 0, 0], metalness: 0.9, roughness: 0.1 })
+cylinder({ color: '#ffcc00', size: 0.6, height: 2, position: [2, 0.5, 0], metalness: 0.7, roughness: 0.2 })

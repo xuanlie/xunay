@@ -1,0 +1,15 @@
+﻿scene({
+  bg: '#0e1116',
+  lights: [
+    { dir: [0.4, -1.0, -0.3], color: '#ffffff', intensity: 1.2 },
+    { dir: [-0.4, -0.5, 0.5], color: '#88aaff', intensity: 0.5 }
+  ]
+})
+
+cube({     color: '#ff6600', size: 0.7, position: [-3, 0, 0], metalness: 0.3, roughness: 0.35 })
+sphere({   color: '#22ccff', size: 0.7, position: [-2, 0, 0], metalness: 0.8, roughness: 0.15 })
+plane({    color: '#aaaaaa', size: 0.7, position: [-1, 0, 0], metalness: 0.1, roughness: 0.5 })
+cylinder({ color: '#88ff44', size: 0.5, height: 0.7, position: [0, 0, 0], metalness: 0.4, roughness: 0.3 })
+cone({     color: '#ff44cc', size: 0.5, height: 0.7, position: [1, 0, 0], metalness: 0.4, roughness: 0.3 })
+torus({    color: '#ffcc00', radius: 0.35, tube: 0.12, position: [2, 0, 0], metalness: 0.6, roughness: 0.25 })
+pyramid({  color: '#9944ff', size: 0.7, height: 0.7, position: [3, 0, 0], metalness: 0.3, roughness: 0.4 })

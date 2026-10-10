@@ -1,0 +1,10 @@
+﻿scene({
+  bg: '#0e1116',
+  autoRotate: true,
+  lights: [
+    { dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 1.2 }
+  ]
+})
+
+model({ src: 'examples/models/testquad.gltf', position: [0, 0, 0] })
+cube({ color: '#ff6600', size: 0.5, position: [-2.2, 0, 0] })

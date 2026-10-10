@@ -1,0 +1,31 @@
+// hydrate
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("hydrate"),
+    Tip("从 xunay/ssr 引入：import { hydrateMount } from 'xunay/ssr'"),
+    P("hydrate 是\"接管已有 DOM\"——服务端已经渲染好 HTML，客户端不再重建，而是给这些 DOM 挂上事件和响应式。"),
+    H2("和 mount 的区别"),
+    Table(["","mount","hydrate"], [["目标","空容器","有内容的容器"],["行为","清空后重建","同样重建（当前实现）"],["速度","慢（从头创建）","同 mount"],["场景","纯客户端","SSR 后的客户端"]]),
+    H2("基础用法"),
+    Code("import { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')\n// 假设 #app 里已经有服务端渲染的 HTML", "xuy"),
+    H2("内部做什么"),
+    P("当前实现与 mount 一致——清空容器后重新渲染，不做 DOM 复用。所谓 hydrate 只是语义上的\"接管\"，性能优势尚未实现。"),
+    Warn("SSR 首屏能省网络等待时间（HTML 直达浏览器），但 hydration 阶段仍会重建 DOM，大页面成本不小。"),
+    H2("什么时候用 hydrate"),
+    Ul("服务端已渲染","希望复用已有 DOM","首屏已有 HTML"),
+    Warn("如果容器是空的，用 mount 而不是 hydrate——hydrate 期望已有内容。"),
+    H2("数据一致性"),
+    P("服务端和客户端的初始 signal 值必须一致，否则会出现\"闪变\"。"),
+    Code("// 服务端：把初始数据序列化到 HTML\nconst initial = await fetchData()\nconst html = renderToString(App({ initial }))\n\nres.send(`\n  <div id=\"app\">${html}</div>\n  <script>window.__INITIAL__ = ${JSON.stringify(initial)}</script>\n`)\n\n// 客户端：读 window.__INITIAL__ 恢复状态\nconst initial = window.__INITIAL__\nhydrate(App({ initial }), '#app')", "xuy"),
+    H2("完整示例"),
+    Code("// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\napp.get('/', async (req, res) => {\n  const todos = await db.getTodos()\n  const html = renderToString(App({ initialTodos: todos }))\n  res.send(\n    '<!DOCTYPE html><html><body>' +\n    '<div id=\"app\">' + html + '</div>' +\n    '<script>window.__TODOS__ = ' + JSON.stringify(todos) + '</script>' +\n    '<script src=\"/client.js\"></script>' +\n    '</body></html>'\n  )\n})\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nconst initialTodos = window.__TODOS__ || []\nhydrate(App({ initialTodos }), '#app')", "xuy"),
+    H2("常见陷阱"),
+    H3("陷阱 1：容器里没内容"),
+    Code("// 错误：空的容器用 hydrate\n// <div id=\"app\"></div>\nhydrate(App(), '#app')\n\n// 正确：用 mount\nmount(App(), '#app')", "xuy"),
+    H3("陷阱 2：服务端和客户端初次渲染不同"),
+    Code("// 服务端：按 UTC 时间渲染\n// 客户端：按本地时间渲染\n// → hydration 不匹配警告", "js"),
+    P("所有依赖环境（时间、随机数、用户代理）的逻辑都放到 onMount 之后再执行。"),
+  )
+}

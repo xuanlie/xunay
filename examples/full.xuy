@@ -1,0 +1,14 @@
+const n = s(0)
+const name = s('')
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '全表达式演示'),
+  button({ style: { background: '#4CAF50', color: '#ffffff', padding: 16 }, on: { click: () => n(v => v + 1) } }, '+1'),
+  button({ style: { background: '#2196F3', color: '#ffffff', padding: 16 }, on: { click: () => n(0) } }, '归零'),
+  input({ placeholder: '输入名字', on: { input: (e) => name(e) } }),
+  span({ style: { fontSize: 20 } }, txt`计数: ${n}`),
+  span({ style: { color: '#0077cc', fontSize: 20 } }, txt`翻倍: ${n * 2}`),
+  span({ style: { color: '#ff6600', fontSize: 20 } }, txt`状态: ${n > 0 ? '正数' : '零'}`),
+  span({ style: { color: '#9900cc', fontSize: 20 } }, txt`${name} 的计数: ${n}`),
+  span({ style: { color: '#009900', fontSize: 20 } }, txt`组合: ${n * 2 + 1}`)
+), '#app')

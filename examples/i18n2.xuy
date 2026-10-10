@@ -1,0 +1,12 @@
+const LANG = {
+  zh: { greet: '你好', desc: '这是中文界面' },
+  en: { greet: 'Hello', desc: 'This is English UI' }
+}
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, 'i18n 测试'),
+  span({ style: { fontSize: 24 } }, t('greet')),
+  span({ style: { fontSize: 16, color: '#666' } }, t('desc')),
+  button({ style: { padding: 16, background: '#4CAF50', color: '#fff' }, on: { click: () => setLang('zh') } }, '中文'),
+  button({ style: { padding: 16, background: '#2196F3', color: '#fff' }, on: { click: () => setLang('en') } }, 'English')
+), '#app')

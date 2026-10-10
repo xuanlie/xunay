@@ -1,0 +1,30 @@
+// Android CLI 命令
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Android CLI 命令"),
+    P("xuyc-android.js 是 Android 端的命令行入口。负责读取 .xuy、生成 Java/XML/Gradle、可选编译和安装。"),
+    H2("基本用法"),
+    Code("node bin/xuyc-android.js <entry.xuy> [选项]", "bash"),
+    H2("选项"),
+    Table(["选项","说明"], [["--out <dir>","输出目录，默认 build/android"],["--build","生成后立即调用 gradlew assembleDebug"],["--install","生成 + 编译 + adb install -r + am start"]]),
+    H2("一键脚本 run.ps1"),
+    P("PowerShell 脚本，把整个流程封成一条命令。"),
+    Code(".\\run.ps1 -Entry examples/counter.xuy", "powershell"),
+    P("run.ps1 自动执行 6 步："),
+    Ul("1. 生成 7 个工程文件","2. gradlew assembleDebug","3. 检测设备 (adb devices)","4. 卸载旧版 (adb uninstall com.xunay.app)","5. 安装 (adb install -r)","6. 启动 (adb shell am start)"),
+    H2("手动执行"),
+    Code("node bin/xuyc-android.js examples/counter.xuy --out build/android\\ncd build/android\\ngradlew wrapper --gradle-version 8.7\\n.\\gradlew.bat assembleDebug\\nadb install -r app/build/outputs/apk/debug/app-debug.apk\\nadb shell am start -n com.xunay.app/.MainActivity", "bash"),
+    H2("Gradle wrapper"),
+    P("第一次编译前需要生成 wrapper。CLI 会自动尝试调系统 gradle 生成；如果系统没装 gradle，三种方案："),
+    Ul("安装 Gradle 8.x（https://gradle.org/install/）","用 Android Studio 打开 build/android 目录","从任意 Android 工程拷贝 gradlew / gradlew.bat / gradle/ 到 build/android/"),
+    H2("抓崩溃日志"),
+    Code("adb logcat -c\\nadb shell am force-stop com.xunay.app\\nadb shell am start -n com.xunay.app/.MainActivity\\nStart-Sleep -Seconds 2\\nadb logcat -b crash -d", "powershell"),
+    H2("3D 场景"),
+    P("3D 场景用独立入口。"),
+    Code("node bin/xuyc-3d.js examples/scene3d.xuy --out build/android-3d", "bash"),
+    H2("目录对照"),
+    Table(["命令","输出目录","包名"], [["xuyc-android.js","build/android","com.xunay.app"],["xuyc-3d.js","build/android-3d","com.xunay.gl"]]),
+  )
+}

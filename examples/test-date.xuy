@@ -1,0 +1,16 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const d = computed(() => {
+  const dt = new Date()
+  return dt.getFullYear() + '-' + (dt.getMonth() + 1) + '-' + dt.getDate()
+})
+
+const t = computed(() => {
+  const dt = new Date()
+  return dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds()
+})
+
+mount(() => div(null,
+  span(null, txt`日期: ${d}`),
+  span(null, txt`时间: ${t}`)
+), '#app')

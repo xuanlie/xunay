@@ -1,0 +1,23 @@
+// theme 主题
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("theme 主题"),
+    P("明暗主题切换。跟随系统、持久化、响应式。"),
+    H2("引入"),
+    Code("import { theme } from 'xunay/theme'", "js"),
+    H2("基础用法"),
+    Code("theme.theme()      // 'light' / 'dark'\ntheme.isDark()     // true / false\ntheme.isLight()    // true / false\n\ntheme.toggle()     // 切换\ntheme.set('dark')  // 指定", "js"),
+    H2("响应式"),
+    Code("import { div } from 'xunay'\nimport { theme } from 'xunay/theme'\n\ndiv({ class: () => theme.isDark() ? 'dark' : 'light' },\n  '内容'\n)", "js"),
+    H2("自定义配置"),
+    Code("import { createTheme } from 'xunay/theme'\n\nconst theme = createTheme({\n  themes: ['light', 'dark', 'auto'],\n  default: 'auto',\n  storageKey: 'myapp:theme',\n  attribute: 'data-theme',    // 写到 <html data-theme=\"dark\">\n  persist: true,\n})", "js"),
+    H2("跟随系统"),
+    P("默认开启。用户没手动设置时，跟随系统的 prefers-color-scheme。"),
+    H2("自动设置"),
+    Ul("<html data-theme=\"dark\"> 属性","<html class=\"dark\"> 类名","localStorage 持久化","切换时自动更新"),
+    H2("CSS 配合"),
+    Code("/* 按主题写样式 */\n:root {\n  --bg: #fff;\n  --text: #1f2328;\n}\n\n[data-theme=\"dark\"] {\n  --bg: #0d1117;\n  --text: #e6edf3;\n}", "css"),
+  )
+}

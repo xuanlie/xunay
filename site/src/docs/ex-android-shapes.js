@@ -1,0 +1,20 @@
+// 例子：8 种形状
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("例子：8 种形状"),
+    P("展示所有内置几何体。"),
+    H2("源码"),
+    Code("scene({ bg: \"#1a1a2e\", autoRotate: true, camera: { distance: 10, fov: 45 } })\\n\\ncube({ color: \"#ff6600\", size: 1, position: [-3, 0, 0] })\\nsphere({ color: \"#00ccff\", size: 1, position: [-1, 0, 0] })\\ncylinder({ color: \"#ff00ff\", size: 0.8, height: 1.5, position: [1, 0, 0] })\\ncone({ color: \"#ffff00\", size: 1, height: 1.5, position: [3, 0, 0] })\\ntorus({ color: \"#00ff88\", radius: 0.8, tube: 0.3, position: [-2, 0, 2] })\\npyramid({ color: \"#ff3366\", size: 1, height: 1.5, position: [0, 0, 2] })\\nplane({ color: \"#444455\", size: 6, position: [0, -1.5, 0] })", "xuy"),
+    H2("屏幕效果"),
+    Ul("立方体：橙，绕 Y 轴转","球：青蓝，纹理分段可见（segments 默认 12）","圆柱：紫，侧面 + 上下底","圆锥：黄，锥面 + 底面","圆环：绿，甜甜圈形状","金字塔：粉红，四棱锥 + 底座","地面：深灰平面"),
+    H2("几何参数"),
+    Table(["形状","参数","默认"], [["cube","size","1"],["sphere","size / segments","1 / 12"],["plane","size","2"],["cylinder","size / height / segments","1 / 1 / 16"],["cone","size / height / segments","1 / 1 / 16"],["torus","radius / tube / segments","1 / 0.3 / 16"],["pyramid","size / height","1 / 1.5"]]),
+    H2("调整细节"),
+    P("segments 越大越圆，但顶点数也越多："),
+    Code("sphere({ size: 2, segments: 32 })   // 更圆，864 顶点\\nsphere({ size: 2, segments: 8 })    // 粗糙，192 顶点", "xuy"),
+    H2("跑起来"),
+    Code("node bin/xuyc-3d.js examples/scene-shapes.xuy\\ncd build/android-3d\\n.\\gradlew.bat assembleDebug\\nadb install -r app/build/outputs/apk/debug/app-debug.apk\\nadb shell am start -n com.xunay.gl/.MainActivity", "powershell"),
+  )
+}

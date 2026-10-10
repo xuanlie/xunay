@@ -1,0 +1,28 @@
+// Android 已知限制
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Android 已知限制"),
+    P("Android 端跟 Web 端是两套实现，能力边界不一样。这里列出明确不支持的。"),
+    H2("外部 npm 库"),
+    Quote("Android 端完全不支持任何外部 npm 库。只有 xunay 自己的 API 能被翻译。"),
+    Table(["库","Web 端","Android 端"], [["@babylonjs/*","✅","❌ 只能手写 OpenGL ES"],["howler","✅","❌ 只能手写 MediaPlayer"],["tonal","✅","❌ 只能手写 Java"],["任何其它 npm 包","✅","❌"]]),
+    P("每引一个外部库，就要在 gen.js 里加一套\"遇到 X 就生成 Y\"的规则，或者手写 Java 等价。"),
+    H2("JS 语法不支持的"),
+    Table(["语法","状态"], [["class / extends","❌"],["生成器 function* / yield","❌"],["Promise.then 链式","❌ 只支持 await"],["解构 const {a} = obj","❌"],["展开 ...arr","❌"],["动态 import()","❌"],["tagged template tag`...`","❌"],["with","❌"]]),
+    H2("组件 / 指令不支持"),
+    Table(["功能","状态"], [["each 循环渲染","❌"],["provide / inject","❌"],["lazy 懒加载","❌"],["hydrate SSR","❌"],["trans 过渡","❌"],["Fragment","❌"]]),
+    H2("CSS 不支持的"),
+    Table(["属性","状态"], [["max-width/height 百分比","❌ 只支持 px"],["grid-template-rows","❌"],["grid-auto-flow","⚠️ 部分"],["跨行跨列 span","⚠️ 模拟，不准"],["filter / backdrop-filter","❌"],["mix-blend-mode","❌"],["@font-face 自定义字体","❌"],[":hover","❌ Android 无鼠标"],[":active / :focus","❌"],["transition","❌ 用 animate prop 代替"]]),
+    H2("运行时缺少的"),
+    Ul("Computed 自动依赖追踪（现在靠手动 subscribe）","Router 返回栈管理","Theme 主题系统（只有简单的明暗切换）","DevTools","错误边界","Context / 依赖注入"),
+    H2("工具链缺少的"),
+    Ul("多模块工程","增量编译","资源打包（图片/字体/音频）","单元测试 / 快照测试","release 签名自动化（要手工填 gradle.properties）"),
+    H2("3D 限制"),
+    Table(["能力","状态"], [["多光源","✅ 最多 8 个"],["PBR 材质","✅ metalness / roughness"],["纹理","✅ triplanar 投影"],["双指缩放","❌"],["阴影 / 透明","❌"],["gltf / fbx / stl","❌ 只支持 .obj"],["后处理","❌"]]),
+    H2("怎么办"),
+    P("遇到不支持的功能，三条路："),
+    Ul("手写 Java 等价 —— 写一个 Java 类，在 gen.js 里加映射规则","用 Android 原生替代 —— 换库，比如 Babylon.js → Filament","放弃 —— 那功能只跑 Web 端"),
+  )
+}

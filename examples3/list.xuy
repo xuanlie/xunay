@@ -1,0 +1,37 @@
+// title: 待办列表
+import { signal, mount } from 'xunay'
+
+const items = signal([
+  { id: 1, text: '学习 compiler3' },
+  { id: 2, text: '修复 signal 传播' },
+])
+const nextId = signal(3)
+const input = signal('')
+
+mount(() => div({ style: { padding: 24, maxWidth: '500px' } },
+  h1(null, '待办'),
+  div({ style: { display: 'flex', gap: '8px', marginBottom: '16px' } },
+    input({
+      value: () => input(),
+      on: { input: e => input(e.target.value) },
+      style: { flex: '1', padding: '6px' }
+    }),
+    button({
+      on: { click: () => {
+        const v = input()
+        if (v.trim()) {
+          items([...items(), { id: nextId(), text: v }])
+          nextId(nextId() + 1)
+          input('')
+        }
+      } }
+    }, '添加')
+  ),
+  ul({ style: { paddingLeft: '20px' } },
+    () => items().map(it => li({ key: it.id, style: { marginBottom: '6px' } },
+      span(null, it.text + ' '),
+      button({ on: { click: () => items(items().filter(x => x.id !== it.id)) } }, '×')
+    ))
+  ),
+  p(null, txt`共 ${items().length} 项`)
+), '#app')

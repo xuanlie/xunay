@@ -1,0 +1,104 @@
+﻿// Android 端 API
+import { D, H1, H2, H3, P, Code, Ul, Ol, Tip, Warn, Note, Table } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1('Android 端 API'),
+    P('给 AI 写 Android .xuy 的速查。Web 端的 API 大部分可用，这里是差异 + Android 专有。'),
+
+    H2('能用 vs 不能用'),
+    Table(['API', 'Android', '说明'], [
+      ['signal / s', '✅', '主线程自动调度'],
+      ['computed', '✅', '同 Web'],
+      ['effect', '✅', '同 Web'],
+      ['show / list', '✅', '同 Web'],
+      ['onMount / onUnmount', '✅', '转 onCreate / onDestroy'],
+      ['ref', '✅', '返回 android.view.View'],
+      ['txt 模板', '✅', ''],
+      ['page / goto / back', '✅', 'Android 专有'],
+      ['param("key")', '✅', 'Android 专有，路由传参'],
+      ['localStorage', '✅', 'SharedPreferences 内联'],
+      ['setTheme("dark")', '✅', 'Android 专有'],
+      ['toast / showNotification', '✅', 'Android 专有'],
+      ['fetch(url) / await fetch', '✅', '后台线程 + Handler'],
+      ['setTimeout / setInterval', '✅', 'Handler'],
+      ['import 外部 npm 库', '❌', '完全不加载'],
+      ['document / window', '❌', '没有 DOM'],
+      ['canvas / WebGL', '❌', '用 3D 路'],
+      ['class / extends', '❌', '不支持 class 语法'],
+      ['解构 / 展开', '❌', '不支持 const {a} = x / ...arr'],
+      ['Promise.then 链', '❌', '只支持 await'],
+      ['xunay/anim 大多数', '❌', '只有几个 preset'],
+      ['xunay/kit 组件', '❌', '用 div/span 等原生标签'],
+      ['xunay/ssr', '❌', '没有 SSR'],
+      ['CSS :hover', '❌', '无鼠标'],
+      ['CSS transition', '❌', '用 animation'],
+    ]),
+
+    H2('Android 专有 API'),
+    Code('// 路由\npage("home", () => div(null, "首页"))\ngoto("home")\ngoto("detail", { id: 42 })\nparam("id")            // 目标页读参\nback()\n\n// 存储\nlocalStorage.setItem("k", "v")\nlocalStorage.getItem("k")\nlocalStorage.removeItem("k")\n\n// 主题\nsetTheme("dark")\n\n// 通知\nshowNotification("标题", "内容")\ntoast("提示")\n\n// 文件\nreadFile("a.txt", sig)\nwriteFile("a.txt", sig)\n\n// 国际化\nsetLang("zh")\nt("key")', 'xuy'),
+
+    H2('signal 主线程调度'),
+    P('Android 端 signal.set 自动处理主线程。子线程里写 signal 会自动 post 到主线程执行订阅者，所以 fetch 后不用手动 runOnUiThread。'),
+    Code('async () => {\n  const data = await fetch("https://api.x.com/data")\n  items(data)   // 后台线程写的，但订阅者会在主线程执行\n}', 'xuy'),
+
+    H2('组件映射'),
+    Table(['.xuy 标签', 'Android 类'], [
+      ['div / section / main / aside / nav / header / footer', 'LinearLayout'],
+      ['span / p / h1~h6 / label', 'TextView'],
+      ['button', 'Button'],
+      ['input / textarea', 'EditText'],
+      ['input type=checkbox', 'CheckBox'],
+      ['input type=radio', 'RadioButton'],
+      ['input type=switch', 'Switch'],
+      ['img', 'ImageView'],
+      ['progress', 'ProgressBar'],
+      ['slider', 'SeekBar'],
+      ['ul / ol / li', 'LinearLayout'],
+      ['table / tr / td / th', 'LinearLayout / TextView'],
+      ['a', 'TextView'],
+      ['select', 'android.widget.Spinner'],
+      ['option', '（进 Spinner 的 ArrayAdapter）'],
+      ['form', 'LinearLayout'],
+      ['hr', 'View'],
+    ]),
+
+    H2('下拉框'),
+    Code('select(null,\n  option({ value: "a" }, "选项 A"),\n  option({ value: "b", selected: true }, "选项 B"),\n  option({ value: "c" }, "选项 C")\n)', 'xuy'),
+    P('生成 Spinner + ArrayAdapter + setSelection。'),
+
+    H2('路由传参'),
+    Code('// 发送页\npage("home", () => div(null,\n  button({ on: { click: () => goto("detail", { id: 42, name: "张三" }) } }, "详情")\n))\n\n// 接收页\npage("detail", () => div(null,\n  span(null, txt`ID: ${param("id")}`),\n  span(null, txt`名字: ${param("name")}`)\n))', 'xuy'),
+
+    H2('Android 事件'),
+    Table(['on.xxx', '生成'], [
+      ['click', 'setOnClickListener'],
+      ['input', 'TextWatcher.afterTextChanged'],
+      ['change', 'OnCheckedChange / Spinner.onItemSelected'],
+      ['submit', 'form + button type=submit'],
+      ['blur / focus', 'setOnFocusChangeListener'],
+      ['keydown / keyup', 'setOnKeyListener'],
+      ['scroll', 'setOnScrollChangeListener'],
+      ['mousedown / up / touchstart / end', 'setOnTouchListener'],
+    ]),
+
+    H2('命名约束'),
+    Warn('signal 变量名不能和 Java 关键字冲突：class / int / new / public / return / if / for / while / true / false / null / void / this / super。'),
+    Code('// 错\nconst class = s(0)\nconst int = s(0)\n\n// 对\nconst cls = s(0)\nconst num = s(0)', 'xuy'),
+
+    H2('推荐模式'),
+    Code('// 表单验证：signal + computed + show + disabled\nconst name = s("")\nconst err = computed(() => name().length < 2 ? "太短" : "")\nshow(() => err() !== "", () => span(null, () => err()))\nbutton({ disabled: () => !!err() }, "提交")', 'xuy'),
+
+    H2('CLI'),
+    Code('node bin/xuyc-android.js x.xuy --out build/android --build --install\n# 或统一入口\nnode bin/xuyc.js x.xuy --target=ui --build --install', 'bash'),
+
+    H2('排查流程'),
+    Ol(
+      '跑 CLI 看 AST 数（页数）',
+      '看 build/android 有没有生成文件',
+      '编译失败看 gradle 输出',
+      '运行时崩溃：adb logcat -b crash -d',
+      '看清哪行崩的：adb logcat -d -s "AndroidRuntime:E"',
+    ),
+  )
+}

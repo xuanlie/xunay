@@ -1,0 +1,16 @@
+// kit: Popconfirm
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Popconfirm"),
+    P("kit 里的 Popconfirm 组件。"),
+    H2("引入"),
+    Code("import { Popconfirm } from 'xunay/kit/overlay'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["cancelText","——","——",""],["okText","——","——",""],["onCancel","——","——","回调"],["onConfirm","——","——","回调"],["title","——","——","标题"]]),
+    H2("基础用法"),
+    Code("import { Popconfirm } from 'xunay/kit/overlay'\n\nPopconfirm({ title: 'example', onCancel: () => {}, onConfirm: () => {} })", "js"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

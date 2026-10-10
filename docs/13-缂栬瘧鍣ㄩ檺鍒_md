@@ -1,0 +1,21 @@
+编译器限制
+
+一、参数化模板必须包箭头函数
+
+.xuy 里写列表模板，必须写成 (r) => tag(...)。
+
+对：
+  const row = (r) => div({ class: 'row' }, span(null, r.id))
+  编译成 (r) => (() => {...})()
+
+错：
+  const row = div({ class: 'row' }, span(null, r.id))
+  编译成 (() => {...})()，r 未定义，加载即崩
+
+原因：编译器扫描顶层 tag(...) 一律转立即执行 IIFE。
+包一层箭头函数后，IIFE 落到函数体内，改为调用时才执行。
+
+二、已验证
+
+compiler2/test/example.xuy 的 row 是正确样本。
+test/compiler.test.js 钉住了这条规则。

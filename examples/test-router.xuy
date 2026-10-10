@@ -1,0 +1,10 @@
+﻿import { div, span, button, signal, mount, txt, goto, back } from 'xunay'
+
+const n = s(0)
+
+mount(() => div(null,
+  button({ on: { click: () => n(n() + 1) } }, '+1'),
+  span(null, txt`n: ${n}`),
+  button({ on: { click: () => goto('home') } }, '去 home'),
+  button({ on: { click: () => back() } }, '返回')
+), '#app')

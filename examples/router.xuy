@@ -1,0 +1,18 @@
+const page = s('home')
+
+const Home = () => div(null,
+  h1(null, '首页'),
+  span(null, '欢迎来到首页'),
+  button({ on: { click: () => page('about') } }, '去关于')
+)
+
+const About = () => div(null,
+  h1(null, '关于'),
+  span(null, '这是关于页'),
+  button({ on: { click: () => page('home') } }, '回首页')
+)
+
+app(() => div(null,
+  show(page(v => v === 'home'), Home()),
+  show(page(v => v === 'about'), About())
+), '#app')

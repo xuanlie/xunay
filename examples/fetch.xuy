@@ -1,0 +1,8 @@
+const data = s('点按钮加载')
+const loading = s(false)
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '网络请求'),
+  button({ style: { background: '#2196F3', color: '#ffffff', padding: 16 }, on: { click: () => fetch('https://api.github.com/repos/xuanlie/xunay', data) } }, '加载 GitHub API'),
+  span({ style: { fontSize: 12, color: '#666666' } }, txt`状态: ${data}`)
+), '#app')

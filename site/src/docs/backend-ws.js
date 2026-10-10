@@ -1,0 +1,27 @@
+// WebSocket
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("WebSocket"),
+    P("实时双向通信——服务端主动推送给客户端。"),
+    H2("场景"),
+    Ul("聊天室","实时通知","协同编辑","数据看板"),
+    H2("前端连接"),
+    Code("export function connectWS(onChange) {\n  function connect() {\n    const proto = location.protocol === 'https:' ? 'wss' : 'ws'\n    const ws = new WebSocket(proto + '://' + location.host + '/ws')\n    ws.onmessage = e => {\n      try {\n        const msg = JSON.parse(e.data)\n        if (msg.type === 'todos_changed') onChange()\n      } catch (_) {}\n    }\n    ws.onclose = () => setTimeout(connect, 2000)   // 自动重连\n    ws.onerror = () => ws.close()\n  }\n  connect()\n}", "js"),
+    H2("后端（Python）"),
+    Code("# api/ws.py\nfrom fastapi import APIRouter, WebSocket\n\nrouter = APIRouter()\nclients = set()\n\n@router.websocket('/ws')\nasync def ws_endpoint(ws: WebSocket):\n    await ws.accept()\n    clients.add(ws)\n    try:\n        while True:\n            await ws.receive_text()\n    except:\n        clients.remove(ws)\n\nasync def broadcast(msg):\n    for ws in list(clients):\n        try:\n            await ws.send_json(msg)\n        except:\n            clients.remove(ws)", "py"),
+    H2("触发广播"),
+    Code("# todos.py\n@router.post('/rpc/addTodo')\nasync def add_todo(body: AddTodoReq):\n    todo = db.add_todo(body.title)\n    await broadcast({ 'type': 'todos_changed' })\n    return { 'ok': True, 'data': todo }", "py"),
+    H2("Node 后端 SSE 替代"),
+    P("Node 原生不支持 WebSocket——用 SSE（Server-Sent Events）替代单向推送："),
+    Code("// server.js\nif (req.url === '/sse') {\n  res.writeHead(200, {\n    'Content-Type': 'text/event-stream',\n    'Cache-Control': 'no-cache'\n  })\n  const client = { send: msg => res.write('data: ' + JSON.stringify(msg) + '\\n\\n') }\n  clients.add(client)\n  req.on('close', () => clients.delete(client))\n}", "js"),
+    H2("前端监听 SSE"),
+    Code("const es = new EventSource('/sse')\nes.onmessage = e => {\n  const msg = JSON.parse(e.data)\n  if (msg.type === 'todos_changed') reload()\n}", "js"),
+    H2("重连机制"),
+    P("网络不稳定时连接会断——必须自动重连。上面的例子用了 setTimeout 2 秒后重连。"),
+    H2("心跳"),
+    P("长时间空闲的连接会被中间代理断开——定期发心跳："),
+    Code("setInterval(() => {\n  if (ws.readyState === WebSocket.OPEN) ws.send('ping')\n}, 30000)", "js"),
+  )
+}

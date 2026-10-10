@@ -1,0 +1,43 @@
+// ref
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("ref"),
+    P("ref 是一个闭包变量，专门用来保存 DOM 引用。读它返回真实 DOM，写它更新引用。"),
+    H2("基础用法"),
+    Code("import { ref, input, onMount } from 'xunay'\n\nconst inputRef = ref()\n\ninput({\n  ref: el => inputRef(el),\n  placeholder: '输入'\n})\n\nonMount(() => inputRef().focus())", "xuy"),
+    H2("为什么用函数包装"),
+    P("ref 返回一个函数：\n· 调用 r() 读\n· 调用 r(dom) 写\n\n这样避免暴露内部变量，也能保证每次读到的都是最新值。"),
+    Code("const r = ref()\nr()          // 读（null）\nr(el)        // 写\nr()          // 读（el）", "xuy"),
+    H2("ref 不是响应式的"),
+    Warn("ref 和 signal 不一样——它不是响应式的。写 ref 不会触发 effect，读 ref 也不会订阅。它就是一个简单的变量存储。"),
+    Code("const r = ref()\neffect(() => {\n  console.log(r())   // ✗ 不会因为 r 变化而重跑\n})", "xuy"),
+    H2("ref vs signal"),
+    Table(["","ref","signal"], [["读","r()","s()"],["写","r(v)","s(v)"],["触发 effect","不","会"],["嵌套在动态里","不重跑","会重跑"],["用途","DOM 引用","状态"]]),
+    P("简单记：想触发更新用 signal，只想存个值用 ref。"),
+    H2("什么时候用 ref"),
+    Ul("拿到 DOM 后 focus / blur","测量元素尺寸（getBoundingClientRect）","滚动控制（scrollTop / scrollIntoView）","第三方库初始化（echarts / mapbox / video）","手动操作 DOM（特殊情况）"),
+    H2("多个元素共享 ref"),
+    P("一个 ref 只能存一个值。要存多个用 Map 或对象。"),
+    Code("const inputs = {}        // 普通对象\n// 或\nconst inputs = new Map()\n\nitems.map(i =>\n  input({\n    ref: el => inputs[i.id] = el\n  })\n)\n\n// 之后\ninputs[42].focus()", "xuy"),
+    H2("ref 的时机"),
+    P("ref 回调在元素创建后立即执行，但此时元素还没挂到文档树。要确保挂载后用 onMount。"),
+    Code("let el = null\\ndiv({ ref: e => { el = e; console.log('创建') } })\\n// 打印: 创建\\nonMount(() => console.log('挂载', el))\\n// 打印: 挂载", "xuy"),
+    H2("ref 在列表里"),
+    P("list 每一项可以有自己的 ref。用 map 存："),
+    Code("import { list, li, ref } from 'xunay'\n\nconst itemRefs = new Map()\n\nlist(todos, t => t.id, t =>\n  li({\n    ref: el => {\n      if (el) itemRefs.set(t.id, el)\n      else itemRefs.delete(t.id)\n    }\n  }, t.title)\n)", "xuy"),
+    H2("ref 在组件间传递"),
+    P("父组件想访问子组件的 DOM——有两种模式："),
+    Code("// 模式 A：子组件内部处理，父组件不关心\nfunction FancyInput(props) {\n  const el = ref()\n  onMount(() => el().focus())\n  return input({ ref: e => el(e), ...props })\n}\n\n// 模式 B：父组件显式传入 ref 回调\nfunction FancyInput({ inputRef, ...props }) {\n  return input({ ref: inputRef, ...props })\n}\n// 用：FancyInput({ inputRef: el => myRef(el) })", "xuy"),
+    H2("常见陷阱"),
+    H3("陷阱 1：以为 ref 是响应式的"),
+    Code("const r = ref()\ndiv(null, () => r() ? r().tagName : '未挂载')\n// ✗ ref 变化不触发这个动态节点重跑", "xuy"),
+    H3("陷阱 2：在 onMount 之前读"),
+    Code("const r = ref()\ndiv({ ref: e => r(e) })\nconsole.log(r())   // 立即读：可能是 null（DOM 还没挂载）\nonMount(() => console.log(r()))   // ✓ 一定非空", "xuy"),
+    H3("陷阱 3：把 ref 当 signal 传给模板"),
+    Code("div({ class: () => r() ? 'ready' : '' })\n// ✗ 首次求值后就不再更新", "xuy"),
+    H2("完整示例：自定义滚动条"),
+    Code("import { div, ref, signal, onMount, onUnmount, mount } from 'xunay'\n\nfunction CustomScroll() {\n  const scroller = ref()\n  const content = ref()\n  const thumbH = signal(50)\n  const thumbTop = signal(0)\n\n  const update = () => {\n    const s = scroller(), c = content()\n    if (!s || !c) return\n    const ratio = s.clientHeight / c.scrollHeight\n    thumbH(Math.max(30, s.clientHeight * ratio))\n    const maxTop = s.clientHeight - thumbH()\n    thumbTop((s.scrollTop / (c.scrollHeight - s.clientHeight)) * maxTop)\n  }\n\n  onMount(() => {\n    const s = scroller()\n    s.addEventListener('scroll', update)\n    window.addEventListener('resize', update)\n    update()\n    onUnmount(() => {\n      s.removeEventListener('scroll', update)\n      window.removeEventListener('resize', update)\n    })\n  })\n\n  return div({\n    ref: e => scroller(e),\n    class: 'scroll-wrap',\n    style: { position: 'relative', height: '300px', overflow: 'auto' }\n  },\n    div({ ref: e => content(e) },\n      ...Array.from({ length: 50 }, (_, i) => div(null, '行 ' + i))\n    ),\n    div({\n      class: 'scroll-thumb',\n      style: () => ({\n        height: thumbH() + 'px',\n        transform: 'translateY(' + thumbTop() + 'px)'\n      })\n    })\n  )\n}\n\nmount(() => CustomScroll(), '#app')", "xuy"),
+  )
+}

@@ -1,0 +1,6 @@
+﻿scene({ bg: '#0e1116', autoRotate: true,
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+
+cube({ color: '#ff6600', size: 1 })
+
+audio({ name: 'ding', src: 'examples/audios/ding.wav', autoplay: true, volume: 0.8 })

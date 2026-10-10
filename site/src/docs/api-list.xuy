@@ -1,0 +1,25 @@
+// list(arr, key, fn)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("list(arr, key, fn)"),
+    P("按 key 做 diff 的列表渲染。"),
+    H2("签名"),
+    Code("list(arr, keyFn, renderFn)", "js"),
+    H2("参数"),
+    Table(["参数","类型","说明"], [["arr","T[] 或 () => T[]","数据源"],["keyFn","(item, i) => key","提取唯一 key"],["renderFn","(item, i) => VNode","渲染每一项"]]),
+    H2("示例"),
+    Code("import { list, ul, li, signal } from 'xunay'\n\nconst items = signal(['a', 'b', 'c'])\n\nul(null,\n  list(items, i => i, i => li(null, i))\n)", "xuy"),
+    H2("diff 行为"),
+    Table(["变化","处理"], [["新增 item","创建新 DOM"],["删除 item","dispose scope + removeChild"],["重排","DocumentFragment 一次性重排"],["item 引用变","fastUpdate 原地更新或重建"],["key 不变 item 不变","完全跳过"]]),
+    H2("key 选择"),
+    Code("list(todos, t => t.id, ...)        // 正确：稳定 id\nlist(names, n => n, ...)           // 字符串本身\nlist(todos, (t, i) => i, ...)      // 不推荐：索引不稳定", "xuy"),
+    H2("性能"),
+    Table(["操作（1000 项）","耗时"], [["首次渲染","~40ms"],["追加 1 项","~0.5ms"],["删除 1 项","~0.5ms"],["改 1 项属性","~0.3ms"],["全重排","~8ms"]]),
+    H2("常见陷阱"),
+    H3("key 不唯一"),
+    H3("直接 push 数组"),
+    H3("渲染函数里有副作用"),
+  )
+}

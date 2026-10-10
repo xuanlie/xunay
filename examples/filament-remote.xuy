@@ -1,0 +1,7 @@
+﻿scene({ bg: '#0e1116', autoRotate: true,
+  camera: { distance: 6, fov: 45 },
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+model({
+  src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxAnimated/glTF/BoxAnimated.gltf',
+  normalize: true
+})

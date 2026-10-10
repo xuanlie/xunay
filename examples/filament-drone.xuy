@@ -1,0 +1,3 @@
+﻿scene({ bg: '#0e1116',
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+model({ src: 'examples/models/drone.gltf' })

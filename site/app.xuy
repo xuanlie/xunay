@@ -1,0 +1,23 @@
+// title: XuNay 文档
+import { div, a, mount, signal } from 'xunay'
+import { Sidebar } from './src/components/Sidebar.xuy'
+import { Content } from './src/components/Content.xuy'
+import { go } from './src/router.xuy'
+
+const menuOpen = signal(false)
+
+mount(() => div({ class: () => 'layout' + (menuOpen() ? ' menu-open' : '') },
+  div({ class: 'topbar' },
+    div({ class: 'topbar-btn', on: { click: () => menuOpen(!menuOpen()) } },
+      div({ class: 'hamburger' })
+    ),
+    div({ class: 'topbar-title', on: { click: () => go('/') } }, 'XuNay'),
+    div({ class: 'topbar-links' },
+      a({ class: 'topbar-link', href: 'https://github.com', target: '_blank' }, 'GitHub'),
+      a({ class: 'topbar-link', href: 'https://npmjs.com/package/xunay', target: '_blank' }, 'npm')
+    )
+  ),
+  div({ class: 'backdrop', on: { click: () => menuOpen(false) } }),
+  Sidebar({ onPick: () => menuOpen(false) }),
+  Content()
+), '#app')

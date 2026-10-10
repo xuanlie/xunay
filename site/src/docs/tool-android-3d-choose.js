@@ -1,0 +1,20 @@
+// 两条 3D 路怎么选
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("两条 3D 路怎么选"),
+    P("xunay 有两条 3D 路，共用同一套 .xuy DSL，只是后端不同。选哪条取决于你要什么。"),
+    H2("对比"),
+    Table(["","android-3d/（老路）","android-3d-filament/（新路）"], [["渲染","手写 OpenGL ES 2.0","Filament 1.51.6"],["模型","只 .obj","glTF 2.0（含 Draco）"],["纹理","triplanar 近似","真 UV"],["材质","Lambert + Blinn-Phong","metallicRoughness PBR"],["光照","固定 8 光源","DIRECTIONAL + IBL"],["骨骼动画","❌","✅"],["触摸","手写 onTouchEvent","Manipulator ORBIT"],["依赖","零外部库","4 个 Filament jni"],["包名","com.xunay.gl","com.xunay.filament"],["CLI","bin/xuyc-3d.js","bin/xuyc-filament.js"],["输出","build/android-3d","build/filament"]]),
+    H2("选老路的情况"),
+    Ul("APK 体积敏感（零外部依赖）","离线环境 / 无 Google Maven 访问","只画简单几何体 + 单色，不需要真实感","已经有 .obj 资产","不需要骨骼动画"),
+    H2("选新路的情况"),
+    Ul("需要 glTF 2.0（Sketchfab / Blender 导出）","需要 PBR 真材质（金属 / 粗糙度 / 法线贴图）","需要骨骼动画 / 节点动画","需要 Draco 压缩的模型","需要真 UV 纹理映射","未来要接后处理（bloom / SSAO）"),
+    H2("两条都跑"),
+    P("同一个 .xuy 可以在两条路上都跑，对比效果。"),
+    Code("# 老路\nnode bin/xuyc-3d.js examples/scene-anim.xuy --out build/android-3d --build\n\n# 新路\nnode bin/xuyc-filament.js examples/scene-anim.xuy --out build/filament --build", "bash"),
+    H2("共用 DSL"),
+    P("两条路的 .xuy 语法完全一样：scene / 7 种几何体 / model / spin / bob / rotate / metalness / roughness / texture / texScale。切换后端不用改源码。"),
+  )
+}

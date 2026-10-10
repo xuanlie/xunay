@@ -1,0 +1,43 @@
+// Fragment
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Fragment"),
+    P("Fragment 是\"一组并列节点的容器\"——它本身不产生真实 DOM 节点，只把子节点拼在一起。用来避免多余的包裹层。"),
+    H2("为什么需要它"),
+    P("组件返回多个根节点时，React 要求用 <></> 或 <div> 包。用 div 会多一层无意义的 DOM；xunay 用 frag 解决。"),
+    Code("// 方式 A：包一层 div（多一层 DOM）\nreturn div(null,\n  h1(null, '标题'),\n  p(null, '正文')\n)\n\n// 方式 B：fragment（无包裹）\nreturn frag(\n  h1(null, '标题'),\n  p(null, '正文')\n)", "xuy"),
+    H2("基础用法"),
+    Code("import { frag, h1, p, button } from 'xunay'\n\nfrag(\n  h1(null, '标题'),\n  p(null, '正文'),\n  button(null, '按钮')\n)", "xuy"),
+    H2("内部机制"),
+    P("frag 内部创建一个 display:contents 的 span 作为容器。display:contents 的 span 不参与布局——它的子元素直接参与父级布局，视觉上等于\"没有这个 span\"。"),
+    Code("// frag(...) 内部结构\nconst holder = document.createElement('span')\nholder.style.display = 'contents'\n// 子节点 appendChild 到 holder\n// holder 本身不占空间", "js"),
+    H2("frag 与 F"),
+    P("F 是 frag 的短别名。"),
+    Code("import { frag, F } from 'xunay'\nfrag(a, b)   // 两者等价\nF(a, b)", "xuy"),
+    H2("使用场景"),
+    H3("组件返回多个根节点"),
+    Code("function UserCard({ user }) {\n  return frag(\n    h1(null, user.name),\n    p(null, user.bio)\n  )\n}", "xuy"),
+    H3("条件渲染中的多节点"),
+    Code("show(() => loggedIn(), () => frag(\n  span(null, '欢迎 ' + user().name),\n  button({ on: { click: logout } }, '退出')\n))", "xuy"),
+    H3("列表项返回多个节点"),
+    Code("list(items, i => i.id, i => frag(\n  li(null, i.title),\n  li(null, i.desc)\n))", "xuy"),
+    H2("frag vs 其他容器"),
+    Table(["方案","DOM 开销","布局影响","适用场景"], [["frag","1 个 span（display:contents）","无","多根节点"],["div","1 个 div","有（默认 block）","需要 class/style 时"],["span","1 个 span","无（inline）","行内多节点"],["null","0","无","不需要"]]),
+    H2("frag 与 key"),
+    P("frag 没有 key 概念。列表用 list + keyFn 处理，不需要给 frag 加 key。"),
+    H2("嵌套 fragment"),
+    Code("frag(\n  h1(null, '标题'),\n  frag(\n    p(null, '段落 1'),\n    p(null, '段落 2')\n  )\n)\n// 输出 3 个并列节点", "xuy"),
+    H2("常见陷阱"),
+    H3("陷阱 1：frag 里没有子节点"),
+    Code("frag()   // 空 frag，无意义", "xuy"),
+    H3("陷阱 2：以为 frag 能加 class"),
+    Code("frag({ class: 'x' }, a, b)   // ✗ frag 不接受 props\nfrag(a, b)                    // ✓", "xuy"),
+    P("frag 只接受子节点参数。需要属性用 div。"),
+    H3("陷阱 3：fragment 里的 ref"),
+    Code("frag(\n  input({ ref: el => inputRef(el) }),\n  button(null, 'x')\n)\n// ref 各自处理，不冲突", "xuy"),
+    H2("完整示例：评论 + 回复"),
+    Code("import { frag, div, span, p, button, ul, li, signal, list, show, mount } from 'xunay'\n\nconst comments = signal([\n  { id: 1, user: 'A', text: '第一条', replies: [{ id: 11, user: 'B', text: '回复' }] }\n])\n\nfunction Comment({ c }) {\n  return frag(\n    div({ class: 'comment-head' },\n      span(null, c.user + ': '),\n      span(null, c.text)\n    ),\n    show(() => c.replies && c.replies.length,\n      () => ul({ class: 'replies' },\n        list(c.replies, r => r.id, r => li(null, r.user + ': ' + r.text))\n      )\n    )\n  )\n}\n\nmount(() => div(null,\n  list(comments, c => c.id, c => Comment({ c }))\n), '#app')", "xuy"),
+  )
+}

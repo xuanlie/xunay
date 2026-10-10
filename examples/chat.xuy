@@ -1,0 +1,82 @@
+// title: XuNay 实时聊天
+import { div,h1,input,button,ul,li,span,p,signal,mount,list,show,onMount,onUnmount } from 'xunay'
+
+const messages = signal([])
+const draft = signal('')
+const status = signal('连接中...')
+const name = signal('用户' + Math.floor(Math.random() * 1000))
+
+let ws = null
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws'
+  ws = new WebSocket(`${proto}://${location.host}/ws`)
+
+  ws.onopen = () => status('已连接')
+  ws.onclose = () => {
+    status('已断开')
+    setTimeout(connect, 2000)
+  }
+  ws.onmessage = e => {
+    try {
+      const msg = JSON.parse(e.data)
+      if (msg.type === 'chat') {
+        messages([...messages(), { id: Date.now() + Math.random(), from: msg.from, text: msg.text, time: msg.time }])
+      }
+    } catch (err) {}
+  }
+}
+
+const send = () => {
+  const t = draft().trim()
+  if (!t || !ws || ws.readyState !== 1) return
+  ws.send(JSON.stringify({
+    type: 'chat',
+    from: name(),
+    text: t,
+    time: new Date().toLocaleTimeString()
+  }))
+  draft('')
+}
+
+mount(() => {
+  onMount(() => {
+    connect()
+    onUnmount(() => ws && ws.close())
+  })
+
+  return div({ class: 'app' },
+    div({ class: 'hdr' },
+      h1(null, 'XuNay 聊天'),
+      span({ class: () => `status ${status() === '已连接' ? 'on' : 'off'}` }, () => status())
+    ),
+    div({ class: 'me' }, () => `你是：${name()}`),
+    ul({ class: 'msgs' },
+      show(() => messages().length === 0, () =>
+        div({ class: 'empty' }, '还没有消息，打个招呼吧')
+      ),
+      list(messages, m => m.id, m =>
+        li({ class: () => `msg ${m.from === name() ? 'me' : 'other'}` },
+          div({ class: 'who' }, `${m.from} · ${m.time}`),
+          div({ class: 'text' }, m.text)
+        )
+      )
+    ),
+    div({ class: 'row' },
+      input({
+        class: 'inp',
+        placeholder: '输入消息，回车发送...',
+        value: () => draft(),
+        on: {
+          input: e => draft(e.target.value),
+          keydown: e => { if (e.key === 'Enter') send() }
+        }
+      }),
+      button({ class: 'btn', on: { click: send } }, '发送')
+    )
+  )
+}, '#app')
+
+const s = document.createElement('style')
+s.textContent = `*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;background:#f0f2f5;padding:20px;height:100vh}.app{max-width:720px;margin:0 auto;height:calc(100vh - 40px);background:#fff;border-radius:12px;padding:24px;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,.06)}.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.hdr h1{font-size:22px}.status{font-size:12px;padding:4px 10px;border-radius:12px}.status.on{background:#d4f4dd;color:#0a7}.status.off{background:#fdd;color:#c33}.me{font-size:12px;color:#888;margin-bottom:12px}.msgs{flex:1;overflow-y:auto;list-style:none;margin-bottom:16px;padding:0}.msg{padding:10px 14px;margin:8px 0;border-radius:12px;max-width:70%;word-wrap:break-word}.msg.other{background:#f0f2f5}.msg.me{background:#1f6feb;color:#fff;margin-left:auto}.who{font-size:11px;opacity:.7;margin-bottom:4px}.text{font-size:14px;line-height:1.5}.empty{text-align:center;color:#aaa;padding:40px 0;font-size:14px}.row{display:flex;gap:8px}.inp{flex:1;padding:10px 14px;font-size:14px;border:1px solid #ddd;border-radius:8px;outline:none}.inp:focus{border-color:#1f6feb}.btn{padding:10px 20px;background:#1f6feb;color:#fff;border:none;border-radius:8px;cursor:pointer}`
+document.head.appendChild(s)

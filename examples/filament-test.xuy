@@ -1,0 +1,12 @@
+scene({
+  bg: '#0e1116',
+  camera: { distance: 7, fov: 45 },
+  lights: [
+    { dir: [0.5, -1.0, -0.3], color: '#ffffff', intensity: 1.2 },
+    { dir: [-0.5, -0.5, 0.5], color: '#88aaff', intensity: 0.4 }
+  ]
+})
+
+cube({    color: '#ff6600', size: 1.2, position: [-1.6, 0, 0], metalness: 0.3, roughness: 0.35 })
+sphere({  color: '#22ccff', size: 1.0, position: [0, 0, 0],    metalness: 0.8, roughness: 0.15 })
+torus({   color: '#ffcc00', radius: 0.5, tube: 0.18, position: [1.6, 0, 0], metalness: 0.6, roughness: 0.25 })

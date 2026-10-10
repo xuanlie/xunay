@@ -1,0 +1,639 @@
+{
+  "Typography": [
+    "bold",
+    "code",
+    "color",
+    "del",
+    "delete",
+    "isCode",
+    "italic",
+    "size",
+    "underline",
+    "variant"
+  ],
+  "Comment": [
+    "actions",
+    "author",
+    "avatar",
+    "time"
+  ],
+  "Watermark": [
+    "1",
+    "100",
+    "16",
+    "22",
+    "fontSize",
+    "gap",
+    "opacity",
+    "rotate",
+    "text"
+  ],
+  "Ribbon": [
+    "color",
+    "position",
+    "text"
+  ],
+  "Code": [
+    "copyable",
+    "language",
+    "true"
+  ],
+  "Keyboard": [],
+  "Highlight": [
+    "color",
+    "keyword",
+    "text"
+  ],
+  "Ellipsis": [
+    "1",
+    "lines",
+    "tooltip",
+    "true"
+  ],
+  "Tabs": [
+    "active",
+    "items",
+    "onChange"
+  ],
+  "Breadcrumb": [
+    "items",
+    "separator"
+  ],
+  "Pagination": [
+    "20",
+    "onChange",
+    "page",
+    "pageSize",
+    "total"
+  ],
+  "Steps": [
+    "0",
+    "current",
+    "steps"
+  ],
+  "Accordion": [
+    "0",
+    "defaultOpen",
+    "items"
+  ],
+  "Layout": [],
+  "Grid": [],
+  "Flex": [],
+  "Affix": [
+    "0",
+    "bottom",
+    "top"
+  ],
+  "CodeEditor": [
+    "300",
+    "height",
+    "language",
+    "lineNumbers",
+    "onChange",
+    "readOnly",
+    "theme",
+    "true",
+    "value"
+  ],
+  "RichText": [
+    "onChange",
+    "placeholder",
+    "value"
+  ],
+  "CopyButton": [
+    "copied",
+    "label",
+    "text"
+  ],
+  "useHotkey": [],
+  "SplitButton": [
+    "items",
+    "onClick",
+    "text"
+  ],
+  "Carousel": [
+    "3000",
+    "auto",
+    "false",
+    "height",
+    "interval"
+  ],
+  "Image": [
+    "alt",
+    "fallback",
+    "height",
+    "preview",
+    "src",
+    "true",
+    "width"
+  ],
+  "VirtualTable": [
+    "40",
+    "400",
+    "columns",
+    "data",
+    "height",
+    "rowHeight"
+  ],
+  "Kanban": [
+    "columns",
+    "items",
+    "onMove"
+  ],
+  "Gantt": [
+    "30",
+    "days",
+    "startDate",
+    "tasks"
+  ],
+  "QRScanner": [
+    "onScan"
+  ],
+  "Menu": [
+    "items",
+    "mode",
+    "onSelect",
+    "selected"
+  ],
+  "Anchor": [
+    "0",
+    "items",
+    "offsetTop"
+  ],
+  "BackTop": [
+    "40",
+    "400",
+    "bottom",
+    "right",
+    "top"
+  ],
+  "Collapse": [
+    "items"
+  ],
+  "Upload": [
+    "1024",
+    "accept",
+    "maxSize",
+    "multiple",
+    "onFiles",
+    "true"
+  ],
+  "FileList": [
+    "files",
+    "onPreview",
+    "onRemove"
+  ],
+  "Dropzone": [
+    "accept",
+    "multiple",
+    "onFiles",
+    "true"
+  ],
+  "FilePreview": [
+    "file",
+    "onClose"
+  ],
+  "Markdown": [
+    "height",
+    "onChange",
+    "preview",
+    "true",
+    "value"
+  ],
+  "JSONViewer": [
+    "2",
+    "collapsed",
+    "data",
+    "false",
+    "indent"
+  ],
+  "DiffViewer": [
+    "newText",
+    "oldText"
+  ],
+  "Terminal": [
+    "height",
+    "lines",
+    "onCommand",
+    "prompt"
+  ],
+  "CommandPalette": [
+    "items",
+    "onSelect",
+    "open",
+    "placeholder"
+  ],
+  "ContextMenu": [
+    "items",
+    "onSelect"
+  ],
+  "Input": [
+    "disabled",
+    "error",
+    "hint",
+    "label",
+    "name",
+    "onChange",
+    "placeholder",
+    "size",
+    "type",
+    "value"
+  ],
+  "Textarea": [
+    "4",
+    "error",
+    "hint",
+    "label",
+    "onChange",
+    "placeholder",
+    "rows",
+    "value"
+  ],
+  "Select": [
+    "disabled",
+    "error",
+    "hint",
+    "label",
+    "onChange",
+    "options",
+    "placeholder",
+    "size",
+    "value"
+  ],
+  "Checkbox": [
+    "checked",
+    "disabled",
+    "label",
+    "onChange"
+  ],
+  "Radio": [
+    "checked",
+    "disabled",
+    "label",
+    "name",
+    "onChange"
+  ],
+  "Switch": [
+    "checked",
+    "disabled",
+    "label",
+    "onChange"
+  ],
+  "NumberInput": [
+    "1",
+    "disabled",
+    "error",
+    "hint",
+    "label",
+    "max",
+    "min",
+    "onChange",
+    "step",
+    "value"
+  ],
+  "DatePicker": [
+    "disabled",
+    "error",
+    "hint",
+    "label",
+    "onChange",
+    "value"
+  ],
+  "TimePicker": [
+    "disabled",
+    "error",
+    "hint",
+    "label",
+    "onChange",
+    "value"
+  ],
+  "SearchInput": [
+    "onChange",
+    "onSearch",
+    "placeholder",
+    "value"
+  ],
+  "PasswordStrength": [
+    "value"
+  ],
+  "Rate": [
+    "24",
+    "5",
+    "max",
+    "onChange",
+    "size",
+    "value"
+  ],
+  "useForm": [],
+  "Btn": [
+    "block",
+    "disabled",
+    "icon",
+    "onClick",
+    "size",
+    "type"
+  ],
+  "Row": [
+    "4",
+    "align",
+    "gap",
+    "justify",
+    "wrap"
+  ],
+  "Col": [
+    "4",
+    "align",
+    "gap"
+  ],
+  "Text": [
+    "bold",
+    "center",
+    "dim",
+    "size",
+    "tag"
+  ],
+  "Card": [
+    "desc",
+    "flat",
+    "footer",
+    "hover",
+    "title"
+  ],
+  "Divider": [
+    "text"
+  ],
+  "Space": [
+    "16",
+    "size"
+  ],
+  "Tag": [
+    "closable",
+    "onClose",
+    "type"
+  ],
+  "Badge": [
+    "type"
+  ],
+  "Table": [
+    "columns",
+    "data",
+    "empty",
+    "keyFn",
+    "true",
+    "wrap"
+  ],
+  "List": [
+    "hover",
+    "items",
+    "keyFn",
+    "render"
+  ],
+  "Timeline": [
+    "items"
+  ],
+  "Tree": [
+    "data",
+    "render"
+  ],
+  "TreeSelect": [
+    "data",
+    "onChange",
+    "placeholder",
+    "value"
+  ],
+  "Calendar": [
+    "initMonth",
+    "month",
+    "onChange",
+    "value"
+  ],
+  "SplitPane": [
+    "50",
+    "direction",
+    "initial",
+    "left",
+    "right"
+  ],
+  "BarChart": [
+    "200",
+    "color",
+    "data",
+    "height",
+    "labels",
+    "showValue",
+    "true"
+  ],
+  "LineChart": [
+    "200",
+    "color",
+    "data",
+    "fill",
+    "height",
+    "labels",
+    "true"
+  ],
+  "PieChart": [
+    "200",
+    "data",
+    "donut",
+    "false",
+    "size"
+  ],
+  "Sparkline": [
+    "100",
+    "30",
+    "color",
+    "data",
+    "height",
+    "width"
+  ],
+  "DragUpload": [
+    "accept",
+    "multiple",
+    "onFiles",
+    "text",
+    "true"
+  ],
+  "ImageUpload": [
+    "1024",
+    "maxSize",
+    "onFile"
+  ],
+  "Alert": [
+    "title",
+    "type"
+  ],
+  "Modal": [
+    "footer",
+    "mobile",
+    "onClose",
+    "open",
+    "title",
+    "width"
+  ],
+  "Spinner": [
+    "20",
+    "size"
+  ],
+  "Empty": [
+    "icon",
+    "text"
+  ],
+  "Progress": [
+    "0",
+    "100",
+    "color",
+    "max",
+    "showText",
+    "size",
+    "value"
+  ],
+  "Avatar": [
+    "size",
+    "src",
+    "text"
+  ],
+  "Result": [
+    "extra",
+    "status",
+    "subTitle",
+    "title"
+  ],
+  "Skeleton": [
+    "3",
+    "lines"
+  ],
+  "Count": [
+    "0",
+    "99",
+    "max",
+    "type",
+    "value"
+  ],
+  "Stat": [
+    "color",
+    "label",
+    "trend",
+    "unit",
+    "value"
+  ],
+  "Descriptions": [
+    "2",
+    "bordered",
+    "columns",
+    "false",
+    "items"
+  ],
+  "ItemCard": [
+    "actions",
+    "avatar",
+    "desc",
+    "onClick",
+    "title"
+  ],
+  "QRCode": [
+    "200",
+    "size",
+    "text"
+  ],
+  "ColorPicker": [
+    "onChange",
+    "showText",
+    "true",
+    "value"
+  ],
+  "Slider": [
+    "0",
+    "1",
+    "100",
+    "disabled",
+    "max",
+    "min",
+    "onChange",
+    "step",
+    "value"
+  ],
+  "Mentions": [
+    "onChange",
+    "options",
+    "placeholder",
+    "value"
+  ],
+  "Transfer": [
+    "data",
+    "onChange",
+    "titles",
+    "value"
+  ],
+  "Cascader": [
+    "onChange",
+    "options",
+    "placeholder",
+    "value"
+  ],
+  "VirtualList": [
+    "40",
+    "400",
+    "5",
+    "height",
+    "itemHeight",
+    "items",
+    "keyFn",
+    "overscan",
+    "render"
+  ],
+  "Sortable": [
+    "items",
+    "keyFn",
+    "onChange",
+    "render"
+  ],
+  "InfiniteList": [
+    "400",
+    "50",
+    "height",
+    "itemHeight",
+    "items",
+    "loadMore",
+    "loading",
+    "render"
+  ],
+  "px": [],
+  "Tooltip": [
+    "position",
+    "text",
+    "trigger"
+  ],
+  "Popover": [
+    "content",
+    "position",
+    "title",
+    "trigger"
+  ],
+  "Dropdown": [
+    "items",
+    "onSelect"
+  ],
+  "Drawer": [
+    "onClose",
+    "open",
+    "position",
+    "swipeClose",
+    "title",
+    "true",
+    "width"
+  ],
+  "Popconfirm": [
+    "cancelText",
+    "okText",
+    "onCancel",
+    "onConfirm",
+    "title"
+  ],
+  "Tour": [
+    "current",
+    "onChange",
+    "onFinish",
+    "steps"
+  ]
+}

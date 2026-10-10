@@ -1,0 +1,26 @@
+﻿import { div, span, input, button, signal, computed, mount, txt, onMount } from 'xunay'
+
+const name = s('')
+const saved = s('')
+const clicks = s(0)
+
+onMount(() => {
+  const v = localStorage.getItem('userName')
+  if (v != null) name(v)
+  const c = localStorage.getItem('clickCount')
+  if (c != null) clicks(Number.parseInt(c))
+})
+
+const save = () => {
+  localStorage.setItem('userName', name())
+  localStorage.setItem('clickCount', String(clicks()))
+  saved('已保存')
+}
+
+mount(() => div(null,
+  input({ placeholder: '输入名字', value: () => name(), on: { input: e => name(e.target.value) } }),
+  span(null, txt`名字: ${name}`),
+  button({ on: { click: () => { clicks(clicks() + 1); save() } } }, '点我 + 保存'),
+  span(null, txt`点击次数: ${clicks}`),
+  span(null, txt`状态: ${saved}`)
+), '#app')

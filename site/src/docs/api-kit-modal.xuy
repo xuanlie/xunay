@@ -1,0 +1,22 @@
+// kit: Modal
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: Modal"),
+    P("kit 里的 Modal 组件。"),
+    H2("引入"),
+    Code("import { Modal } from 'xunay/kit/display'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["footer","——","——",""],["mobile","——","——",""],["onClose","——","——","回调"],["open","——","——","可传 signal（响应式）"],["title","——","——","标题"],["width","——","auto","宽度"]]),
+    H2("移动端"),
+    P("底部弹出 + 滚动锁定。"),
+    H2("基础用法"),
+    Code("import { Modal } from 'xunay/kit/display'\n\nModal({ title: 'example', open: mySignal, onClose: () => {} })", "js"),
+    H2("响应式"),
+    P("这些参数可以直接传 signal，值变化时 DOM 会自动更新："),
+    Code("import { signal } from 'xunay'\nimport { Modal } from 'xunay/kit/display'\n\nconst v = signal(false)\n\nModal({ open: v })", "js"),
+    Tip("不要写成 open: v() —— 传函数给 render.js，让它挂 effect。"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

@@ -1,0 +1,17 @@
+// createElement
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("createElement"),
+    P("底层 vnode 创建函数。"),
+    H2("签名"),
+    Code("createElement(type, props, ...children)", "js"),
+    H2("示例"),
+    Code("import { createElement } from 'xunay'\n\ncreateElement('div', { class: 'card' },\n  createElement('h1', null, '标题'),\n  createElement('p', null, '正文')\n)", "xuy"),
+    H2("返回值"),
+    Code("{\n  [ELEMENT]: true,\n  type: 'div',\n  props: { class: 'card' },\n  children: [...],\n}", "js"),
+    H2("说明"),
+    P("一般不用直接调——用标签工厂 div/span/button 更短。"),
+  )
+}

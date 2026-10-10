@@ -1,0 +1,80 @@
+﻿// @title 任意值（JIT）
+// @group CSS
+// @order 2
+// @slug tool-css-jit
+
+import { D, H1, H2, H3, P, Code, Ul, Tip, Warn, Note, Table } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1('任意值（JIT）'),
+    P('tw.css 里没定义的精确值，用方括号直接写。构建时自动生成 CSS。跟 Tailwind 的 JIT 一样。'),
+
+    H2('基本用法'),
+    Code('div({ class: "w-[200px] h-[100px] bg-[#ff6600]" }, "自定义尺寸")', 'xuy'),
+
+    H2('生成的 CSS'),
+    P('build-site.mjs 的 JIT 步骤扫 .xuy / .js / .html 里的 xxx-[value] 语法，现场生成 jit.css。'),
+    Code('.w-\\[200px\\] { width: 200px; }\n.h-\\[100px\\] { height: 100px; }\n.bg-\\[\\#ff6600\\] { background-color: #ff6600; }', 'css'),
+
+    H2('支持的前缀'),
+    Table(['前缀', '生成'], [
+      ['w-[值] / h-[值] / size-[值]', 'width / height'],
+      ['p-[值] / px-[值] / py-[值] / pt/pr/pb/pl-[值]', 'padding'],
+      ['m-[值] / mx/my/mt/mr/mb/ml-[值]', 'margin'],
+      ['gap-[值] / gap-x / gap-y', 'gap'],
+      ['top/right/bottom/left-[值] / inset-[值]', '定位'],
+      ['bg-[值] / text-[值] / border-[值]', '颜色（自动判断是色还是尺寸）'],
+      ['rounded-[值]', 'border-radius'],
+      ['shadow-[值]', 'box-shadow'],
+      ['grid-cols-[值] / grid-rows-[值]', 'grid 模板'],
+      ['opacity-[值] / z-[值]', '不透明度 / z 轴'],
+      ['translate-x/y-[值] / rotate-[值] / scale-[值]', 'transform'],
+      ['blur-[值] / brightness-[值] / ...', 'filter'],
+    ]),
+
+    H2('单位规则'),
+    Table(['写', '生成'], [
+      ['w-[200]', 'width: 200px'],
+      ['w-[200px]', 'width: 200px'],
+      ['w-[50%]', 'width: 50%'],
+      ['w-[calc(100%-20px)]', 'width: calc(100%-20px)'],
+      ['bg-[#f60]', 'background-color: #f60'],
+      ['shadow-[0_4px_8px_rgba(0,0,0,0.3)]', 'box-shadow: 0 4px 8px rgba(0,0,0,0.3)'],
+      ['text-[14px]', 'font-size: 14px'],
+      ['text-[#f60]', 'color: #f60（值像颜色时自动用 color）'],
+    ]),
+    Tip('值里的下划线 _ 会被替换成空格（Tailwind 约定）。'),
+
+    H2('响应式 + 任意值'),
+    Code('div({ class: "w-full md:w-[300px] lg:w-[500px]" })', 'xuy'),
+    Code('@media (min-width: 768px) {\n  .md\\:w-\\[300px\\] { width: 300px; }\n}\n@media (min-width: 1024px) {\n  .lg\\:w-\\[500px\\] { width: 500px; }\n}', 'css'),
+
+    H2('状态变体 + 任意值'),
+    Code('button({ class: "bg-[#3b82f6] hover:bg-[#2563eb] active:bg-[#1d4ed8]" })', 'xuy'),
+    Code('.bg-\\[\\#3b82f6\\] { background-color: #3b82f6; }\n.hover\\:bg-\\[\\#2563eb\\]:hover { background-color: #2563eb; }\n.active\\:bg-\\[\\#1d4ed8\\]:active { background-color: #1d4ed8; }', 'css'),
+
+    H2('支持的变体'),
+    Table(['变体', '效果'], [
+      ['sm: / md: / lg: / xl: / 2xl:', '@media 响应式断点'],
+      ['hover: / focus: / active:', '伪类'],
+      ['disabled: / checked: / focus-within:', '状态'],
+      ['dark:', '.dark 后代'],
+    ]),
+
+    H2('构建流程'),
+    Code('node build-site.mjs\n\n[1/5] 生成文档\n[2/5] 编译 app.xuy\n[3/5] JIT 任意值  ← 扫描 + 生成 jit.css\n[4/5] 后处理\n[5/5] 清 dist 缓存', 'txt'),
+    P('jit.css 自动被 index.html 引用，无需手动。'),
+
+    H2('限制'),
+    Ul(
+      '值里不能有 ] 字符',
+      '不支持嵌套变体组合（md:hover:xxx）',
+      '不支持 @apply 指令',
+      '不支持嵌套值（calc 里再放括号）',
+    ),
+
+    H2('手动跑 JIT'),
+    Code('node scripts/gen-jit.mjs site/src\nnode scripts/gen-jit.mjs 任意目录', 'bash'),
+  )
+}

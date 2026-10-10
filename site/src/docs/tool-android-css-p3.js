@@ -1,0 +1,37 @@
+// Android CSS P3 补充
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Android CSS P3 补充"),
+    P("以下 CSS 属性在近期更新中补齐。"),
+    H2("filter 图像滤镜"),
+    Code(".photo { filter: grayscale(100%) brightness(1.2); }\n.glow { filter: blur(4px) hue-rotate(90deg); }", "css"),
+    Table(["滤镜","生成"], [["grayscale","ColorMatrix.setSaturation(1-x)"],["brightness","ColorMatrix 乘 r/g/b"],["contrast","ColorMatrix 加偏移 127.5"],["saturate","setSaturation"],["invert","ColorMatrix 负值"],["sepia","ColorMatrix 混合"],["hue-rotate","3x3 旋转矩阵"],["blur","API 31+ RenderEffect"]]),
+    Warn("filter 强制 LAYER_TYPE_SOFTWARE。blur 需要 Android 12+。"),
+    H2("backdrop-filter"),
+    Code(".card { backdrop-filter: blur(10px) grayscale(50%); }", "css"),
+    P("支持 blur / grayscale / brightness。"),
+    H2("background-size"),
+    Code(".a { background-size: cover; }\n.b { background-size: contain; }\n.c { background-size: 100% 100%; }", "css"),
+    Table(["值","生成"], [["cover","CENTER_CROP"],["contain","FIT_CENTER"],["100% 100%","FIT_XY"],["auto","FIT_CENTER"]]),
+    H2("background-position"),
+    Code(".a { background-position: top left; }\n.b { background-position: bottom center; }\n.c { background-position: 100% 0%; }", "css"),
+    P("支持 9 方向 + 百分比，生成 setForegroundGravity。"),
+    H2(":active 伪类"),
+    Code(".btn { background: #2563eb; }\n.btn:active { background: #1d4ed8; }", "css"),
+    P("setOnTouchListener：ACTION_DOWN 切背景，ACTION_UP/CANCEL 恢复。支持 background 和 opacity。"),
+    Warn("Android 无鼠标，:hover 不实现。"),
+    H2("@font-face 自定义字体"),
+    Code("@font-face { font-family: X; src: url(fonts/X.ttf); }\n.title { font-family: X; font-size: 32px; }", "css"),
+    P("CLI 自动拷字体到 assets/fonts/，生成 Typeface.createFromAsset。扩展名 .ttf / .otf / .woff2 / .woff。"),
+    H2("max-width / max-height 百分比"),
+    Code(".box { max-width: 80%; }", "css"),
+    H2("text-shadow"),
+    Code(".title { text-shadow: 2px 2px 4px #000000; }", "css"),
+    H2("border-style dashed / dotted"),
+    Code(".a { border: 2px dashed #f00; }\n.b { border: 2px dotted #0f0; }", "css"),
+    H2("文字属性下传（bug 修复）"),
+    P("div 里的文字自动继承父容器的 color / font-size / font-family 等属性。"),
+  )
+}

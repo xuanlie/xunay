@@ -1,0 +1,19 @@
+// 例子：计数器
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("例子：计数器"),
+    P("最小可跑的例子。一个按钮、一个文本、一个 signal。"),
+    H2("源码"),
+    Code("const n = s(0)\\n\\napp(() => div(null,\\n  button({ on: { click: () => n(v => v + 1) } }, \"+1\"),\\n  span(null, txt`n = ${n}`)\\n), \"#app\")", "xuy"),
+    H2("生成的 Java"),
+    Code("public class MainActivity extends Activity {\\n    private final Signal<Integer> n = new Signal<>(0);\\n\\n    @Override\\n    protected void onCreate(Bundle savedInstanceState) {\\n        super.onCreate(savedInstanceState);\\n        setContentView(R.layout.activity_main);\\n        findViewById(R.id.v1).setOnClickListener(view -> { n.set(n.get() + 1); });\\n        n.subscribe(val -> ((TextView) findViewById(R.id.v2)).setText(\"n = \" + numStr(n.get())));\\n    }\\n}", "java"),
+    H2("生成的 XML"),
+    Code("<LinearLayout android:id=\"@+id/v0\" orientation=\"vertical\">\\n    <Button android:id=\"@+id/v1\" android:text=\"+1\" />\\n    <TextView android:id=\"@+id/v2\" />\\n</LinearLayout>", "xml"),
+    H2("关键点"),
+    Ul("signal(0) → Signal<Integer>","txt`n = ${n}` → n.subscribe 回调里 setText","n(v => v + 1) → n.set(n.get() + 1)","点击立即触发 set，同步执行订阅者"),
+    H2("跑起来"),
+    Code(".\\run.ps1 -Entry examples/counter.xuy", "powershell"),
+  )
+}

@@ -1,0 +1,15 @@
+// form 表单
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("form 表单"),
+    P("表单校验 + 状态管理 + 字段绑定。"),
+    H2("引入"),
+    Code("import { createForm, rules } from 'xunay/form'", "js"),
+    H2("基础用法"),
+    Code("const form = createForm({\n  initial: { name: '', email: '' },\n  rules: {\n    name: [rules.required(), rules.minLength(2)],\n    email: [rules.required(), rules.email()],\n  },\n  onSubmit: async (values) => {\n    await http.post('/api/register', values)\n  },\n})\n\ninput({ ...form.field('name'), placeholder: '姓名' })\ninput({ ...form.field('email'), placeholder: '邮箱' })", "js"),
+    H2("内置规则"),
+    Table(["规则","说明"], [["required","必填"],["minLength","最小长度"],["maxLength","最大长度"],["min / max","数值范围"],["pattern","正则"],["email","邮箱"],["phone","手机号"],["url","URL"],["number / integer","数字 / 整数"],["sameAs","两次一致"],["oneOf","枚举"],["custom","自定义"]]),
+  )
+}

@@ -1,0 +1,25 @@
+// xuyc 命令
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("xuyc 命令"),
+    P("xuyc3 是 compiler3 的命令行工具，把 .xuy 编译成浏览器可执行文件。"),
+    H2("基本用法"),
+    Code("node bin/xuyc3.js build <input.xuy> [选项]", "bash"),
+    H2("选项"),
+    Table(["选项","简写","默认","说明"], [["--out","-o","dist","输出目录"],["--title","","XuNay App","HTML 标题"],["--mode","","(package.json)","compiled / runtime / hybrid"]]),
+    H2("三种模式"),
+    Code("# 默认：读 package.json.xunay.compileMode\nnode bin/xuyc3.js build app.xuy\n\n# 强制编译模式\nnode bin/xuyc3.js build app.xuy --mode compiled\n\n# 强制运行时模式\nnode bin/xuyc3.js build app.xuy --mode runtime", "bash"),
+    H2("输出"),
+    Code("   编译模式: compiled\n✅ 构建完成 → dist/index.html", "bash"),
+    H2("优先级"),
+    Table(["位置","优先级"], [["文件头 // @runtime 或 // @compiled","最高"],["命令行 --mode","中"],["package.json.xunay.compileMode","低"],["内置默认 compiled","最低"]]),
+    H2("和旧 xuyc 的区别"),
+    Table(["维度","xuyc (compiler2)","xuyc3 (compiler3)"], [["解析","字符串扫描","acorn AST"],["模式开关","XUYC_NO_COMPILE=1","--mode / package.json"],["value 响应式","错","对"],["测试","54","1391"]]),
+    H2("site 构建"),
+    P("文档站有自己的构建脚本："),
+    Code("cd site && bash build.sh", "bash"),
+    P("它用的是 bin/xuyc.js（compiler2），因为 320 篇文档是旧版编译的。如果要用 compiler3 重构建，改 build.sh 里的 xuyc 为 xuyc3。"),
+  )
+}

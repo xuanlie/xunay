@@ -1,0 +1,64 @@
+// 侧栏导航（原生 details 折叠）
+import { div, span, a, tag, computed, effect } from 'xunay'
+import { nav } from '../docs-nav.xuy'
+import { route, go } from '../router.xuy'
+
+const Details = tag('details')
+const Summary = tag('summary')
+
+// 一个 computed 集中订阅 route，避免 320 个 item 各自订阅
+const curSlug = computed(() => {
+  const r = route()
+  return r === '/' ? '01-overview' : r.slice(1)
+})
+
+// 每个 slug 对应一个 slug → el 的映射（Sidebar 内部）
+// 用模块级 Map，保证跨多次 Sidebar() 调用
+const itemRefs = new Map()
+
+function Group(g, onPick) {
+  return Details({ class: 'nav-group', open: true },
+    Summary({ class: 'nav-group-title' },
+      span({ class: 'nav-arrow' }, '▾'),
+      span({ class: 'nav-title-text' }, g.group),
+      span({ class: 'nav-count' }, String(g.items.length))
+    ),
+    div({ class: 'nav-items' },
+      ...g.items.map(it => a({
+        ref: (el) => itemRefs.set(it.slug, el),
+        class: 'nav-item',
+        'data-slug': it.slug,
+        href: '#' + it.slug,
+        on: { click: () => { if (onPick) onPick() } }
+      }, it.title))
+    )
+  )
+}
+
+export function Sidebar({ onPick }) {
+  // 一个 effect 更新所有 item 的 on 类
+  effect(() => {
+    const cur = curSlug()
+    for (const [slug, el] of itemRefs) {
+      if (!el || !el.isConnected) continue
+      if (slug === cur) {
+        if (!el.classList.contains('on')) el.classList.add('on')
+      } else {
+        if (el.classList.contains('on')) el.classList.remove('on')
+      }
+    }
+  })
+
+  return div({ class: 'sidebar' },
+    div({ class: 'sidebar-brand', on: { click: () => go('/') } },
+      div({ class: 'brand-logo' }, 'X'),
+      div({ class: 'brand-text' },
+        span({ class: 'brand-name' }, 'XuNay'),
+        span({ class: 'brand-ver' }, 'v1.1.2')
+      )
+    ),
+    div({ class: 'sidebar-body' },
+      div(null, ...nav.map(g => Group(g, onPick)))
+    )
+  )
+}

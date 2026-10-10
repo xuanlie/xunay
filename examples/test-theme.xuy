@@ -1,0 +1,14 @@
+﻿import { div, span, button, signal, mount, txt, setTheme } from 'xunay'
+
+const mode = s('light')
+const toggle = () => {
+  const next = mode() === 'light' ? 'dark' : 'light'
+  mode(next)
+  setTheme(next)
+}
+
+mount(() => div(null,
+  button({ on: { click: () => toggle() } }, '切换主题'),
+  span(null, txt`当前: ${mode}`),
+  span(null, '这是一段文字，切换主题后颜色会变')
+), '#app')

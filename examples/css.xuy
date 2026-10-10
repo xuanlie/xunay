@@ -1,0 +1,15 @@
+const CSS = `
+  .card { background: #f0f0f0; padding: 24; margin: 8 }
+  .title { font-size: 28; color: #333; text-align: center }
+  .btn { background: #4CAF50; color: #ffffff; padding: 16; font-size: 18 }
+  .danger { background: #ff6600 }
+`
+
+app(() => div({ style: { padding: 24 } },
+  div({ class: 'card' },
+    h1({ class: 'title' }, 'CSS 样式演示'),
+    span({ class: 'title' }, '副标题也用 title')
+  ),
+  button({ class: 'btn', on: { click: () => toast('CSS 生效') } }, '正常按钮'),
+  button({ class: 'btn danger', on: { click: () => alert('警告', '这是个危险操作') } }, '危险按钮')
+), '#app')

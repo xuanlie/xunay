@@ -1,0 +1,22 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+
+const user = signal({ name: 'Alice', addr: null })
+const empty = signal(null)
+const maybeStr = signal(null)
+const zero = signal(0)
+
+const n1 = computed(() => user().addr?.city ?? '未填')
+const n2 = computed(() => empty()?.foo ?? 'default')
+const n3 = computed(() => maybeStr() ?? 'fallback')
+const n4 = computed(() => user().name ?? 'anon')
+const n5 = computed(() => (zero() || 99))
+const n6 = computed(() => zero() ?? 'zero-null')
+
+mount(() => div(null,
+  span(null, txt`addr?.city ?? '未填': ${n1}`),
+  span(null, txt`null?.foo ?? 'default': ${n2}`),
+  span(null, txt`null ?? 'fallback': ${n3}`),
+  span(null, txt`'Alice' ?? 'anon': ${n4}`),
+  span(null, txt`0 || 99: ${n5}`),
+  span(null, txt`0 ?? 'zero-null': ${n6}`)
+), '#app')

@@ -1,0 +1,25 @@
+// 错误处理
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("错误处理"),
+    P("compiler3 把语法解析交给 acorn，acorn 的错误信息包含行列号，直接抛给调用方。"),
+    H2("语法错误"),
+    Code("acorn.parse('const = 1', { ecmaVersion: 2022 })\n// SyntaxError: Unexpected token (1:6)\n// 带位置信息，直接定位", "js"),
+    P("不包装、不吞掉。acorn 抛什么，编译就抛什么。构建工具能拿到准确行列号，报错清楚。"),
+    H2("嵌套表达式容错"),
+    Code("function compileExpr(src, bound) {\n  let expr\n  try {\n    expr = acorn.parseExpressionAt(src, 0, { ecmaVersion: 2022 })\n  } catch {\n    return src   // ← 解析不了就原样返回\n  }\n  if (!expr) return src\n  const calls = []\n  findTagCalls(expr, bound, calls)\n  if (calls.length === 0) return src\n  ...\n}", "js"),
+    P("单个子表达式的解析失败不会让整个编译崩。它会被当普通表达式输出，运行时可能仍然对（如果它本来就是普通 JS）。"),
+    H2("常见错误来源"),
+    Table(["场景","原因","处理"], [["Unexpected token","JS 语法错","acorn 抛，调用方看"],["属性名重复","对象字面量限制","acorn 不报，最后的值覆盖"],["模板字符串未闭合","缺 backtick","acorn 抛"],["非法的属性名","如 for-bar 未加引号","acorn 抛"]]),
+    H2("属性 key 带引号"),
+    Code("// 合法写法\ndiv({ 'data-id': 1 })\n\n// 生成\nel.setAttribute('data-id', 1)\n\n// 不是\nel.setAttribute('\\'data-id\\'', 1)", "js"),
+    P("getKey() 会剥掉引号，取原始字符串。这是 compiler2 踩过的坑。"),
+    H2("和 compiler2 的区别"),
+    Table(["维度","compiler2","compiler3"], [["错误源","自己写扫描器","acorn"],["行列号","手算","acorn 自带"],["错误类型","字符串","SyntaxError 对象"],["容错","遇到怪异语法可能死循环","try/catch 兜底"]]),
+    H2("构建时表现"),
+    Code("$ node bin/xuyc3.js build bad.xuy\n✘ [ERROR] Unexpected token (3:14)\n\n  bad.xuy:3:14:\n    3 │ const el = div(])\n      ╵                   ^\n\nError: Build failed with 1 error", "bash"),
+    P("esbuild 拿到编译抛出的错误后，会格式化成带位置的错误输出。"),
+  )
+}

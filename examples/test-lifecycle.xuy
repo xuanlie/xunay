@@ -1,0 +1,15 @@
+﻿import { div, span, signal, computed, mount, txt, onMount, onUnmount } from 'xunay'
+
+const now = s('')
+
+onMount(() => {
+  now('已挂载')
+})
+
+onUnmount(() => {
+  console.log('bye')
+})
+
+mount(() => div(null,
+  span(null, txt`状态: ${now}`)
+), '#app')

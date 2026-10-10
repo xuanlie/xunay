@@ -1,0 +1,18 @@
+// 鸣谢
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("鸣谢"),
+    H2("设计灵感"),
+    Table(["项目","借鉴"], [["Solid","信号 + 精确更新模型"],["Svelte","编译 + 简单语法"],["Vue 3","Composition API"],["React","生态系统参考"],["Preact","极小体积思路"]]),
+    H2("技术栈"),
+    Ul("esbuild——极快打包器","granian——Python ASGI 服务器","FastAPI——Python Web 框架","Node.js——JS 运行时"),
+    H2("工具"),
+    Ul("VS Code","iTerm / Windows Terminal","Chrome DevTools","git"),
+    H2("致谢"),
+    P("感谢所有使用、反馈、贡献的人。"),
+    H2("联系"),
+    Ul("GitHub: github.com/xxx/xunay","Email: hello@xunay.dev","文档: xunay.dev"),
+  )
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>XuNay Browser Benchmark</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font: 13px/1.6 ui-monospace, monospace; background: #0d1117; color: #e6edf3; padding: 24px; }
+h1 { font-size: 18px; margin-bottom: 16px; color: #58a6ff; }
+h2 { font-size: 14px; margin: 24px 0 8px; color: #7ee787; }
+table { border-collapse: collapse; width: 100%; max-width: 800px; }
+th, td { padding: 6px 12px; text-align: left; border-bottom: 1px solid #30363d; }
+th { background: #161b22; color: #8b949e; font-weight: 600; }
+td:first-child { color: #e6edf3; }
+td:nth-child(2) { text-align: right; color: #79c0ff; }
+td:nth-child(3) { text-align: right; color: #8b949e; }
+.fast { color: #7ee787; }
+.slow { color: #ff7b72; }
+#status { padding: 12px; background: #161b22; border-radius: 6px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<h1>XuNay Browser Benchmark</h1>
+<div id="status">加载中...</div>
+<div id="out"></div>
+<script type="module">
+import * as X from '../core/src/index.js'
+import * as tags from '../core/src/tags-entry.js'
+import * as ssr from '../core/src/ssr-entry.js'
+import { runtime } from '../core/src/runtime.js'
+
+runtime.dev = false
+
+const { signal, computed, effect, batch, untrack, onCleanup,
+  createElement, registerTags, tag, tags: tagMap,
+  mount, list, show,
+  createRuntime, withRuntime } = X
+const { div, span } = tags
+
+function bench(name, fn, N = 1e5, opts = {}) {
+  const warmup = Math.min(2000, Math.floor(N / 10))
+  for (let i = 0; i < warmup; i++) fn(i)
+  let best = Infinity
+  const rounds = opts.rounds || 5
+  for (let r = 0; r < rounds; r++) {
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) fn(i)
+    const dt = performance.now() - t0
+    if (dt < best) best = dt
+  }
+  const avgUs = best / N * 1000
+  const ops = N / (best / 1000)
+  return { name, N, avgUs, ops }
+}
+
+function fmt(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
+  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K'
+  return n.toFixed(2)
+}
+
+function print(results, title) {
+  const out = document.getElementById('out')
+  const h = document.createElement('h2')
+  h.textContent = title
+  out.appendChild(h)
+  const t = document.createElement('table')
+  t.innerHTML = '<tr><th>操作</th><th>单次</th><th>ops/s</th></tr>'
+  for (const r of results) {
+    let s
+    if (r.avgUs < 1) s = (r.avgUs * 1000).toFixed(0) + ' ns'
+    else if (r.avgUs < 1000) s = r.avgUs.toFixed(2) + ' µs'
+    else s = (r.avgUs / 1000).toFixed(2) + ' ms'
+    const tr = document.createElement('tr')
+    tr.innerHTML = '<td>' + r.name + '</td><td>' + s + '</td><td>' + fmt(r.ops) + '</td>'
+    t.appendChild(tr)
+  }
+  out.appendChild(t)
+}
+
+const all = []
+const status = document.getElementById('status')
+
+async function run() {
+  // A. 响应式
+  {
+    const r = []
+    r.push(bench('signal 创建', () => signal(0), 1e6))
+    const s = signal(1)
+    r.push(bench('signal 读', () => s(), 1e7))
+    const sw = signal(0)
+    r.push(bench('signal 写（无订阅）', () => sw(v => v + 1), 1e6))
+    const sw2 = signal(0)
+    const stop1 = effect(() => { sw2() })
+    r.push(bench('signal 写（1 订阅）', () => sw2(v => v + 1), 1e5))
+    stop1()
+    const a = signal(1), b = signal(2)
+    r.push(bench('computed 创建（不读）', () => computed(() => a() + b()), 1e5))
+    const c = computed(() => a() + b())
+    c()
+    r.push(bench('computed 读（缓存命中）', () => c(), 1e6))
+    const a2 = signal(1)
+    const c2 = computed(() => a2())
+    c2()
+    r.push(bench('computed 读（dirty 重算）', () => { a2(a2() + 1); return c2() }, 1e5))
+    r.push(bench('effect 创建+首跑', () => {
+      const s = signal(0)
+      const stop = effect(() => s())
+      stop()
+    }, 1e5))
+    const ba = signal(0), bb = signal(0)
+    r.push(bench('batch 两写', () => batch(() => { ba(ba() + 1); bb(bb() + 1) }), 1e5))
+    const su = signal(1)
+    r.push(bench('untrack 读', () => untrack(() => su()), 1e6))
+    r.push(bench('onCleanup 注册', () => {
+      const stop = effect(() => { onCleanup(() => {}) })
+      stop()
+    }, 1e5))
+    const seq = signal({ x: 1 }, { equals: () => false })
+    r.push(bench('signal.equals 自定义', () => seq({ x: 1 }), 1e6))
+    print(r, 'A. 响应式')
+    all.push(...r)
+  }
+
+  // B. 元素
+  {
+    const r = []
+    r.push(bench('createElement', () => createElement('div', {}, 'x'), 1e5))
+    r.push(bench('tag("div") 调用', () => tag('div')({}, 'x'), 1e5))
+    r.push(bench('tags.div 调用', () => tagMap.div({}, 'x'), 1e5))
+    r.push(bench('div() 直调', () => div({}, 'x'), 1e5))
+    print(r, 'B. 元素创建')
+    all.push(...r)
+  }
+
+  // C. 渲染（真实 DOM）
+  {
+    const r = []
+    const v1 = div({ class: 'x' }, 'hello')
+    r.push(bench('render 单节点', () => { const root = document.createElement('div'); root.appendChild(X.render(v1)) }, 1e4, { rounds: 3 }))
+    const v2 = div({}, span({}, 'a'), span({}, 'b'), span({}, 'c'))
+    r.push(bench('render 三子节点', () => { const root = document.createElement('div'); root.appendChild(X.render(v2)) }, 1e4, { rounds: 3 }))
+    let counter = 0
+    r.push(bench('mount 简单组件', () => {
+      const root = document.createElement('div')
+      const dispose = mount(() => div({}, () => counter++), root)
+      dispose()
+    }, 500, { rounds: 3 }))
+    r.push(bench('show 切换', () => {
+      const root = document.createElement('div')
+      const cond = signal(true)
+      const dispose = mount(() => show(cond, () => div({}, 'x')), root)
+      cond(false); cond(true)
+      dispose()
+    }, 500, { rounds: 3 }))
+    print(r, 'C. 渲染')
+    all.push(...r)
+  }
+
+  // D. 列表
+  {
+    const r = []
+    r.push(bench('list 首渲 100 项', () => {
+      const root = document.createElement('div')
+      const arr = signal(Array.from({ length: 100 }, (_, i) => ({ id: i })))
+      const dispose = mount(() => list(arr, i => i.id, i => div({}, String(i.id))), root)
+      dispose()
+    }, 100, { rounds: 3 }))
+    r.push(bench('list 追加 1 项', () => {
+      const root = document.createElement('div')
+      const arr = signal(Array.from({ length: 100 }, (_, i) => ({ id: i })))
+      const dispose = mount(() => list(arr, i => i.id, i => div({}, String(i.id))), root)
+      arr([...arr(), { id: 100 }])
+      dispose()
+    }, 100, { rounds: 3 }))
+    r.push(bench('list 删除 1 项', () => {
+      const root = document.createElement('div')
+      const arr = signal(Array.from({ length: 100 }, (_, i) => ({ id: i })))
+      const dispose = mount(() => list(arr, i => i.id, i => div({}, String(i.id))), root)
+      arr(arr().slice(1))
+      dispose()
+    }, 100, { rounds: 3 }))
+    r.push(bench('list 全替换 100 项', () => {
+      const root = document.createElement('div')
+      const arr = signal(Array.from({ length: 100 }, (_, i) => ({ id: i })))
+      const dispose = mount(() => list(arr, i => i.id, i => div({}, String(i.id))), root)
+      arr(Array.from({ length: 100 }, (_, i) => ({ id: i })))
+      dispose()
+    }, 100, { rounds: 3 }))
+    print(r, 'D. 列表')
+    all.push(...r)
+  }
+
+  // E. Runtime
+  {
+    const r = []
+    r.push(bench('createRuntime', () => createRuntime(), 1e5))
+    const rt = createRuntime()
+    r.push(bench('withRuntime 空操作', () => withRuntime(rt, () => 0), 1e5))
+    print(r, 'E. Runtime')
+    all.push(...r)
+  }
+
+  // F. SSR
+  {
+    const r = []
+    r.push(bench('renderToString 单节点', () => ssr.renderToString(() => div({}, 'hello')), 1e4, { rounds: 3 }))
+    r.push(bench('renderToString 100 项列表', () => {
+      const arr = Array.from({ length: 100 }, (_, i) => ({ id: i }))
+      return ssr.renderToString(() => list(arr, i => i.id, i => div({}, String(i.id))))
+    }, 200, { rounds: 3 }))
+    print(r, 'F. SSR')
+    all.push(...r)
+  }
+
+  // 总览
+  const sorted = [...all].sort((a, b) => b.ops - a.ops)
+  const h = document.createElement('h2')
+  h.textContent = '最快 10 个'
+  document.getElementById('out').appendChild(h)
+  const ul1 = document.createElement('ul')
+  for (const r of sorted.slice(0, 10)) {
+    const li = document.createElement('li')
+    li.innerHTML = r.name + ': <b class="fast">' + fmt(r.ops) + '</b> ops/s'
+    ul1.appendChild(li)
+  }
+  document.getElementById('out').appendChild(ul1)
+
+  const h2 = document.createElement('h2')
+  h2.textContent = '最慢 10 个'
+  document.getElementById('out').appendChild(h2)
+  const ul2 = document.createElement('ul')
+  for (const r of sorted.slice(-10).reverse()) {
+    const li = document.createElement('li')
+    li.innerHTML = r.name + ': <b class="slow">' + fmt(r.ops) + '</b> ops/s'
+    ul2.appendChild(li)
+  }
+  document.getElementById('out').appendChild(ul2)
+
+  status.textContent = '完成。UA: ' + navigator.userAgent
+}
+
+run().catch(e => { status.textContent = 'ERROR: ' + e.message; console.error(e) })
+</script>
+</body>
+</html>

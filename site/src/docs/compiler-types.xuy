@@ -1,0 +1,25 @@
+// 类型声明
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("类型声明"),
+    P(".xuy 是纯 JS，类型写在 .d.ts 里给编辑器用。"),
+    H2("tsconfig.json"),
+    Code("{\n  \"compilerOptions\": {\n    \"types\": [\"./types/xunay.d.ts\"]\n  }\n}", "json"),
+    H2("types/xunay.d.ts"),
+    Code("declare module 'xunay' {\n  export function signal<T>(init: T): {\n    (): T\n    (v: T | ((prev: T) => T)): T\n  }\n  export function computed<T>(fn: () => T): () => T\n  export function effect(fn: () => void): () => void\n  export function mount(comp: () => Node, target: string): void\n  export function batch(fn: () => void): void\n  export function untrack<T>(fn: () => T): T\n}", "js"),
+    H2("标签函数类型"),
+    Code("declare module 'xunay' {\n  type Props = Record<string, unknown> | null\n  type Child = string | number | Node | (() => unknown) | null | undefined\n  export function div(props: Props, ...children: Child[]): HTMLElement\n  export function span(props: Props, ...children: Child[]): HTMLElement\n  export function button(props: Props, ...children: Child[]): HTMLButtonElement\n  export function input(props: Props, ...children: Child[]): HTMLInputElement\n  // ... 其余标签\n}", "js"),
+    H2(".xuy 文件的类型"),
+    P("编辑器默认不认 .xuy，需要声明："),
+    Code("// types/xuy.d.ts\ndeclare module '*.xuy' {\n  const mod: Record<string, unknown>\n  export default mod\n}", "js"),
+    H2("compiler3 的类型"),
+    Code("declare module 'compiler3' {\n  export interface CompileOptions {\n    mode?: 'compiled' | 'runtime' | 'hybrid'\n    tagModule?: string\n  }\n  export function compile(src: string, opts?: CompileOptions): string\n}", "js"),
+    H2("和 compiler2 的区别"),
+    Table(["维度","compiler2","compiler3"], [["类型文件位置","types/xunay.d.ts","types/xunay.d.ts（同）"],["CompileOptions","无","mode / tagModule"],["测试","无类型测试","无类型测试（同）"]]),
+    H2("相关文件"),
+    Table(["文件","作用"], [["types/xunay.d.ts","框架 API 类型"],["types/xuy.d.ts",".xuy 文件模块声明"],["tsconfig.json","types 路径"]]),
+
+  )
+}

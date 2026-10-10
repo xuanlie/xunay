@@ -1,0 +1,27 @@
+﻿// AI 参考
+import { div } from 'xunay'
+import { Doc as Overview } from './ai-overview.xuy'
+import { Doc as Contract } from './ai-contract.xuy'
+import { Doc as Patterns } from './ai-patterns.xuy'
+import { Doc as Antipatterns } from './ai-antipatterns.xuy'
+import { Doc as Constraints } from './ai-constraints.xuy'
+import { Doc as Migration } from './ai-migration.xuy'
+import { Doc as AndroidContract } from './ai-android-contract.xuy'
+import { Doc as AndroidApi } from './ai-android-api.xuy'
+import { Doc as ThreeDApi } from './ai-3d-api.xuy'
+import { Doc as FilamentApi } from './ai-3d-filament-api.xuy'
+
+export function Doc() {
+  return div(null,
+    Overview(),
+    Contract(),
+    Patterns(),
+    Antipatterns(),
+    Constraints(),
+    Migration(),
+    AndroidContract(),
+    AndroidApi(),
+    ThreeDApi(),
+    FilamentApi(),
+  )
+}

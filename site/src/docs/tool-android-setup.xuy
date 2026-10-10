@@ -1,0 +1,25 @@
+// Android 环境准备
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Android 环境准备"),
+    P("编译 APK 需要 JDK 17 + Android SDK + Gradle + adb。"),
+    H2("必需"),
+    Table(["工具","版本","检查命令"], [["JDK","17+","java -version"],["Android SDK","API 35","echo $ANDROID_HOME"],["Gradle","8.6+","gradle -v"],["adb","任意","adb version"],["Node.js","18+","node -v"]]),
+    H2("最快路径：装 Android Studio"),
+    P("Android Studio 自带 JDK + SDK + Gradle + adb，装完在命令行能直接用。"),
+    Ul("1. 下载 https://developer.android.com/studio","2. 安装时选默认配置","3. 打开任意工程触发首次同步","4. 命令行的 gradle / adb 自动可用"),
+    H2("配置环境变量（Windows）"),
+    Code("$env:ANDROID_HOME = \"$env:LOCALAPPDATA\\Android\\Sdk\"\n$env:Path += \";$env:ANDROID_HOME\\platform-tools\"\n$env:Path += \";$env:ANDROID_HOME\\cmdline-tools\\latest\\bin\"", "powershell"),
+    H2("验证"),
+    Code("java -version\ngradle -v\nadb devices\nnode -v", "powershell"),
+    H2("真机调试"),
+    Ul("手机开开发者选项（连点版本号 7 次）","开 USB 调试","插 USB，手机上点\"允许\"","小米/OPPO/vivo 还要额外开「USB 安装」","adb devices 应该列出设备"),
+    H2("Redmi / 小米特有"),
+    P("报 INSTALL_FAILED_USER_RESTRICTED 说明 MIUI 拦截。需要："),
+    Ul("开发者选项 → 打开「USB 安装」","开发者选项 → 打开「USB 调试（安全设置）」","开发者选项 → 关闭「启用 MIUI 优化」","手机管家 → 应用管理 → 权限 → 关「USB 安装管理」"),
+    H2("模拟器"),
+    Code("emulator -list-avds\nemulator -avd <name>\nadb devices", "bash"),
+  )
+}

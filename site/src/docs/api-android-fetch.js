@@ -1,0 +1,23 @@
+// fetch(url, sig)
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("fetch(url, sig)"),
+    P("发起 HTTP 请求，结果写入 signal。后台线程执行，自动回主线程更新 UI。"),
+    H2("两种形式"),
+    Table(["形式","说明"], [["fetch(url, sig)","异步，结果写 sig，不阻塞"],["const r = await fetch(url)","同步等待，返回 String"]]),
+    H2("异步形式"),
+    Code("const data = s(\"点按钮加载\")\\n\\nbutton({\\n  on: { click: () => fetch(\"https://api.example.com/data\", data) }\\n}, \"加载\")", "xuy"),
+    P("生成：后台 Thread + HttpURLConnection + runOnUiThread。"),
+    H2("await 形式"),
+    Code("button({\\n  on: { click: async () => {\\n    data(\"加载中...\")\\n    const r = await fetch(\"https://api.example.com/data\")\\n    data(r)\\n  } }\\n}, \"加载\")", "xuy"),
+    P("生成：整个回调在线程里跑，await 用 fetchBlocking 同步拿结果。"),
+    H2("生成的 Java（异步）"),
+    Code("findViewById(R.id.v1).setOnClickListener(view -> {\\n    fetchUrl(\"https://api.example.com/data\", data);\\n});\\n\\nprivate void fetchUrl(String url, Signal<String> target) {\\n    new Thread(() -> {\\n        try {\\n            URL u = new URL(url);\\n            HttpURLConnection c = (HttpURLConnection) u.openConnection();\\n            ...\\n            final String result = sb.toString();\\n            runOnUiThread(() -> target.set(result));\\n        } catch (Exception e) {\\n            final String err = \"Error: \" + e.getMessage();\\n            runOnUiThread(() -> target.set(err));\\n        }\\n    }).start();\\n}", "java"),
+    H2("权限"),
+    P("AndroidManifest.xml 里自动加 INTERNET 权限。"),
+    H2("注意事项"),
+    Ul("只支持 GET","只返回 String，JSON 自己 parse","HTTPS 走系统证书链，自定义证书要额外配置","超时用默认值（无显式设置）"),
+  )
+}

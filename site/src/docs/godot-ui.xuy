@@ -1,0 +1,22 @@
+// Godot UI 融合
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Godot UI 融合"),
+    P("在 Godot canvas 上用 XuNay kit 组件叠加 HUD、按钮、面板。UI 只接收自己的事件, 其余区域透传给游戏。"),
+    H2("核心原理"),
+    Ul("覆盖层 position: fixed 全屏, z-index 高于 iframe","覆盖层 pointer-events: none → 鼠标/触摸穿透到 canvas","按钮 pointer-events: auto → 单独捕获事件","safe-area-inset-* 处理刘海屏和底部指示条"),
+    H2("覆盖层结构"),
+    Code("<div id=\"overlay\">      <!-- pointer-events: none -->\n  <div class=\"top\">\n    <div class=\"panel\">score: <span id=\"s-score\">0</span></div>\n  </div>\n  <div class=\"bottom\">\n    <button id=\"btn-pause\">暂停</button>   <!-- pointer-events: auto -->\n  </div>\n</div>", "html"),
+    H2("关键 CSS"),
+    Code("#overlay {\n  position: absolute; inset: 0; z-index: 10;\n  pointer-events: none;   /* 整层默认穿透 */\n  display: grid;\n  grid-template-rows: auto 1fr auto;\n  padding: calc(16px + env(safe-area-inset-top, 0px)) 16px;\n}\n\nbutton {\n  pointer-events: auto;    /* 只有按钮收事件 */\n  min-height: 44px;        /* 触摸最小尺寸 */\n  backdrop-filter: blur(12px);\n}", "css"),
+    H2("组件 vs Godot 分工"),
+    Table(["层","负责"], [["Godot (iframe)","游戏逻辑、画面渲染、物理、碰撞"],["XuNay 覆盖层","分数显示、暂停按钮、设置面板、对话框"],["桥接","signal ↔ GDScript 双向同步, 事件推送"]]),
+    H2("事件流"),
+    Code("// 点暂停按钮:\n// DOM click → send('ui:pause') → Godot 收到 → 暂停 _process\n// → XunayBridge.push_bound('game.paused')\n// → JS signal paused() 更新\n// → 按钮文字变\"继续\"", "js"),
+    H2("注意点"),
+    Ul("覆盖层不能用 pointer-events: auto 到整层 —— 会挡住游戏操作","所有交互元素显式设 pointer-events: auto","用 safe-area-inset 处理 iPhone 刘海 + 底部横条","z-index 要比 iframe 大, 但别太高避免挡住 DevTools","按钮最少 44x44px (移动端触摸标准)"),
+    Tip("示例见 examples/godot-demo/index.html。"),
+  )
+}

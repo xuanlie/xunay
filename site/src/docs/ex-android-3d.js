@@ -1,0 +1,23 @@
+// 例子：3D 场景
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("例子：3D 场景"),
+    P("完整的 3D 场景，包含 7 个物体、双光源、PBR 材质。"),
+    H2("源码"),
+    Code("scene({\n  bg: \"#0a0a1a\",\n  autoRotate: true,\n  camera: { distance: 10, fov: 45 },\n  lights: [\n    { dir: [0.7, 1.0, 0.5], color: \"#ffddaa\", intensity: 1.2 },\n    { dir: [-0.5, 0.3, -1.0], color: \"#6699ff\", intensity: 1.0 }\n  ]\n})\n\ncube({ color: \"#ff6600\", size: 1.2, position: [-3, 0, 0], spin: { axis: [0, 1, 0], speed: 2 }, metalness: 0.0, roughness: 0.9 })\nsphere({ color: \"#00ccff\", size: 1.2, position: [-1, 0, 0], bob: { amp: 0.5, speed: 0.1 }, metalness: 0.9, roughness: 0.1 })\ncylinder({ color: \"#ffcc00\", size: 0.8, height: 1.5, position: [1, 0, 0], spin: { axis: [0, 1, 0], speed: -3 }, metalness: 1.0, roughness: 0.2 })\ncone({ color: \"#ffff00\", size: 1, height: 1.5, position: [3, 0, 0], rotate: [0, 0, 30], metalness: 0.3, roughness: 0.5 })\ntorus({ color: \"#00ff88\", radius: 0.8, tube: 0.3, position: [-2, 0, 2], spin: { axis: [1, 0, 0], speed: 1.5 }, metalness: 0.8, roughness: 0.3 })\npyramid({ color: \"#ff3366\", size: 1, height: 1.5, position: [0, 0, 2], bob: { amp: 0.3, speed: 0.15 }, metalness: 0.1, roughness: 0.8 })\nplane({ color: \"#444455\", size: 8, position: [0, -1.8, 0], metalness: 0.0, roughness: 1.0 })", "xuy"),
+    H2("屏幕效果"),
+    Ul("立方体：哑光橙色，绕 Y 轴自转","球：金属青蓝，上下浮动","圆柱：纯金属黄色，反向旋转","圆锥：半哑光黄，固定 30 度倾斜","圆环：半金属绿色，绕 X 轴转","金字塔：哑光粉红，上下浮动","地面：深灰哑光"),
+    H2("运行"),
+    Code("node bin/xuyc-3d.js examples/scene-pbr.xuy\ncd build/android-3d\n.\\gradlew.bat assembleDebug\nadb install -r app/build/outputs/apk/debug/app-debug.apk\nadb shell am start -n com.xunay.gl/.MainActivity", "powershell"),
+    H2("交互"),
+    P("手指在屏幕上拖动可旋转整个场景（全局视角）。"),
+    H2("性能"),
+    Table(["指标","值"], [["顶点数","约 4000"],["Draw calls","7"],["帧率","60 fps（大部分设备）"]]),
+    H2("新路跑同一个 .xuy"),
+    P("同一个 scene-anim.xuy 换成 Filament 后端，只要换 CLI 名字。渲染从手写 GLES2 变成 Filament 引擎，PBR 从简化变真 PBR，纹理从 triplanar 变真 UV。"),
+    Code("node bin/xuyc-filament.js examples/scene-anim.xuy --out build/filament --build", "powershell"),
+    Tip("想要 glTF 外部模型 / 骨骼动画 / Draco 压缩 → 只能走新路。"),
+  )
+}

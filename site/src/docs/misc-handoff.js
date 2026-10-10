@@ -1,0 +1,31 @@
+// 交接与现状
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("交接与现状"),
+    P("项目当前状态的快照。新对话直接看这篇。"),
+    H2("基本信息"),
+    Table(["项","值"], [["名称","XuNay (xunay)"],["版本","v1.0.4"],["定位","编译期 DOM 生成 + 细粒度响应式前端框架"],["特点","编译期优先 + 运行时最小"],["路径","E:\\xunay"],["技术栈","纯 JS (ESM) + esbuild"]]),
+    H2("规模"),
+    Table(["维度","数量"], [["核心 API","24"],["核心体积","6.01 KB gzip"],["kit 组件","106 (17 文件)"],["动画导出","228"],["工具库","10 (auth/storage/http/i18n/theme/query/form/persist/router/mobile)"],["site 文档","322 篇 .xuy"],["子路径","21"]]),
+    H2("编译期架构"),
+    P("2026-10 完成编译期迁移。.xuy 里的 DOM 原语、kit 组件、map/三元里的标签全部编译成 createElement。"),
+    Table(["路径","时机","产物"], [["编译期","构建时","document.createElement + __rt__ 调用"],["运行时","运行时","vnode → render() → DOM"]]),
+    P("详见「编译器 → 编译架构」。"),
+    H2("site 系统"),
+    P("gen-docs.py 是内容源——GROUPS 是嵌套 Python 列表，每篇文档 = (slug, title, [blocks])。改文档 = 改 GROUPS + 跑 python site/gen-docs.py。"),
+    Code("# 重新生成文档\npython site/gen-docs.py\n\n# 完整构建\nnode build-site.mjs", "bash"),
+    Warn("不要手改 src/docs/*.xuy 和 docs-index.xuy / docs-nav.xuy——会被 gen-docs.py 覆盖。"),
+    H2("常用命令"),
+    Code("# 完整构建\nnode build-site.mjs\n\n# 只重建 core 运行时\ncd core && node build.js\n\n# 只重建 site\nnode build-site.mjs\n\n# 性能测试\nnode bench/node.mjs", "bash"),
+    H2("已知问题"),
+    Ul("gen-docs.py 有 SyntaxWarning (invalid escape sequence)，无害","项目根有多个 .bak-* 历史备份目录，可清理","subs 每次 render 累积（effect 未 dispose），长会话会变慢","b2-kit-compile.py / fix-*.py / *.bak-* 等临时脚本散落根目录"),
+    H2("回退机制"),
+    Table(["方式","作用"], [["XUYC_NO_COMPILE=1","全局关闭 .xuy 编译期转换"],["// @runtime 头注释","单文件退回运行时 vnode"],["// core/build.js 里注释掉 kit-compile plugin","临时关闭 kit 编译"]]),
+    H2("下一步"),
+    Ul("清理项目根临时文件和 .bak-* 备份","把 bench 数据同步到 README","发布 npm（core/bin/xuyc.js 已修好 3 个 P0 bug）","裁 runtime（element.js 是公开 API，只能内部优化）","list() 编译期版本（当前只走运行时）"),
+    H2("设计哲学"),
+    Ul("不发明新语法 —— .xuy 就是 JS","不做无用抽象 —— 只有 signal 和元素","不保留历史包袱 —— 不兼容 React","编译期优先 —— 能编译的绝不放到运行时","不追求万能 —— 90% 场景够用就好"),
+  )
+}

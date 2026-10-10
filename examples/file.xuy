@@ -1,0 +1,11 @@
+const inputText = s('')
+const fileContent = s('点按钮')
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '文件读写测试'),
+  input({ placeholder: '输入要写入的内容', on: { input: (e) => inputText(e) } }),
+  span(null, txt`当前输入: ${inputText}`),
+  button({ style: { padding: 16, background: '#4CAF50', color: '#fff' }, on: { click: () => writeFile('test.txt', inputText) } }, '写文件'),
+  button({ style: { padding: 16, background: '#2196F3', color: '#fff' }, on: { click: () => readFile('test.txt', fileContent) } }, '读文件'),
+  span(null, txt`文件内容: ${fileContent}`)
+), '#app')

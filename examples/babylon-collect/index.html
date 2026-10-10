@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050508">
+<title>XuNay × Babylon · 收集游戏</title>
+<link rel="preconnect" href="https://cdn.babylonjs.com" crossorigin>
+<link rel="preload" href="https://cdn.babylonjs.com/babylon.js" as="script" crossorigin>
+<link rel="stylesheet" href="../../core/src/ui.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100dvh; overflow: hidden; background: #050508; color: #e8e8f0;
+    font: 14px/1.6 -apple-system, "Segoe UI", "PingFang SC", sans-serif;
+    touch-action: none; overscroll-behavior: none;
+    -webkit-touch-callout: none; user-select: none;
+    -webkit-tap-highlight-color: transparent; }
+  #cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+
+  #hud {
+    position: absolute; inset: 0; pointer-events: none; z-index: 10;
+    padding: 16px;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; gap: 12px;
+  }
+  #hud > * { pointer-events: auto; }
+  #hud-top { grid-column: 1; grid-row: 1; display: flex; gap: 12px; }
+  #hud-title { grid-column: 2; grid-row: 1; align-self: start; }
+  #hud-joy { grid-column: 1; grid-row: 3; align-self: end; justify-self: start; }
+  #hud-btns { grid-column: 2; grid-row: 3; align-self: end; justify-self: end; display: flex; flex-direction: column; gap: 8px; }
+
+  #hud .card { background: rgba(14,14,22,.85); border-color: rgba(68,68,85,.5); backdrop-filter: blur(12px); }
+  #hud .card-title, #hud .card-header { color: #e8e8f0; }
+  #hud .text-dim { color: #888 !important; }
+  #hud .btn { background: rgba(26,26,36,.9); color: #e8e8f0; border-color: rgba(68,68,85,.6); }
+  #hud .btn:hover { border-color: #66ccff; color: #66ccff; }
+
+  /* 虚拟摇杆 */
+  #joystick {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: rgba(14,14,22,.5);
+    border: 2px solid rgba(102,204,255,.25);
+    backdrop-filter: blur(8px);
+    position: relative;
+    display: none;
+    touch-action: none;
+  }
+  #joystick.visible { display: block; }
+  #knob {
+    position: absolute; top: 50%; left: 50%;
+    width: 60px; height: 60px;
+    margin: -30px 0 0 -30px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(102,204,255,.9), rgba(50,140,200,.7));
+    box-shadow: 0 4px 20px rgba(102,204,255,.4);
+    transition: transform 0.05s;
+    pointer-events: none;
+  }
+
+  /* Loading */
+  #loading {
+    position: absolute; inset: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    background: #050508;
+    flex-direction: column; gap: 20px;
+    transition: opacity 0.4s;
+  }
+  #loading.hide { opacity: 0; pointer-events: none; }
+  #loading .bar {
+    width: 240px; height: 6px; border-radius: 3px;
+    background: rgba(68,68,85,.4); overflow: hidden;
+  }
+  #loading .bar > div {
+    height: 100%; background: linear-gradient(90deg, #66ccff, #66ffcc);
+    transition: width 0.2s;
+  }
+  #loading .text { font-size: 12px; color: #666; letter-spacing: 1px; }
+
+  /* 结束遮罩 */
+  #end {
+    position: absolute; inset: 0; z-index: 90;
+    background: rgba(5,5,8,.85);
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    backdrop-filter: blur(8px);
+  }
+  #end.show { display: flex; }
+
+  @media (max-width: 768px) {
+    #hud { padding: 10px;
+      padding-top: calc(10px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      gap: 8px; }
+    #hud .card { padding: 8px 12px; }
+    #hud-top [class*="text-xl"] { font-size: 18px !important; }
+    #hud .btn { min-height: 44px; font-size: 14px; }
+    #hud-joy { grid-column: 1; grid-row: 3; }
+  }
+
+  @media (hover: none) {
+    #hud .btn:hover { border-color: rgba(68,68,85,.6); color: #e8e8f0; }
+  }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div id="loading">
+  <div style="font-size: 16px; color: #66ccff; letter-spacing: 2px">XUNAY · COLLECT</div>
+  <div class="bar"><div id="loading-bar" style="width: 0%"></div></div>
+  <div class="text" id="loading-text">加载中 0%</div>
+</div>
+
+<div id="hud">
+  <div id="hud-top"></div>
+  <div id="hud-title"></div>
+  <div id="hud-joy">
+    <div id="joystick"><div id="knob"></div></div>
+  </div>
+  <div id="hud-btns"></div>
+</div>
+
+<div id="end"></div>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+<script type="module" src="./dist/bundle.js?v=1791114722"></script>
+</body>
+</html>

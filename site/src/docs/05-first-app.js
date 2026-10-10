@@ -1,0 +1,11 @@
+// 第一个应用
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("第一个应用"),
+    P("做一个待办清单。"),
+    H2("状态"),
+    Code("import { signal, computed } from 'xunay'\n\nexport const todos = signal([])\nexport const filter = signal('all')\n\nexport const filtered = computed(() => {\n  const t = todos(), f = filter()\n  if (f === 'active') return t.filter(x => !x.done)\n  if (f === 'done') return t.filter(x => x.done)\n  return t\n})", "js"),
+  )
+}

@@ -1,0 +1,21 @@
+// 脚手架
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("脚手架"),
+    P("bin/create.js 一键生成项目骨架。"),
+    H2("使用"),
+    Code("node bin/create.js my-new-app", "bash"),
+    H2("生成的结构"),
+    Code("my-new-app/\n├── app.xuy              入口\n├── index.html\n├── package.json\n├── src/\n│   ├── components/\n│   ├── pages/\n│   ├── store/\n│   └── style.css\n└── README.md", "txt"),
+    H2("初始 app.xuy"),
+    Code("// title: my-new-app\nimport { div, h1, button, signal, mount } from 'xunay'\n\nconst n = signal(0)\n\nmount(() => div({ class: 'app' },\n  h1(null, 'Hello XuNay'),\n  button({ on: { click: () => n(v => v + 1) } }, () => '点了 ' + n() + ' 次')\n), '#app')", "xuy"),
+    H2("启动"),
+    Code("cd my-new-app\nnpm install\nnpm run build\nnpm run dev", "bash"),
+    H2("内置脚本"),
+    Table(["命令","作用"], [["npm run build","编译 .xuy → dist"],["npm run dev","构建 + 起静态服务器"],["npm run deploy","部署到服务器"]]),
+    H2("自定义"),
+    P("想改默认结构——直接改 bin/create.js 里的模板字符串。"),
+  )
+}

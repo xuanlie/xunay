@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>XuNay vs Solid vs Vue</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:13px/1.6 ui-monospace,monospace;background:#0d1117;color:#e6edf3;padding:24px}
+h1{font-size:18px;color:#58a6ff;margin-bottom:8px}
+h2{font-size:14px;color:#7ee787;margin:24px 0 8px}
+table{border-collapse:collapse;width:100%;max-width:900px;margin-bottom:16px}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #30363d}
+th{background:#161b22;color:#8b949e}
+td:not(:first-child){text-align:right;color:#79c0ff;font-family:ui-monospace,monospace}
+td:first-child{color:#e6edf3}
+.win{color:#7ee787!important;font-weight:600}
+.lose{color:#ff7b72!important}
+#status{padding:12px;background:#161b22;border-radius:6px;margin-bottom:16px;font-size:13px}
+</style>
+</head>
+<body>
+<h1>XuNay vs Solid vs Vue 并排对比</h1>
+<div id="status">加载中...</div>
+<div id="out"></div>
+<script type="module">
+const status = document.getElementById('status')
+const out = document.getElementById('out')
+
+// 加载各家框架
+let X, S, V
+try {
+  X = await import('../core/src/index.js')
+  const rt = await import('../core/src/runtime.js')
+  rt.runtime.dev = false
+} catch (e) { status.textContent = 'XuNay 加载失败: ' + e.message; throw e }
+
+try { S = await import('https://esm.sh/solid-js@1.9.3') } catch (e) { console.warn('Solid 加载失败', e) }
+try { V = await import('https://esm.sh/vue@3.5.13') } catch (e) { console.warn('Vue 加载失败', e) }
+
+function bench(name, fn, N = 1e6) {
+  const warm = Math.min(2000, Math.floor(N / 10))
+  for (let i = 0; i < warm; i++) fn(i)
+  let best = Infinity
+  for (let r = 0; r < 5; r++) {
+    const t0 = performance.now()
+    for (let i = 0; i < N; i++) fn(i)
+    const dt = performance.now() - t0
+    if (dt < best) best = dt
+  }
+  return best / N * 1000
+}
+
+function fmt(n) {
+  if (n < 1) return (n * 1000).toFixed(0) + ' ns'
+  if (n < 1000) return n.toFixed(2) + ' µs'
+  return (n / 1000).toFixed(2) + ' ms'
+}
+
+function row(label, values) {
+  const min = Math.min(...values.filter(v => v > 0))
+  return '<tr><td>' + label + '</td>' + values.map(v => {
+    if (!v) return '<td>—</td>'
+    const cls = v === min ? 'win' : ''
+    return '<td class="' + cls + '">' + fmt(v) + '</td>'
+  }).join('') + '</tr>'
+}
+
+async function run() {
+  status.textContent = '测试中...'
+  const N = 1e6
+
+  // XuNay
+  const xs = X.signal(0)
+  const xr = bench('', () => xs(), N)
+  let xw = 0
+  {
+    const s = X.signal(0)
+    const stop = X.effect(() => { s() })
+    xw = bench('', () => s(v => v + 1), 1e5)
+    stop()
+  }
+
+  // Solid
+  let sr = 0, sw = 0
+  if (S) {
+    const [s, setS] = S.createSignal(0)
+    sr = bench('', () => s(), N)
+    const [s2, setS2] = S.createSignal(0)
+    S.createEffect(() => { s2() })
+    sw = bench('', () => setS2(v => v + 1), 1e5)
+  }
+
+  // Vue
+  let vr = 0, vw = 0
+  if (V) {
+    const r = V.ref(0)
+    vr = bench('', () => r.value, N)
+    const r2 = V.ref(0)
+    V.effect(() => { r2.value })
+    vw = bench('', () => { r2.value++ }, 1e5)
+  }
+
+  // 读
+  let html = '<h2>signal 读</h2><table><tr><th>框架</th><th>单次</th></tr>'
+  html += row('signal 读', [xr, sr, vr])
+  html += '</table>'
+  html = html.replace('<th>框架</th><th>单次</th>', '<th>操作</th><th>XuNay</th><th>Solid</th><th>Vue</th>')
+
+  // 写
+  let html2 = '<h2>signal 写触发（1 订阅）</h2><table>'
+  html2 += '<tr><th>操作</th><th>XuNay</th><th>Solid</th><th>Vue</th></tr>'
+  html2 += row('写触发', [xw, sw, vw])
+  html2 += '</table>'
+
+  out.innerHTML = html + html2
+
+  const missing = []
+  if (!S) missing.push('Solid')
+  if (!V) missing.push('Vue')
+  status.textContent = missing.length
+    ? '完成（' + missing.join(' / ') + ' 未加载，可能是网络问题）'
+    : '完成。UA: ' + navigator.userAgent.slice(0, 80)
+}
+run()
+</script>
+</body>
+</html>

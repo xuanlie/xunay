@@ -1,0 +1,10 @@
+const data = s('点按钮加载')
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '异步请求'),
+  button({ style: { background: '#2196F3', color: '#ffffff', padding: 16 }, on: { click: async () => {
+    const r = await fetchUrl('https://api.github.com/repos/xuanlie/xunay')
+    data(r)
+  } } }, '加载 GitHub API'),
+  span({ style: { fontSize: 12, color: '#666666' } }, txt`${data}`)
+), '#app')

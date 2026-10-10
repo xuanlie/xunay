@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>XuNay Full Test</title>
+<style>
+body{font-family:ui-monospace,Menlo,monospace;max-width:1200px;margin:0 auto;padding:24px;font-size:13px;line-height:1.6;background:#fafafa}
+h2{font-size:15px;border-bottom:2px solid #333;padding-bottom:6px;margin-top:28px}
+pre{background:#fff;padding:16px;border-radius:8px;border:1px solid #e0e0e0;overflow-x:auto}
+.ok{color:#0a7}
+.err{color:#c00}
+.warn{color:#a80}
+</style></head><body>
+<h1>XuNay 完整基准测试</h1>
+<div id="env" class="warn"></div>
+<pre id="out">跑测试中...（30-60 秒）</pre>
+<div id="app" style="position:fixed;left:-99999px;top:0"></div>
+<script type="module">
+const out = []
+const outEl = document.getElementById('out')
+function log(s) { out.push(s); outEl.textContent = out.join('\n') }
+function clear() { out.length = 0 }
+const nextFrame = () => new Promise(r => setTimeout(r, 80))
+const median = a => [...a].sort((x,y)=>x-y)[Math.floor(a.length/2)]
+const fmt = (x, d=1) => x.toFixed(d)
+
+document.getElementById('env').textContent = navigator.userAgent.slice(0,120)
+
+const X = await import('../core/dist/xunay.esm.js')
+const { signal, computed, effect, batch, createElement, render, mount, list, div, span, p, button, h1, show } = X
+
+// 通用测量：预热 + 多轮取中位
+async function bench(label, iters, runs, fn) {
+  await nextFrame()
+  // 预热
+  for (let i = 0; i < Math.max(5, Math.floor(iters/10)); i++) fn(i)
+  const times = []
+  for (let r = 0; r < runs; r++) {
+    const t0 = performance.now()
+    for (let i = 0; i < iters; i++) fn(i)
+    times.push((performance.now() - t0) / iters * 1000)  // µs/次
+  }
+  const m = median(times)
+  const all = times.map(x => fmt(x)).join(' / ')
+  log(`  ${label.padEnd(38)} ${fmt(m, 3).padStart(11)} µs   中位(${runs}轮)  [${all}]`)
+  return m
+}
+
+const host = document.getElementById('app')
+
+// ==================== 1. Signal ====================
+log('=== 1. Signal 核心 ===')
+await bench('signal.create', 100000, 3, i => signal(i))
+{
+  const s = signal(0)
+  await bench('signal.read', 100000, 3, () => s())
+}
+{
+  const s = signal(0)
+  await bench('signal.write (无订阅)', 100000, 3, i => s(i))
+}
+{
+  const s = signal(0)
+  const d = effect(() => { s() })
+  await bench('signal.write (1 effect)', 100000, 3, i => s(i))
+  d()
+}
+{
+  const a = signal(0), c = computed(() => a() + 1)
+  c()
+  await bench('computed.read (缓存)', 100000, 3, () => c())
+}
+{
+  const a = signal(0), c = computed(() => a() + 1)
+  c()
+  await bench('computed.recompute', 10000, 3, i => { a(i); c() })
+}
+await bench('effect.create + dispose', 10000, 3, i => {
+  const s = signal(i)
+  const d = effect(() => { s() })
+  d()
+})
+{
+  const a = signal(0), b = signal(0)
+  const d = effect(() => { a(); b() })
+  await bench('batch (2 写)', 10000, 3, i => batch(() => { a(i); b(i) }))
+  d()
+}
+
+// ==================== 2. DOM 基础 ====================
+log('')
+log('=== 2. DOM 基础 ===')
+await bench('createElement (静态)', 100000, 3, () => createElement('div', null, 'x'))
+{
+  const n = signal(0)
+  await bench('createElement (动态)', 100000, 3, () => createElement('div', null, () => n()))
+}
+await bench('render(文本)', 100000, 3, () => render('hello'))
+
+// ==================== 3. 渲染 ====================
+log('')
+log('=== 3. 渲染 1000 节点 ===')
+{
+  const kids = Array.from({length:1000},(_,i)=>span(null,'x'+i))
+  const vnode = div(null, ...kids)
+  await bench('render(1000 静态)', 30, 3, () => render(vnode))
+}
+{
+  const n = signal(0)
+  const kids = Array.from({length:1000},(_,i)=>span(null,()=>n()+i))
+  const vnode = div(null, ...kids)
+  await bench('render(1000 动态)', 30, 3, () => render(vnode))
+}
+
+// ==================== 4. 挂载 ====================
+log('')
+log('=== 4. Mount ===')
+await bench('mount(简单)', 1000, 3, () => {
+  host.innerHTML = ''
+  const el = document.createElement('div')
+  host.appendChild(el)
+  mount(() => div(null, 'hello'), el)
+})
+{
+  const n = signal(0)
+  await bench('mount(计数器)', 500, 3, () => {
+    host.innerHTML = ''
+    const el = document.createElement('div')
+    host.appendChild(el)
+    mount(() => div(null,
+      h1(null, 'Counter'),
+      p(null, () => 'n = ' + n()),
+      button({on:{click:()=>n(v=>v+1)}}, '+')
+    ), el)
+  })
+}
+
+// ==================== 5. 细粒度 ====================
+log('')
+log('=== 5. 细粒度响应式 (护城河) ===')
+{
+  host.innerHTML = ''
+  const n = signal(0)
+  const kids = Array.from({length:1000},(_,i)=>span(null,()=>n()+i))
+  mount(() => div(null, ...kids), host)
+  await bench('1000 节点共享 signal · 更新', 100, 3, i => n(i))
+}
+{
+  host.innerHTML = ''
+  const sigs = Array.from({length:1000},(_,i)=>signal(i))
+  mount(() => div(null, ...sigs.map(s => span(null, () => s()))), host)
+  await bench('1000 节点各读各的 · 改 1 个', 10000, 3, i => sigs[0](i))
+}
+
+// ==================== 6. list ====================
+log('')
+log('=== 6. list (keyed) ===')
+const setupArr = () => Array.from({length:1000},(_,i)=>({id:i,t:'row '+i}))
+{
+  host.innerHTML = ''
+  const arr = signal(setupArr())
+  mount(() => div(null, list(arr, x=>x.id, x=>span(null,x.t))), host)
+  await bench('list 改 1 项', 100, 3, i => arr(p => p.map((x,k)=>k===0?{...x,t:'v'+i}:x)))
+}
+{
+  host.innerHTML = ''
+  const arr = signal(setupArr())
+  mount(() => div(null, list(arr, x=>x.id, x=>span(null,x.t))), host)
+  await bench('list 末尾追加', 100, 3, i => arr(p => [...p, {id:1000+i, t:'n'+i}]))
+}
+{
+  host.innerHTML = ''
+  const arr = signal(setupArr())
+  mount(() => div(null, list(arr, x=>x.id, x=>span(null,x.t))), host)
+  await bench('list 末尾删除', 100, 3, i => arr(p => p.slice(0, -1)))
+}
+{
+  host.innerHTML = ''
+  const arr = signal(setupArr())
+  mount(() => div(null, list(arr, x=>x.id, x=>span(null,x.t))), host)
+  await bench('list 排序 (逆序)', 20, 3, i => arr(p => [...p].reverse()))
+}
+
+// ==================== 7. SSR ====================
+log('')
+log('=== 7. SSR ===')
+try {
+  const ssr = await import('../core/dist/xunay-ssr.min.js?v=' + Date.now())
+  log('  导出: ' + Object.keys(ssr).join(', '))
+  if (typeof ssr.renderToString === 'function') {
+    const vnode = div(null, ...Array.from({length:1000},(_,i)=>span(null,'n'+i)))
+    // 先单独跑一次看 HTML 长度
+    const html = ssr.renderToString(vnode)
+    log('  HTML 长度: ' + html.length + ' 字节')
+    await bench('renderToString(1000 节点)', 30, 3, () => ssr.renderToString(vnode))
+  } else {
+    log('  ❌ renderToString 不存在')
+  }
+} catch (e) {
+  log('  ❌ SSR 加载失败: ' + e.message)
+}
+
+// ==================== 8. 包体积 ====================
+log('')
+log('=== 8. 包体积 ===')
+for (const f of ['xunay.js','xunay-kit.js','xunay-devtools.js','xunay-ssr.js','xunay-anim.js','app.js']) {
+  try {
+    const r = await fetch('../core/dist/' + f, { method: 'HEAD' })
+    const n = parseInt(r.headers.get('content-length') || '0', 10)
+    log(`  ${f.padEnd(24)} ${(n/1024).toFixed(2).padStart(8)} KB`)
+  } catch (e) {}
+}
+
+// ==================== 9. 内存 ====================
+log('')
+log('=== 9. 内存 ===')
+if (performance.memory) {
+  log('  usedJSHeapSize: ' + (performance.memory.usedJSHeapSize/1048576).toFixed(2) + ' MB')
+  log('  totalJSHeapSize: ' + (performance.memory.totalJSHeapSize/1048576).toFixed(2) + ' MB')
+} else {
+  log('  performance.memory 不可用（仅 Chromium）')
+}
+
+log('')
+host.innerHTML = ''
+log('=== 完成 ===')
+</script></body></html>

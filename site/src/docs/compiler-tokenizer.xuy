@@ -1,0 +1,24 @@
+// 标签表
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("标签表"),
+    P("compiler3 没有独立的 tokenizer。整段源码交给 acorn 解析，标签表只负责回答一个问题：某个名字是不是标签？"),
+    H2("tags.js"),
+    Code("export const TAGS = new Set([\n  'div', 'span', 'p', 'a', 'button', 'input', 'form', 'label',\n  'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td',\n  'pre', 'code', 'blockquote',\n  'header', 'footer', 'nav', 'main', 'section', 'article',\n  'select', 'option', 'textarea',\n  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',\n  'img', 'br', 'hr',\n  'canvas', 'video', 'audio', 'summary', 'details',\n  'checkbox', 'switch', 'radio', 'progress', 'slider', 'tabs', 'tab',\n])\n\nexport const VOID_TAGS = new Set(['img', 'br', 'hr', 'input'])", "js"),
+    P("整个文件只有 14 行。没有状态机，没有字符扫描。"),
+    H2("TAGS 和 VOID_TAGS"),
+    Table(["集合","用途","示例"], [["TAGS","哪些名字当标签","div / span / button 等 50 个"],["VOID_TAGS","哪些标签不能 appendChild","img / br / hr / input"]]),
+    H2("和 compiler2 的区别"),
+    Table(["维度","compiler2","compiler3"], [["tokenizer 文件","40 行状态机","不存在，用 acorn"],["TAGS 位置","tokenizer.js","tags.js"],["扫描方式","逐字符","acorn.parse 返回 AST"]]),
+
+    H2("加新标签"),
+    Code("// compiler3/src/tags.js\nexport const TAGS = new Set([\n  // ... 现有的\n  'my-tag',\n  'custom-element',\n])", "js"),
+    Warn("加了 TAGS 里的名字，编译器才会把 name(...) 当标签。不加的话原样透传——可以用 tag() 或 createElement() 手动创建。"),
+    H2("保留字问题"),
+    P("switch 是 JS 保留字，不能作为标识符导出。所以 element.js 里只有 tags.switch 而没有具名导出 switch。"),
+    H2("相关源码"),
+    Table(["文件","行数","职责"], [["compiler3/src/tags.js","14","TAGS + VOID_TAGS"],["compiler3/src/index.js","438","用 TAGS 判断是否标签"]]),
+  )
+}

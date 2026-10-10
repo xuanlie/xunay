@@ -1,0 +1,7 @@
+scene({
+  bg: '#0a0a1a',
+  autoRotate: true,
+  camera: { distance: 4, fov: 45 }
+})
+
+model({ src: 'cube.obj', color: '#ff6600', scale: 2, rotate: 30 })

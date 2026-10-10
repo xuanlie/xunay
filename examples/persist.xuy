@@ -1,0 +1,11 @@
+const n = s(0, 'count')
+const name = s('', 'username')
+
+app(() => div({ style: { padding: 24 } },
+  h1(null, '持久化演示'),
+  span(null, '用户名（重启保留）'),
+  input({ placeholder: '输入名字', on: { input: (e) => name(e) } }),
+  span(null, txt`你好, ${name}`),
+  span(null, txt`计数: ${n}（重启保留）`),
+  button({ on: { click: () => n(v => v + 1) } }, '+1')
+), '#app')

@@ -1,0 +1,45 @@
+﻿import { div, span, signal, computed, mount, txt } from 'xunay'
+const n = s(3.7)
+const str = s('  Hello World  ')
+const arr = s([3, 1, 2])
+const numStr = s('42')
+const r1 = computed(() => Math.floor(n()))
+const r2 = computed(() => Math.ceil(n()))
+const r3 = computed(() => Math.round(n()))
+const r4 = computed(() => Math.abs(-5))
+const r5 = computed(() => Math.max(1, 2, 3))
+const r6 = computed(() => Math.min(1, 2, 3))
+const r7 = computed(() => Math.pow(2, 3))
+const r8 = computed(() => str().trim())
+const r9 = computed(() => str().trim().toUpperCase())
+const r10 = computed(() => str().trim().slice(0, 5))
+const r11 = computed(() => str().trim().includes('World'))
+const r12 = computed(() => '0'.repeat(3))
+const r13 = computed(() => numStr().padStart(5, '0'))
+const r14 = computed(() => Number.parseInt(numStr()))
+const r15 = computed(() => Number.parseFloat(numStr()))
+const r16 = computed(() => arr().join(','))
+const r17 = computed(() => arr().slice(0, 2))
+const r18 = computed(() => arr().indexOf(2))
+const r19 = computed(() => arr().includes(3))
+mount(() => div(null,
+  span(null, txt`floor: ${r1}`),
+  span(null, txt`ceil: ${r2}`),
+  span(null, txt`round: ${r3}`),
+  span(null, txt`abs: ${r4}`),
+  span(null, txt`max: ${r5}`),
+  span(null, txt`min: ${r6}`),
+  span(null, txt`pow: ${r7}`),
+  span(null, txt`trim: [${r8}]`),
+  span(null, txt`upper: ${r9}`),
+  span(null, txt`slice: ${r10}`),
+  span(null, txt`includes: ${r11}`),
+  span(null, txt`repeat: ${r12}`),
+  span(null, txt`padStart: ${r13}`),
+  span(null, txt`parseInt: ${r14}`),
+  span(null, txt`parseFloat: ${r15}`),
+  span(null, txt`join: ${r16}`),
+  span(null, txt`slice2: ${r17}`),
+  span(null, txt`indexOf: ${r18}`),
+  span(null, txt`includes2: ${r19}`)
+), '#app')

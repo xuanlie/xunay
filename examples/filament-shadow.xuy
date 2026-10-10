@@ -1,0 +1,6 @@
+﻿scene({ bg: '#0e1116', shadows: true,
+  camera: { distance: 10, fov: 45 },
+  lights: [{ dir: [0.5, -1, -0.3], color: '#ffffff', intensity: 3.0 }] })
+plane({ color: '#888888', size: 8, position: [0, -1, 0] })
+cube({ color: '#ff6600', size: 1.5, position: [0, 0.5, 0], spin: { axis: [0, 1, 0], speed: 0.5 } })
+sphere({ color: '#22ccff', size: 1, position: [-2, 0, 0] })

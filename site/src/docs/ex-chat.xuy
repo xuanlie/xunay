@@ -1,0 +1,15 @@
+// 聊天室
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("聊天室"),
+    P("WebSocket 实时聊天——多个标签页互相同步。"),
+    H2("前端"),
+    Code("// app.xuy\n// title: 聊天室\nimport { div, h1, ul, li, input, button, span, signal, list, onMount, onUnmount, mount } from 'xunay'\n\nconst messages = signal([])\nconst draft = signal('')\nconst ws = signal(null)\n\nonMount(() => {\n  const proto = location.protocol === 'https:' ? 'wss' : 'ws'\n  const socket = new WebSocket(proto + '://' + location.host + '/ws')\n\n  socket.onmessage = e => {\n    try {\n      const msg = JSON.parse(e.data)\n      messages(l => [...l, msg])\n      setTimeout(() => {\n        const el = document.querySelector('.chat-body')\n        if (el) el.scrollTop = el.scrollHeight\n      }, 0)\n    } catch (_) {}\n  }\n\n  socket.onclose = () => {\n    console.log('连接关闭，2 秒后重连')\n    setTimeout(() => onMount(() => {}), 2000)\n  }\n\n  ws(socket)\n  onUnmount(() => socket.close())\n})\n\nconst send = () => {\n  if (!draft().trim()) return\n  const s = ws()\n  if (s && s.readyState === 1) {\n    s.send(JSON.stringify({ user: 'me', text: draft() }))\n  }\n  draft('')\n}\n\nmount(() => div({ class: 'chat' },\n  h1(null, '聊天室'),\n  ul({ class: 'chat-body' },\n    list(messages, m => m.id || Date.now() + Math.random(), m =>\n      li({ class: 'msg' },\n        span({ class: 'user' }, m.user + ': '),\n        span({ class: 'text' }, m.text)\n      )\n    )\n  ),\n  div({ class: 'chat-input' },\n    input({\n      placeholder: '输入消息…',\n      value: () => draft(),\n      on: {\n        input: e => draft(e.target.value),\n        keydown: e => { if (e.key === 'Enter') send() }\n      }\n    }),\n    button({ on: { click: send } }, '发送')\n  )\n), '#app')", "xuy"),
+    H2("后端"),
+    Code("// backends/node/server.js\nimport { WebSocketServer } from 'ws'\n\nconst wss = new WebSocketServer({ port: 12341 })\nconst clients = new Set()\n\nwss.on('connection', ws => {\n  clients.add(ws)\n  ws.on('message', data => {\n    const msg = JSON.parse(data)\n    msg.id = Date.now() + Math.random()\n    for (const c of clients) {\n      if (c.readyState === 1) c.send(JSON.stringify(msg))\n    }\n  })\n  ws.on('close', () => clients.delete(ws))\n})", "js"),
+    H2("学习点"),
+    Ul("WebSocket 集成","自动重连","自动滚到底部","多标签页同步"),
+  )
+}

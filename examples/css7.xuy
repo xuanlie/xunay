@@ -1,0 +1,13 @@
+const CSS = `
+  .box1 { border: 2px solid #ff0000; padding: 16; margin: 8 }
+  .box2 { border: 1px solid #00ff00; border-radius: 12; background: #f0f0f0; padding: 16; margin: 8 }
+  .box3 { border: 3px solid #0000ff; border-radius: 24; background: #ffff00; padding: 16; margin: 8 }
+  .card { border: 1px solid #cccccc; border-radius: 8; background: white; padding: 16; margin: 8 }
+`
+
+app(() => div({ style: { padding: 24 } },
+  div({ class: 'box1' }, '红边框'),
+  div({ class: 'box2' }, '绿边框 + 灰底 + 圆角 12'),
+  div({ class: 'box3' }, '蓝边框 + 黄底 + 圆角 24'),
+  div({ class: 'card' }, '卡片：浅灰边框 + 白底 + 圆角')
+), '#app')

@@ -1,0 +1,34 @@
+// .xuy 语法
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1(".xuy 语法"),
+    P(".xuy 就是 JavaScript。唯一的约定：HTML 标签名可以直接当函数调用，不用 import。"),
+    H2("标签即函数"),
+    Code("// 你写\ndiv({ class: 'box' }, span(null, 'hi'))\n\n// 编译后\n(() => {\n  const _div0 = document.createElement('div')\n  _div0.className = 'box'\n  const _span1 = document.createElement('span')\n  _span1.appendChild(document.createTextNode('hi'))\n  _div0.appendChild(_span1)\n  return _div0\n})()", "js"),
+    H2("内置标签（50 个）"),
+    Code("结构：div span p a button input form label\n列表：ul ol li\n表格：table thead tbody tr th td\n标题：h1 h2 h3 h4 h5 h6\n文本：pre code blockquote\n布局：header footer nav main section article\n表单：select option textarea\n其他：img br hr\n媒体：canvas video audio summary details", "txt"),
+    P("这些名字在 compiler3/src/tags.js 的白名单里。不在白名单里的名字不会被编译。"),
+    H2("参数约定"),
+    Table(["位置","含义","示例"], [["第一个参数","属性对象或 null","div({ class: 'x' }, ...) 或 div(null, ...)"],["后面","子节点","字符串 / 数字 / 函数 / 嵌套标签"]]),
+    H2("响应式子节点"),
+    P("传函数 = 响应式。函数在 effect 里跑，自动追踪依赖："),
+    Code("// 静态文本\nspan(null, 'fixed')\n\n// 响应式文本\nspan(null, () => String(count()))\n\n// 响应式模板字符串\nspan(null, txt`count = ${count()}`)", "js"),
+    H2("事件"),
+    Code("button({ on: { click: () => count(v => v + 1) } }, '+')", "js"),
+    Warn("不是 onClick，是 on: { click: ... }。on 是属性对象里的一个 key。"),
+    H2("属性"),
+    Table(["写法","编译成"], [["class: 'box'","el.className = 'box'"],["class: () => c()","__rt__.bindAttr(el, 'class', ...)"],["style: { color: 'red' }","Object.assign(el.style, ...)"],["on: { click: fn }","el.addEventListener('click', fn)"],["value: () => n()","__rt__.bindAttr(el, 'value', ...)"],["checked: true","el.checked = true"],["data-id: 1","el.setAttribute('data-id', 1)"]]),
+    H2("作用域规则"),
+    P("标签名被变量遮蔽时，不再当标签："),
+    Code("// 编译成 createElement('div')\nconst el = div(null, 'x')\n\n// 原样保留——div 是变量，不是标签\nconst div = something\ndiv()", "js"),
+
+    H2("不支持的语法"),
+    Ul("JSX —— 没有 <div>","模板语法 —— 没有 {{ }}","TypeScript 类型注解","自定义标签名（除非用 registerTags 注册）"),
+    H2("和普通 JS 的关系"),
+    P(".xuy 里可以写任何 JavaScript："),
+    Code("import { signal } from 'xunay'\nimport axios from 'axios'\n\nasync function load() {\n  const { data } = await axios.get('/api')\n  return data.map(x => ({ ...x, id: x.id || crypto.randomUUID() }))\n}", "js"),
+    Tip("async/await、解构、展开、可选链、空值合并——全部原样透传，因为 compiler3 用的是 acorn。"),
+  )
+}

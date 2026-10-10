@@ -1,0 +1,28 @@
+// 性能报告
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("性能报告"),
+
+    H2("核心响应式（Node.js 22 + V8 实测）"),
+    Table(["操作","单次","ops/s"], [["signal.read","0.003 µs","333.3M"],["signal.write（无订阅）","0.017 µs","58.8M"],["signal.write（1 effect）","0.027 µs","37.0M"],["computed.read（缓存命中）","0.016 µs","62.5M"]]),
+    P("最新内核（listener 直挂 + _ultra 快路径）实测：signal 读 3 纳秒、写 17 纳秒、单 effect 触发 27 纳秒。和 Preact Signals / Solid 同级。computed 缓存命中 16 纳秒，接近直接读变量。"),
+    H2("编译期 vs 运行时（浏览器实测）"),
+    P("这是 xuyc 编译期方案的核心收益——动态节点首挂近 2 倍提升。"),
+    Table(["场景","编译期","运行时 vnode","加速"], [["首挂 1000 静态节点","0.8 ms","1.0 ms","1.25×"],["首挂 1000 动态节点（每个带 effect）","2.0 ms","3.7 ms","1.85×"],["list() 1000 项 keyed 更新","—","2.2 ms","—"]]),
+    P("运行时版本的动态节点首挂要创建 vnode 对象再走 render() 遍历；编译期直接 createElement + effect 挂载。省下 42% 首挂时间。"),
+    H2("包体积（gzip）"),
+    Table(["文件","gzip"], [["xunay.min.js（iife）","7.06 KB"],["xunay.esm.js（核心）","6.84 KB"],["xunay-full.min.js","7.85 KB"],["xunay-ssr.min.js","5.45 KB"],["xunay-kit.min.js（106 组件）","29.58 KB"],["xunay-anim.min.js（228 动画）","15.06 KB"],["xunay-devtools.min.js","15.89 KB"]]),
+    H2("对比同类框架"),
+    Table(["框架","runtime gzip","1000 动态节点首挂","参考"], [["React 18","45 KB","30-60 ms","VDOM diff"],["Vue 3","34 KB","10-20 ms","Proxy + 编译"],["Svelte 5","~10 KB","4-6 ms","编译 + rune"],["Solid","8 KB","2-3 ms","编译 + signal"],["XuNay","6.84 KB","2.0 ms","编译 + signal"]]),
+    P("runtime 体积同级别最小；首挂跟 Solid 同档，比 Vue 快 5-10 倍，比 React 快 15-25 倍。"),
+    H2("signal 写触发（对比）"),
+    Table(["框架","写触发耗时","参考"], [["XuNay（listener 直挂）","0.027 µs","Preact 同档"],["XuNay（完整 effect）","0.050 µs","带 cleanup / hook"],["Solid","0.2 ~ 0.3 µs","官方基准"],["Vue 3","1 ~ 2 µs","Proxy 开销"],["React 19","~50 µs","VDOM + scheduler"]]),
+    H2("复现"),
+    P("所有数字都可以自己跑。"),
+    Code("# signal 层\ncd E:/xunay\nnode bench/node.mjs\n\n# DOM 层\ncd E:/xunay\npython -m http.server 12341\n# 浏览器打开 http://localhost:12341/bench/compile-vs-runtime.html", "bash"),
+    H2("说明"),
+    Ul("Node 数据是纯 JS 环境，浏览器数据含真实 DOM 操作","跨框架数字来自各自公开基准，测试条件不完全一致，仅供参考","单次测量噪音大，bench 脚本取中位数","已知未解：subs 每次 render 累积（effect 未 dispose），长会话会变慢"),
+  )
+}

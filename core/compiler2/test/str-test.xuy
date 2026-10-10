@@ -1,0 +1,11 @@
+﻿const { n, app } = __rt__
+
+app(() => div({ class: 'box' },
+  button({ on: { click: () => n(v => v - 1) } }, '-'),
+  span(null, () => `n = ${n()}`)
+), '#app')
+
+// 下面这行注释里的 div(x) 不该被编译
+const s = "example: div(hello)"
+const t = `code: span(world)`
+const u = "not a tag: button(x)"

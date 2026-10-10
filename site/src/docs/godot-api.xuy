@@ -1,0 +1,30 @@
+// Godot JS API
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Godot 集成：JS API"),
+    H2("createGame(container, src, opts?)"),
+    P("挂载 iframe 加载 Godot Web 导出。返回 { iframe, game }。"),
+    Table(["参数","类型","说明"], [["container","HTMLElement","挂载容器"],["src","string","Godot index.html 路径"],["opts.width","string","默认 100%"],["opts.height","string","默认 100%"],["opts.style","string","额外 CSS"],["opts.allow","string","iframe allow 属性"],["opts.readyTimeout","number","ready 超时毫秒（默认 5000）"]]),
+    P("返回的 game 对象："),
+    Table(["成员","说明"], [["iframe","DOM 元素"],["ready","Promise，Godot 侧 godot:ready 触发或超时"],["send / on / off","同上"],["bindSignal / pushSignal / bindTwoWay","同上"],["destroy()","移除 iframe"]]),
+    H2("send(event, payload)"),
+    P("发事件给 Godot。同一 microtask 内多次同名事件只推最后一次。"),
+    Code("send('ui:setText', { text: 'hi' })\nsend('game:addScore', { n: 1 })", "js"),
+    Warn("payload 必须是 JSON-safe 值，否则立即抛 TypeError。"),
+    H2("on(event, fn) / off(event, fn)"),
+    P("订阅 Godot 推来的事件。on 返回取消订阅函数。"),
+    Code("const off = on('game:ready', (p) => {\n  console.log('ready', p)\n})\n// 取消\noff()", "js"),
+    H2("bindSignal(sig, godotPath)"),
+    P("signal 变化时推给 Godot 的对应路径。返回 stop 函数。"),
+    Code("const stop = bindSignal(score, 'game.score')\n// 卸载时\nstop()", "js"),
+    H2("pushSignal(sig, godotPath)"),
+    P("推一次当前值，不建立持续订阅。适合初始化。"),
+    Code("pushSignal(score, 'game.score')", "js"),
+    H2("bindTwoWay(sig, godotPath)"),
+    P("双向绑定。JS 改 sig 推给 Godot，Godot push_bound 推回 JS。"),
+    Code("const stop = bindTwoWay(score, 'game.score')\n// 之后\nscore(5)              // → Godot 收到 5\n// Godot 侧 push_bound('game.score') → JS score() 变", "js"),
+    Tip("回环保护用 === 严格比较。原始类型安全。"),
+  )
+}

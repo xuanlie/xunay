@@ -1,0 +1,13 @@
+﻿import { div, button, app } from 'xunay'
+
+const CSS = `
+.btn { display: block; padding: 12px; background: #2563eb; color: #fff; border-radius: 8px; margin: 8px; }
+.btn:active { background: #1d4ed8; }
+.btn2 { display: block; padding: 12px; background: #16a34a; color: #fff; border-radius: 4px; margin: 8px; }
+.btn2:active { opacity: 0.5; }
+`
+
+app(() => div(null,
+  button({ 'class': 'btn' }, '按下变深'),
+  button({ 'class': 'btn2' }, '按下变淡')
+), '#app')

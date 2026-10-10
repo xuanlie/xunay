@@ -1,0 +1,23 @@
+// http 请求
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("http 请求"),
+    P("fetch 封装。内置超时、重试、拦截器、自动带 token。"),
+    H2("引入"),
+    Code("import { http } from 'xunay/http'", "js"),
+    H2("基础用法"),
+    Code("await http.get('/api/users')\nawait http.post('/api/users', { name: 'Leo' })\nawait http.put('/api/users/1', { name: 'Leo2' })\nawait http.patch('/api/users/1', { age: 30 })\nawait http.delete('/api/users/1')", "js"),
+    H2("返回结构"),
+    Code("const r = await http.get('/api/users')\n// r = {\n//   status: 200,\n//   ok: true,\n//   headers: Headers,\n//   data: [...]\n// }", "js"),
+    H2("创建实例"),
+    Code("const api = createHttp({\n  baseURL: 'https://api.example.com',\n  timeout: 30000,\n  retries: 2,\n  retryDelay: 500,\n  headers: { 'X-App': 'myapp' },\n  auth: true,                       // 自动带 auth token\n  authHeader: 'Authorization',\n  authPrefix: 'Bearer ',\n})", "js"),
+    H2("拦截器"),
+    Code("const api = createHttp({\n  onRequest: (req) => {\n    console.log('请求', req)\n    req.headers['X-Time'] = String(Date.now())\n    return req\n  },\n  onResponse: (res) => {\n    console.log('响应', res.status)\n  },\n  onError: (err) => {\n    console.error('错误', err)\n  },\n})", "js"),
+    H2("取消请求"),
+    Code("const ctrl = new AbortController()\nhttp.get('/api/slow', { signal: ctrl.signal })\n\n// 取消\nctrl.abort()", "js"),
+    H2("超时 / 重试"),
+    Ul("timeout：默认 30 秒，超时抛 AbortError","retries：默认重试 2 次","4xx 不重试（客户端错误重试无意义）","5xx 和网络错误会重试"),
+  )
+}

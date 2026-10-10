@@ -1,0 +1,49 @@
+// XuNay 完整 Todo 示例
+import { div,h1,input,button,ul,li,span,p,signal,computed,mount,list,show,onMount,effect } from "./xunay.js"
+
+const stored=(()=>{try{return JSON.parse(localStorage.getItem('xunay-todos')||'[]')}catch(e){return[]}})()
+const todos=signal(stored), draft=signal(''), filter=signal('all')
+
+onMount(()=>effect(()=>{try{localStorage.setItem('xunay-todos',JSON.stringify(todos()))}catch(e){}}))
+
+const filtered=computed(()=>{const t=todos(),f=filter();return f==='active'?t.filter(x=>!x.done):f==='done'?t.filter(x=>x.done):t})
+const total=computed(()=>todos().length)
+const activeCount=computed(()=>todos().filter(t=>!t.done).length)
+const doneCount=computed(()=>todos().filter(t=>t.done).length)
+
+const add=()=>{const x=draft().trim();if(!x)return;todos([...todos(),{id:Date.now(),title:x,done:false}]);draft('')}
+const toggle=id=>todos(todos().map(t=>t.id===id?{...t,done:!t.done}:t))
+const remove=id=>todos(todos().filter(t=>t.id!==id))
+const clearDone=()=>todos(todos().filter(t=>!t.done))
+const edit=(id,title)=>todos(todos().map(t=>t.id===id?{...t,title}:t))
+
+const Header=()=>div({class:'hdr'},h1(null,'XuNay Todo'),p({class:'sub'},()=>`共 ${total()} 条 · 未完成 ${activeCount()} · 已完成 ${doneCount()}`))
+
+const Input=()=>div({class:'row'},
+input({class:'inp',placeholder:'输入待办...',value:()=>draft(),on:{input:e=>draft(e.target.value),keydown:e=>{if(e.key==='Enter')add()}}}),
+button({class:'btn pri',on:{click:add}},'添加'))
+
+const Filters=()=>{const tabs=[['all','全部'],['active','未完成'],['done','已完成']]
+return div({class:'flt'},...tabs.map(([k,l])=>button({class:()=>`tab ${filter()===k?'on':''}`,on:{click:()=>filter(k)}},l)),
+show(()=>doneCount()>0,()=>button({class:'btn lnk',on:{click:clearDone}},()=>`清除已完成(${doneCount()})`)))}
+
+function TodoItem(t){
+const ed=signal(false),edv=signal(t.title)
+const save=()=>{const v=edv().trim();if(v)edit(t.id,v);ed(false)}
+return li({class:()=>`it ${t.done?'dn':''}`},
+input({class:'chk',type:'checkbox',checked:()=>t.done,on:{change:()=>toggle(t.id)}}),
+show(()=>!ed(),()=>span({class:'ttl',on:{dblclick:()=>{edv(t.title);ed(true)}}},t.title)),
+show(()=>ed(),()=>input({class:'ed',value:()=>edv(),on:{input:e=>edv(e.target.value),blur:save,keydown:e=>{if(e.key==='Enter')save();if(e.key==='Escape')ed(false)}}})),
+button({class:'btn del',on:{click:()=>remove(t.id)}},'×'))}
+
+const List=()=>div(null,
+show(()=>filtered().length===0,()=>div({class:'emp'},()=>filter()==='active'?'没有未完成':filter()==='done'?'没有已完成':'还没有待办')),
+ul({class:'lst'},list(filtered,t=>t.id,t=>TodoItem(t))))
+
+const Footer=()=>div({class:'ftr'},show(()=>total()>0,()=>button({class:'btn lnk',on:{click:()=>{if(confirm('删除全部？'))todos([])}}},'删除全部')))
+
+mount(()=>div({class:'app'},Header(),Input(),Filters(),List(),Footer()),'#app')
+
+const s=document.createElement('style')
+s.textContent=`*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;background:#f5f5f7;color:#222;padding:40px 20px}.app{max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 4px 24px rgba(0,0,0,.06)}.hdr{margin-bottom:24px}.hdr h1{font-size:28px;margin-bottom:8px}.sub{font-size:13px;color:#888}.row{display:flex;gap:8px;margin-bottom:16px}.inp{flex:1;padding:10px 14px;font-size:15px;border:1px solid #ddd;border-radius:8px;outline:none}.inp:focus{border-color:#1f6feb}.btn{padding:10px 18px;border:none;border-radius:8px;cursor:pointer;background:#eee}.pri{background:#1f6feb;color:#fff}.lnk{background:none;color:#888;padding:6px 10px;font-size:13px}.del{background:none;color:#ccc;padding:4px 8px;font-size:18px}.flt{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}.tab{padding:6px 14px;font-size:13px;border:none;background:none;border-radius:6px;cursor:pointer;color:#666}.tab.on{background:#1f6feb;color:#fff}.lst{list-style:none}.it{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0}.it.dn .ttl{text-decoration:line-through;color:#aaa}.chk{width:18px;height:18px}.ttl{flex:1;font-size:15px}.ed{flex:1;padding:6px 10px;border:1px solid #1f6feb;border-radius:6px;outline:none}.emp{text-align:center;color:#aaa;padding:40px 0}.ftr{margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0;text-align:right}`
+document.head.appendChild(s)

@@ -1,0 +1,22 @@
+// kit: Drawer
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("kit: Drawer"),
+    P("kit 里的 Drawer 组件。"),
+    H2("引入"),
+    Code("import { Drawer } from 'xunay/kit/overlay'", "js"),
+    H2("参数"),
+    Table(["参数","类型","默认","说明"], [["onClose","——","——","回调"],["open","——","——","可传 signal（响应式）"],["position","——","——",""],["swipeClose","——","——",""],["title","——","——","标题"],["width","——","auto","宽度"]]),
+    H2("移动端"),
+    P("全宽 / 92vw + 滑动关闭 + 滚动锁定。"),
+    H2("基础用法"),
+    Code("import { Drawer } from 'xunay/kit/overlay'\n\nDrawer({ title: 'example', open: mySignal, onClose: () => {} })", "js"),
+    H2("响应式"),
+    P("这些参数可以直接传 signal，值变化时 DOM 会自动更新："),
+    Code("import { signal } from 'xunay'\nimport { Drawer } from 'xunay/kit/overlay'\n\nconst v = signal(false)\n\nDrawer({ open: v })", "js"),
+    Tip("不要写成 open: v() —— 传函数给 render.js，让它挂 effect。"),
+    Tip("完整组件清单见「Kit 组件 → Kit 组件 API」。"),
+  )
+}

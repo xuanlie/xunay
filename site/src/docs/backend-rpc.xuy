@@ -1,0 +1,22 @@
+// RPC 协议
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("RPC 协议"),
+    P("统一请求格式——四套后端共用。"),
+    H2("请求"),
+    Code("POST /rpc/addTodo HTTP/1.1\nContent-Type: application/json\nAuthorization: Bearer <token>\n\n{\n  \"title\": \"新任务\"\n}", "txt"),
+    H2("响应"),
+    Code("// 成功\n{\n  \"ok\": true,\n  \"data\": { \"id\": 1, \"title\": \"新任务\", \"done\": false },\n  \"error\": null\n}\n\n// 失败\n{\n  \"ok\": false,\n  \"data\": null,\n  \"error\": \"title 必填\"\n}", "json"),
+    H2("状态码"),
+    Table(["码","含义"], [["200","成功"],["400","参数错误"],["401","未认证"],["403","无权限"],["404","接口不存在"],["500","服务器错误"]]),
+    H2("认证"),
+    Code("// 1. 获取 token\nGET /rpc/token\n→ { ok: true, data: { token: 'xxx' } }\n\n// 2. 后续请求带 token\nGET /rpc/getTodos\nAuthorization: Bearer xxx", "txt"),
+    H2("前端客户端"),
+    Code("// api/client.js\nexport const client = {\n  async get(path, opts = {}) {\n    const r = await fetch(path, {\n      method: 'GET',\n      headers: { ...authHeader(), ...opts.headers }\n    })\n    const j = await r.json()\n    if (!j.ok) throw new Error(j.error)\n    return j.data\n  },\n  async post(path, body) {\n    const r = await fetch(path, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json', ...authHeader() },\n      body: JSON.stringify(body)\n    })\n    const j = await r.json()\n    if (!j.ok) throw new Error(j.error)\n    return j.data\n  }\n}", "js"),
+    H2("为什么用 RPC 而不是 REST"),
+    Table(["","REST","RPC"], [["URL","/todos/1","/rpc/getTodo"],["语义","资源","动作"],["方法","GET/POST/PUT","都 POST"],["前端友好","一般","好（函数名）"],["缓存","浏览器自动","手动"]]),
+    P("RPC 的好处：接口名就是函数名，前端不用拼 URL。"),
+  )
+}

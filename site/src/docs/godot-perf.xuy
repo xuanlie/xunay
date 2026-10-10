@@ -1,0 +1,26 @@
+// Godot 桥接性能
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Godot 桥接性能实测"),
+    P("XuNay × Godot Web 双向桥接的往返延迟测试。测试环境: Chrome, Godot 4.3 stable, 60fps, iframe 内嵌。"),
+    H2("测试方法"),
+    P("JS 侧发 bench:ping, Godot 侧 _on_ping 收到后立即 send bench:pong, JS 侧记时间差。间隔 1 ms 逐条发, 避开同 tick 合并。"),
+    Code("const N = 50\nconst times = []\nconst sentAt = {}\n\ndemo.on('bench:pong', (p) => {\n  if (typeof p.id === 'number' && sentAt[p.id] != null) {\n    times.push(performance.now() - sentAt[p.id])\n  }\n})\n\nfor (let i = 0; i < N; i++) {\n  sentAt[i] = performance.now()\n  demo.send('bench:ping', { id: i })\n  await new Promise(r => setTimeout(r, 1))\n}", "js"),
+    H2("结果"),
+    Table(["指标","数值"], [["样本","50 / 50 (无丢包)"],["平均","7.59 ms"],["p50","7.90 ms"],["p95","12.90 ms"],["min","2.40 ms"],["max","14.10 ms"]]),
+    H2("解读"),
+    Ul("60fps 一帧 = 16.67 ms, 往返平均不到半帧","p95 12.9 ms 说明没有偶发卡顿, 分布紧","min 2.4 ms 说明 drain 队列为空时几乎无开销","max 14.1 ms 说明最坏情况仍在一帧内"),
+    H2("对比同类方案"),
+    Table(["方案","典型往返"], [["iframe postMessage","1-5 ms"],["WebSocket 本地","2-8 ms"],["XuNay × Godot (本次)","7.6 ms"],["Unity WebGL ↔ JS","15-40 ms"],["Electron IPC","0.5-3 ms"]]),
+    P("对一个\"每帧 drain 队列\"的设计, 这个数字超出预期。"),
+    H2("理论上限与优化空间"),
+    P("当前每帧最多 drain 一次, 上限受 Godot 帧率限制。阶段 4 换用 JavaScriptBridge.create_callback 零轮询方案, 预期压到 3-5 ms。"),
+    Tip("复现: examples/godot-demo/ 打开 Console, 跑 demo.send('bench:ping', {id: 0})。"),
+    H2("附: XuNay signal 性能 (同页测)"),
+    P("同一页面 Console 里测的 signal 性能。注意: DevTools 开着 + Godot iframe 抢占主线程, 写延迟数字偏高, 不可作为严格基准。"),
+    Table(["操作","实测"], [["signal 读","25.7 ns"],["signal 写 (无订阅)","736 ns (受 DevTools 干扰)"],["signal 写 (1 订阅)","1465 ns (受干扰)"],["computed 缓存读","7.2 ns"]]),
+    P("读和 computed 数字可信。写延迟受 Chrome DevTools 打开时执行慢 2-10 倍的已知行为影响, 需独立 bench.html 才能拿到严格数字。"),
+  )
+}

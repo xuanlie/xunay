@@ -1,0 +1,18 @@
+// 总览
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("总览"),
+    P("XuNay 是一个极简、极快、极省的前端框架。核心 gzip 4.86KB，零依赖，无 VDOM，无 Fiber，无 Hooks。"),
+    H2("为什么是 XuNay"),
+    P("React 45KB，Vue 34KB。前端框架越做越重。XuNay 想回到最初：一个信号，一个元素，一个挂载。"),
+    Ul("组件只执行一次，数据变了只更新用到它的节点","没有虚拟 DOM，直接操作真实 DOM","没有 Fiber 调度，没有优先级队列","没有 Hooks 链表，没有顺序规则","核心 gzip 4.86KB，比 React 小 10 倍","零依赖，浏览器直接跑"),
+    H2("30 秒上手"),
+    Code("<div id=\"app\"></div>\n<script src=\"https://unpkg.com/xunay/dist/xunay.min.js\"></script>\n<script>\n  const { div, button, span, signal, mount } = XuNay\n  const n = signal(0)\n  mount(() => div(null,\n    button({ on: { click: () => n(v => v - 1) } }, \"-\"),\n    span(null, () => `n = ${n()}`),\n    button({ on: { click: () => n(v => v + 1) } }, \"+\")\n  ), \"#app\")\n</script>", "html"),
+    H2("概念对照"),
+    Table(["XuNay","React","Vue"], [["signal(0)","useState(0)","ref(0)"],["n()","n","n.value"],["n(1)","setN(1)","n.value = 1"],["computed(fn)","useMemo(fn, deps)","computed(fn)"],["effect(fn)","useEffect(fn, deps)","watchEffect(fn)"],["list(arr,key,fn)","arr.map(fn)","v-for"],["show(cond,fn)","cond ? A : B","v-if"]]),
+    H2("设计取舍"),
+    Quote("不兼容 React，不用 VDOM，不用 Fiber，不用 Hooks 链表，不写 TypeScript。"),
+  )
+}

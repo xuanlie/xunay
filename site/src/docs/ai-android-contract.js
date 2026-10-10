@@ -1,0 +1,23 @@
+// AI 契约：Android
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("AI 契约"),
+    P("给 AI 写 Android .xuy 的规则。违反契约会导致编译失败或运行时错误。"),
+    H2("能用"),
+    Table(["类别","用法"], [["信号","signal / s"],["派生","computed"],["条件","show(() => cond, () => tag)"],["列表","list(() => arr, item => tag)"],["事件","on: { click / input / change / submit / blur / focus }"],["属性","class / style / value / disabled / placeholder"],["生命周期","onMount / onUnmount / effect"],["持久化","localStorage"],["路由","page / goto / back"],["异步","async () => { await fetch(url) }"],["主题","setTheme"],["引用","ref()"]]),
+    H2("不能用"),
+    Table(["禁止","原因"], [["import xxx from \"外部库\"","Android 端不加载任何外部 JS"],["document.querySelector","没有 DOM"],["window.location","没有浏览器环境"],["WebSocket / EventSource","不支持"],["canvas / WebGL","用 3D 路"],["class Foo {}","不支持 class 语法"],["const { a } = obj","不支持解构"],["arr.map(x => <div/>)","用 list 而不是 map 生成元素"],["setInterval 里更新 signal","可以但要用 Signal 主线程调度（已内置）"],["CSS :hover","无鼠标"],["CSS transition","用 animate 属性"],["position: fixed 复杂定位","近似"]]),
+    H2("编写规则"),
+    Ul("1. 顶层结构只能是 app / mount / page / 顶层 tag","2. 组件用 function 或箭头函数，body 返回单个 tag","3. signal 名不能和 Java 关键字冲突（如 class / int / new）","4. computed 里只用表达式，不要副作用","5. 中文 / emoji 直接写，不用转义","6. 缩进 2 空格","7. 字符串用双引号（Java 生成更稳）"),
+    H2("推荐模式"),
+    Code("// 表单：signal + computed + show + disabled\\nconst name = s(\"\")\\nconst err = computed(() => name().length < 2 ? \"太短\" : \"\")\\nshow(() => err() !== \"\", () => span(null, () => err()))\\nbutton({ disabled: () => !!err() }, \"提交\")", "xuy"),
+    H2("反模式"),
+    Code("// 反模式 1：lambda 里写复杂逻辑\\nconst r = computed(() => {\\n  for (let i = 0; i < 1000; i++) { /* 循环 */ }\\n  return result\\n})\\n\\n// 反模式 2：signal 嵌套 signal\\nconst a = s(0)\\nconst b = s(a)  // 不要，b 拿到的是 Signal 对象\\n\\n// 反模式 3：computed 里改 signal\\nconst x = computed(() => { n(5); return n() })  // 不要", "xuy"),
+    H2("排查"),
+    P("AI 写完先跑："),
+    Code("node bin/xuyc-android.js examples/my.xuy --out build/android", "bash"),
+    P("看输出里 AST 是不是 1（或页数），再看 build/android 下有没有生成文件。"),
+  )
+}

@@ -1,0 +1,20 @@
+﻿import { div, mount } from 'xunay'
+
+const s = document.createElement('style')
+s.textContent = `
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cell { padding: 20px; background: #1f6feb; color: #fff; text-align: center; }
+.wide { grid-column: span 2; background: #e33; }
+.tall { grid-row: span 2; background: #8c4; }
+`
+
+mount(() => div({ class: 'grid' },
+  div({ class: 'cell' }, 'A'),
+  div({ class: 'cell' }, 'B'),
+  div({ class: 'cell' }, 'C'),
+  div({ class: 'cell wide' }, 'D-span2'),
+  div({ class: 'cell' }, 'E'),
+  div({ class: 'cell tall' }, 'F-tall'),
+  div({ class: 'cell' }, 'G'),
+  div({ class: 'cell' }, 'H')
+), '#app')

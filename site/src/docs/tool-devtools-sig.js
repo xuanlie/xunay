@@ -1,0 +1,30 @@
+// Signals 面板
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Signals 面板"),
+    P("显示所有 signal 的当前值、写入次数、订阅者数量。"),
+    H2("列表"),
+    Code("#0   string   0w   4s   \"/\"\n#1   object   0w   3s   [{\"id\":1,\"title\":\"...\"]\n#2   string   1w   1s   \"all\"\n#4   object   1w   2s   {\"total\":2,...}", "txt"),
+    H2("列含义"),
+    Table(["列","含义"], [["序号","#0 / #1 / ..."],["类型","string / number / object / boolean"],["写入次数","橙色 Xw，表示写了 X 次"],["订阅者","灰色 Xs，表示有 X 个订阅者"],["当前值","红色，超长截断"]]),
+    H2("过滤"),
+    Code("object     → 只显示 object 类型\n\"all\"      → 值含 all 的\n#3         → 只看 #3\ntodo       → 值含 todo 的", "txt"),
+    H2("复制全部"),
+    P("顶部 📋 按钮——一键复制所有 signal 的 JSON 快照："),
+    Code("[\n  { \"index\": 0, \"type\": \"string\", \"value\": \"/\", \"writes\": 0, \"subs\": 4 },\n  { \"index\": 1, \"type\": \"object\", \"value\": [...], \"writes\": 0, \"subs\": 3 }\n]", "json"),
+    H2("详情页"),
+    P("点任一行查看单条 signal 的完整信息："),
+    Ul("头部：序号、类型、订阅者、写入、创建时间","当前值（JSON 格式化）","写入历史（最近 30 条，时间 + 旧值 → 新值）"),
+    H2("写入历史"),
+    Code("10:31:05.234  \"all\" → \"active\"\n10:31:04.988  \"active\" → \"all\"\n10:31:03.512  \"\" → \"all\"", "txt"),
+    H2("实战用法"),
+    H3("找内存泄漏"),
+    P("反复操作后看 signal 数量是否持续增长。"),
+    H3("找性能瓶颈"),
+    P("看某个 signal 的写入次数——如果一次点击写 100 次，说明有循环。"),
+    H3("追踪状态变化"),
+    P("详情页看写入历史，一眼看出什么时候变成什么值。"),
+  )
+}
