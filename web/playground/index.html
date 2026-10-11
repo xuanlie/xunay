@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XuNay Playground</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0d1117; color: #e6edf3; min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { padding: 12px 20px; background: #161b22; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand { font-size: 18px; font-weight: 700; color: #58a6ff; }
+.actions { display: flex; gap: 8px; align-items: center; }
+.actions button { padding: 6px 14px; font-size: 13px; border: 1px solid #30363d; background: #21262d; color: #e6edf3; border-radius: 6px; cursor: pointer; font-family: inherit; }
+.actions button:hover { background: #30363d; }
+.actions button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+#component-picker { padding: 6px 10px; background: #21262d; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; font: inherit; font-size: 12px; }
+.main { flex: 1; display: flex; overflow: hidden; }
+.pane { flex: 1; display: flex; flex-direction: column; }
+.pane + .pane { border-left: 1px solid #30363d; }
+.pane-head { padding: 8px 14px; background: #161b22; border-bottom: 1px solid #30363d; font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+.editor { flex: 1; padding: 14px; background: #0d1117; color: #e6edf3; border: none; outline: none; font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.6; resize: none; tab-size: 2; }
+.preview { flex: 1; background: #fff; border: none; }
+@media (max-width: 768px) {
+  .main { flex-direction: column; }
+  .pane + .pane { border-left: none; border-top: 1px solid #30363d; }
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">XuNay Playground</div>
+  <select id="component-picker">
+    <option value="">插入组件...</option>
+    <option value="Btn">Btn 按钮</option>
+    <option value="Input">Input 输入框</option>
+    <option value="Modal">Modal 模态框</option>
+    <option value="Card">Card 卡片</option>
+    <option value="Badge">Badge 徽章</option>
+    <option value="Table">Table 表格</option>
+    <option value="BarChart">BarChart 柱状图</option>
+    <option value="Calendar">Calendar 日历</option>
+    <option value="Counter">Counter 计数</option>
+    <option value="Ripple">Ripple 涟漪</option>
+  </select>
+  <div class="actions">
+    <button id="reset">重置</button>
+    <button id="share">分享</button>
+    <button id="run" class="primary">运行 ▶</button>
+  </div>
+</div>
+<div class="main">
+  <div class="pane">
+    <div class="pane-head">代码</div>
+    <textarea id="code" class="editor" spellcheck="false"></textarea>
+  </div>
+  <div class="pane">
+    <div class="pane-head">预览</div>
+    <iframe id="preview" class="preview"></iframe>
+  </div>
+</div>
+<script src="./runner.js"></script>
+<script>
+const SNIPPETS = {
+  Btn: `import { mount } from 'xunay'
+import { Btn } from 'xunay/kit/base'
+
+mount(() => Btn({
+  type: 'primary',
+  onClick: () => alert('点了')
+}, '按钮'), '#app')`,
+  Input: `import { mount } from 'xunay'
+import { Input } from 'xunay/kit/form'
+
+mount(() => Input({
+  label: '用户名',
+  placeholder: '请输入',
+  onChange: v => console.log('输入:', v)
+}), '#app')`,
+  Modal: `import { mount } from 'xunay'
+import { Modal } from 'xunay/kit/display'
+
+mount(() => Modal({
+  open: true,
+  title: '提示',
+  onClose: () => console.log('关闭')
+}, '这是模态框内容'), '#app')`,
+  Card: `import { mount } from 'xunay'
+import { Card } from 'xunay/kit/base'
+
+mount(() => Card({
+  title: '标题',
+  desc: '副标题'
+}, '卡片内容'), '#app')`,
+  Badge: `import { mount } from 'xunay'
+import { Badge } from 'xunay/kit/base'
+
+mount(() => Badge({ type: 'success' }, '成功'), '#app')`,
+  Table: `import { mount } from 'xunay'
+import { Table } from 'xunay/kit/data'
+
+mount(() => Table({
+  columns: [
+    { title: '姓名', key: 'name' },
+    { title: '年龄', key: 'age' }
+  ],
+  data: [
+    { name: '张三', age: 20 },
+    { name: '李四', age: 25 }
+  ]
+}), '#app')`,
+  BarChart: `import { mount } from 'xunay'
+import { BarChart } from 'xunay/kit/charts'
+
+mount(() => BarChart({
+  data: [10, 20, 15, 30],
+  labels: ['A', 'B', 'C', 'D'],
+  height: 200
+}), '#app')`,
+  Calendar: `import { mount } from 'xunay'
+import { Calendar } from 'xunay/kit/data'
+
+mount(() => Calendar({ value: '2026-10-15' }), '#app')`,
+  Counter: `import { mount } from 'xunay'
+import { Counter } from 'xunay/anim'
+
+mount(() => Counter({ value: 12345, duration: 1000 }), '#app')`,
+  Ripple: `import { mount, button } from 'xunay'
+import { Ripple } from 'xunay/anim'
+
+mount(() => Ripple(null, button(null, '点我')), '#app')`,
+}
+
+const cp = document.getElementById('component-picker')
+cp.onchange = () => {
+  if (!cp.value) return
+  const ed = document.getElementById('code')
+  ed.value = SNIPPETS[cp.value] || ''
+  cp.value = ''
+  document.getElementById('run').click()
+}
+</script>
+</body>
+</html>

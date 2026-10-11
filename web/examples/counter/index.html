@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="UTF-8">
+<title>XuNay 计数器</title>
+<style>
+body{font-family:sans-serif;padding:2rem}
+.box{display:flex;gap:1rem;align-items:center}
+button{padding:.5rem 1rem;font-size:1.2rem;cursor:pointer}
+span{font-size:1.5rem}
+#err{display:none;padding:14px;background:#fff0f0;color:#cf222e;font-family:monospace;font-size:12px;white-space:pre-wrap;margin-top:16px;border:1px solid #ffb3b3;border-radius:6px}
+</style>
+</head><body>
+<div id="app"></div>
+<pre id="err"></pre>
+<script>
+window.addEventListener('error', e => {
+  const el = document.getElementById('err')
+  el.style.display = 'block'
+  el.textContent += '[ERROR] ' + (e.filename || '') + ':' + (e.lineno || '') + '\n' + ((e.error && e.error.stack) || e.message) + '\n\n'
+}, true)
+window.addEventListener('unhandledrejection', e => {
+  const el = document.getElementById('err')
+  el.style.display = 'block'
+  const r = e.reason
+  el.textContent += '[REJECT] ' + ((r && (r.stack || r.message)) || String(r)) + '\n\n'
+})
+</script>
+<script type="module">
+import { signal, mount, txt, show } from 'https://esm.sh/xunay@1.2.2'
+import { div, button, span } from 'https://esm.sh/xunay@1.2.2/tags'
+const n = signal(0)
+mount(() => div({ class: 'box' },
+  button({ on: { click: () => n(v => v - 1) } }, '-'),
+  span(null, txt`n = ${n}`),
+  button({ on: { click: () => n(v => v + 1) } }, '+'),
+  show(() => n() > 5, () => span({ style: { color: 'red' } }, ' 太多了'))
+), '#app')
+</script>
+</body></html>

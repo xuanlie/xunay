@@ -1,0 +1,84 @@
+// 首页：Hero + 快捷入口 + 特性 + 底部链接
+import { div, a, span, button } from 'xunay'
+import { go } from '../router.xuy'
+
+function copyCmd(e) {
+  const cmd = 'npm i xunay'
+  if (navigator.clipboard) navigator.clipboard.writeText(cmd)
+  const btn = e.currentTarget
+  btn.textContent = '已复制'
+  setTimeout(() => { btn.textContent = '复制' }, 1200)
+}
+
+export function Home() {
+  return div({ class: 'home' },
+
+    // Hero
+    div({ class: 'home-hero' },
+      div({ class: 'home-badge' }, 'v1.2.2 · MIT'),
+      div({ class: 'home-title' }, 'XuNay'),
+      div({ class: 'home-tagline' }, '内存最少、速度最快的前端框架'),
+      div({ class: 'home-cmd' },
+        span({ class: 'home-cmd-prompt' }, '$'),
+        span({ class: 'home-cmd-text' }, 'npm i xunay'),
+        button({ class: 'home-cmd-copy', on: { click: copyCmd } }, '复制')
+      ),
+      div({ class: 'home-cta' },
+        button({ class: 'home-btn primary', on: { click: () => go('/03-quickstart') } }, '快速开始'),
+        a({ class: 'home-btn', href: 'https://github.com/xuanlie/xunay', target: '_blank' }, 'GitHub')
+      )
+    ),
+
+    // 三个入口
+    div({ class: 'home-grid' },
+      div({ class: 'home-card', on: { click: () => go('/01-overview') } },
+        div({ class: 'home-card-icon' }, '📖'),
+        div({ class: 'home-card-title' }, '文档'),
+        div({ class: 'home-card-desc' }, '从安装到 API，完整参考'),
+        div({ class: 'home-card-arrow' }, '→')
+      ),
+      a({ class: 'home-card', href: '/playground/', target: '_blank' },
+        div({ class: 'home-card-icon' }, '⚡'),
+        div({ class: 'home-card-title' }, 'Playground'),
+        div({ class: 'home-card-desc' }, '在线写代码，实时预览'),
+        div({ class: 'home-card-arrow' }, '→')
+      ),
+      a({ class: 'home-card', href: '/examples/', target: '_blank' },
+        div({ class: 'home-card-icon' }, '🧩'),
+        div({ class: 'home-card-title' }, '案例'),
+        div({ class: 'home-card-desc' }, '100+ 可运行示例'),
+        div({ class: 'home-card-arrow' }, '→')
+      )
+    ),
+
+    // 特性
+    div({ class: 'home-section-title' }, '为什么选 XuNay'),
+    div({ class: 'home-features' },
+      div({ class: 'home-feature' },
+        div({ class: 'home-feature-num' }, '4.86KB'),
+        div({ class: 'home-feature-label' }, '核心 gzip')
+      ),
+      div({ class: 'home-feature' },
+        div({ class: 'home-feature-num' }, '0'),
+        div({ class: 'home-feature-label' }, '虚拟 DOM')
+      ),
+      div({ class: 'home-feature' },
+        div({ class: 'home-feature-num' }, 'Signal'),
+        div({ class: 'home-feature-label' }, '细粒度更新')
+      ),
+      div({ class: 'home-feature' },
+        div({ class: 'home-feature-num' }, '5 行'),
+        div({ class: 'home-feature-label' }, '起步代码')
+      )
+    ),
+
+    // 底部
+    div({ class: 'home-links' },
+      a({ href: 'https://npmjs.com/package/xunay', target: '_blank' }, 'npm'),
+      span({ class: 'home-link-sep' }, '·'),
+      a({ href: 'https://github.com/xuanlie/xunay', target: '_blank' }, 'GitHub'),
+      span({ class: 'home-link-sep' }, '·'),
+      a({ href: 'https://github.com/xuanlie/xunay/blob/main/LICENSE', target: '_blank' }, 'MIT License')
+    )
+  )
+}

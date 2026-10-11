@@ -9,9 +9,9 @@ const ROOT = path.resolve(__dirname, '..')
 // 扫描目录（用户可传参）
 const SCAN_DIRS = process.argv.slice(2)
 if (SCAN_DIRS.length === 0) {
-  SCAN_DIRS.push(path.join(ROOT, 'site', 'src'))
+  SCAN_DIRS.push(path.join(ROOT, 'web', 'site', 'src'))
 }
-const OUT_FILE = path.join(ROOT, 'site', 'dist', 'jit.css')
+const OUT_FILE = path.join(ROOT, 'web', 'site', 'dist', 'jit.css')
 
 const EXT = new Set(['.xuy', '.js', '.mjs', '.html', '.ts', '.tsx'])
 

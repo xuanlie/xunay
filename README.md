@@ -106,11 +106,21 @@ div span p a button input form label ul ol li h1–h6 table thead tbody tr td th
 ```
 xunay/
 ├── core/           运行时 + 106 个 kit 组件 + compiler2/3
+├── compiler2/      旧版编译器
 ├── compiler3/      acorn AST 编译器（当前推荐）
 ├── bin/            CLI（xuyc / xuyc3 / create / xai）
+├── scripts/        构建脚本（build-site / gen-jit / post-build）
 ├── backends/       后端参考实现（Node / Python / Go / C++）
-├── site/           文档站（322 篇，用 XuNay 自举）
-├── examples/       .xuy 示例
+├── web/
+│   ├── site/       文档站（322 篇，用 XuNay 自举）
+│   ├── playground/ 在线编辑器 + 实时预览
+│   └── examples/   100+ 可运行示例
+├── android/        Android 原生壳
+├── android-3d/     Android 3D 示例（Babylon）
+├── android-3d-filament/ Android Filament 3D
+├── bench/          性能基准测试
+├── deploy/         部署配置（nginx / systemd）
+├── types/          TypeScript 类型定义
 └── test/           测试
 ```
 
