@@ -19,79 +19,107 @@ function walk(dir, base) {
 function toRoute(rel) {
   const p = rel.replace(/\.xuy$/, '')
   const segs = p.split('/')
-  const effective = segs.filter(s => s !== 'index')
+  const effective = segs.filter((s) => s !== 'index')
   const urlSegs = []
   const params = []
-  const nameSegs = []
   for (const seg of effective) {
     if (seg.startsWith('[') && seg.endsWith(']')) {
       const pname = seg.slice(1, -1).toLowerCase()
       urlSegs.push(':' + pname)
       params.push(pname)
-      nameSegs.push(pname.charAt(0).toUpperCase() + pname.slice(1))
     } else {
       urlSegs.push(seg.toLowerCase())
-      nameSegs.push(seg.charAt(0).toUpperCase() + seg.slice(1))
     }
   }
   const url = '/' + urlSegs.join('/')
-  const compName = nameSegs.length > 0 ? nameSegs.join('') : 'Index'
-  return { url: url === '/' ? '/' : url, compName, params, rel }
+  return { url: url === '/' ? '/' : url, params, rel }
 }
 
 function generateRouter(routes) {
-  let out = '// 自动生成，请勿手改\n'
-  out += '// 源：src/pages/\n'
-  out += '// 用 node bin/scan-pages.js 或 xuyc build 同步\n\n'
-  out += "import { signal } from 'xunay'\n"
+  const L = []
+  L.push('// 自动生成，请勿手改')
+  L.push('// 源：src/pages/')
+  L.push('// 用 node bin/scan-pages.js 或 xuyc build 同步')
+  L.push('')
+  L.push("import { signal, show, div } from 'xunay'")
+  L.push('')
+  L.push("export const route = signal(norm(location.hash))")
+  L.push('')
+  L.push("if (typeof window !== 'undefined') {")
+  L.push("  window.addEventListener('hashchange', () => {")
+  L.push('    route(norm(location.hash))')
+  L.push('    window.scrollTo(0, 0)')
+  L.push('  })')
+  L.push('}')
+  L.push('')
+  L.push('function norm(h) {')
+  L.push("  h = (h || '').replace(/^#/, '')")
+  L.push("  if (!h) return '/'")
+  L.push("  if (!h.startsWith('/')) h = '/' + h")
+  L.push('  return h')
+  L.push('}')
+  L.push('')
+  L.push('export function go(p) {')
+  L.push("  location.hash = p.startsWith('/') ? p : '/' + p")
+  L.push('}')
+  L.push('')
+  L.push('const TABLE = [')
   for (const r of routes) {
-    out += "import { " + r.compName + " } from './pages/" + r.rel + "'\n"
+    L.push(
+      '  { url: ' + JSON.stringify(r.url) +
+      ', load: () => import(' + JSON.stringify('./pages/' + r.rel) + ')' +
+      ', params: ' + JSON.stringify(r.params) + ' },'
+    )
   }
-  out += '\n'
-  out += "export const route = signal(norm(location.hash))\n\n"
-  out += "if (typeof window !== 'undefined') {\n"
-  out += "  window.addEventListener('hashchange', () => {\n"
-  out += "    route(norm(location.hash))\n"
-  out += "    window.scrollTo(0, 0)\n"
-  out += "  })\n"
-  out += "}\n\n"
-  out += "function norm(h) {\n"
-  out += "  h = (h || '').replace(/^#/, '')\n"
-  out += "  if (!h) return '/'\n"
-  out += "  if (!h.startsWith('/')) h = '/' + h\n"
-  out += "  return h\n"
-  out += "}\n\n"
-  out += "export function go(p) {\n"
-  out += "  location.hash = p.startsWith('/') ? p : '/' + p\n"
-  out += "}\n\n"
-  out += 'const TABLE = [\n'
-  for (const r of routes) {
-    out += '  { url: ' + JSON.stringify(r.url) + ', Comp: ' + r.compName + ', params: ' + JSON.stringify(r.params) + ' },\n'
-  }
-  out += ']\n\n'
-  out += "export function match(path) {\n"
-  out += "  for (const r of TABLE) {\n"
-  out += "    const m = parse(r, path)\n"
-  out += "    if (m) return m\n"
-  out += "  }\n"
-  out += "  return null\n"
-  out += "}\n\n"
-  out += "function parse(r, path) {\n"
-  out += "  if (r.params.length === 0) {\n"
-  out += "    return r.url === path ? { Comp: r.Comp, params: {} } : null\n"
-  out += "  }\n"
-  out += "  const parts = path.split('/').filter(Boolean)\n"
-  out += "  const tpl = r.url.split('/').filter(Boolean)\n"
-  out += "  if (parts.length !== tpl.length) return null\n"
-  out += "  const params = {}\n"
-  out += "  for (let i = 0; i < tpl.length; i++) {\n"
-  out += "    const t = tpl[i]\n"
-  out += "    if (t.startsWith(':')) params[t.slice(1)] = decodeURIComponent(parts[i])\n"
-  out += "    else if (t !== parts[i]) return null\n"
-  out += "  }\n"
-  out += "  return { Comp: r.Comp, params }\n"
-  out += "}\n"
-  return out
+  L.push(']')
+  L.push('')
+  L.push('const _pageCache = new Map()')
+  L.push('const _loading = new Map()')
+  L.push('')
+  L.push('export function match(path) {')
+  L.push('  for (const r of TABLE) {')
+  L.push('    const m = parse(r, path)')
+  L.push('    if (m) return { url: r.url, load: r.load, params: m.params }')
+  L.push('  }')
+  L.push('  return null')
+  L.push('}')
+  L.push('')
+  L.push('export function LazyPage(m) {')
+  L.push('  const comp = signal(_pageCache.get(m.url))')
+  L.push('  if (!comp() && !_loading.has(m.url)) {')
+  L.push('    _loading.set(m.url, true)')
+  L.push('    m.load().then((mod) => {')
+  L.push('      const fn = Object.values(mod).find((v) => typeof v === "function")')
+  L.push('      _pageCache.set(m.url, fn)')
+  L.push('      comp(fn)')
+  L.push('    }).catch((e) => {')
+  L.push('      console.error("[router] lazy load failed:", m.url, e)')
+  L.push('      _loading.delete(m.url)')
+  L.push('    })')
+  L.push('  }')
+  L.push('  return show(')
+  L.push('    () => comp() !== undefined && comp() !== null,')
+  L.push('    () => { const C = comp(); return C ? C(m.params) : div({ class: "x-empty" }, "") }')
+  L.push('  )')
+  L.push('}')
+  L.push('')
+  L.push('function parse(r, path) {')
+  L.push('  if (r.params.length === 0) {')
+  L.push('    return r.url === path ? { params: {} } : null')
+  L.push('  }')
+  L.push("  const parts = path.split('/').filter(Boolean)")
+  L.push("  const tpl = r.url.split('/').filter(Boolean)")
+  L.push('  if (parts.length !== tpl.length) return null')
+  L.push('  const params = {}')
+  L.push('  for (let i = 0; i < tpl.length; i++) {')
+  L.push('    const t = tpl[i]')
+  L.push("    if (t.startsWith(':')) params[t.slice(1)] = decodeURIComponent(parts[i])")
+  L.push('    else if (t !== parts[i]) return null')
+  L.push('  }')
+  L.push('  return { params }')
+  L.push('}')
+  L.push('')
+  return L.join('\n')
 }
 
 export function scanPages(cwd) {

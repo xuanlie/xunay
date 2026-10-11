@@ -18,7 +18,9 @@ function readXunayConfig() {
     try {
       const j = JSON.parse(fs.readFileSync(f, 'utf8'))
       if (j.xunay) return j.xunay
-    } catch (e) {}
+    } catch (e) {
+      console.warn('[xuyc] 读取 ' + f + ' 失败: ' + e.message)
+    }
   }
   return {}
 }
@@ -26,7 +28,7 @@ const XUNAY_CFG = readXunayConfig()
 const IS_PROD = process.env.NODE_ENV === 'production' || XUNAY_CFG.production === true
 const DEVTOOLS_ON = XUNAY_CFG.devtools !== false && !IS_PROD
 const MINIFY = XUNAY_CFG.minify !== undefined ? XUNAY_CFG.minify : IS_PROD
-const TARGET = XUNAY_CFG.target || "es2020"
+const TARGET = XUNAY_CFG.target || 'es2020'
 const SOURCEMAP = XUNAY_CFG.sourcemap !== undefined ? XUNAY_CFG.sourcemap : !IS_PROD
 const EXTERNALS = XUNAY_CFG.externals || []
 const ALIAS = XUNAY_CFG.alias || {}
@@ -34,12 +36,15 @@ const DEFINE = XUNAY_CFG.define || {}
 const TITLE_CFG = XUNAY_CFG.title || null
 const OPEN_BROWSER = XUNAY_CFG.open === true
 const PWA_CFG = XUNAY_CFG.pwa || null
+const COMPILE_MODE = XUNAY_CFG.compileMode || 'compiled'
+const ERR_SCRIPT_ON = XUNAY_CFG.errScript !== false && !IS_PROD
+const KEEP = process.env.XUYC_KEEP === '1'
 
-let DEVTOOLS_INJECTED = false
 console.log('[xuyc] devtools:', DEVTOOLS_ON ? 'on' : 'off')
+console.log('[xuyc] compileMode:', COMPILE_MODE)
 const args = process.argv.slice(2)
 
-// --target=ui|3d|filament → 转发到 Android CLI
+// --target=ui|3d|filament → 转发到 Android/3D CLI
 {
   const __ti = args.findIndex(a => a === '--target' || a.startsWith('--target='))
   if (__ti >= 0) {
@@ -50,7 +55,6 @@ const args = process.argv.slice(2)
       console.error('[xuyc] 未知 --target: ' + __tv + '（支持 ui / 3d / filament）')
       process.exit(1)
     }
-    // 去掉 --target 相关参数
     const __fwd = []
     for (let i = 0; i < args.length; i++) {
       if (i === __ti) { if (!args[__ti].includes('=')) i++; continue }
@@ -93,105 +97,191 @@ const outIdx = args.indexOf('--out')
 const outDir = outIdx >= 0 ? path.resolve(args[outIdx + 1]) : path.resolve(XUNAY_CFG.outDir || 'dist')
 fs.mkdirSync(outDir, { recursive: true })
 
-const esm = path.join(ROOT, 'core/dist/xunay-site.esm.js')
-if (!fs.existsSync(esm)) {
+const esm = [
+  path.join(ROOT, 'dist/xunay-site.esm.js'),
+  path.join(ROOT, 'dist/xunay-site.esm.js'),
+].find(p => fs.existsSync(p))
+if (!esm) {
   console.error('缺少 core/dist/xunay-site.esm.js，先跑 node core/build.js')
   process.exit(1)
 }
 const xunayPath = path.join(outDir, 'xunay.js')
 fs.copyFileSync(esm, xunayPath)
 
-// devtools 产物（如果配置开启）
+// devtools 产物
 let dtFileName = 'xunay-devtools.js'
 if (DEVTOOLS_ON) {
-  const dtSrc = path.join(ROOT, 'core/dist/xunay-devtools.min.js')
-  if (fs.existsSync(dtSrc)) {
-    const hash = Math.floor(fs.statSync(dtSrc).mtimeMs).toString(36).slice(-8)
-    dtFileName = 'xunay-devtools.' + hash + '.js'
+  const dtSrc = [
+    path.join(ROOT, 'dist/xunay-devtools.min.js'),
+    path.join(ROOT, 'dist/xunay-devtools.min.js'),
+  ].find(p => fs.existsSync(p))
+  if (dtSrc) {
+    dtFileName = 'xunay-devtools.js'
     fs.copyFileSync(dtSrc, path.join(outDir, dtFileName))
   }
 }
 
 // 可选入口：core/dist/xunay-*.min.js → outDir/xunay-*.js
-const optionals = ['kit', 'devtools', 'ssr', 'anim', 'dev']
-const optPaths = {}
+const optionals = ['kit', 'devtools', 'ssr', 'anim', 'dev', 'alias', 'tags', 'audio', 'auth', 'babylon', 'music', 'game', 'game-mobile', 'router', 'theme', 'i18n', 'http', 'storage', 'persist', 'query', 'mobile', 'form']
 for (const name of optionals) {
-  const src = path.join(ROOT, 'core/dist/xunay-' + name + '.min.js')
-  if (fs.existsSync(src)) {
-    const dst = path.join(outDir, 'xunay-' + name + '.js')
-    fs.copyFileSync(src, dst)
-    optPaths[name] = dst
-  }
+  const src = [
+    path.join(ROOT, 'dist/xunay-' + name + '.min.js'),
+    path.join(ROOT, 'dist/xunay-' + name + '.min.js'),
+  ].find(p => fs.existsSync(p))
+  if (src) fs.copyFileSync(src, path.join(outDir, 'xunay-' + name + '.js'))
 }
 
+// === 状态 ===
 const cache = new Map()
+const generated = new Set()      // 生成的 .xuy→.js，构建后删除
+const modified = new Map()       // 被改写的 .js 源文件，构建后还原
+
+function shouldCompileFile(src) {
+  if (/^\s*\/\/\s*@compiled/.test(src)) return true
+  if (/^\s*\/\/\s*@runtime/.test(src)) return false
+  return COMPILE_MODE !== 'runtime'
+}
+
+function expandAlias(spec) {
+  if (!spec) return null
+  if (spec.startsWith('.') || spec.startsWith('/') || spec.startsWith('node:')) return null
+  if (spec === 'xunay' || spec.startsWith('xunay/')) return null
+  for (const [key, value] of Object.entries(ALIAS)) {
+    if (spec === key || spec.startsWith(key + '/')) {
+      const rel = spec === key ? '' : spec.slice(key.length + 1)
+      return path.resolve(process.cwd(), value, rel)
+    }
+  }
+  return null
+}
+
+const XUNAY_MAP = {
+  '/kit': 'xunay-kit',
+  '/anim': 'xunay-anim',
+  '/ssr': 'xunay-ssr',
+  '/devtools': 'xunay-devtools',
+  '/alias': 'xunay-alias',
+  '/tags': 'xunay-tags',
+  '/audio': 'xunay-audio',
+  '/auth': 'xunay-auth',
+  '/babylon': 'xunay-babylon',
+  '/music': 'xunay-music',
+  '/game': 'xunay-game',
+  '/game-mobile': 'xunay-game-mobile',
+  '/router': 'xunay-router',
+  '/theme': 'xunay-theme',
+  '/i18n': 'xunay-i18n',
+  '/http': 'xunay-http',
+  '/storage': 'xunay-storage',
+  '/persist': 'xunay-persist',
+  '/query': 'xunay-query',
+  '/mobile': 'xunay-mobile',
+  '/form': 'xunay-form',
+}
+
+function resolveXunaySub(sub) {
+  if (!sub) return xunayPath
+  for (const [k, v] of Object.entries(XUNAY_MAP)) {
+    if (sub === k || sub.startsWith(k + '/')) return path.join(outDir, v + '.js')
+  }
+  return null
+}
+
+function rewriteImports(src) {
+  // 1. xunay / xunay/*（静态和动态一起处理）
+  src = src.replace(/(['"])xunay(\/[^'"]*)?\1/g, (m, q, sub) => {
+    const target = resolveXunaySub(sub)
+    if (!target) return m
+    return q + target.replace(/\\/g, '/') + q
+  })
+  // 2. .xuy → .js
+  src = src.replace(/from\s+(['"])([^'"]+)\.xuy\1/g, 'from $1$2.js$1')
+  src = src.replace(/import\(\s*(['"])([^'"]+)\.xuy\1\s*\)/g, 'import($1$2.js$1)')
+  // 3. 静态 import alias 展开
+  src = src.replace(/from\s+(['"])([^'"]+)\1/g, (m, q, spec) => {
+    const abs = expandAlias(spec)
+    if (!abs) return m
+    return `from ${q}${abs}${q}`
+  })
+  // 4. 动态 import alias 展开
+  src = src.replace(/import\(\s*(['"])([^'"]+)\1\s*\)/g, (m, q, spec) => {
+    const abs = expandAlias(spec)
+    if (!abs) return m
+    return `import(${q}${abs}${q})`
+  })
+  return src
+}
+
+function resolveDep(spec, basedir) {
+  if (!spec) return null
+  if (spec === 'xunay' || spec.startsWith('xunay/')) return null
+  if (spec.startsWith('node:')) return null
+  let p
+  if (spec.startsWith('.')) p = path.resolve(basedir, spec)
+  else if (spec.startsWith('/')) p = spec
+  else {
+    const abs = expandAlias(spec)
+    if (!abs) return null  // 裸包名，交给 esbuild
+    p = abs
+  }
+  const candidates = []
+  // 优先 .xuy：如果 p 是 .js 且同名 .xuy 存在，用 .xuy
+  if (p.endsWith('.js')) {
+    const xuyAlt = p.replace(/\.js$/, '.xuy')
+    if (fs.existsSync(xuyAlt) && fs.statSync(xuyAlt).isFile()) candidates.push(xuyAlt)
+  }
+  candidates.push(
+    p,
+    p + '.js',
+    p + '.xuy',
+    path.join(p, 'index.js'),
+    path.join(p, 'index.xuy'),
+  )
+  for (const c of candidates) {
+    try {
+      if (fs.existsSync(c) && fs.statSync(c).isFile()) return c
+    } catch {}
+  }
+  return null
+}
+
 function processFile(file) {
   if (cache.has(file)) return cache.get(file)
-  let src = fs.readFileSync(file, 'utf8')
-  src = src.replace(/^(\s*import\s+[^\n]*?\s+from\s+)['"]xunay['"]/gm, (m, prefix) => prefix + "'" + xunayPath.replace(/\\/g, '/') + "'")
+  const original = fs.readFileSync(file, 'utf8')
+  let src = rewriteImports(original)
 
-  src = src.replace(/from\s+(['"])([^'"]+)\.xuy\1/g, "from $1$2.js$1")
-  // 动态 import('./x.xuy') → import('./x.js')
-  src = src.replace(/import\(\s*(['"])([^'"]+)\.xuy\1\s*\)/g, "import($1$2.js$1)")
-
-  // 展开 xunay.alias：@/xxx → 绝对路径
-  // （esbuild 的 alias 只对裸包名生效，不支持路径别名）
-  src = src.replace(/from\s+(['"])([^'"]+)\1/g, (m, q, p2) => {
-    if (p2.startsWith('.') || p2.startsWith('/') || p2.startsWith('node:')) return m
-    if (p2 === 'xunay' || p2.startsWith('xunay/')) return m
-    for (const [key, value] of Object.entries(ALIAS)) {
-      if (p2 === key || p2.startsWith(key + '/')) {
-        const rel = p2 === key ? '' : p2.slice(key.length + 1)
-        const abs = path.resolve(process.cwd(), value, rel)
-        return `from ${q}${abs}${q}`
-      }
-    }
-    return m
-  })
-  // ?????:.xuy ? ?? DOM ??
-  if (file.endsWith('.xuy') && !process.env.XUYC_NO_COMPILE && !/^\s*\/\/\s*@runtime/.test(src)) {
+  if (file.endsWith('.xuy') && !process.env.XUYC_NO_COMPILE && shouldCompileFile(src)) {
     try {
       const before = src.length
-      src = compileXuy(src, { mode: 'compiled' })  // compiler3 显式 compiled
+      src = compileXuy(src, { mode: 'compiled' })
       if (process.env.XUYC_DEBUG) console.log('[xuyc] compiled ' + file + ': ' + before + ' -> ' + src.length)
     } catch (e) {
-      console.warn('[xuyc] FAIL ' + file + ': ' + e.message)
+      console.error('[xuyc] 编译失败 ' + file + ': ' + e.message)
+      process.exit(1)
     }
   }
 
-  const out = file.replace(/\.xuy$/, '.js')
-  fs.writeFileSync(out, src)
+  const isXuy = file.endsWith('.xuy')
+  const out = isXuy ? file.replace(/\.xuy$/, '.js') : file
+  if (isXuy) {
+    fs.writeFileSync(out, src)
+    generated.add(out)
+  } else if (src !== original) {
+    if (!modified.has(file)) modified.set(file, original)
+    fs.writeFileSync(out, src)
+  }
   cache.set(file, out)
-  const re = /(?:from\s+|import\(\s*)['"]([^'"]+\.(?:xuy|js))['"]/g
+
+  const re = /(?:from\s+|import\(\s*)['"]([^'"]+)['"]/g
   let m
   while ((m = re.exec(src))) {
-    const dep = m[1]
-    let depPath = null
-
-    // 1. 尝试 alias 展开（@/x → <cwd>/<alias value>/x）
-    for (const [key, value] of Object.entries(ALIAS)) {
-      if (dep === key || dep.startsWith(key + '/')) {
-        const rel = dep === key ? '' : dep.slice(key.length + 1)
-        depPath = path.resolve(process.cwd(), value, rel)
-        break
-      }
-    }
-
-    // 2. 相对路径
-    if (!depPath && (dep.startsWith('.') || dep.startsWith('/'))) {
-      depPath = path.resolve(path.dirname(file), dep)
-    }
-
-    if (depPath) {
-      let depXuy = depPath.replace(/\.js$/, '.xuy')
-      if (fs.existsSync(depXuy)) processFile(depXuy)
-      else if (fs.existsSync(depPath) && depPath.endsWith('.xuy')) processFile(depPath)
-    }
+    const depPath = resolveDep(m[1], path.dirname(file))
+    if (depPath) processFile(depPath)
   }
   return out
 }
 
-// 自动扫描文件系统路由（src/pages/ 存在时）
+// 自动扫描文件系统路由
 if (XUNAY_CFG.scan !== false) {
   try {
     const { scanPages } = await import('./lib/scan-pages.js')
@@ -215,7 +305,7 @@ const baseOpts = {
   charset: 'utf8',
   sourcemap: SOURCEMAP,
   external: EXTERNALS,
-  alias: Object.assign({ 'xunay': path.resolve(xunayPath) }, ALIAS),
+  alias: ALIAS,
   define: DEFINE,
 }
 if (WANT_SPLIT) {
@@ -231,32 +321,48 @@ if (WANT_SPLIT) {
   }))
 }
 
-for (const [, out] of cache) {
-  try { fs.unlinkSync(out) } catch (e) {}
+if (!KEEP) {
+  for (const f of generated) {
+    try { fs.unlinkSync(f) } catch (e) { console.warn('[xuyc] 清理失败 ' + f + ': ' + e.message) }
+  }
+  for (const [f, orig] of modified) {
+    try { fs.writeFileSync(f, orig) } catch (e) { console.warn('[xuyc] 还原失败 ' + f + ': ' + e.message) }
+  }
+} else {
+  console.log('[xuyc] XUYC_KEEP=1，保留 ' + generated.size + ' 个生成产物，' + modified.size + ' 个源文件保持改写')
 }
 
-// 复制入口目录 + src 下的 CSS
+// 复制 CSS（递归）
 const cssLinks = []
 function collectCss(dir, rel) {
   if (!fs.existsSync(dir)) return
   for (const f of fs.readdirSync(dir)) {
-    if (f.endsWith('.css')) {
+    if (f === 'node_modules' || f === '.git') continue
+    const full = path.join(dir, f)
+    try {
+      if (path.resolve(full) === path.resolve(outDir)) continue
+    } catch {}
+    const stat = fs.statSync(full)
+    if (stat.isDirectory()) {
+      collectCss(full, rel ? path.join(rel, f) : f)
+    } else if (f.endsWith('.css')) {
       const dst = path.join(outDir, rel, f)
       fs.mkdirSync(path.dirname(dst), { recursive: true })
-      fs.copyFileSync(path.join(dir, f), dst)
+      fs.copyFileSync(full, dst)
       cssLinks.push('./' + path.join(rel, f).replace(/\\/g, '/'))
     }
   }
 }
 collectCss(entryDir, '')
-collectCss(path.join(entryDir, 'src'), 'src')
 
-// 内置 CSS（从配置读，默认全部）
 const builtinCss = Array.isArray(XUNAY_CFG.css) ? XUNAY_CFG.css : ['tw', 'ui']
 console.log('[xuyc] 内置 CSS:', builtinCss.length ? builtinCss.join(', ') : '(无)')
 for (const name of builtinCss) {
-  const src = path.join(ROOT, 'core/src/' + name + '.css')
-  if (fs.existsSync(src)) {
+  const src = [
+    path.join(ROOT, 'src/' + name + '.css'),
+    path.join(ROOT, 'src/' + name + '.css'),
+  ].find(p => fs.existsSync(p))
+  if (src) {
     fs.copyFileSync(src, path.join(outDir, name + '.css'))
     cssLinks.push('./' + name + '.css')
   } else {
@@ -264,19 +370,18 @@ for (const name of builtinCss) {
   }
 }
 
-// 复制 docs 目录（如果存在）
+// 复制 docs
 const docsDir = path.join(entryDir, 'docs')
 if (fs.existsSync(docsDir)) {
   const dst = path.join(outDir, 'docs')
   fs.mkdirSync(dst, { recursive: true })
-  function cp(src, dst2) {
+  ;(function cp(src, dst2) {
     for (const f of fs.readdirSync(src)) {
       const s = path.join(src, f), d = path.join(dst2, f)
       if (fs.statSync(s).isDirectory()) { fs.mkdirSync(d, { recursive: true }); cp(s, d) }
       else fs.copyFileSync(s, d)
     }
-  }
-  cp(docsDir, dst)
+  })(docsDir, dst)
 }
 
 const raw = fs.readFileSync(entryPath, 'utf8')
@@ -285,7 +390,7 @@ const title = TITLE_CFG || (t ? t[1].trim() : path.basename(entryPath, '.xuy'))
 
 const cssTag = cssLinks.map(l => '<link rel="stylesheet" href="' + l + '">').join('\n')
 const devtoolsScript = DEVTOOLS_ON ? '<script type="module" async src="./' + dtFileName + '"></script>' : ''
-const errScript = IS_PROD ? '' : '<script>window.addEventListener("error",function(e){var m=(e.error&&e.error.stack)||e.message||"unknown";var l=(e.filename||"")+":"+(e.lineno||"")+":"+(e.colno||"");var d=document.getElementById("app");if(d)d.innerHTML="<pre style=\\"color:#d00;padding:20px;font-size:12px;white-space:pre-wrap;word-break:break-all\\">[ERROR]\\n\\n"+l+"\\n\\n"+m+"</pre>"},true);window.addEventListener("unhandledrejection",function(e){var r=e.reason;var d=document.getElementById("app");if(d)d.innerHTML="<pre style=\\"color:#d00;padding:20px;font-size:12px;white-space:pre-wrap\\">[REJECT]\\n\\n"+((r&&(r.stack||r.message))||r)+"</pre>"})</script>'
+const errScript = ERR_SCRIPT_ON ? '<script>window.addEventListener("error",function(e){var m=(e.error&&e.error.stack)||e.message||"unknown";var l=(e.filename||"")+":"+(e.lineno||"")+":"+(e.colno||"");var d=document.getElementById("app");if(d)d.innerHTML="<pre style=\\"color:#d00;padding:20px;font-size:12px;white-space:pre-wrap;word-break:break-all\\">[ERROR]\\n\\n"+l+"\\n\\n"+m+"</pre>"},true);window.addEventListener("unhandledrejection",function(e){var r=e.reason;var d=document.getElementById("app");if(d)d.innerHTML="<pre style=\\"color:#d00;padding:20px;font-size:12px;white-space:pre-wrap\\">[REJECT]\\n\\n"+((r&&(r.stack||r.message))||r)+"</pre>"})</script>' : ''
 let pwaHead = ''
 let pwaScript = ''
 if (PWA_CFG) {
@@ -346,7 +451,6 @@ if (PWA_CFG) {
 
 console.log('构建完成: ' + outDir)
 
-// 自动打开浏览器
 if (OPEN_BROWSER) {
   try {
     const { execSync } = await import('node:child_process')

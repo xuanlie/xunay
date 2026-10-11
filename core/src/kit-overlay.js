@@ -5,7 +5,7 @@ import { show } from './misc.js'
 import { signal, effect, onCleanup } from './core.js'
 import { isTouch } from './mobile.js'
 import { lockScroll, swipe } from './mobile.js'
-import { Btn } from './kit.js'
+import { Btn, Row } from './kit.js'
 
 export function Tooltip(props, ...children) {
   const { text, position = 'top', trigger } = px(props)

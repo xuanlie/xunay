@@ -45,3 +45,8 @@ compiler3/dist/
 .idea/
 *.swp
 *~
+*.bak_*
+*.bak2
+dist/
+dist/
+.github/

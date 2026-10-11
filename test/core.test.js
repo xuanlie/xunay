@@ -120,7 +120,6 @@ test('list 重复 key 会警告', () => {
   const origWarn = console.warn
   console.warn = (...args) => warns.push(args.join(' '))
   try {
-    const { signal: sig } = require('../core/src/core.js')
     // 这个测试需要 DOM，跳过
   } finally {
     console.warn = origWarn

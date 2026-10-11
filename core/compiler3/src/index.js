@@ -406,7 +406,8 @@ function genChild(parentVar, node, src, bound, lines) {
 
   if (isFn(node)) {
     const tVar = uid('t')
-    lines.push(`const ${tVar} = document.createTextNode('')`)
+    lines.push(`const ${tVar} = document.createElement('span')`)
+    lines.push(`${tVar}.style.display = 'contents'`)
     const info = detectSingleSignal(node, src)
     if (info) {
       // 单信号直出

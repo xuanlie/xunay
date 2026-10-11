@@ -1,4 +1,4 @@
-// compiler2 编译产物依赖的运行时
+// compiler2/compiler3 编译产物依赖的运行时
 import { effect, onCleanup } from './core.js'
 import { render as __render } from './render.js'
 import { createScope, disposeScope, runInScope, runtime } from './runtime.js'
@@ -9,6 +9,16 @@ export function renderChild(...args) {
   const f = document.createDocumentFragment()
   for (const a of args) f.appendChild(__render(a))
   return f
+}
+
+export const toString = (v) => v == null ? '' : String(v)
+
+export function bindTextDirect(textNode, sig, toStr) {
+  const update = () => { textNode.textContent = toStr(sig()) }
+  update()
+  const ls = sig._listeners
+  if (!ls) sig._listeners = [update]
+  else ls.push(update)
 }
 
 export function bindText(node, fn) {
@@ -59,9 +69,61 @@ export function bindAttr(el, name, fn) {
   })
 }
 
+export function bindStyle(el, fn) {
+  let prev = {}
+  effect(() => {
+    const s = fn()
+    if (s == null) { el.style.cssText = ''; prev = {}; return }
+    if (typeof s === 'string') { el.style.cssText = s; prev = {}; return }
+    if (typeof s !== 'object') return
+    for (const k of Object.keys(prev)) if (!(k in s)) el.style[k] = ''
+    for (const k of Object.keys(s)) if (el.style[k] !== s[k]) el.style[k] = s[k]
+    prev = s
+  })
+}
+
+export function applyProps(el, props) {
+  if (!props) return
+  for (const key of Object.keys(props)) {
+    const v = props[key]
+    if (key === 'on' && v) { for (const ev of Object.keys(v)) el.addEventListener(ev, v[ev]) }
+    else if (key === 'style' && v) {
+      if (typeof v === 'string') el.style.cssText = v
+      else Object.assign(el.style, v)
+    }
+    else if (key === 'class' || key === 'className') el.className = v == null ? '' : v
+    else if (key === 'ref' && typeof v === 'function') v(el)
+    else if (key === 'value' || key === 'textContent') el[key] = v == null ? '' : v
+    else if (typeof v === 'boolean') { el[key] = v; if (!v) el.removeAttribute(key) }
+    else if (v == null) { /* skip */ }
+    else el.setAttribute(key, v)
+  }
+}
+
+export function applyStyle(el, style) {
+  if (style == null) return
+  if (typeof style === 'string') el.style.cssText = style
+  else if (typeof style === 'object') Object.assign(el.style, style)
+}
+
+export function classNames(obj) {
+  if (!obj || typeof obj !== 'object') return ''
+  const out = []
+  for (const k of Object.keys(obj)) if (obj[k]) out.push(k)
+  return out.join(' ')
+}
+
+export function createStatic(html) {
+  const tpl = document.createElement('template')
+  tpl.innerHTML = html
+  return tpl.content.firstChild
+}
+
 export function install() {
   if (typeof globalThis === 'undefined') return
   globalThis.__rt__ = {
     bindText, bindAttr, renderChild,
+    bindTextDirect, bindStyle, applyProps, applyStyle,
+    classNames, createStatic, toString,
   }
 }

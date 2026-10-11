@@ -79,7 +79,7 @@ export function onInterval(fn, ms) {
 
 // 元素可见性变化
 export function onVisible(el, onShow, onHide) {
-  if (typeof document === 'undefined' || !document.hidden !== undefined) return () => {}
+  if (typeof document === 'undefined' || typeof document.hidden === 'undefined') return () => {}
   const handler = () => {
     if (document.hidden) onHide && onHide()
     else onShow && onShow()

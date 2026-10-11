@@ -61,6 +61,8 @@ await build({
 })
 
 for (const [entry, out] of [
+  ['alias-entry.js', 'xunay-alias.min.js'],
+  ['tags-entry.js', 'xunay-tags.min.js'],
   ['ssr-entry.js', 'xunay-ssr.min.js'],
   ['babylon-entry.js', 'xunay-babylon.min.js'],
   ['audio-entry.js', 'xunay-audio.min.js'],

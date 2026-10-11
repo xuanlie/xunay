@@ -1,0 +1,9 @@
+node_modules
+dist
+**/dist
+*.min.js
+docs
+site/src/docs
+*.bak*
+*.backup*
+package-lock.json

@@ -2,6 +2,8 @@
 import { div } from './element.js'
 import { signal } from './core.js'
 import { px } from './kit-util.js'
+import { Col } from './kit.js'
+import { show } from './misc.js'
 
 // ===== 虚拟滚动 =====
 export function VirtualList(props) {
