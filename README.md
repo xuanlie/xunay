@@ -1,4 +1,3 @@
-```markdown
 # XuNay
 
 编译期优先 + 细粒度响应式的前端框架。`.xuy` 就是 JavaScript——标签名可以当函数直接用。
@@ -17,14 +16,20 @@ mount(() => div(null,
 
 没有 JSX，没有模板语法，没有 Hooks 规则。
 
-快速开始
+## 在线
+
+- 文档：http://107.172.190.220:12342/
+- Playground：http://107.172.190.220:12342/playground/
+- 示例集：http://107.172.190.220:12342/examples/
+
+## 快速开始
 
 ```bash
 npm i xunay
 npx xuyc3 build app.xuy --out dist
 ```
 
-性能（Node.js 22 + V8 实测）
+## 性能（Node.js 22 + V8 实测）
 
 操作 耗时
 signal 读 3 ns
@@ -34,7 +39,7 @@ computed 缓存命中 16 ns
 
 内核走 listener 直挂 + _ultra 快路径，和 Preact Signals / Solid 同量级。
 
-体积（gzip 实测）
+## 体积（gzip 实测）
 
 模块 大小
 xunay.min.js（核心） 7.06 KB
@@ -43,7 +48,7 @@ xunay-kit.min.js（106 组件） 29.58 KB
 xunay-anim.min.js（228 动画） 15.06 KB
 xunay-ssr.min.js 5.45 KB
 
-compiler3
+## compiler3
 
 用 acorn 解析 .xuy 源码，做作用域分析，把标签调用编译成 DOM 创建代码。
 
@@ -51,7 +56,7 @@ compiler3
 · value 响应式正确：input({ value: () => n() }) 生成 bindAttr
 · 支持 spread / 嵌套 / 三元里的标签
 
-编译模式
+## 编译模式
 
 package.json：
 
@@ -82,7 +87,7 @@ npx xuyc3 build app.xuy --mode runtime
 
 优先级：文件头 > 命令行 > package.json > 默认。
 
-核心 API
+## 核心 API
 
 API 说明
 signal(init) 响应式状态。s() 读，s(v) 写，s(fn) 函数式更新
@@ -95,13 +100,13 @@ mount(comp, target) 挂载应用
 list(arr, key, fn) keyed 列表
 show(cond, fn) 条件渲染
 
-内置标签（50 个）
+## 内置标签（50 个）
 
 div span p a button input form label ul ol li h1–h6 table thead tbody tr td th img br hr pre code blockquote header footer nav main section article select option textarea canvas video audio summary details
 
 不在列表里的标签用 createElement('x', ...) 或 tag('x')。
 
-项目结构
+## 项目结构
 
 ```
 xunay/
@@ -124,7 +129,7 @@ xunay/
 └── test/           测试
 ```
 
-测试
+## 测试
 
 ```bash
 node --test compiler3/test/*.test.js core/test/*.test.js
@@ -132,8 +137,7 @@ node --test compiler3/test/*.test.js core/test/*.test.js
 
 1571 个测试全绿。
 
-许可
+## 许可
 
 MIT
 
-```
