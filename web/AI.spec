@@ -121,8 +121,11 @@ id:E005
 id:E006
   sym:5000 items -> 731KB single arrow function
   cause:compiled mode fully expands each li
-  fix:use list() API for arrays >200 elements
-  note:JSDOM shows high variance, real browser unverified
+  status:NOT-A-BUG
+  evidence:min-time compiled 270ms vs loop 291ms, compiled faster
+  evidence:earlier 797ms was JSDOM GC noise, not reproducible
+  note:for 10000+ items use list() API anyway (avoids 15MB+ bundle)
+  note:V8 handles the large function fine, no optimization bailout observed
 
 id:E007
   sym:signal 在订阅它的 effect 里被写入
