@@ -7,6 +7,9 @@ import { build } from 'esbuild'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
+const CORE_SRC = fs.existsSync(path.join(ROOT, 'core/src'))
+  ? path.join(ROOT, 'core/src')
+  : path.join(ROOT, 'src')
 
 function parseArgs(argv) {
   const args = { input: null, out: 'dist', title: 'XuNay App', mode: null }
@@ -41,10 +44,10 @@ async function main() {
   if (args.mode) compileMode = args.mode
   console.log('   编译模式: ' + compileMode)
 
-  const tagModule = path.join(ROOT, 'core/src/element.js')
+  const tagModule = path.join(CORE_SRC, 'element.js')
   const compiled = compile(src, { mode: compileMode, tagModule })
 
-  const coreEntry = path.join(ROOT, 'core/src/index.js')
+  const coreEntry = path.join(CORE_SRC, 'index.js')
   const rtEntry = path.join(ROOT, 'compiler3/src/runtime.js')
 
   const entryCode =
