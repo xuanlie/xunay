@@ -42,14 +42,19 @@ export function registerHandler(el, eventType, raw) {
     if (opts.value) { const t = e.target; fn(t && t.value !== undefined ? t.value : e) }
     else fn(e)
   } : fn
-  // 支持同一元素同一事件多个 handler
+
+  // 不委托的事件：直接 addEventListener
+  if (NON_DELEGATED.has(eventType)) { el.addEventListener(eventType, handler); return }
+
+  // 无委托 root（mount 完成后）：直接 addEventListener，不进 __xunay_handlers
+  const root = currentRoot
+  if (!root) { el.addEventListener(eventType, handler); return }
+
+  // 有委托 root：只登记到 __xunay_handlers，由 root dispatcher 统一调用
+  if (!el.__xunay_handlers) el.__xunay_handlers = {}
   if (!el.__xunay_handlers[eventType]) el.__xunay_handlers[eventType] = [handler]
   else el.__xunay_handlers[eventType].push(handler)
 
-  if (NON_DELEGATED.has(eventType)) { el.addEventListener(eventType, handler); return }
-
-  const root = currentRoot
-  if (!root) { el.addEventListener(eventType, handler); return }
   if (!root.__xunay_boundEvents.has(eventType)) {
     root.__xunay_boundEvents.add(eventType)
     const dispatcher = (e) => dispatch(e, root)
