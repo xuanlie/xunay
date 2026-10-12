@@ -50,3 +50,5 @@ compiler3/dist/
 dist/
 dist/
 .github/
+bench/gen/
+bench/probe/
