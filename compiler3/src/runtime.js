@@ -1,7 +1,7 @@
 // compiler2/compiler3 编译产物依赖的运行时
-import { effect, onCleanup } from './core.js'
-import { render as __render } from './render.js'
-import { createScope, disposeScope, runInScope, runtime } from './runtime.js'
+import { effect, onCleanup } from '../../core/src/core.js'
+import { render as __render, mount } from '../../core/src/render.js'
+import { createScope, disposeScope, runInScope, runtime } from '../../core/src/runtime.js'
 
 export function renderChild(...args) {
   if (args.length === 0) return document.createTextNode('')
@@ -127,3 +127,6 @@ export function install() {
     classNames, createStatic, toString,
   }
 }
+
+// 编译产物入口使用的 app = mount
+export const app = mount

@@ -59,5 +59,17 @@ console.log('\n[额外] 复制 playground + examples...')
   console.log('  ✓ 已复制')
 }
 
+// 复制 AI.spec 到 dist
+{
+  const fs3 = await import('node:fs')
+  for (const c of ['../AI.spec', '../../web/AI.spec', 'web/AI.spec', 'AI.spec']) {
+    if (fs3.existsSync(c)) {
+      fs3.copyFileSync(c, 'dist/AI.spec')
+      console.log('  ✓ 已复制 AI.spec ← ' + c)
+      break
+    }
+  }
+}
+
 console.log('\n完成: ' + process.cwd() + '/dist')
 console.log('启动: node web/site/serve.mjs 8080')
