@@ -1,5 +1,5 @@
 [XUNAY]
-ver:1.2.2
+ver:1.2.4
 kind:frontend-framework
 paradigm:compile-first + fine-grained-reactive
 lang:javascript
@@ -132,6 +132,16 @@ id:E007
   cause:dev mode warning, self-subscribe write
   fix:same as E004
 
+id:E008
+  sym:动态渲染的按钮点击"没反应"（toggle 类操作失效）
+  cause:mount() 完成后动态创建的 DOM，registerHandler 双重绑定
+  cause:既存 el.__xunay_handlers，又 addEventListener
+  cause:一次点击触发两次 handler，值翻转两次回到原样
+  fix:upgrade to xunay@1.2.4 (fix in core/src/events.js aad6b70)
+  fix:mount 完成后 currentRoot=null 时只 addEventListener，不进 __xunay_handlers
+  scope:所有"数据加载后动态渲染"的按钮，不只权限矩阵
+  verify:重构 events.js registerHandler：有 root 走委托，无 root 直接绑定，不重复
+
 [PERF]
 env:node v22.23.3 + jsdom, 1core2G
 note:jsdom noise ±50%, trend only
@@ -150,6 +160,8 @@ d4:why effect recursion guard -> prod needs it, deadloop burns CPU
 d5:why list holder is <span display:contents> -> layout transparent
 d6:why hybrid default -> dynamic structure can't be statically expanded
 d7:why listener-list on signal._listeners -> bypass subscribe/propagate for hot path
+
+d8:why dual-mode event binding -> 有委托 root 走 __xunay_handlers（性能），无 root 直接 addEventListener（动态元素）。两条路互斥，避免双触发
 
 [TESTS]
 core:test/core.test.js
