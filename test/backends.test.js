@@ -55,7 +55,20 @@ async function waitReady(base, timeoutMs = 15000) {
 }
 
 async function killPort(port) {
-  try { execSync(`fuser -k ${port}/tcp 2>/dev/null || true`) } catch {}
+  // V072 修复：跨平台端口清理
+  try {
+    if (process.platform === 'win32') {
+      const out = execSync(`netstat -ano | findstr :${port}`, { encoding: 'utf8' })
+      const pids = [...new Set(out.split('\n').map(l => l.trim().split(/\s+/).pop()).filter(Boolean))]
+      for (const pid of pids) {
+        try { execSync(`taskkill /F /PID ${pid}`, { stdio: 'ignore' }) } catch {}
+      }
+    } else if (process.platform === 'darwin') {
+      execSync(`lsof -ti:${port} | xargs -r kill -9 2>/dev/null || true`, { shell: true })
+    } else {
+      execSync(`fuser -k ${port}/tcp 2>/dev/null || true`, { shell: true })
+    }
+  } catch {}
   await sleep(500)
 }
 

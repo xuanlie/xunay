@@ -1,11 +1,31 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { JSDOM } from 'jsdom'
 
-// mock 浏览器
-globalThis.localStorage = { _m: new Map(), getItem(k) { return this._m.get(k) ?? null }, setItem(k, v) { this._m.set(k, v) }, removeItem(k) { this._m.delete(k) }, clear() { this._m.clear() } }
-globalThis.sessionStorage = globalThis.localStorage
-globalThis.window = { addEventListener: () => {}, removeEventListener: () => {}, dispatchEvent: () => {} }
-globalThis.document = { documentElement: { setAttribute: () => {}, classList: { add: () => {}, remove: () => {} } }, cookie: '' }
+// V071 修复：用 jsdom 提供完整浏览器环境，避免测试静默跳过
+const dom = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>', {
+  pretendToBeVisual: true,
+  url: 'http://localhost/',
+})
+globalThis.window = dom.window
+globalThis.document = dom.window.document
+globalThis.Node = dom.window.Node
+globalThis.HTMLElement = dom.window.HTMLElement
+// Node 22+ 的 navigator 是只读 getter，用 defineProperty 绕过
+try {
+  Object.defineProperty(globalThis, 'navigator', {
+    value: dom.window.navigator,
+    configurable: true,
+    writable: true,
+  })
+} catch (e) {}
+globalThis.localStorage = dom.window.localStorage
+globalThis.sessionStorage = dom.window.sessionStorage
+globalThis.matchMedia = dom.window.matchMedia || (() => ({
+  matches: false,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+}))
 
 test('storage 读写', async () => {
   const { storage } = await import('../core/src/storage.js')

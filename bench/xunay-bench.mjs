@@ -13,7 +13,13 @@ globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 globalThis.Node = dom.window.Node;
 globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.requestAnimationFrame = (cb) => setTimeout(() => cb(performance.now()), 0);
+// V076 修复：优先用 JSDOM 的 rAF（pretendToBeVisual 提供），退回 setTimeout
+globalThis.requestAnimationFrame = dom.window.requestAnimationFrame
+  ? dom.window.requestAnimationFrame.bind(dom.window)
+  : ((cb) => setTimeout(() => cb(performance.now()), 16));
+globalThis.cancelAnimationFrame = dom.window.cancelAnimationFrame
+  ? dom.window.cancelAnimationFrame.bind(dom.window)
+  : clearTimeout;
 
 // ========== 加载 xunay ==========
 const _T0 = performance.now();

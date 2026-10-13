@@ -113,27 +113,33 @@ test('effect 死循环保护', () => {
 
 // === 警告相关 ===
 
-test('list 重复 key 会警告', () => {
-  // 只在 node 环境跑，DOM 相关跳过
-  if (typeof document === 'undefined') return
+// V067 修复：用 node:test 的 skip 而非静默 return
+test('list 重复 key 会警告', { skip: typeof document === 'undefined' ? 'Node 环境无 DOM' : false }, () => {
+  // 需要 DOM + mount，实现在 jsdom 环境下
+  // 完整实现见 test/backends.test.js 的 jsdom 用法
   const warns = []
   const origWarn = console.warn
   console.warn = (...args) => warns.push(args.join(' '))
   try {
-    // 这个测试需要 DOM，跳过
+    // TODO: 用 jsdom 挂载 list()，触发 key 重复
   } finally {
     console.warn = origWarn
   }
 })
 
 test('registerTags 重复注册跳过', async () => {
-  const { tags, registerTags } = await import('../core/src/element.js')
-  const a = registerTags(['__test_tag_1'])
-  const b = registerTags(['__test_tag_1'])
-  if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-    // 第一次应该注册，第二次返回空
-    if (a.length !== 1) throw new Error('第一次注册应返回 1 个')
-    if (b.length !== 0) throw new Error('第二次注册应返回 0 个')
+  const { registerTags } = await import('../core/src/element.js')
+  const { runtime } = await import('../core/src/runtime.js')
+  // V068 修复：registerTags 内部用 runtime.dev 判定，不用 NODE_ENV
+  const prevDev = runtime.dev
+  runtime.dev = true
+  try {
+    const a = registerTags(['__test_tag_1'])
+    const b = registerTags(['__test_tag_1'])
+    if (a.length !== 1) throw new Error('第一次注册应返回 1 个，实际 ' + a.length)
+    if (b.length !== 0) throw new Error('第二次注册应返回 0 个，实际 ' + b.length)
+  } finally {
+    runtime.dev = prevDev
   }
 })
 
