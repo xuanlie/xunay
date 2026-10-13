@@ -107,13 +107,18 @@ export function createInput(opts = {}) {
   const joystick = opts.joystick || signal([0, 0])
   const deadzone = opts.deadzone ?? 0.1
 
+  // V028 修复：记录 handler 引用，支持 dispose
+  let _onKeydown = null, _onKeyup = null, _onBlur = null
   if (opts.listenKeyboard !== false && typeof window !== 'undefined') {
-    window.addEventListener('keydown', e => {
+    _onKeydown = e => {
       keys[e.key.toLowerCase()] = true
       if (opts.preventDefault !== false) e.preventDefault()
-    })
-    window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false })
-    window.addEventListener('blur', () => { for (const k in keys) keys[k] = false })
+    }
+    _onKeyup = e => { keys[e.key.toLowerCase()] = false }
+    _onBlur = () => { for (const k in keys) keys[k] = false }
+    window.addEventListener('keydown', _onKeydown)
+    window.addEventListener('keyup', _onKeyup)
+    window.addEventListener('blur', _onBlur)
   }
 
   return {
@@ -128,6 +133,14 @@ export function createInput(opts = {}) {
       return [Math.abs(x) < deadzone ? 0 : x, Math.abs(z) < deadzone ? 0 : z]
     },
     isDown(k) { return !!keys[k] },
+    // V028 修复：卸载监听
+    dispose() {
+      if (typeof window === 'undefined') return
+      if (_onKeydown) window.removeEventListener('keydown', _onKeydown)
+      if (_onKeyup) window.removeEventListener('keyup', _onKeyup)
+      if (_onBlur) window.removeEventListener('blur', _onBlur)
+      _onKeydown = _onKeyup = _onBlur = null
+    },
   }
 }
 

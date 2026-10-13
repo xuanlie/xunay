@@ -87,7 +87,16 @@ export function VirtualTable(props) {
   const offset = () => start() * rowHeight
   return div({
     style: { height: height + 'px', overflowY: 'auto', border: '1px solid #e5e7eb', borderRadius: '8px' },
-    on: { scroll: e => scrollTop(e.target.scrollTop) }
+    // V012 修复：rAF 节流，避免每次 scroll 都重渲染
+    on: { scroll: e => {
+      const el = e.target
+      if (el.__scrollRaf) return
+      const top = el.scrollTop
+      el.__scrollRaf = requestAnimationFrame(() => {
+        el.__scrollRaf = 0
+        scrollTop(top)
+      })
+    } }
   },
     div({ style: { display: 'flex', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', position: 'sticky', top: 0, zIndex: 1 } },
       ...columns.map(c => div({ style: { flex: 1, padding: '10px 12px', fontWeight: '600', fontSize: '13px' } }, c.title))),

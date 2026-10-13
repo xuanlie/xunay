@@ -100,7 +100,8 @@ export function particles(container, opts = {}) {
     const dy = Math.sin(angle) * dist
     anim(p, [
       { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
-      { transform: `translate(${dx - 50}%,${dy - 50}%) scale(0)`, opacity: 0 }
+      // V022 修复：百分比相对自身尺寸，应用 px 位移
+      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`, opacity: 0 }
     ], { duration, fill: 'forwards', onFinish: () => p.remove() })
     parts.push(p)
   }

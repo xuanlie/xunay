@@ -136,12 +136,15 @@ export function parallaxSVG(el, opts = {}) {
 // 圆形进度环
 export function ringProgress(el, opts = {}) {
   const { value = 0, duration = 800, size = 100, stroke = 8, color = '#1f6feb' } = opts
+  // V023 修复：颜色白名单，避免 XSS
+  const safeColor = /^#[0-9a-fA-F]{3,8}$/.test(color) || /^rgba?\(/.test(color) || /^hsla?\(/.test(color) || /^[a-z]+$/.test(color)
+    ? color : '#1f6feb'
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   el.setAttribute('viewBox', `0 0 ${size} ${size}`)
   el.innerHTML = `
     <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#e5e7eb" stroke-width="${stroke}"/>
-    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${safeColor}" stroke-width="${stroke}"
       stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}"
       transform="rotate(-90 ${size/2} ${size/2})"/>
   `

@@ -1,5 +1,6 @@
 import { div, span, img } from './element.js'
 import { signal, effect } from './core.js'
+import { createScope, runInScope, runtime } from './runtime.js'
 import { anim } from './anim.js'
 import { presets } from './anim-presets.js'
 import { splitText, typewriterIn, countUp, typewriter } from './anim-text.js'
@@ -68,13 +69,16 @@ export function Counter(props) {
     ref: el => {
       if (!el) return
       countUp(el, { from: 0, to: prev, duration, format })
-      effect(() => {
+      // V021 修复：手动建子 scope
+      const scope = createScope(runtime.currentScope)
+      el.__xunay_scope = scope
+      runInScope(scope, () => effect(() => {
         const v = val()
         if (v !== prev) {
           countUp(el, { from: prev, to: v, duration, format })
           prev = v
         }
-      })
+      }))
     }
   })
 }
@@ -160,6 +164,9 @@ export function LazyImage(props) {
 export function ProgressRing(props) {
   const { value = 0, size = 100, stroke = 8, color = '#1f6feb' } = px(props)
   const val = typeof value === 'function' ? value : () => value
+  // V023 修复：颜色白名单
+  const safeColor = /^#[0-9a-fA-F]{3,8}$/.test(color) || /^rgba?\(/.test(color) || /^hsla?\(/.test(color) || /^[a-z]+$/.test(color)
+    ? color : '#1f6feb'
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   return div({ style: { width: size + 'px', height: size + 'px', position: 'relative' } },
@@ -168,7 +175,7 @@ export function ProgressRing(props) {
         if (!el) return
         const svg = `<svg width="${size}" height="${size}">
           <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#e5e7eb" stroke-width="${stroke}"/>
-          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${safeColor}" stroke-width="${stroke}"
             stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}"
             transform="rotate(-90 ${size/2} ${size/2})"/>
         </svg>`

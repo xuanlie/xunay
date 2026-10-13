@@ -5,7 +5,7 @@
 //   3. 和 XuNay 的 div({...}) 风格一致
 //   4. Babylon 从 window.BABYLON 拿 (CDN), 不打包
 
-import { effect, untrack } from './core.js'
+import { effect, untrack, onCleanup } from './core.js'
 
 // ============================================================
 // 0. 加载
@@ -878,17 +878,25 @@ export function bindSet(sigs, setter) {
   return effect(() => setter(...arr.map(s => s())))
 }
 
+/**
+ * V029 修复：timer 通过 onCleanup 注册，effect 所在 scope dispose 时自动清
+ * 仍然返回 dispose 供手动调用（双保险）
+ */
 export function bindTwoWay(sig, target, prop, opts = {}) {
   let guard = false
+  let timer = null
   const stop1 = effect(() => {
     const v = sig(); if (guard) return
     if (target[prop] !== v) target[prop] = v
+    // 每次 effect 重跑前清旧 timer
+    if (timer) { clearInterval(timer); timer = null }
+    timer = setInterval(() => {
+      const cur = target[prop]
+      if (cur !== sig()) { guard = true; try { sig(cur) } finally { guard = false } }
+    }, opts.interval ?? 50)
+    onCleanup(() => { if (timer) { clearInterval(timer); timer = null } })
   })
-  const timer = setInterval(() => {
-    const cur = target[prop]
-    if (cur !== sig()) { guard = true; try { sig(cur) } finally { guard = false } }
-  }, opts.interval ?? 50)
-  return () => { stop1(); clearInterval(timer) }
+  return () => { stop1(); if (timer) { clearInterval(timer); timer = null } }
 }
 
 export function bindColor(sig, target, prop, Color3Class) {

@@ -15,7 +15,16 @@ export function VirtualList(props) {
   const visible = () => items.slice(start(), end())
   return div({
     style: { height: height + 'px', overflowY: 'auto', position: 'relative', border: '1px solid var(--x-border)', borderRadius: 'var(--x-radius)' },
-    on: { scroll: e => scrollTop(e.target.scrollTop) }
+    // V019 修复：rAF 节流
+    on: { scroll: e => {
+      const el = e.target
+      if (el.__scrollRaf) return
+      const top = el.scrollTop
+      el.__scrollRaf = requestAnimationFrame(() => {
+        el.__scrollRaf = 0
+        scrollTop(top)
+      })
+    } }
   },
     div({ style: { height: (items.length * itemHeight) + 'px', position: 'relative' } },
       div({ style: () => ({ transform: 'translateY(' + offset() + 'px)', willChange: 'transform' }) },
@@ -89,9 +98,15 @@ export function InfiniteList(props) {
     style: { height: height + 'px', overflowY: 'auto', border: '1px solid var(--x-border)', borderRadius: 'var(--x-radius)' },
     on: {
       scroll: e => {
-        scrollTop(e.target.scrollTop)
+        // V019 修复：rAF 节流
         const el = e.target
-        if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) trigger()
+        if (el.__scrollRaf) return
+        const top = el.scrollTop
+        el.__scrollRaf = requestAnimationFrame(() => {
+          el.__scrollRaf = 0
+          scrollTop(top)
+          if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) trigger()
+        })
       }
     }
   },

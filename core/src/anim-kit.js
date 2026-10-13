@@ -3,6 +3,7 @@ import { div, span } from './element.js'
 import { list } from './render.js'
 import { show } from './misc.js'
 import { signal, effect } from './core.js'
+import { createScope, runInScope, runtime } from './runtime.js'
 import { presets, fadeIn } from './anim-presets.js'
 import { anim } from './anim.js'
 
@@ -55,15 +56,19 @@ export function AnimatedValue(props, ...children) {
     ref: el => {
       if (!el) return
       let prev = val()
-      // effect 会自动注册到 runtime.currentScope.effects
-      // 组件卸载时 scope 会清掉它，不需要手动 onCleanup
-      effect(() => {
-        const v = val()
-        if (v !== prev) {
-          prev = v
-          const fn = presets[type] || presets.pulse
-          fn(el, {})
-        }
+      // V021 修复：ref 在 props 处理阶段被调用，早于本组件 scope 创建
+      // 手动建子 scope 并挂到 el 上，list/show 的 dispose 会清掉它
+      const scope = createScope(runtime.currentScope)
+      el.__xunay_scope = scope
+      runInScope(scope, () => {
+        effect(() => {
+          const v = val()
+          if (v !== prev) {
+            prev = v
+            const fn = presets[type] || presets.pulse
+            fn(el, {})
+          }
+        })
       })
     }
   }, ...children)
@@ -80,7 +85,10 @@ export function AnimatedNumber(props) {
       if (!node) return
       prev = val()
       node.textContent = format(prev)
-      effect(() => {
+      // V021 修复：手动建子 scope，防止 effect 挂到父 scope
+      const scope = createScope(runtime.currentScope)
+      node.__xunay_scope = scope
+      runInScope(scope, () => effect(() => {
         const target = val()
         if (target === prev) return
         const from = prev
@@ -94,7 +102,7 @@ export function AnimatedNumber(props) {
           if (t < 1) raf = requestAnimationFrame(tick)
         }
         raf = requestAnimationFrame(tick)
-      })
+      }))
     }
   })
   return el

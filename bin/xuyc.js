@@ -137,8 +137,25 @@ const generated = new Set()      // 生成的 .xuy→.js，构建后删除
 const modified = new Map()       // 被改写的 .js 源文件，构建后还原
 
 function shouldCompileFile(src) {
-  if (/^\s*\/\/\s*@compiled/.test(src)) return true
-  if (/^\s*\/\/\s*@runtime/.test(src)) return false
+  // V035 修复：与 compiler3 __readFileMode 一致，扫前 10 行
+  const head = src.split('\n', 10)
+  for (const line of head) {
+    const t = line.trim()
+    if (t === '') continue
+    if (t.startsWith('//')) {
+      if (/^\/\/\s*@runtime\b/.test(t)) return false
+      if (/^\/\/\s*@compiled\b/.test(t)) return true
+      if (/^\/\/\s*@hybrid\b/.test(t)) return COMPILE_MODE !== 'runtime'
+      continue
+    }
+    if (t.startsWith('/*')) {
+      if (/@runtime\b/.test(t)) return false
+      if (/@compiled\b/.test(t)) return true
+      if (/@hybrid\b/.test(t)) return COMPILE_MODE !== 'runtime'
+      continue
+    }
+    break
+  }
   return COMPILE_MODE !== 'runtime'
 }
 
