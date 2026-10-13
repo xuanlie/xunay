@@ -1517,6 +1517,15 @@
     btn.appendChild(svg(ICONS.dev, 22))
     btn.style.bottom = '20px'
     document.body.style.paddingBottom = ''
+    // V006 修复：关闭后还原 console，允许下次重挂
+    if (XD._oLog) {
+      console.log = XD._oLog
+      console.warn = XD._oWarn
+      console.error = XD._oErr
+      XD._oLog = XD._oWarn = XD._oErr = null
+      window.__xd_console = false
+      _hooked = false
+    }
   }
 
   btn.addEventListener('click', function () {
@@ -1563,6 +1572,8 @@
       if (!window.__xd_console) {
         window.__xd_console = true
         var oLog = console.log, oWarn = console.warn, oErr = console.error
+        // V006 修复：记录原引用，close 时还原
+        XD._oLog = oLog; XD._oWarn = oWarn; XD._oErr = oErr
         var push = function (level, text) {
           XD.logs.push({ level: level, text: text })
           if (XD.logs.length > 300) XD.logs.shift()

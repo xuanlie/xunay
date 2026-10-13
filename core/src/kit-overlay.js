@@ -201,8 +201,15 @@ function pushNotification({ title, desc, type = 'info', duration = 4000 }) {
   const el = document.createElement('div')
   el.style.cssText = `background:#fff;padding:14px 16px;border-radius:8px;margin-bottom:10px;
     box-shadow:0 8px 24px rgba(0,0,0,.15);border-left:3px solid ${colors[type]};animation:slideIn .2s`
-  el.innerHTML = `<div style="font-weight:600;font-size:14px;margin-bottom:4px">${title || ''}</div>
-    <div style="font-size:13px;color:#6b7280">${desc || ''}</div>`
+  // V015 修复：改用 textContent，避免 title/desc 被当 HTML 解析
+  const titleEl = document.createElement('div')
+  titleEl.style.cssText = 'font-weight:600;font-size:14px;margin-bottom:4px'
+  titleEl.textContent = title || ''
+  const descEl = document.createElement('div')
+  descEl.style.cssText = 'font-size:13px;color:#6b7280'
+  descEl.textContent = desc || ''
+  el.appendChild(titleEl)
+  el.appendChild(descEl)
   notiContainer.appendChild(el)
   setTimeout(() => el.remove(), duration)
 }

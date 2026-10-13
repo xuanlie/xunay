@@ -4,6 +4,7 @@ import { createElement } from './element.js'
 import { show } from './misc.js'
 import { signal, effect, onCleanup } from './core.js'
 import { Row, Col, Card, Btn } from './kit.js'
+import { sanitize } from './sanitize.js'
 
 export function Markdown(props) {
   const { value, onChange, preview = true, height = '300px' } = px(props)
@@ -31,7 +32,7 @@ export function Markdown(props) {
     ),
     preview ? div({ style: { flex: 1, display: 'flex', flexDirection: 'column' } },
       div({ style: { fontSize: '11px', color: '#9ca3af', padding: '6px 0' } }, '预览'),
-      div({ style: { flex: 1, padding: '12px', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'auto', fontSize: '14px', lineHeight: 1.6 }, html: () => parse(val()) })
+      div({ style: { flex: 1, padding: '12px', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'auto', fontSize: '14px', lineHeight: 1.6 }, html: () => sanitize(parse(val())) })
     ) : null
   )
 }

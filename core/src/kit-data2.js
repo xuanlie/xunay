@@ -4,6 +4,7 @@ import { createElement } from './element.js'
 import { show } from './misc.js'
 import { signal, effect, onCleanup } from './core.js'
 import { swipe } from './mobile.js'
+import { runtime } from './runtime.js'
 import { Row, Col, Card, Btn } from './kit.js'
 
 export function Carousel(props, ...children) {
@@ -19,10 +20,16 @@ export function Carousel(props, ...children) {
     style: { position: 'relative', overflow: 'hidden', height, borderRadius: '8px' },
     ref: el => {
       if (!el || typeof swipe !== 'function') return
-      swipe(el, {
+      // V011 修复：注册到 scope，组件卸载时清理
+      const cleanup = swipe(el, {
         onSwipeLeft: () => idx((idx() + 1) % items.length),
         onSwipeRight: () => idx((idx() - 1 + items.length) % items.length),
       })
+      const sc = runtime.currentScope
+      if (sc) {
+        if (!sc.unmountFns) sc.unmountFns = []
+        sc.unmountFns.push(cleanup)
+      }
     }
   },
     div({

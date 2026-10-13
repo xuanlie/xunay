@@ -21,7 +21,8 @@ export function modelNum(sig) {
     on: { input: e => {
       const raw = e.target.value
       if (raw === '-' || raw === '-.') return
-      sig(Number(raw) || 0)
+      // V008 修复：空串保留 ''，不强制归 0
+      sig(raw === '' ? '' : Number(raw) || 0)
     } }
   }
 }

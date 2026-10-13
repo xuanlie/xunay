@@ -61,7 +61,11 @@ export function Sortable(props) {
           touchmove: e => {
             const t = e.touches[0]
             const el = document.elementFromPoint(t.clientX, t.clientY)
-            const idx = [...el.closest('div').parentNode.children].indexOf(el.closest('div'))
+            // V018 修复：elementFromPoint 可能返回 null 或不在 div 内
+            if (!el) return
+            const target = el.closest('div')
+            if (!target || !target.parentNode) return
+            const idx = [...target.parentNode.children].indexOf(target)
             if (idx >= 0) overIdx(idx)
           },
           touchend: () => { move(dragIdx(), overIdx()); dragIdx(-1); overIdx(-1) },

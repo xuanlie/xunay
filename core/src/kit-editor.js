@@ -4,6 +4,8 @@ import { createElement } from './element.js'
 import { show } from './misc.js'
 import { signal, effect, onCleanup } from './core.js'
 import { Btn, Row, Col, Text, Card, Divider, Space, Tag, Badge } from './kit.js'
+import { runtime } from './runtime.js'
+import { sanitize } from './sanitize.js'
 
 export function CodeEditor(props) {
   const { value, onChange, language = 'js', height = 300, theme = 'onedark', readOnly, lineNumbers = true } = px(props)
@@ -83,6 +85,12 @@ export function CodeEditor(props) {
           taEl = el
           scheduleRender()
           el.addEventListener('scroll', onScroll, { passive: true })
+          // V014 修复：注册到 scope，组件卸载时清理
+          const sc = runtime.currentScope
+          if (sc) {
+            if (!sc.unmountFns) sc.unmountFns = []
+            sc.unmountFns.push(() => el.removeEventListener('scroll', onScroll))
+          }
         },
         value: val(),
         readOnly: !!readOnly,
@@ -114,7 +122,7 @@ export function RichText(props) {
     div({
       contenteditable: true,
       style: { padding: '12px', minHeight: '120px', outline: 'none', fontSize: '14px', lineHeight: '1.6' },
-      html: val(),
+      html: sanitize(val()),
       on: { input: e => onChange && onChange(e.target.innerHTML) }
     })
   )

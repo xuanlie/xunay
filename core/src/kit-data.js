@@ -4,6 +4,7 @@ import { createElement } from './element.js'
 import { show } from './misc.js'
 import { signal, effect, onCleanup } from './core.js'
 import { swipe } from './mobile.js'
+import { runtime } from './runtime.js'
 import { Btn, Row, Col, Text, Card, Divider, Space, Tag, Badge } from './kit.js'
 
 export function Table(props) {
@@ -176,10 +177,16 @@ export function Calendar(props) {
     style: { maxWidth: '340px' },
     ref: el => {
       if (!el) return
-      swipe(el, {
+      // V011 修复：注册到 scope，组件卸载时清理 touch 监听
+      const cleanup = swipe(el, {
         onSwipeLeft: () => next(),
         onSwipeRight: () => prev(),
       })
+      const sc = runtime.currentScope
+      if (sc) {
+        if (!sc.unmountFns) sc.unmountFns = []
+        sc.unmountFns.push(cleanup)
+      }
     }
   },
     Row({ gap: 2, align: 'center', justify: 'between' },

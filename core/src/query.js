@@ -6,7 +6,18 @@ const _cache = new Map()
 const _subs = new Map()
 
 function hashKey(k) {
-  return typeof k === 'string' ? k : JSON.stringify(k)
+  if (typeof k === 'string') return k
+  // V005 修复：递归排序 key，避免属性顺序影响缓存命中
+  const sortKeys = (o) => {
+    if (Array.isArray(o)) return o.map(sortKeys)
+    if (o && typeof o === 'object') {
+      const out = {}
+      for (const kk of Object.keys(o).sort()) out[kk] = sortKeys(o[kk])
+      return out
+    }
+    return o
+  }
+  return JSON.stringify(sortKeys(k))
 }
 
 function now() { return Date.now() }
