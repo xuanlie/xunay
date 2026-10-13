@@ -47,7 +47,9 @@ async function main() {
   const tagModule = path.join(CORE_SRC, 'element.js')
   const compiled = compile(src, { mode: compileMode, tagModule })
 
-  const coreEntry = path.join(CORE_SRC, 'index.js')
+  // V081 修复：用 site-entry.js（index + tags + advanced + alias 超集）
+  // 用户 .xuy 里 `import { div, signal } from 'xunay'` 都能解析
+  const coreEntry = path.join(CORE_SRC, 'site-entry.js')
   const rtEntry = path.join(ROOT, 'compiler3/src/runtime.js')
 
   const entryCode =
@@ -55,8 +57,36 @@ async function main() {
     compiled.replace(/from\s+['"]xunay['"]/g, `from ${JSON.stringify(coreEntry)}`)
 
   fs.mkdirSync(args.out, { recursive: true })
-  const tmpEntry = path.join(args.out, '.entry.js')
+  // V077 修复：.entry.js 相对入口文件解析 import，必须写到入口同目录
+  const entryDir = path.dirname(path.resolve(args.input))
+  const tmpEntry = path.join(entryDir, '.xuyc-entry.js')
   fs.writeFileSync(tmpEntry, entryCode)
+
+  // V078 修复：给 esbuild 加 .xuy loader 插件
+  // 被入口 import 的 .xuy 文件（如 src/router.xuy）也需要编译
+  const xuyPlugin = {
+    name: 'xuy-loader',
+    setup(b) {
+      b.onLoad({ filter: /\.xuy$/ }, async (a) => {
+        // V080 修复：只做路径重写，不调 compile
+        // 原因：.xuy 就是合法 JS；compileRuntime 会重复注入已 import 的标签
+        // 所有 web/site 的 .xuy 都显式 `from 'xunay'`
+        let out = fs.readFileSync(a.path, 'utf8')
+        // xunay / xunay/* → 绝对路径
+        out = out.replace(/(['"])xunay(\/[^'"]*)?\1/g, (m, q, sub) => {
+          if (!sub) return q + coreEntry + q
+          // xunay/kit → core/src/kit-entry.js
+          const subPath = sub.slice(1)  // 去掉开头 /
+          const candidate = path.join(CORE_SRC, subPath + '-entry.js')
+          if (fs.existsSync(candidate)) return q + candidate + q
+          const alt = path.join(CORE_SRC, subPath + '.js')
+          if (fs.existsSync(alt)) return q + alt + q
+          return m
+        })
+        return { contents: out, loader: 'js' }
+      })
+    }
+  }
 
   await build({
     entryPoints: [tmpEntry],
@@ -66,6 +96,7 @@ async function main() {
     platform: 'browser',
     target: 'es2020',
     logLevel: 'error',
+    plugins: [xuyPlugin],
   })
   fs.unlinkSync(tmpEntry)
 

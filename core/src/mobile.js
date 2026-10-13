@@ -47,8 +47,10 @@ export function breakpoint(opts = {}) {
   }
   const bp = signal('md')
   update()
+  // V009 修复：暴露 dispose 供组件卸载时清理
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', update)
+    bp.dispose = () => window.removeEventListener('resize', update)
   }
   return bp
 }

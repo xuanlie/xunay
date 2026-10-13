@@ -178,6 +178,11 @@ const server = http.createServer(async (req, res) => {
     const id = 'c' + Date.now()
     const type = b.type || 'ssh'
     const defaultCwd = type === 'ssh' ? '/root' : process.cwd()
+    // V039 修复：密码明文存储警告（一次性）
+    if (b.password && !loadConns().some(c => c.password)) {
+      console.warn('[xai] ⚠ 密码将以明文存储在 ' + CONN_FILE)
+      console.warn('[xai]   建议用 SSH 密钥 (keyPath) 而非密码')
+    }
     conns.push({
       id,
       name: b.name,

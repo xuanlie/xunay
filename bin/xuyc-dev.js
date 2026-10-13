@@ -144,7 +144,8 @@ const server = http.createServer((req, res) => {
   }
   let buf = fs.readFileSync(full)
   if (file === '/index.html' || file === '/') {
-    const inject = '<script>(function(){var last="";setInterval(function(){fetch("/__xuyc_version",{cache:"no-store"}).then(function(r){return r.text()}).then(function(v){if(last&&last!==v)location.reload();last=v}).catch(function(){})},800)})()</script>'
+    // V034 修复：轮询降到 2s，页面隐藏时暂停（避免后台标签页持续请求）
+    const inject = '<script>(function(){var last="";setInterval(function(){if(document.hidden)return;fetch("/__xuyc_version",{cache:"no-store"}).then(function(r){return r.text()}).then(function(v){if(last&&last!==v)location.reload();last=v}).catch(function(){})},2000)})()</script>'
     buf = Buffer.from(buf.toString().replace('</body>', inject + '\n</body>'))
   }
   const ext = path.extname(file).toLowerCase()
