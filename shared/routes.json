@@ -46,7 +46,8 @@
       "method": "POST",
       "path": "/rpc/updateTodo",
       "auth": true,
-      "handler": "handleUpdateTodo"
+      "handler": "handleUpdateTodo",
+      "desc": "更新标题"
     }
   ]
 }

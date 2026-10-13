@@ -5,7 +5,6 @@
   "type": "module",
   "workspaces": [
     "core",
-    "compiler2",
     "compiler3"
   ],
   "xunay": {
@@ -51,6 +50,7 @@
     "xuyc": "./bin/xuyc.js",
     "xunay": "./bin/create.js"
   },
+  "types": "./core/types/index.d.ts",
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "esbuild": "^0.24.0",

@@ -88,10 +88,22 @@
   "types": "./types/index.d.ts",
   "peerDependencies": {
     "@babylonjs/core": ">=6.0.0",
+    "@babylonjs/loaders": ">=6.0.0",
+    "@babylonjs/materials": ">=6.0.0",
+    "howler": ">=2.0.0",
     "tonal": ">=6.0.0"
   },
   "peerDependenciesMeta": {
     "@babylonjs/core": {
+      "optional": true
+    },
+    "@babylonjs/loaders": {
+      "optional": true
+    },
+    "@babylonjs/materials": {
+      "optional": true
+    },
+    "howler": {
       "optional": true
     },
     "tonal": {
