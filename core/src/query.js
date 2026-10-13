@@ -54,6 +54,8 @@ export function query(opts = {}) {
     try {
       const r = await fetcher({ signal: controller ? controller.signal : undefined })
       if (myVersion !== version) return
+      // V002 修复：成功时重置重试计数，避免下次 refetch 只剩残余次数
+      retriesLeft = retry
       data(r)
       fetchedAt(now())
       _cache.set(cacheKey, { data: r, time: now() })

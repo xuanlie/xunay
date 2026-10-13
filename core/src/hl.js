@@ -170,7 +170,8 @@ export function highlight(code, lang) {
       if (m.indexOf('\uE000') >= 0) return m
       const idx = marks.length
       marks.push({ cls: cls, text: m })
-      return '\uE000' + String.fromCharCode(0xE100 + idx) + '\uE001'
+      // V003 修复：占位符从 2048 提升到 6400（0xE000-0xF8FF 整个 PUA）
+      return '\uE000' + String.fromCharCode(0xE000 + idx) + '\uE001'
     })
   }
 
@@ -178,8 +179,8 @@ export function highlight(code, lang) {
   out = out.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   // 第三步：把占位符恢复成带样式的 span（token 文本也做转义）
-  out = out.replace(/\uE000([\uE100-\uE8FF]+)\uE001/g, (_, ch) => {
-    const m = marks[ch.charCodeAt(0) - 0xE100]
+  out = out.replace(/\uE000([\uE000-\uF8FF]+)\uE001/g, (_, ch) => {
+    const m = marks[ch.charCodeAt(0) - 0xE000]
     if (!m) return ''
     const text = m.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     return '<span class="h-' + m.cls + '">' + text + '</span>'

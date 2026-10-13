@@ -16,7 +16,8 @@ if (fs.existsSync(SESSION_FILE)) {
 }
 
 function record(header, body) {
-  const entry = '\\n$ ' + header + '\\n' + (body || '(无输出)') + '\\n'
+  // V037 修复：'\\n' 是字面量两字符，应为 '\n'
+  const entry = '\n$ ' + header + '\n' + (body || '(无输出)') + '\n'
   buffer += entry
   fs.appendFileSync(SESSION_FILE, entry, 'utf8')
 }
@@ -105,7 +106,7 @@ async function handleSpecial(cmd, arg) {
         const warns = data.warnings || []
         let text
         if (errs.length === 0 && warns.length === 0) text = '✓ 通过'
-        else text = [...warns.map(w => '⚠ ' + w), ...errs.map(e => '✗ ' + e)].join('\\n')
+        else text = [...warns.map(w => '⚠ ' + w), ...errs.map(e => '✗ ' + e)].join('\n')
         console.log(text)
         record('/verify', text)
       } catch (e) {
@@ -153,10 +154,10 @@ function runLocal(cmd) {
     exec(cmd, { maxBuffer: 1024 * 1024 * 10, shell: true }, (err, stdout, stderr) => {
       let out = ''
       if (stdout) out += stdout
-      if (stderr) out += (out ? '\\n' : '') + stderr
+      if (stderr) out += (out ? '\n' : '') + stderr
       if (out) process.stdout.write(out)
       if (err && !out) out = '命令失败: ' + err.message
-      record(cmd, out.replace(/\\n$/, ''))
+      record(cmd, out.replace(/\n$/, ''))
       resolve()
     })
   })

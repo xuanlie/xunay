@@ -171,8 +171,9 @@ export function createAuth(opts = {}) {
       if (refreshTimer) { clearTimeout(refreshTimer); refreshTimer = null }
     },
     // 状态
+    // V004 修复：用 read() 而非 tokenSig()，避免在 effect 里被动订阅 token
     isValid() {
-      const t = tokenSig()
+      const t = read()
       if (!t) return false
       const exp = readExpiresAt()
       if (!exp) return true
