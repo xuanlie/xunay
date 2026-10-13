@@ -334,14 +334,19 @@ if (!KEEP) {
 
 // 复制 CSS（递归）
 const cssLinks = []
+const SKIP_DIRS = new Set([
+  'node_modules', '.git', '.craft', '.xunay-cache',
+  'dist', 'build', 'out', '.output', '.next', '.nuxt',
+  '.turbo', '.vercel', '.svelte-kit', '.vite', 'coverage',
+])
+
 function collectCss(dir, rel) {
   if (!fs.existsSync(dir)) return
+  const outAbs = path.resolve(outDir)
   for (const f of fs.readdirSync(dir)) {
-    if (f === 'node_modules' || f === '.git') continue
+    if (SKIP_DIRS.has(f)) continue
     const full = path.join(dir, f)
-    try {
-      if (path.resolve(full) === path.resolve(outDir)) continue
-    } catch {}
+    if (path.resolve(full) === outAbs) continue
     const stat = fs.statSync(full)
     if (stat.isDirectory()) {
       collectCss(full, rel ? path.join(rel, f) : f)

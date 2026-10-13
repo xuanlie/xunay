@@ -1,6 +1,6 @@
 {
   "name": "xunay",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "内存最少、速度最快的前端框架",
   "type": "module",
   "main": "./src/index.js",
@@ -74,7 +74,8 @@
   "bin": {
     "xuyc": "./bin/xuyc.js",
     "xunay": "./bin/create.js",
-    "xuyc3": "./bin/xuyc3.js"
+    "xuyc3": "./bin/xuyc3.js",
+    "xuyc-dev": "./bin/xuyc-dev.js"
   },
   "repository": {
     "type": "git",
