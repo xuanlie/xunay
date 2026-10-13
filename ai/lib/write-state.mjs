@@ -1,12 +1,15 @@
 import fs from 'node:fs'
+import path from 'node:path'
 
 export function appendHistory(stateFile, title, files) {
   let md = fs.readFileSync(stateFile, 'utf8')
   const now = new Date().toISOString().slice(0, 10)
+  // V049 修复：相对 stateFile 所在目录判断文件存在
+  const projectRoot = path.dirname(stateFile)
   let entry = '### ' + now + ' · ' + title + '\n\n'
   if (files && files.length) {
     for (const f of files) {
-      const verb = fs.existsSync(f) ? '修改' : '新增'
+      const verb = fs.existsSync(path.join(projectRoot, f)) ? '修改' : '新增'
       entry += '- ' + verb + ' ' + f + '\n'
     }
   }

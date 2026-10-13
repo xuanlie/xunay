@@ -359,6 +359,22 @@ function renderPlanFile(f, i, msgIdx) {
 function computeDiff(a, b) {
   const la = a.split('\n')
   const lb = b.split('\n')
+  // V051 修复：超过 3000 行只做行级摘要，避免 O(n*m) 卡死
+  const LIMIT = 3000
+  if (la.length > LIMIT || lb.length > LIMIT) {
+    const out = []
+    const max = Math.max(la.length, lb.length)
+    for (let i = 0; i < Math.min(max, LIMIT); i++) {
+      if (la[i] !== lb[i]) {
+        if (la[i] !== undefined) out.push({ t: '-', s: la[i] })
+        if (lb[i] !== undefined) out.push({ t: '+', s: lb[i] })
+      } else if (la[i] !== undefined) {
+        out.push({ t: ' ', s: la[i] })
+      }
+    }
+    if (max > LIMIT) out.push({ t: ' ', s: '... 还有 ' + (max - LIMIT) + ' 行未 diff' })
+    return out
+  }
   const out = []
   // 简单 LCS
   const m = la.length, n = lb.length

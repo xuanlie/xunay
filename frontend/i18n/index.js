@@ -1,5 +1,6 @@
 // XuNay - i18n
-import { signal } from '../../../core/src/index.js'
+// V056 修复：用包名导入，构建时由 xuyc 重写
+import { signal } from 'xunay'
 
 const dicts = {}
 const lang = signal('zh')

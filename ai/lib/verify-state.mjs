@@ -32,17 +32,23 @@ export function verify(projectRoot) {
     }
   }
 
-  for (const { dir, ext } of SCAN_DIRS) {
+  // V047 修复：递归扫描子目录
+  function walk(dir, ext) {
     const full = path.join(projectRoot, dir)
-    if (!fs.existsSync(full)) continue
+    if (!fs.existsSync(full)) return
     for (const f of fs.readdirSync(full)) {
-      if (!f.endsWith(ext)) continue
+      const child = path.join(full, f)
       const rel = dir + '/' + f
-      if (!declared.has(rel)) {
-        errors.push('[未声明] ' + rel + '（文件存在，但未在 AI-STATE.md 里声明）')
+      if (fs.statSync(child).isDirectory()) {
+        walk(rel, ext)
+      } else if (f.endsWith(ext)) {
+        if (!declared.has(rel)) {
+          errors.push('[未声明] ' + rel + '（文件存在，但未在 AI-STATE.md 里声明）')
+        }
       }
     }
   }
+  for (const { dir, ext } of SCAN_DIRS) walk(dir, ext)
 
   return { errors, warnings }
 }

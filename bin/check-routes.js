@@ -18,11 +18,20 @@ function toSnake(name) {
   return name.replace(/[A-Z]/g, c => '_' + c.toLowerCase())
 }
 
+// V033 修复：去除注释后的源码，避免注释掉的 handler 被误判为存在
+function stripComments(src) {
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n')
+    .map(line => line.replace(/\/\/.*$/, ''))
+    .join('\n')
+}
+
 const BACKENDS = {
   node: {
     file: 'backends/node/handlers.js',
     has: (src, name) =>
-      new RegExp('export\\s+(?:async\\s+)?function\\s+' + name + '\\b').test(src),
+      new RegExp('export\\s+(?:async\\s+)?function\\s+' + name + '\\b').test(stripComments(src)),
     stub: (name) =>
       '\nexport async function ' + name + '(ctx) {\n' +
       '  // TODO: 实现\n' +
@@ -32,7 +41,7 @@ const BACKENDS = {
   python: {
     file: 'backends/python/handlers.py',
     has: (src, name) =>
-      new RegExp('def\\s+' + toSnake(name) + '\\b').test(src),
+      new RegExp('def\\s+' + toSnake(name) + '\\b').test(stripComments(src)),
     stub: (name) =>
       '\n\ndef ' + toSnake(name) + '(ctx):\n' +
       '    # TODO: 实现\n' +
@@ -41,7 +50,7 @@ const BACKENDS = {
   go: {
     file: 'backends/go/handlers.go',
     has: (src, name) =>
-      new RegExp('func\\s+' + name + '\\b').test(src),
+      new RegExp('func\\s+' + name + '\\b').test(stripComments(src)),
     stub: (name) =>
       '\nfunc ' + name + '(w http.ResponseWriter, r *http.Request) {\n' +
       '\t// TODO: 实现\n' +
@@ -51,7 +60,7 @@ const BACKENDS = {
   cpp: {
     file: 'backends/cpp/handlers.cpp',
     has: (src, name) =>
-      new RegExp('void\\s+' + name + '\\b').test(src),
+      new RegExp('void\\s+' + name + '\\b').test(stripComments(src)),
     stub: (name) =>
       '\nvoid ' + name + '(const httplib::Request& req, httplib::Response& res) {\n' +
       '    // TODO: 实现\n' +

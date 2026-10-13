@@ -1604,8 +1604,12 @@
         rt.hooks.__xd = true
         var origCreate = rt.hooks.onSignalCreate
         rt.hooks.onSignalCreate = function (s) {
-          XD.signals.push(s)
-          if (XD.signals.length > 500) XD.signals.shift()
+          // V007 修复：环形缓冲，避免 O(n) shift
+          if (XD.signals.length >= 500) {
+            XD.signals[XD._sigHead = ((XD._sigHead || 0) + 1) % 500] = s
+          } else {
+            XD.signals.push(s)
+          }
           XD.sigMeta.set(s, { writes: [] })
           if (XD.open && XD.tab === 'signals') scheduleRender('signals')
           if (origCreate) origCreate(s)

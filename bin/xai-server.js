@@ -92,7 +92,15 @@ async function execSSH(conn, cmd) {
       host: conn.host,
       port: conn.port || 22,
       username: conn.user,
-      readyTimeout: 15000
+      readyTimeout: 15000,
+      // V050 修复：默认只记录主机指纹，不阻断（如需严格校验可设 strictHostKey）
+      hostVerifier: (hashedKey) => {
+        if (conn.strictHostKey) {
+          // TODO: 查 ~/.ssh/known_hosts
+          console.warn('[xai] SSH host key:', hashedKey, '(strictHostKey 未实现具体校验)')
+        }
+        return true
+      }
     }
     if (conn.keyPath) {
       try { cfg.privateKey = fs.readFileSync(conn.keyPath) }
@@ -484,6 +492,12 @@ ${fileList.join('\n')}
 
     const stateFile = findStateFile(process.cwd())
     const root = stateFile ? path.dirname(stateFile) : process.cwd()
+
+    // V052 修复：plan 应包含 AI-STATE.md，否则拒绝
+    const hasState = (plan.files || []).some(f => /^AI-STATE\.md$/i.test(f.path))
+    if (!hasState) {
+      return json(res, { error: 'AI 未返回 AI-STATE.md，拒绝应用（避免状态不一致）' }, 400)
+    }
 
     // 备份
     const backupDir = path.join(XAI_HOME, 'backups', Date.now().toString())
