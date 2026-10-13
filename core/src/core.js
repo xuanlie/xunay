@@ -196,6 +196,10 @@ function propagate(sig) {
           _inPropagate = false
         }
       }
+      // V001 修复：快速路径收尾 flush（否则 effect 内写 signal 的下游 effect 会丢）
+      if (!_currentEffect && runtime.batchDepth === 0 && runtime.pendingEffects.size > 0) {
+        flushPendingEffects()
+      }
       return
     }
   }

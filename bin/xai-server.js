@@ -252,7 +252,11 @@ const server = http.createServer(async (req, res) => {
       const rel = url.searchParams.get('p')
       if (!rel) return json(res, { error: 'no path' }, 400)
       const full = path.resolve(root, rel)
-      if (!full.startsWith(root)) return json(res, { error: 'denied' }, 403)
+      // V036 修复：path.relative 判断，避免 ../proj2 绕过 startsWith
+      const relCheck = path.relative(root, full)
+      if (relCheck.startsWith('..') || path.isAbsolute(relCheck)) {
+        return json(res, { error: 'denied' }, 403)
+      }
       if (!fs.existsSync(full)) return json(res, { error: 'not found' }, 404)
       return json(res, { content: fs.readFileSync(full, 'utf8') })
     }
@@ -488,7 +492,9 @@ ${fileList.join('\n')}
     const applied = []
     for (const f of plan.files) {
       const full = path.resolve(root, f.path)
-      if (!full.startsWith(root)) continue
+      // V048 修复：path.relative 检查，避免写入 root 之外
+      const relCheck = path.relative(root, full)
+      if (relCheck.startsWith('..') || path.isAbsolute(relCheck)) continue
       // 备份原文件
       if (fs.existsSync(full)) {
         const bak = path.join(backupDir, f.path.replace(/[\/]/g, '__'))
@@ -530,11 +536,17 @@ ${fileList.join('\n')}
   }
 
   // ---- 静态 ----
+  // V038 修复：静态文件路径穿越检查
+  const uiDir = path.join(__dirname, '..', 'ai', 'ui')
   let filePath
   if (p === '/' || p === '/index.html') {
-    filePath = path.join(__dirname, '..', 'ai', 'ui', 'index.html')
+    filePath = path.join(uiDir, 'index.html')
   } else {
-    filePath = path.join(__dirname, '..', 'ai', 'ui', p)
+    filePath = path.resolve(uiDir, '.' + p)
+    const relStatic = path.relative(uiDir, filePath)
+    if (relStatic.startsWith('..') || path.isAbsolute(relStatic)) {
+      res.writeHead(403); return res.end('403')
+    }
   }
   if (!fs.existsSync(filePath)) { res.writeHead(404); return res.end('404') }
   const ext = path.extname(filePath)
@@ -553,10 +565,13 @@ function findStateFile(dir) {
   }
 }
 
-server.listen(PORT, () => {
+// V040 修复：默认绑 127.0.0.1，需局域网访问时设 XAI_HOST=0.0.0.0
+const HOST = process.env.XAI_HOST || '127.0.0.1'
+server.listen(PORT, HOST, () => {
   console.log('')
   console.log('  xai-server')
   console.log('  http://localhost:' + PORT)
+  console.log('  监听: ' + HOST + ':' + PORT)
   console.log('  项目: ' + process.cwd())
   console.log('  连接配置: ' + CONN_FILE)
   console.log('')

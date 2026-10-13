@@ -1,10 +1,12 @@
-import { div, input, button, ul, li, span, sig, app, list } from '/xunay/index.js'
+// V053 修复：sig→signal, app→mount；标签从 element.js 导入
+import { signal, mount, list } from '/xunay/index.js'
+import { div, input, button, ul, li, span } from '/xunay/index.js'
 import { initToken } from './api/client.js'
 import { api, connectWS } from './api/todos.js'
 
-const todos = sig([])
-const inputVal = sig('')
-const status = sig('加载中...')
+const todos = signal([])
+const inputVal = signal('')
+const status = signal('加载中...')
 
 async function load() {
   try {
@@ -46,7 +48,7 @@ async function remove(id) {
   }
 }
 
-app(() => div(null,
+mount(() => div(null,
   div({ class: 'row' },
     input({
       type: 'text',

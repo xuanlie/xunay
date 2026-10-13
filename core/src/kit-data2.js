@@ -154,17 +154,18 @@ export function Gantt(props) {
 
 export function QRScanner(props) {
   const { onScan } = px(props)
-  const video = typeof document !== 'undefined' ? document.createElement('video') : null
+  // V010 修复：避免遮蔽 import 的 video 标签函数
+  const videoEl = typeof document !== 'undefined' ? document.createElement('video') : null
   effect(() => {
-    if (!video || !navigator.mediaDevices) return
+    if (!videoEl || !navigator.mediaDevices) return
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(s => { video.srcObject = s; video.play() })
+      .then(s => { videoEl.srcObject = s; videoEl.play() })
       .catch(() => {})
-    onCleanup(() => { const s = video.srcObject; if (s) s.getTracks().forEach(t => t.stop()) })
+    onCleanup(() => { const s = videoEl.srcObject; if (s) s.getTracks().forEach(t => t.stop()) })
   })
   return div({ style: { position: 'relative', width: '100%', maxWidth: '400px', borderRadius: '8px', overflow: 'hidden' } },
-    video
-      ? video( { ref: el => { el && (el.srcObject = video.srcObject); video.onplay = () => el.play() }, style: { width: '100%', display: 'block' } })
+    videoEl
+      ? video({ ref: el => { el && (el.srcObject = videoEl.srcObject); videoEl.onplay = () => el.play() }, style: { width: '100%', display: 'block' } })
       : div({ style: { padding: '40px', textAlign: 'center', color: '#9ca3af' } }, '浏览器不支持摄像头')
   )
 }

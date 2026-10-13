@@ -226,8 +226,11 @@ console.log('[filament] 输出:', outDir)
 
 if (doBuild) {
   const { spawnSync } = await import('node:child_process')
-  console.log('[filament] gradlew assembleDebug ...')
-  const r = spawnSync('cmd', ['/c', 'gradlew.bat', 'assembleDebug'], { cwd: outDir, stdio: 'inherit' })
+  // V042 修复：跨平台 gradlew
+  const gradlew = process.platform === 'win32' ? 'gradlew.bat' : './gradlew'
+  const shell = process.platform === 'win32'
+  console.log('[filament] ' + gradlew + ' assembleDebug ...')
+  const r = spawnSync(gradlew, ['assembleDebug'], { cwd: outDir, stdio: 'inherit', shell })
   if (r.status !== 0) process.exit(r.status || 1)
   const apk = path.join(outDir, 'app/build/outputs/apk/debug/app-debug.apk')
   console.log('[filament] APK:', apk)
