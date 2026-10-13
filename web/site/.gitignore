@@ -1,0 +1,9 @@
+# 构建产物
+dist/
+# 运行痕迹
+serve.log
+serve.pid
+# 编辑器备份
+*.bak
+*.bak_*
+src.bak_*
