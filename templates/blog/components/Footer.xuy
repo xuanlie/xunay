@@ -1,1 +1,10 @@
-﻿export function Footer() { return div(null, "Footer") }
+import { div, span, a } from 'xunay'
+
+export function Footer() {
+  const year = new Date().getFullYear()
+  return div({ class: 'site-footer' },
+    span(null, `© ${year} · 用 XuNay 构建`),
+    span({ class: 'sep' }, ' · '),
+    a({ href: 'https://github.com/xuanlie/xunay', target: '_blank' }, 'GitHub')
+  )
+}

@@ -1,1 +1,34 @@
-﻿export function Comment() { return div(null, "Comment") }
+import { div, span, input, button } from 'xunay'
+import { comments } from '../store.xuy'
+
+export function Comment({ postId }) {
+  const list = () => comments().filter(c => c.postId === postId)
+  let draft = ''
+
+  const add = () => {
+    const t = draft.trim()
+    if (!t) return
+    comments([...comments(), { id: Date.now(), postId, text: t, time: new Date().toISOString().slice(0, 16).replace('T', ' ') }])
+    draft = ''
+  }
+
+  return div({ class: 'comments' },
+    div({ class: 'comment-title' }, () => `评论 (${list().length})`),
+    div({ class: 'comment-list' },
+      () => list().length === 0
+        ? div({ class: 'empty' }, '还没有评论')
+        : div(null, ...list().map(c => div({ class: 'comment-item' },
+            div({ class: 'comment-time' }, c.time),
+            div({ class: 'comment-text' }, c.text)
+          )))
+    ),
+    div({ class: 'comment-form' },
+      input({
+        class: 'comment-input',
+        placeholder: '写点什么...',
+        on: { input: e => { draft = e.target.value } }
+      }),
+      button({ class: 'btn', on: { click: add } }, '发布')
+    )
+  )
+}

@@ -1,1 +1,14 @@
-﻿export function Doc() { return div(null, "About") }
+import { div, p, a } from 'xunay'
+
+export function About() {
+  return div({ class: 'page' },
+    div({ class: 'page-title' }, '关于'),
+    p(null, '这是一个用 XuNay 搭建的博客模板。'),
+    p(null,
+      '了解更多：',
+      a({ href: 'https://github.com/xuanlie/xunay', target: '_blank' }, 'GitHub'),
+      ' · ',
+      a({ href: '#/' }, '返回首页')
+    )
+  )
+}

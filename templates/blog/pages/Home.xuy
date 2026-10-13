@@ -1,1 +1,15 @@
-﻿export function Doc() { return div(null, "Home") }
+import { div, a, span } from 'xunay'
+import { posts, postCount } from '../store.xuy'
+
+export function Home() {
+  return div({ class: 'page' },
+    div({ class: 'page-title' }, '文章'),
+    div({ class: 'page-sub' }, () => `共 ${postCount()} 篇`),
+    div({ class: 'post-list' },
+      ...() => posts().map(p => div({ class: 'post-item' },
+        a({ href: `#/post/${p.slug}`, class: 'post-link' }, p.title),
+        div({ class: 'post-date' }, p.date)
+      ))
+    )
+  )
+}

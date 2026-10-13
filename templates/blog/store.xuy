@@ -1,4 +1,25 @@
-﻿import { signal } from 'xunay'
-export const posts = signal([])
+import { signal, computed } from 'xunay'
+
+// 全局状态
+export const posts = signal([
+  { id: 1, title: '你好，XuNay', slug: 'hello', content: '这是一个用 XuNay 搭建的博客模板。', date: '2026-01-01' },
+  { id: 2, title: '响应式原理', slug: 'reactivity', content: 'signal / computed / effect 是怎么工作的。', date: '2026-01-15' },
+])
+
 export const currentPost = signal(null)
 export const comments = signal([])
+
+// 派生
+export const postCount = computed(() => posts().length)
+
+// 动作
+export function addPost(title, content) {
+  const id = Date.now()
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  posts([...posts(), { id, title, slug, content, date: new Date().toISOString().slice(0, 10) }])
+  return slug
+}
+
+export function findPost(slug) {
+  return posts().find(p => p.slug === slug) || null
+}

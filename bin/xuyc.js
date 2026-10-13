@@ -40,6 +40,24 @@ const COMPILE_MODE = XUNAY_CFG.compileMode || 'compiled'
 const ERR_SCRIPT_ON = XUNAY_CFG.errScript !== false && !IS_PROD
 const KEEP = process.env.XUYC_KEEP === '1'
 
+// V031 修复：注册退出信号兜底，保证构建中途崩溃时也恢复被改写的源文件
+let _cleanupModified = null
+function _registerCleanup(fn) { _cleanupModified = fn }
+function _runCleanup() {
+  if (_cleanupModified) {
+    try { _cleanupModified() } catch (e) {}
+    _cleanupModified = null
+  }
+}
+process.on('exit', _runCleanup)
+process.on('SIGINT', () => { _runCleanup(); process.exit(130) })
+process.on('SIGTERM', () => { _runCleanup(); process.exit(143) })
+process.on('uncaughtException', (e) => {
+  console.error('[xuyc] 未捕获异常:', e.message)
+  _runCleanup()
+  process.exit(1)
+})
+
 console.log('[xuyc] devtools:', DEVTOOLS_ON ? 'on' : 'off')
 console.log('[xuyc] compileMode:', COMPILE_MODE)
 const args = process.argv.slice(2)
@@ -339,12 +357,22 @@ if (WANT_SPLIT) {
 }
 
 if (!KEEP) {
+  // V031 修复：注册兜底，即便下面循环中途崩溃也能恢复
+  _registerCleanup(() => {
+    for (const f of generated) {
+      try { fs.unlinkSync(f) } catch (e) {}
+    }
+    for (const [f, orig] of modified) {
+      try { fs.writeFileSync(f, orig) } catch (e) {}
+    }
+  })
   for (const f of generated) {
     try { fs.unlinkSync(f) } catch (e) { console.warn('[xuyc] 清理失败 ' + f + ': ' + e.message) }
   }
   for (const [f, orig] of modified) {
     try { fs.writeFileSync(f, orig) } catch (e) { console.warn('[xuyc] 还原失败 ' + f + ': ' + e.message) }
   }
+  _cleanupModified = null
 } else {
   console.log('[xuyc] XUYC_KEEP=1，保留 ' + generated.size + ' 个生成产物，' + modified.size + ' 个源文件保持改写')
 }

@@ -1,1 +1,17 @@
-﻿export function Header() { return div(null, "Header") }
+import { div, a, span } from 'xunay'
+
+const LINKS = [
+  { href: '#/', label: '首页' },
+  { href: '#/about', label: '关于' },
+]
+
+export function Header() {
+  return div({ class: 'site-header' },
+    div({ class: 'brand' },
+      a({ href: '#/', class: 'brand-link' }, '博客')
+    ),
+    div({ class: 'nav' },
+      ...LINKS.map(l => a({ href: l.href, class: 'nav-link' }, l.label))
+    )
+  )
+}
