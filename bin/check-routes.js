@@ -1,4 +1,12 @@
 #!/usr/bin/env node
+// bin/check-routes.js —— 路由一致性检查 + 自动补 handler 骨架
+//
+// 用法：
+//   node bin/check-routes.js                     # 检查
+//   node bin/check-routes.js --fix               # 检查并补缺失的
+//   node bin/check-routes.js --lang=node         # 只看某个后端
+//   node bin/check-routes.js --lang=node --fix   # 只补某个后端
+
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -6,43 +14,115 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 
-const routes = JSON.parse(fs.readFileSync(path.join(ROOT, 'shared/routes.json'), 'utf8')).routes
+function toSnake(name) {
+  return name.replace(/[A-Z]/g, c => '_' + c.toLowerCase())
+}
 
 const BACKENDS = {
-  node:   { file: 'backends/node/handlers.js',  regex: /(?:export\s+)?(?:async\s+)?function\s+(\w+)/g },
-  python: { file: 'backends/python/handlers.py', regex: /def\s+(\w+)\s*\(/g },
-  go:     { file: 'backends/go/handlers.go',     regex: /func\s+(\w+)\s*\(/g },
-  cpp:    { file: 'backends/cpp/handlers.cpp',   regex: /void\s+(\w+)\s*\(/g }
+  node: {
+    file: 'backends/node/handlers.js',
+    has: (src, name) =>
+      new RegExp('export\\s+(?:async\\s+)?function\\s+' + name + '\\b').test(src),
+    stub: (name) =>
+      '\nexport async function ' + name + '(ctx) {\n' +
+      '  // TODO: 实现\n' +
+      "  ctx.fail('未实现')\n" +
+      '}\n',
+  },
+  python: {
+    file: 'backends/python/handlers.py',
+    has: (src, name) =>
+      new RegExp('def\\s+' + toSnake(name) + '\\b').test(src),
+    stub: (name) =>
+      '\n\ndef ' + toSnake(name) + '(ctx):\n' +
+      '    # TODO: 实现\n' +
+      '    ctx["fail"]("未实现")\n',
+  },
+  go: {
+    file: 'backends/go/handlers.go',
+    has: (src, name) =>
+      new RegExp('func\\s+' + name + '\\b').test(src),
+    stub: (name) =>
+      '\nfunc ' + name + '(w http.ResponseWriter, r *http.Request) {\n' +
+      '\t// TODO: 实现\n' +
+      '\twriteJSON(w, 500, fail("未实现"))\n' +
+      '}\n',
+  },
+  cpp: {
+    file: 'backends/cpp/handlers.cpp',
+    has: (src, name) =>
+      new RegExp('void\\s+' + name + '\\b').test(src),
+    stub: (name) =>
+      '\nvoid ' + name + '(const httplib::Request& req, httplib::Response& res) {\n' +
+      '    // TODO: 实现\n' +
+      '    send(res, 500, false, "", "未实现");\n' +
+      '}\n',
+  },
 }
 
-function extractHandlers(backend) {
-  const p = path.join(ROOT, backend.file)
-  if (!fs.existsSync(p)) return null
-  const src = fs.readFileSync(p, 'utf8')
-  const out = new Set()
-  let m
-  while ((m = backend.regex.exec(src))) out.add(m[1])
-  return out
+const args = process.argv.slice(2)
+const FIX = args.includes('--fix')
+const LANG = args.find(a => a.startsWith('--lang='))?.split('=')[1]
+
+const routesFile = path.join(ROOT, 'shared/routes.json')
+if (!fs.existsSync(routesFile)) {
+  console.error('❌ 找不到 shared/routes.json')
+  process.exit(1)
 }
+const routes = JSON.parse(fs.readFileSync(routesFile, 'utf8')).routes || []
 
-console.log('检查 ' + routes.length + ' 个路由...\n')
+console.log('检查 shared/routes.json...')
+console.log('  ✓ ' + routes.length + ' 条路由')
+console.log()
 
-let allOk = true
-const backends = {}
-for (const name of Object.keys(BACKENDS)) backends[name] = extractHandlers(BACKENDS[name])
+let failedBackends = 0
+let totalFixed = 0
 
-for (const r of routes) {
-  const cols = []
-  for (const name of Object.keys(BACKENDS)) {
-    const handlers = backends[name]
-    if (!handlers) { cols.push(name.padEnd(7) + '  -'); continue }
-    const has = handlers.has(r.handler)
-    cols.push(name.padEnd(7) + '  ' + (has ? '✓' : '✗'))
-    if (!has) allOk = false
+for (const [lang, cfg] of Object.entries(BACKENDS)) {
+  if (LANG && lang !== LANG) continue
+
+  const filepath = path.join(ROOT, cfg.file)
+  if (!fs.existsSync(filepath)) {
+    console.log('检查 ' + cfg.file + '...')
+    console.log('  ✗ 文件不存在')
+    failedBackends++
+    continue
   }
-  console.log('  ' + r.name.padEnd(14) + cols.join('   '))
+
+  let src = fs.readFileSync(filepath, 'utf8')
+  const missing = []
+  for (const route of routes) {
+    if (!route.handler) continue
+    if (!cfg.has(src, route.handler)) missing.push(route.handler)
+  }
+
+  console.log('检查 ' + cfg.file + '...')
+
+  if (missing.length === 0) {
+    console.log('  ✓ ' + routes.length + ' 个 handler')
+    continue
+  }
+
+  if (FIX) {
+    if (!src.endsWith('\n')) src += '\n'
+    for (const name of missing) src += cfg.stub(name)
+    fs.writeFileSync(filepath, src)
+    console.log('  ✓ 补充 ' + missing.length + ' 个: ' + missing.join(', '))
+    totalFixed += missing.length
+  } else {
+    console.log('  ✗ 缺少 ' + missing.length + ' 个: ' + missing.join(', '))
+    failedBackends++
+  }
 }
 
-console.log('')
-if (allOk) { console.log('全部一致。'); process.exit(0) }
-else { console.log('有不一致，请补齐实现。'); process.exit(1) }
+console.log()
+if (FIX) {
+  console.log('结果: 补充 ' + totalFixed + ' 个 handler')
+  console.log('下一步：在各语言的 handlers 里把 // TODO 填掉')
+} else if (failedBackends === 0) {
+  console.log('结果: 全部通过 ✅')
+} else {
+  console.log('结果: ' + failedBackends + ' 个后端缺 handler')
+  console.log("跑 'node bin/check-routes.js --fix' 自动补骨架")
+  process.exit(1)
+}

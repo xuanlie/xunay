@@ -2,9 +2,23 @@
   "_comment": "当前项目配置。改 backend 切换后端，改 ports 改端口。",
   "backend": "node",
   "ports": {
+    "frontend": 12342,
+    "backend": 12341,
     "node": 12341,
-    "python": 12342,
-    "go": 12343,
-    "cpp": 12344
+    "python": 12341,
+    "go": 12341,
+    "cpp": 12341
+  },
+  "database": {
+    "driver": "sqlite",
+    "sqlite": {
+      "path": "backends/data/xunay.db"
+    },
+    "postgres": {
+      "url": "postgres://xunay:xunay@localhost:5432/xunay?sslmode=disable"
+    },
+    "mysql": {
+      "url": "xunay:xunay@tcp(localhost:3306)/xunay?parseTime=true"
+    }
   }
 }

@@ -22,23 +22,35 @@ export function render(v) {
 }
 
 function renderShow(v) {
+  if (typeof window!=='undefined' && !window.__rsLog){window.__rsLog=1; console.log('RENDERSHOW_NEW_LOGIC active')}
   const h = document.createElement('span')
   h.style.display = 'contents'
   const outer = createScope(runtime.currentScope)
   h.__xunay_scope = outer
   let cur = null, sc = null
+  let lastCond = undefined
   runInScope(outer, () => {
     effect(() => {
-      if (v.cond()) {
-        if (cur) return
+      const now = v.cond()
+      const active = !!now
+      const changed = now !== lastCond
+      lastCond = now
+      if (active && (!cur || changed)) {
+        if (sc) { disposeScope(sc); sc = null }
+        if (cur) { cur.remove(); cur = null }
         sc = createScope(outer)
         runInScope(sc, () => { cur = render(v.renderFn()); h.appendChild(cur) })
-      } else {
-        if (!cur) return
-        if (sc) disposeScope(sc)
-        sc = null; cur.remove(); cur = null
+      } else if (!active && cur) {
+        if (sc) { disposeScope(sc); sc = null }
+        cur.remove(); cur = null
       }
-      onCleanup(() => { if (sc) { disposeScope(sc); sc = null; if (cur) { cur.remove(); cur = null } } })
+      // true→true 时不动 DOM，保住输入框焦点
+    })
+    // cleanup 挂到 outer scope，只在组件真正销毁时清
+    if (!outer.unmountFns) outer.unmountFns = []
+    outer.unmountFns.push(() => {
+      if (sc) { disposeScope(sc); sc = null }
+      if (cur) { cur.remove(); cur = null }
     })
   })
   return h

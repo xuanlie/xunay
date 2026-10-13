@@ -1,13 +1,15 @@
-from typing import Optional
-from pydantic import BaseModel, field_validator
 import time
+import uuid
+from typing import Optional
+
+from pydantic import BaseModel, field_validator
 
 
 class Todo(BaseModel):
-    id: int = 0
+    id: Optional[str] = None
     title: str = ""
     done: bool = False
-    created_at: Optional[float] = None
+    created_at: Optional[int] = None
 
     @field_validator("title")
     @classmethod
@@ -19,10 +21,18 @@ class Todo(BaseModel):
             raise ValueError("title 最多 200 字")
         return v
 
+    def ensure(self):
+        if not self.id:
+            self.id = str(uuid.uuid4())
+        if not self.created_at:
+            self.created_at = int(time.time() * 1000)
+        return self
+
 
 class TodoIn(BaseModel):
-    id: Optional[int] = None
+    id: str = ""
 
     def check_id(self):
-        if not self.id or self.id <= 0:
+        if not self.id:
             raise ValueError("id 必填")
+        return self

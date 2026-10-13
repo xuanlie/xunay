@@ -26,13 +26,6 @@ type Config struct {
 	Ports   map[string]int `json:"ports"`
 }
 
-var handlerMap = map[string]http.HandlerFunc{
-	"handleToken":      handleToken,
-	"handleGetTodos":   handleGetTodos,
-	"handleAddTodo":    handleAddTodo,
-	"handleToggleTodo": handleToggleTodo,
-	"handleDeleteTodo": handleDeleteTodo,
-}
 
 func wrapAuth(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +44,7 @@ func main() {
 	}
 	defer db.Close()
 
-	root := filepath.Join("..", "..")
+	root := findRoot()
 
 	cfgData, err := os.ReadFile(filepath.Join(root, "xunay.config.json"))
 	if err != nil {
@@ -61,7 +54,7 @@ func main() {
 	if err := json.Unmarshal(cfgData, &cfg); err != nil {
 		log.Fatal("解析配置失败:", err)
 	}
-	port := cfg.Ports["go"]
+	port := cfg.Ports["backend"]
 	if p := os.Getenv("XUNAY_PORT"); p != "" {
 		if n, err := strconv.Atoi(p); err == nil { port = n }
 	}
@@ -76,8 +69,11 @@ func main() {
 		log.Fatal("解析 routes.json 失败:", err)
 	}
 
+	// 动态注册所有 handler
+	registerAll()
+
 	for _, r := range rf.Routes {
-		fn, ok := handlerMap[r.Handler]
+		fn, ok := handlerRegistry[r.Handler]
 		if !ok {
 			log.Fatal("缺 handler: " + r.Handler)
 		}
@@ -91,4 +87,24 @@ func main() {
 	log.Printf("加载 %d 个路由", len(rf.Routes))
 	log.Printf("XuNay Go 后端 %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
+}
+
+func writeJSON(w http.ResponseWriter, status int, v interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(v)
+}
+
+func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "X-Token, Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(204)
+			return
+		}
+		next(w, r)
+	}
 }

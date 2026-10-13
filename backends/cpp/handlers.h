@@ -6,11 +6,8 @@
 #include <functional>
 
 struct RouteSpec {
-    std::string name;
-    std::string method;
-    std::string path;
-    bool auth;
-    std::string handler;
+    std::string name, method, path, handler;
+    bool auth = false;
 };
 
 using Handler = std::function<void(const httplib::Request&, httplib::Response&)>;

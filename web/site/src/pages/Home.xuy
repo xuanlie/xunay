@@ -16,7 +16,7 @@ export function Home() {
     // Hero
     div({ class: 'home-hero' },
       div({ class: 'home-logo' }),
-      div({ class: 'home-badge' }, 'v1.2.5 · MIT'),
+      div({ class: 'home-badge' }, 'v1.2.8 · MIT'),
       div({ class: 'home-title' }, 'XuNay'),
       div({ class: 'home-tagline' }, '内存最少、速度最快的前端框架'),
       div({ class: 'home-cmd' },

@@ -1,10 +1,11 @@
 import crypto from 'crypto'
-import { listTodos, insertTodo, toggleTodo, deleteTodo, saveToken } from './db.js'
+import { listTodos, insertTodo, toggleTodo, deleteTodo, saveToken, cleanupTokens } from './db.js'
 import { Todo, TodoIn } from './schemas.js'
 
-const TTL = 300000
+const TTL = 300 * 1000
 
 export function handleToken(ctx) {
+  cleanupTokens()
   const token = crypto.randomBytes(16).toString('hex')
   saveToken(token, ctx.req.socket.remoteAddress || '', Date.now() + TTL)
   ctx.ok({ token })
@@ -31,4 +32,9 @@ export async function handleDeleteTodo(ctx) {
   t.validateId()
   deleteTodo(t.id)
   ctx.ok(null)
+}
+
+export async function handleUpdateTodo(ctx) {
+  // TODO: 实现
+  ctx.fail('未实现')
 }

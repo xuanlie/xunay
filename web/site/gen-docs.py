@@ -6,7 +6,7 @@ import json, os
 try:
     XUNAY_VERSION = json.load(open(os.path.join(_ROOT_HERE, '../../core/package.json'), encoding='utf-8'))['version']
 except Exception:
-    XUNAY_VERSION = '1.2.5'
+    XUNAY_VERSION = '1.2.8'
 
 # ─── 从 core/src/kit*.js 提取真实参数 ───
 import json as _json
@@ -958,6 +958,7 @@ GROUPS = [
       ('H1','版本历史'),
       ('H2','v' + XUNAY_VERSION + '（最新）'),
       ('Ul',
+        'dev-server：新增 xuyc-dev 开发服务器（文件监听 + HMR 自动刷新）',
         'create：项目创建模板优化（Logo 内嵌 + 欢迎页 + 3 页面 + 文档链接）',
         'create：品牌名自动追加 " app"（项目名 xunay → 显示 xunay app）',
         'site：Logo 接入导航栏和首页 Hero，favicon 自动注入',
@@ -5928,7 +5929,7 @@ GROUPS = [
         'devtools 完整版',
         '类型声明',
         '测试（14 个）'),
-      ('H2','v1.0.4 ✓（当前版本，已完成）'),
+      ('H2','v' + XUNAY_VERSION + ' ✓（当前版本，已完成）'),
       ('Ul',
         '核心瘦身：65 → 24 导出',
         'untrack / onCleanup / registerTags / signal.equals',
@@ -5959,7 +5960,7 @@ GROUPS = [
     ]),
     ('misc-versions', '版本', [
       ('H1','版本历史'),
-      ('H2','v1.0.4（当前）'),
+      ('H2','v' + XUNAY_VERSION + '（当前）'),
       ('H3','基础工具'),
       ('Ul',
         'auth：令牌管理（4 种存储后端）',
@@ -6167,7 +6168,7 @@ GROUPS = [
       ('H2','基本信息'),
       ('Table',['项','值'],[
         ['名称','XuNay (xunay)'],
-        ['版本','v1.0.4'],
+        ['版本','v' + XUNAY_VERSION],
         ['定位','编译期 DOM 生成 + 细粒度响应式前端框架'],
         ['特点','编译期优先 + 运行时最小'],
         ['路径','E:\\xunay'],

@@ -1,10 +1,10 @@
 {
   "name": "my-project",
   "root": ".",
-  "recipe": "react",
+  "recipe": "xunay",
   "pm": "npm",
   "max_file_size": 104857600,
-  "allowed_ext": [".xuy", ".mjs", ".js", ".py", ".ts"],
+  "allowed_ext": [],
   "deny_paths": [
     ".env",
     ".env.*",

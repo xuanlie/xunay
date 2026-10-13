@@ -1,10 +1,15 @@
+import crypto from 'crypto'
+
 export class ValidationError extends Error {
   constructor(msg) { super(msg); this.name = 'ValidationError' }
 }
 
 export class Todo {
-  constructor({ id = 0, title = '', done = false, created_at = 0 } = {}) {
-    this.id = id; this.title = title; this.done = done; this.created_at = created_at
+  constructor({ id = null, title = '', done = false, created_at = 0 } = {}) {
+    this.id = id || crypto.randomUUID()
+    this.title = title
+    this.done = !!done
+    this.created_at = created_at
   }
   validate() {
     this.title = String(this.title || '').trim()
@@ -16,9 +21,9 @@ export class Todo {
 }
 
 export class TodoIn {
-  constructor({ id = 0 } = {}) { this.id = Number(id) || 0 }
+  constructor({ id = '' } = {}) { this.id = String(id || '') }
   validateId() {
-    if (this.id <= 0) throw new ValidationError('id 必填')
+    if (!this.id) throw new ValidationError('id 必填')
     return this
   }
 }

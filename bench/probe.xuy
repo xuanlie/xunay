@@ -1,0 +1,6 @@
+const { app } = __rt__
+
+app(() => ul(null,
+  li(null, "Item 0"),
+  li(null, "Item 1")
+), "#app")

@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { get, post, handle, wrapAuth } from './mini.js'
-import { initDB, checkToken } from './db.js'
+import { checkToken } from './db.js'
 import * as handlers from './handlers.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -12,7 +12,6 @@ const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'xunay.config.json'), 'ut
 const routes = JSON.parse(fs.readFileSync(path.join(ROOT, 'shared/routes.json'), 'utf8')).routes
 
 globalThis.checkToken = checkToken
-initDB()
 
 const PORT = parseInt(process.env.XUNAY_PORT, 10) || cfg.ports.node
 
@@ -25,6 +24,6 @@ for (const r of routes) {
 }
 
 console.log(`加载 ${routes.length} 个路由`)
-http.createServer(handle).listen(PORT, () => {
+http.createServer(handle).listen(PORT, '0.0.0.0', () => {
   console.log(`XuNay Node 后端 :${PORT}`)
 })

@@ -1,28 +1,38 @@
 import json
+import os
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Header
+
+from fastapi import FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import db
-from . import handlers
+import db
+import handlers
 
-ROOT = Path(__file__).parent.parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 cfg = json.loads((ROOT / "xunay.config.json").read_text())
 routes = json.loads((ROOT / "shared" / "routes.json").read_text())["routes"]
-PORT = cfg["ports"]["python"]
+PORT = int(os.environ.get("XUNAY_PORT", cfg["ports"]["python"]))
 
 app = FastAPI(title="XuNay Python 后端")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+)
+
 db.init_db()
 
 
 def make_handler(spec):
-    raw = getattr(handlers, spec["handler"])
+    import re
+    snake = re.sub(r"(?<!^)(?=[A-Z])", "_", spec["handler"]).lower()
+    raw = getattr(handlers, snake)
 
-    def fn(body: dict = None, x_token: str = Header(None)):
+    async def fn(body: dict = None, x_token: str = Header(None)):
+        # 鉴权失败 → 统一格式
         if spec["auth"]:
             if not x_token or not db.check_token(x_token):
-                raise HTTPException(403, "无效 token")
+                return {"ok": False, "data": None, "error": "无效 token"}
+
         result = {"ok": None, "data": None, "error": None}
         ctx = {
             "body": body or {},
@@ -33,7 +43,13 @@ def make_handler(spec):
         try:
             raw(ctx)
         except Exception as e:
-            raise HTTPException(400, str(e))
+            msg = str(e)
+            # Pydantic 的 ValidationError 提取干净消息
+            if hasattr(e, "errors"):
+                errs = e.errors()
+                if errs:
+                    msg = errs[0].get("msg", msg).replace("Value error, ", "")
+            return {"ok": False, "data": None, "error": msg}
         return result
 
     return fn

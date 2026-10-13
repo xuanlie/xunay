@@ -1,5 +1,5 @@
 [XUNAY]
-ver:1.2.4
+ver:1.2.8
 kind:frontend-framework
 paradigm:compile-first + fine-grained-reactive
 lang:javascript

@@ -1,30 +1,15 @@
 #include "handlers.h"
 #include "db.h"
 #include <nlohmann/json.hpp>
-#include <random>
-#include <sstream>
-#include <iomanip>
 #include <ctime>
-#include <stdexcept>
 
 using json = nlohmann::json;
-
-static std::string makeToken() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 15);
-    std::stringstream ss;
-    for (int i = 0; i < 32; i++) ss << std::hex << dis(gen);
-    return ss.str();
-}
 
 static std::string respJSON(bool ok, const std::string& data, const std::string& err) {
     json j;
     j["ok"] = ok;
-    if (!err.empty()) {
-        j["data"] = nullptr;
-        j["error"] = err;
-    } else {
+    if (!err.empty()) { j["data"] = nullptr; j["error"] = err; }
+    else {
         try { j["data"] = json::parse(data.empty() ? "null" : data); }
         catch (...) { j["data"] = data; }
         j["error"] = nullptr;
@@ -32,7 +17,8 @@ static std::string respJSON(bool ok, const std::string& data, const std::string&
     return j.dump();
 }
 
-static void send(httplib::Response& res, int status, bool ok, const std::string& data, const std::string& err = "") {
+static void send(httplib::Response& res, int status, bool ok,
+                 const std::string& data, const std::string& err = "") {
     res.status = status;
     res.set_header("Access-Control-Allow-Origin", "*");
     res.set_content(respJSON(ok, data, err), "application/json; charset=utf-8");
@@ -40,11 +26,10 @@ static void send(httplib::Response& res, int status, bool ok, const std::string&
 
 void handleToken(const httplib::Request& req, httplib::Response& res) {
     cleanupTokens();
-    std::string token = makeToken();
-    long long expires = (long long)std::time(nullptr) + 300;
+    std::string token = makeToken32();
+    long long expires = nowMs() + 300LL * 1000;
     if (!saveToken(token, req.remote_addr, expires)) {
-        send(res, 500, false, "", "保存 token 失败");
-        return;
+        send(res, 500, false, "", "保存 token 失败"); return;
     }
     json d; d["token"] = token;
     send(res, 200, true, d.dump());
@@ -58,6 +43,7 @@ void handleGetTodos(const httplib::Request&, httplib::Response& res) {
         item["id"] = t.id;
         item["title"] = t.title;
         item["done"] = t.done;
+        item["created_at"] = t.created_at;
         arr.push_back(item);
     }
     send(res, 200, true, arr.dump());
@@ -69,7 +55,8 @@ void handleAddTodo(const httplib::Request& req, httplib::Response& res) {
         Todo t;
         t.title = j.value("title", "");
         t.validate();
-        int id = insertTodo(t);
+        std::string id = insertTodo(t);
+        if (id.empty()) { send(res, 500, false, "", "保存失败"); return; }
         json d; d["id"] = id;
         send(res, 200, true, d.dump());
     } catch (const std::exception& e) {
@@ -81,7 +68,7 @@ void handleToggleTodo(const httplib::Request& req, httplib::Response& res) {
     try {
         auto j = json::parse(req.body);
         TodoIn in;
-        in.id = j.value("id", 0);
+        in.id = j.value("id", "");
         in.validateId();
         toggleTodo(in.id);
         send(res, 200, true, "null");
@@ -94,7 +81,7 @@ void handleDeleteTodo(const httplib::Request& req, httplib::Response& res) {
     try {
         auto j = json::parse(req.body);
         TodoIn in;
-        in.id = j.value("id", 0);
+        in.id = j.value("id", "");
         in.validateId();
         deleteTodo(in.id);
         send(res, 200, true, "null");
@@ -103,13 +90,18 @@ void handleDeleteTodo(const httplib::Request& req, httplib::Response& res) {
     }
 }
 
+void handleUpdateTodo(const httplib::Request&, httplib::Response& res) {
+    send(res, 500, false, "", "未实现");
+}
+
 void registerAll(httplib::Server& svr, const std::vector<RouteSpec>& routes) {
-    std::map<std::string, Handler> handlers = {
-        {"handleToken",      handleToken},
-        {"handleGetTodos",   handleGetTodos},
-        {"handleAddTodo",    handleAddTodo},
-        {"handleToggleTodo", handleToggleTodo},
-        {"handleDeleteTodo", handleDeleteTodo}
+    std::map<std::string, Handler> registry = {
+        {"handleToken",       handleToken},
+        {"handleGetTodos",    handleGetTodos},
+        {"handleAddTodo",     handleAddTodo},
+        {"handleToggleTodo",  handleToggleTodo},
+        {"handleDeleteTodo",  handleDeleteTodo},
+        {"handleUpdateTodo",  handleUpdateTodo},
     };
 
     svr.Options(R"(/rpc/.*)", [](const httplib::Request&, httplib::Response& res) {
@@ -119,23 +111,14 @@ void registerAll(httplib::Server& svr, const std::vector<RouteSpec>& routes) {
     });
 
     for (const auto& r : routes) {
-        auto it = handlers.find(r.handler);
-        if (it == handlers.end()) {
-            std::cerr << "缺 handler: " << r.handler << std::endl;
-            exit(1);
-        }
+        auto it = registry.find(r.handler);
+        if (it == registry.end()) { std::cerr << "缺 handler: " << r.handler << std::endl; exit(1); }
         auto fn = it->second;
         auto wrapped = [fn, r](const httplib::Request& req, httplib::Response& res) {
             if (r.auth) {
-                if (!req.has_header("X-Token")) {
-                    send(res, 403, false, "", "无效 token");
-                    return;
-                }
+                if (!req.has_header("X-Token")) { send(res, 403, false, "", "无效 token"); return; }
                 auto tok = req.get_header_value("X-Token");
-                if (!checkToken(tok)) {
-                    send(res, 403, false, "", "无效 token");
-                    return;
-                }
+                if (!checkToken(tok)) { send(res, 403, false, "", "无效 token"); return; }
             }
             fn(req, res);
         };

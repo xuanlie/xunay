@@ -54,7 +54,7 @@ export function Sidebar({ onPick }) {
       div({ class: 'brand-logo' }, 'X'),
       div({ class: 'brand-text' },
         span({ class: 'brand-name' }, 'XuNay'),
-        span({ class: 'brand-ver' }, 'v1.1.2')
+        span({ class: 'brand-ver' }, 'v1.2.8')
       )
     ),
     div({ class: 'sidebar-body' },

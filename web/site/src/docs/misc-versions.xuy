@@ -4,7 +4,7 @@ import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link }
 export function Doc() {
   return D(
     H1("版本历史"),
-    H2("v1.0.4（当前）"),
+    H2("v1.2.8（当前）"),
     H3("基础工具"),
     Ul("auth：令牌管理（4 种存储后端）","storage：通用键值存储（TTL + 响应式）","http：fetch 封装（超时 / 重试 / 拦截器）","i18n：国际化（切换 + 插值）","theme：主题切换（跟随系统）"),
     H3("数据与表单"),

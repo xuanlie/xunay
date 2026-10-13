@@ -1,3 +1,20 @@
+v1.2.8
+
+开发服务器 + 版本号动态注入
+
+  dev-server
+    bin/xuyc-dev.js 新增开发服务器
+    监听 .xuy / CSS 文件改动
+    HMR 自动刷新浏览器（无需手动刷新）
+
+  site
+    scripts/build-site.mjs 构建时读 core/package.json
+    Home.xuy 版本号自动注入，不再硬编码
+
+  修复
+    bin/xuyc.js 修 CSS 复制多层目录 bug
+    bin/create.js 兼容 monorepo 和 npm 扁平布局
+
 v1.2.5
 
 项目创建模板（npx xunay）全面优化

@@ -98,7 +98,7 @@ const outDir = outIdx >= 0 ? path.resolve(args[outIdx + 1]) : path.resolve(XUNAY
 fs.mkdirSync(outDir, { recursive: true })
 
 const esm = [
-  path.join(ROOT, 'dist/xunay-site.esm.js'),
+  path.join(ROOT, 'core/dist/xunay-site.esm.js'),
   path.join(ROOT, 'dist/xunay-site.esm.js'),
 ].find(p => fs.existsSync(p))
 if (!esm) {
@@ -112,7 +112,7 @@ fs.copyFileSync(esm, xunayPath)
 let dtFileName = 'xunay-devtools.js'
 if (DEVTOOLS_ON) {
   const dtSrc = [
-    path.join(ROOT, 'dist/xunay-devtools.min.js'),
+    path.join(ROOT, 'core/dist/xunay-devtools.min.js'),
     path.join(ROOT, 'dist/xunay-devtools.min.js'),
   ].find(p => fs.existsSync(p))
   if (dtSrc) {
@@ -125,7 +125,7 @@ if (DEVTOOLS_ON) {
 const optionals = ['kit', 'devtools', 'ssr', 'anim', 'dev', 'alias', 'tags', 'audio', 'auth', 'babylon', 'music', 'game', 'game-mobile', 'router', 'theme', 'i18n', 'http', 'storage', 'persist', 'query', 'mobile', 'form']
 for (const name of optionals) {
   const src = [
-    path.join(ROOT, 'dist/xunay-' + name + '.min.js'),
+    path.join(ROOT, 'core/dist/xunay-' + name + '.min.js'),
     path.join(ROOT, 'dist/xunay-' + name + '.min.js'),
   ].find(p => fs.existsSync(p))
   if (src) fs.copyFileSync(src, path.join(outDir, 'xunay-' + name + '.js'))
@@ -334,14 +334,19 @@ if (!KEEP) {
 
 // 复制 CSS（递归）
 const cssLinks = []
+const SKIP_DIRS = new Set([
+  'node_modules', '.git', '.craft', '.xunay-cache',
+  'dist', 'build', 'out', '.output', '.next', '.nuxt',
+  '.turbo', '.vercel', '.svelte-kit', '.vite', 'coverage',
+])
+
 function collectCss(dir, rel) {
   if (!fs.existsSync(dir)) return
+  const outAbs = path.resolve(outDir)
   for (const f of fs.readdirSync(dir)) {
-    if (f === 'node_modules' || f === '.git') continue
+    if (SKIP_DIRS.has(f)) continue
     const full = path.join(dir, f)
-    try {
-      if (path.resolve(full) === path.resolve(outDir)) continue
-    } catch {}
+    if (path.resolve(full) === outAbs) continue
     const stat = fs.statSync(full)
     if (stat.isDirectory()) {
       collectCss(full, rel ? path.join(rel, f) : f)
@@ -359,7 +364,7 @@ const builtinCss = Array.isArray(XUNAY_CFG.css) ? XUNAY_CFG.css : ['tw', 'ui']
 console.log('[xuyc] 内置 CSS:', builtinCss.length ? builtinCss.join(', ') : '(无)')
 for (const name of builtinCss) {
   const src = [
-    path.join(ROOT, 'src/' + name + '.css'),
+    path.join(ROOT, 'core/src/' + name + '.css'),
     path.join(ROOT, 'src/' + name + '.css'),
   ].find(p => fs.existsSync(p))
   if (src) {
