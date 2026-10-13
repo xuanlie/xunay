@@ -11,6 +11,7 @@ mount(() => div({ class: () => 'layout' + (menuOpen() ? ' menu-open' : '') },
     div({ class: 'topbar-btn', on: { click: () => menuOpen(!menuOpen()) } },
       div({ class: 'hamburger' })
     ),
+    div({ class: 'topbar-logo', on: { click: () => go('/') } }),
     div({ class: 'topbar-title', on: { click: () => go('/') } }, 'XuNay'),
     div({ class: 'topbar-links' },
       a({ class: 'topbar-link', href: 'https://github.com', target: '_blank' }, 'GitHub'),

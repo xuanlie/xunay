@@ -15,7 +15,8 @@ export function Home() {
 
     // Hero
     div({ class: 'home-hero' },
-      div({ class: 'home-badge' }, 'v1.2.2 · MIT'),
+      div({ class: 'home-logo' }),
+      div({ class: 'home-badge' }, 'v1.2.4 · MIT'),
       div({ class: 'home-title' }, 'XuNay'),
       div({ class: 'home-tagline' }, '内存最少、速度最快的前端框架'),
       div({ class: 'home-cmd' },
@@ -47,6 +48,13 @@ export function Home() {
         div({ class: 'home-card-icon' }, '🧩'),
         div({ class: 'home-card-title' }, '案例'),
         div({ class: 'home-card-desc' }, '100+ 可运行示例'),
+        div({ class: 'home-card-arrow' }, '→')
+      ),
+      a({ class: 'home-card ai-card', href: '/AI.spec', target: '_blank',
+          style: 'background:linear-gradient(135deg,#f0f7ff,#eef4ff);border-color:#93c5fd' },
+        div({ class: 'home-card-icon' }, '🤖'),
+        div({ class: 'home-card-title' }, 'AI.spec'),
+        div({ class: 'home-card-desc' }, 'AI 专用文档 · 让 AI 秒懂 XuNay'),
         div({ class: 'home-card-arrow' }, '→')
       )
     ),

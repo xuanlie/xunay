@@ -59,6 +59,43 @@ console.log('\n[额外] 复制 playground + examples...')
   console.log('  ✓ 已复制')
 }
 
+// 复制 logo 到 dist
+{
+  const fsL = await import('node:fs')
+  const pathL = await import('node:path')
+  const rootL = pathL.resolve(process.cwd(), '..')
+  const srcs = [
+    [pathL.join(rootL, 'logo-512.png'), 'dist/logo.png'],
+    [pathL.join(rootL, 'logo-192.png'), 'dist/icons/icon-192.png'],
+    [pathL.join(rootL, 'logo-64.png'),  'dist/favicon.png'],
+    [pathL.join(rootL, 'logo-32.png'),  'dist/favicon-32.png'],
+  ]
+  fsL.mkdirSync('dist/icons', { recursive: true })
+  for (const [src, dst] of srcs) {
+    if (fsL.existsSync(src)) {
+      fsL.copyFileSync(src, dst)
+    }
+  }
+  console.log('  ✓ 已复制 logo（4 个尺寸）')
+}
+
+// 往 dist/index.html 注入 favicon / manifest links
+{
+  const fsH = await import('node:fs')
+  if (fsH.existsSync('dist/index.html')) {
+    let html = fsH.readFileSync('dist/index.html', 'utf8')
+    if (!html.includes('favicon-32.png')) {
+      const inject = '\n<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">' +
+        '\n<link rel="icon" type="image/png" sizes="64x64" href="./favicon.png">' +
+        '\n<link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">'
+      html = html.replace('</head>', inject + '\n</head>')
+      fsH.writeFileSync('dist/index.html', html)
+      console.log('  ✓ 已注入 favicon links')
+    }
+  }
+}
+
+
 // 复制 AI.spec 到 dist
 {
   const fs3 = await import('node:fs')
