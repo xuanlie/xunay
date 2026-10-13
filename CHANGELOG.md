@@ -1,3 +1,65 @@
+v1.2.5
+
+项目创建模板（npx xunay）全面优化
+
+  Logo 内置
+    新项目自带 Logo（base64 内嵌，零文件依赖）
+    导航栏左侧：28×28 圆角方块 + 品牌名
+    首页 Hero：120×120 圆角方块，悬停放大+旋转
+    品牌名规则：项目名 + " app"（已含 app 不重复）
+
+  首页改为 Vue/React 风格欢迎页
+    Hero：Logo + 大标题 + 标语 + 3 个 CTA 按钮
+    3 个特性卡：⚡极速构建 / 📦极小体积 / 🎯细粒度响应式
+    按钮：查看示例 / 查看文档 / AI 文档
+    Footer：文档 · AI 文档 · GitHub
+
+  导航栏重构
+    5 项链接：首页 / 示例 / 关于 / 文档 / AI 文档
+    外链自动 target="_blank"
+    品牌名 + Logo 一起点击回首页
+
+  新增 /demo 页
+    计数器示例从首页移出
+    演示 signal / computed / 组件拆分
+
+  CSS 内联
+    移除独立 src/style.css
+    样式全部内联到 app.xuy（约 200 行）
+    渐变主题（紫→青），暗色兼容
+
+  新增文件
+    src/components/Footer.xuy
+    src/pages/demo.xuy
+
+  文档链接指向
+    文档：http://107.172.190.220:12342/
+    AI.spec：http://107.172.190.220:12342/AI.spec
+
+站点更新
+
+  Logo 接入文档站
+    web/site/dist/logo.png（512×512）
+    favicon.png（64×64）+ favicon-32.png（32×32）
+    icons/icon-192.png（PWA 图标）
+    构建时自动复制 + 注入 favicon links
+
+  README 更新
+    导航栏新增 Logo + 品牌名
+    Hero 加 logo 展示
+
+v1.2.4
+
+事件系统修复
+
+  core/src/events.js
+    mount() 完成后动态创建的元素，之前会双重绑定：
+      既存 el.__xunay_handlers（由 root 委托调用）
+      又 addEventListener（直接绑定）
+    结果：一次点击触发两次 handler，toggle 类操作失效
+    修复：无委托 root 时只 addEventListener；有 root 只登记委托
+    影响：所有"数据加载后动态渲染"的按钮
+
 v1.1.0
 
 编译期架构迁移
