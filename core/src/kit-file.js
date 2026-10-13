@@ -76,15 +76,21 @@ export function FilePreview(props) {
   const { file, onClose } = px(props)
   if (!file) return null
   const isImage = file.type?.startsWith('image/')
-  const url = file.url || (typeof URL !== 'undefined' && file instanceof Blob ? URL.createObjectURL(file) : '')
+  // V017 修复：blob URL 需要在关闭时 revoke，避免内存泄漏
+  const isBlob = !file.url && typeof URL !== 'undefined' && file instanceof Blob
+  const url = file.url || (isBlob ? URL.createObjectURL(file) : '')
+  const close = () => {
+    if (isBlob) { try { URL.revokeObjectURL(url) } catch (e) {} }
+    onClose && onClose()
+  }
   return div({
     style: { position: 'fixed', inset: 0, zIndex: 5000, background: 'rgba(0,0,0,.85)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-    on: { click: e => e.target.style.position === 'fixed' && onClose && onClose() }
+    on: { click: e => e.target.style.position === 'fixed' && close() }
   },
     div({ style: { background: '#fff', borderRadius: '10px', padding: '20px', maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto' } },
       Row({ gap: 2, align: 'center', justify: 'between', style: { marginBottom: '12px' } },
         div({ style: { fontWeight: '600' } }, file.name),
-        Btn({ size: 'sm', onClick: onClose }, '关闭')
+        Btn({ size: 'sm', onClick: close }, '关闭')
       ),
       isImage
         ? img({ src: url, style: { maxWidth: '100%', maxHeight: '70vh', display: 'block' } })

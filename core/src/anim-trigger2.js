@@ -1,13 +1,25 @@
 export { onScroll, inView, onHover, onInterval, onVisible, once } from './anim-trigger.js'
 
-// 节流触发
+// 节流触发（V025 修复：加尾触发，保证最后一次一定执行）
 export function throttle(fn, ms) {
   let last = 0
+  let timer = null
+  let lastArgs = null
   return (...args) => {
     const now = Date.now()
-    if (now - last < ms) return
-    last = now
-    return fn(...args)
+    const remaining = ms - (now - last)
+    lastArgs = args
+    if (remaining <= 0) {
+      if (timer) { clearTimeout(timer); timer = null }
+      last = now
+      fn(...args)
+    } else if (!timer) {
+      timer = setTimeout(() => {
+        last = Date.now()
+        timer = null
+        fn(...lastArgs)
+      }, remaining)
+    }
   }
 }
 

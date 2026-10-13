@@ -33,7 +33,9 @@ export function Anchor(props) {
     const onScroll = () => {
       let cur = items[0]?.href
       for (const it of items) {
-        const el = document.querySelector(it.href)
+        // V020 修复：href 可能含 : / . 等 CSS 选择器特殊字符
+        let el = null
+        try { el = document.querySelector(it.href) } catch (e) { el = null }
         if (el && el.getBoundingClientRect().top <= offsetTop + 10) cur = it.href
       }
       active(cur)

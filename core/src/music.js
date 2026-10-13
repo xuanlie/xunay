@@ -100,14 +100,7 @@ const ROMAN_MAP = {
 }
 
 export function progressionToChords(progression, keyRoot = 'C', mode = 'major') {
-  // DEBUG
-  try {
-    const mk = Key.majorKey(keyRoot)
-    const mk2 = Key.minorKey(keyRoot)
-    if (typeof window !== 'undefined') {
-      window.__musicDebug = { majorKey: mk, minorKey: mk2 }
-    }
-  } catch(e) {}
+  // V027 修复：删除遗留的 __musicDebug 污染全局
   const numerals = typeof progression === 'string'
     ? progression.split('-').map(s => s.trim())
     : progression
@@ -204,6 +197,7 @@ export function createMusicState(opts = {}) {
 export function createSynth(opts = {}) {
   let ctx = null
   let master = null
+  let volTimer = null
   const volume = signal(opts.volume ?? 0.7)
 
   function ensure() {
@@ -214,8 +208,9 @@ export function createSynth(opts = {}) {
     master.connect(ctx.destination)
     // 立刻尝试 resume
     if (ctx.state === 'suspended') ctx.resume().catch(() => {})
-    // 监听 volume
-    setInterval(() => { if (master) master.gain.value = volume() }, 50)
+    // V026 修复：用 onCleanup 兜底，同时暴露 dispose
+    if (volTimer) clearInterval(volTimer)
+    volTimer = setInterval(() => { if (master) master.gain.value = volume() }, 50)
     return ctx
   }
 
@@ -262,6 +257,11 @@ export function createSynth(opts = {}) {
       ensure()
       if (ctx.state === 'suspended') return ctx.resume()
       return Promise.resolve()
+    },
+    // V026 修复：清理 timer + 关闭 AudioContext
+    dispose() {
+      if (volTimer) { clearInterval(volTimer); volTimer = null }
+      if (ctx) { try { ctx.close() } catch (e) {} ctx = null; master = null }
     },
   }
 }

@@ -20,7 +20,7 @@ export function Table(props) {
         ? [tr( null,
             td( { colspan: columns.length, style: { textAlign: 'center', color: '#999', padding: '32px' } }, empty || '暂无数据')
           )]
-        : data.map((row, i) => tr( { key: keyFn ? keyFn(row) : i },
+        : data.map((row, i) => tr(null,
             ...columns.map(c => td( null, c.render ? c.render(row) : row[c.key]))
           ))
       )

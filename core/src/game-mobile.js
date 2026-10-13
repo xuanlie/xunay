@@ -155,14 +155,21 @@ export function preventGestures(target = document.body) {
 // ============================================================
 export function safeArea() {
   if (typeof window === 'undefined') return { top: 0, bottom: 0, left: 0, right: 0 }
+  // V030 修复：一次读全 4 个边
   const el = document.createElement('div')
-  el.style.cssText = 'position:fixed;top:env(safe-area-inset-top,0);left:env(safe-area-inset-left,0);'
+  el.style.cssText = 'position:fixed;' +
+    'top:env(safe-area-inset-top,0);' +
+    'right:env(safe-area-inset-right,0);' +
+    'bottom:env(safe-area-inset-bottom,0);' +
+    'left:env(safe-area-inset-left,0);' +
+    'pointer-events:none;visibility:hidden;'
   document.body.appendChild(el)
   const cs = getComputedStyle(el)
   const r = {
     top: parseFloat(cs.top) || 0,
+    right: parseFloat(cs.right) || 0,
+    bottom: parseFloat(cs.bottom) || 0,
     left: parseFloat(cs.left) || 0,
-    bottom: 0, right: 0,
   }
   el.remove()
   return r

@@ -144,7 +144,8 @@ export const easings = {
   easeInBounce: t => 1 - _bounceOut(1 - t),
   easeOutBounce: _bounceOut,
   easeInOutBounce: t => t < .5 ? (1 - _bounceOut(1 - 2 * t)) / 2 : (1 + _bounceOut(2 * t - 1)) / 2,
-  easeInQuadAlt: t => t * (2 - t),
+  // V024 修复：easeInQuadAlt 应为 t*t（原与 easeOutQuadAlt 完全相同）
+  easeInQuadAlt: t => t * t,
   easeOutQuadAlt: t => t * (2 - t),
   easeInOutQuadAlt: t => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
   easeInCubicAlt: t => t * t * t,

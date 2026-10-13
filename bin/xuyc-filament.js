@@ -33,12 +33,22 @@ const assets = {}
 function isRemoteUrl(src) { return /^https?:\/\//i.test(String(src || '')) }
 
 async function downloadUrl(url, destPath) {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + url)
-  const buf = Buffer.from(await res.arrayBuffer())
-  fs.mkdirSync(path.dirname(destPath), { recursive: true })
-  fs.writeFileSync(destPath, buf)
-  return buf
+  // V043 修复：30s 超时 + 200MB 上限
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 30000)
+  try {
+    const res = await fetch(url, { signal: ctrl.signal })
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + url)
+    const len = parseInt(res.headers.get('content-length') || '0', 10)
+    if (len > 200 * 1024 * 1024) throw new Error('文件过大 (>200MB): ' + url)
+    const buf = Buffer.from(await res.arrayBuffer())
+    if (buf.length > 200 * 1024 * 1024) throw new Error('文件过大 (>200MB): ' + url)
+    fs.mkdirSync(path.dirname(destPath), { recursive: true })
+    fs.writeFileSync(destPath, buf)
+    return buf
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 async function fetchRemoteGltf(srcUrl, cacheDir) {
@@ -117,7 +127,8 @@ for (const n of ir.nodes) {
   if (!srcRel) { console.warn('[filament] model 缺 src'); continue }
   let gltfPath
   if (isRemoteUrl(srcRel)) {
-    const cacheDir = path.join(ROOT, '.xunay-cache', 'remote')
+    // V045 修复：缓存写到 outDir 而非项目根
+    const cacheDir = path.join(outDir, '.cache', 'remote')
     try {
       gltfPath = await fetchRemoteGltf(srcRel, cacheDir)
     } catch (e) {
@@ -188,8 +199,9 @@ for (const a of ir.audios || []) {
   const name = path.basename(audioPath)
   const key = 'audios/' + name
   assets[key] = fs.readFileSync(audioPath)
-  a.src = key
+  // V044 修复：先 log 再覆盖 a.src
   console.log('[filament] 音频:', a.src, '->', key, '(' + assets[key].length + ' bytes)')
+  a.src = key
 }
 
 const { files } = genMod.genFilament(ir, assets)
