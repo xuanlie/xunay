@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 import json, os
 
+# ─── 读 core 版本号 ───
+try:
+    XUNAY_VERSION = json.load(open(os.path.join(_ROOT_HERE, '../../core/package.json'), encoding='utf-8'))['version']
+except Exception:
+    XUNAY_VERSION = '1.2.5'
+
 # ─── 从 core/src/kit*.js 提取真实参数 ───
 import json as _json
 _ROOT_HERE = os.path.dirname(os.path.abspath(__file__))
@@ -950,7 +956,20 @@ GROUPS = [
     ]),
     ('12-changelog', '版本历史', [
       ('H1','版本历史'),
-      ('H2','v1.1.2（最新）'),
+      ('H2','v' + XUNAY_VERSION + '（最新）'),
+      ('Ul',
+        'create：项目创建模板优化（Logo 内嵌 + 欢迎页 + 3 页面 + 文档链接）',
+        'create：品牌名自动追加 " app"（项目名 xunay → 显示 xunay app）',
+        'site：Logo 接入导航栏和首页 Hero，favicon 自动注入',
+        'events：修 mount 后动态元素事件双绑定，toggle 类操作失效',
+        'craft：新增 xunay recipe（xunay.config.json + package.json 兜底）'),
+      ('H2','v1.2.4'),
+      ('Ul','events.js：修双重绑定 bug（影响所有动态渲染按钮）'),
+      ('H2','v1.2.3'),
+      ('Ul','bin/xuyc3.js：兼容 monorepo 和 npm 扁平目录结构'),
+      ('H2','v1.2.2'),
+      ('Ul','compiler3/src/runtime.js：修 import 路径 + 补 app 导出'),
+      ('H2','v1.1.2'),
       ('Ul',
         'core：修 sanitize XSS 递归漏检、事件委托 stopPropagation 失效、多 handler 覆盖',
         'core：修 effect.dispose 内存泄漏、applyList 删除判断',

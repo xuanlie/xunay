@@ -7,6 +7,19 @@ console.log('[1/5] 生成文档...')
 execSync('python3 gen-docs.py', { stdio: 'inherit' })
 
 console.log('\n[2/5] 编译 app.xuy...')
+// 读 core 版本号 → 替换 Home.xuy 里的 __VERSION__
+{
+  const fsV = await import('node:fs')
+  const ver = JSON.parse(fsV.readFileSync('../../core/package.json', 'utf8')).version
+  const homePath = 'src/pages/Home.xuy'
+  let home = fsV.readFileSync(homePath, 'utf8')
+  if (home.includes('v__VERSION__')) {
+    home = home.replace(/v__VERSION__/g, 'v' + ver)
+    fsV.writeFileSync(homePath, home)
+  }
+  console.log('  ✓ 版本号注入 Home.xuy: v' + ver)
+}
+
 execSync('node ../../bin/xuyc.js build app.xuy --out dist --splitting', { stdio: 'inherit' })
 
 console.log('\n[3/5] JIT 任意值...')
