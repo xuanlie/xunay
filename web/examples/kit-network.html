@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NetworkChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>NetworkChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-layout">⚙ 布局</button>
+  <button id="btn-curve">〰 曲线</button>
+  <button id="btn-arrow">➤ 箭头</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">社交网络 · 力导向 · 可拖拽</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">环形布局 · 有向</div>
+    <div id="c2"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import NetworkChart from './kit/charts/network.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+
+const mkSocial = () => {
+  const NAMES = ['Alice','Bob','Carol','Dave','Eve','Frank','Grace','Henry','Ivy','Jack','Kate','Leo','Mia','Noah','Olivia']
+  const nodes = NAMES.map((n, i) => ({ id: n, name: n, value: rand(20, 100) }))
+  const links = []
+  for (let i = 0; i < 40; i++) {
+    const a = NAMES[rand(0, NAMES.length - 1)]
+    const b = NAMES[rand(0, NAMES.length - 1)]
+    if (a !== b && !links.find(l => l.source === a && l.target === b)) {
+      links.push({ source: a, target: b, value: rand(1, 10) })
+    }
+  }
+  return { nodes, links }
+}
+
+const social = mkSocial()
+
+const c1 = new NetworkChart('#c1', {
+  title: '社交网络',
+  subtitle: '悬停高亮邻居 · 拖动节点 · 滚轮缩放 · 双击重置',
+  ...social,
+  height: 520,
+  layout: 'force',
+  nodeRadiusByValue: true,
+  nodeMinR: 8,
+  nodeMaxR: 22,
+  edgeWidthByValue: true,
+  edgeMinW: 0.6,
+  edgeMaxW: 3,
+  onHover: p => p && log('hover', p.type === 'node' ? p.node.name : `${p.source.name} → ${p.target.name}`),
+  onNodeClick: (n) => log('node', n.name),
+  onLinkClick: (l) => log('link', l.source, '→', l.target),
+})
+
+const ring = {
+  nodes: ['A','B','C','D','E','F','G','H'].map((n) => ({ id: n, name: '节点 ' + n })),
+  links: [
+    { source: 'A', target: 'B', value: 3 },
+    { source: 'B', target: 'C', value: 5 },
+    { source: 'C', target: 'D', value: 2 },
+    { source: 'D', target: 'E', value: 4 },
+    { source: 'E', target: 'F', value: 6 },
+    { source: 'F', target: 'G', value: 3 },
+    { source: 'G', target: 'H', value: 2 },
+    { source: 'H', target: 'A', value: 5 },
+    { source: 'A', target: 'D', value: 1 },
+    { source: 'E', target: 'H', value: 2 },
+  ],
+}
+
+const c2 = new NetworkChart('#c2', {
+  title: '有向关系',
+  ...ring,
+  height: 400,
+  layout: 'circle',
+  edgeArrows: true,
+  edgeCurve: 0.3,
+  nodeRadius: 12,
+})
+
+let dark = false
+const layouts = ['force', 'circle', 'grid']
+let layoutIdx = 0
+let curves = [0, 0.3, 0.6]
+let curveIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-layout').onclick = () => {
+  layoutIdx = (layoutIdx + 1) % layouts.length
+  const l = layouts[layoutIdx]
+  c1.setOptions({ layout: l })
+  log('布局 →', l)
+}
+
+document.getElementById('btn-curve').onclick = () => {
+  curveIdx = (curveIdx + 1) % curves.length
+  const k = curves[curveIdx]
+  c2.setOptions({ edgeCurve: k })
+  log('曲线 →', k)
+}
+
+document.getElementById('btn-arrow').onclick = () => {
+  const v = !c2.opts.edgeArrows
+  c2.setOptions({ edgeArrows: v })
+  log('箭头 →', v)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  const s = mkSocial()
+  c1.setData(s)
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

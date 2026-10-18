@@ -1,10 +1,10 @@
 // 路由校验
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("路由校验"),
-    P("check-routes.js 检查四套后端的接口定义和 shared/routes.json 是否一致。"),
+    P("check-routes.js 检查五套后端的接口定义和 shared/routes.json 是否一致。"),
     H2("使用"),
     Code("node bin/check-routes.js", "bash"),
     H2("输出"),

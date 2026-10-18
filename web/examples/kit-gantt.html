@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>GanttChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>GanttChart · 甘特图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-unit">📅 时间单位</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">软件开发项目</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">每月视图</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import GanttChart from './kit/charts/gantt.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+// 用相对今天的日期
+const today = new Date()
+const d = (n) => { const x = new Date(today); x.setDate(x.getDate() + n); return x }
+const mkTasks = () => ([
+  { id: 'req', name: '需求分析', start: d(-10), end: d(-4), progress: 1.0, group: 'plan' },
+  { id: 'design', name: 'UI 设计', start: d(-3), end: d(3), progress: 0.7, group: 'plan', deps: ['req'] },
+  { id: 'fe', name: '前端开发', start: d(4), end: d(18), progress: 0.3, group: 'dev', deps: ['design'] },
+  { id: 'be', name: '后端开发', start: d(4), end: d(20), progress: 0.25, group: 'dev', deps: ['design'] },
+  { id: 'db', name: '数据库设计', start: d(0), end: d(6), progress: 0.6, group: 'dev', deps: ['design'] },
+  { id: 'test', name: '测试', start: d(14), end: d(24), progress: 0.1, group: 'qa', deps: ['be'] },
+  { id: 'deploy', name: '部署上线', start: d(25), end: d(28), progress: 0, group: 'ops', deps: ['test'] },
+  { id: 'docs', name: '文档编写', start: d(10), end: d(22), progress: 0.4, group: 'plan' },
+])
+const GROUP_COLORS = {
+  plan: '#8b5cf6',
+  dev: '#3b82f6',
+  qa: '#f59e0b',
+  ops: '#10b981',
+}
+const decorate = (tasks) => tasks.map(t => ({ ...t, color: GROUP_COLORS[t.group] || '#3b82f6' }))
+const c1 = new GanttChart('#c1',{
+  title:'项目排期',
+  subtitle:'带依赖关系与进度',
+  tasks: decorate(mkTasks()),
+  rowHeight: 38,
+  showDependencies: true,
+  showProgress: true,
+  showToday: true,
+  onHover: t => t && log('hover', t.name, Math.round(t.progress*100)+'%'),
+  onBarClick: (t,i) => log('click', t.name),
+})
+const c2 = new GanttChart('#c2',{
+  title:'季度视图',
+  tasks: decorate(mkTasks().map((t,i)=>({...t, start: d(-60+i*8), end: d(-55+i*8+Math.round(Math.random()*15))}))),
+  rowHeight: 34,
+  timeUnit: 'month',
+  showProgress: true,
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let units=['day','week','month'], ui=0
+document.getElementById('btn-unit').onclick=()=>{ui=(ui+1)%units.length;const u=units[ui];c1.setOptions({timeUnit:u});log('时间单位 →',u)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(decorate(mkTasks()));c2.setData(decorate(mkTasks()));log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

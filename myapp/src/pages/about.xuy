@@ -1,0 +1,28 @@
+import { div, a } from 'xunay'
+import { Card, Btn, Tag, Row, Text } from 'xunay/kit/ui'
+import { go } from '@/router.xuy'
+
+export function About() {
+  return div({ class: 'page-wrap' },
+    div({ style: 'font-size:32px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px' }, '关于'),
+    div({ style: 'color:var(--x-fg-dim);font-size:15px;margin-bottom:32px' }, '这是一个用 XuNay 创建的项目'),
+
+    Card({ title: '项目信息' },
+      Row({ gap: 2, wrap: true, style: 'margin-bottom:16px' },
+        Tag({ type: 'primary' }, 'XuNay'),
+        Tag({ type: 'success' }, 'v1.2.8'),
+        Tag({ type: 'info' }, 'MIT License')
+      ),
+      div({ style: 'font-size:13px;color:var(--x-fg-dim);line-height:1.7' },
+        'XuNay 是一个内存最少、速度最快的前端框架，', 
+        '采用编译期展开 + 信号式响应式设计。'
+      )
+    ),
+
+    div({ style: 'margin-top:20px' },
+      Btn({ onClick: () => go('/') }, '← 返回首页'),
+      ' ',
+      a({ class: 'btn btn-primary', href: 'https://github.com/xuanlie/xunay', target: '_blank' }, 'GitHub')
+    )
+  )
+}

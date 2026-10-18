@@ -1,11 +1,11 @@
 // 动画
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("动画"),
     P("XuNay 提供 228 个动画相关导出：151 个预设 + 40 个缓动函数 + 9 个核心函数 + 15 个触发工具 + 5 个文本动画 + 10 个 SVG / 技术动画 + 4 个物理动画 + 15 个工具 + 20 个组件。"),
-    Tip("全部基于 Web Animations API（el.animate），零依赖，浏览器原生性能。gzip 后 13.42 KB。"),
+    Tip("全部基于 Web Animations API（el.animate），零依赖，浏览器原生性能。gzip 后 15.06 KB。"),
     H2("引入"),
     Code("import {\n  // 核心函数\n  anim, timeline, spring, sequence, parallel, stagger, wait, cancelAll, trans,\n  // 缓动函数\n  easings, ease,\n  // 预设（151 个）\n  fadeIn, fadeInUp, slideInUp, zoomIn, shake, bounce, pulse, flipInX,\n  // 触发工具\n  inView, onScroll, onHover, onInterval, onVisible, throttle, debounce, onDrag, onSwipe,\n  // 文本动画\n  typewriter, countUp, splitText, highlightWords,\n  // SVG / 技术\n  drawPath, followPath, maskReveal, gradientFlow, flip, tiltCard,\n  // 物理\n  springChain, inertia, particles, trail,\n  // 工具\n  queue, interruptable, prefersReducedMotion, safeAnim, scrollProgress, parallax, followMouse,\n  // 组件\n  Entrance, Transition, AnimatedList, AnimatedValue, AnimatedNumber,\n  Marquee, Typewriter, Reveal, Ripple, FlipCard, Counter, ProgressRing,\n} from 'xunay/anim'", "js"),
     H2("9 个核心函数"),
@@ -46,7 +46,7 @@ export function Doc() {
     H2("20 个组件"),
     Table(["组件","用途"], [["Entrance","进入时播放指定动画"],["Transition","条件切换入场"],["AnimatedList","列表错开入场"],["AnimatedValue","值变化时脉冲"],["AnimatedNumber","数字滚动过渡"],["Marquee","跑马灯"],["Typewriter","打字机"],["Reveal","滚动到视口才播"],["Ripple","涟漪点击"],["FlipCard","卡片翻转"],["TypewriterText","打字机组件"],["Counter","计数滚动"],["SplitTextIn","逐字进入"],["GradientText","渐变文字"],["NeonText","发光文字"],["OutlineText","描边文字"],["Marker","高亮标记"],["LazyImage","图片懒加载淡入"],["ProgressRing","进度环"]]),
     H2("完整示例"),
-    Code("// app.xuy\nimport { div, button, signal, mount } from 'xunay'\nimport {\n  Entrance, AnimatedList, Reveal, Counter,\n  Ripple, ProgressRing,\n  fadeInUp, shake,\n  inView, onScroll, parallax\n} from 'xunay/anim'\n\nconst items = signal(['A', 'B', 'C'])\nconst n = signal(42)\n\nmount(() => div(null,\n  Entrance({ type: 'fadeInUp' },\n    div(null, '淡入上滑')\n  ),\n\n  Reveal({ type: 'zoomIn' },\n    div(null, '滚动到视口才播')\n  ),\n\n  Counter({ value: () => n(), duration: 800 }),\n\n  Ripple(null,\n    button({ on: { click: () => shake(button) } }, '点我抖动')\n  ),\n\n  AnimatedList({\n    items: items(),\n    keyFn: i => i,\n    render: i => div(null, i),\n  }),\n\n  ProgressRing({ value: 75, size: 100 })\n), '#app')", "xuy"),
+    Code("// app.xuy\nimport { signal, mount } from 'xunay'\nimport {\n  Entrance, AnimatedList, Reveal, Counter,\n  Ripple, ProgressRing,\n  fadeInUp, shake,\n  inView, onScroll, parallax\n} from 'xunay/anim'\n\nconst items = signal(['A', 'B', 'C'])\nconst n = signal(42)\n\nmount(() => div(null,\n  Entrance({ type: 'fadeInUp' },\n    div(null, '淡入上滑')\n  ),\n\n  Reveal({ type: 'zoomIn' },\n    div(null, '滚动到视口才播')\n  ),\n\n  Counter({ value: () => n(), duration: 800 }),\n\n  Ripple(null,\n    button({ on: { click: () => shake(button) } }, '点我抖动')\n  ),\n\n  AnimatedList({\n    items: items(),\n    keyFn: i => i,\n    render: i => div(null, i),\n  }),\n\n  ProgressRing({ value: 75, size: 100 })\n), '#app')", "xuy"),
     Tip("所有动画都支持 prefersReducedMotion——用户系统开了「减少动画」会自动降级。"),
   )
 }

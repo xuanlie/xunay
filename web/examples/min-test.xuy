@@ -1,0 +1,7 @@
+// title: MIN
+import { mount } from 'xunay'
+
+mount(() => div({ style: 'padding:24px;background:#111;color:#0f0;font:20px monospace' },
+  'XUNAY OK',
+  div(null, '如果你看到这两行，最底层没问题')
+), '#app')

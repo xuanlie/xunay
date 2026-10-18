@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>SlopeChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>SlopeChart · 斜率图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-delta">📊 Delta</button>
+<button id="btn-sort">↕ 排序</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">全球品牌价值排名变化</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">员工绩效 · Q1 vs Q2</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import SlopeChart from './kit/charts/slope.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const BRANDS = ['Apple','Microsoft','Google','Amazon','Tesla','Meta','NVIDIA','Samsung','Coca-Cola','Netflix']
+function mkBrands() {
+  return BRANDS.map(name => {
+    const a = rand(60, 120)
+    const b = Math.max(20, a + (Math.random() - 0.4) * 70)
+    return { label: name, a, b }
+  })
+}
+const MEMBERS = ['张伟','李娜','王芳','刘洋','陈静','杨帆','赵磊','周敏']
+function mkPerformance() {
+  return MEMBERS.map(name => {
+    const a = rand(55, 90)
+    const b = Math.min(100, Math.max(30, a + (Math.random() - 0.4) * 35))
+    return { label: name, a, b }
+  })
+}
+const c1 = new SlopeChart('#c1',{
+  title:'品牌价值',
+  leftLabel:'2023',
+  rightLabel:'2024',
+  data: mkBrands(),
+  valueFormat: v => '$' + v.toFixed(0) + 'B',
+  showDelta: true,
+  onHover: d => d && log('hover', d.label, d.a+'→'+d.b),
+  onLineClick: (d,i) => log('click', d.label),
+})
+const c2 = new SlopeChart('#c2',{
+  title:'绩效评分',
+  leftLabel:'Q1',
+  rightLabel:'Q2',
+  data: mkPerformance(),
+  valueFormat: v => v.toFixed(0),
+  onHover: d => d && log('hover', d.label),
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-delta').onclick=()=>{const v=!c1.opts.showDelta;c1.setOptions({showDelta:v});log('Delta →',v)}
+let sorts=['none','up','down'], si=0
+document.getElementById('btn-sort').onclick=()=>{si=(si+1)%sorts.length;const s=sorts[si];c1.setOptions({sort:s});c1.setData(mkBrands());log('排序 →',s)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(mkBrands());c2.setData(mkPerformance());log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

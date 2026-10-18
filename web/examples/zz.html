@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>loading...</title>
+<style>
+  body{font:16px sans-serif;padding:40px;background:#0f172a;color:#e2e8f0}
+  #box{border:3px solid #4ade80;padding:20px;margin-top:20px;background:#fff;color:#0f172a;border-radius:8px}
+  .err{color:#f87171;font-size:20px;margin:6px 0}
+  .ok{color:#4ade80;font-size:20px;margin:6px 0}
+</style>
+</head>
+<body>
+<div id="log1" class="err">sync 未执行</div>
+<div id="log2" class="err">module 未执行</div>
+<div id="log3" class="err">import 未执行</div>
+<div id="box">(组件渲染到这里)</div>
+
+<script>
+  document.getElementById('log1').textContent = '✓ sync'
+  document.getElementById('log1').className = 'ok'
+</script>
+
+<script type="module">
+  document.getElementById('log2').textContent = '✓ module'
+  document.getElementById('log2').className = 'ok'
+
+  try {
+    const { Input } = await import('./kit/ui/input.js')
+    document.getElementById('log3').textContent = '✓ import Input'
+    document.getElementById('log3').className = 'ok'
+
+    function render(v, c) {
+      if (v == null || v === false || v === true) return
+      if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+      if (typeof v === 'function') return render(v(), c)
+      if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+      if (!v.type) return
+      const el = document.createElement(v.type)
+      const p = v.props || {}
+      for (const k in p) {
+        const val = p[k]
+        if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+        else if (k === 'ref' && typeof val === 'function') val(el)
+        else if (k === 'style') { const st = typeof val === 'function' ? val() : val; if (typeof st === 'string') el.setAttribute('style', st) }
+        else if (k === 'class' || k === 'className') { const cc = typeof val === 'function' ? val() : val; if (cc) el.className = cc }
+        else if (typeof val !== 'function' && val != null) { if (val === true) el.setAttribute(k, ''); else el.setAttribute(k, val) }
+      }
+      for (const ch of (v.children || [])) render(ch, el)
+      c.appendChild(el)
+    }
+
+    const box = document.getElementById('box')
+    box.innerHTML = '<div style="font-size:12px;color:#64748b;margin-bottom:10px">↓ 下面是 Input 组件 ↓</div>'
+    render(Input({ label: '用户名', placeholder: '请输入', hint: '4-20 个字符' }), box)
+    document.title = 'all-ok'
+  } catch (e) {
+    document.getElementById('log3').textContent = '✗ ' + e.message
+    document.title = 'fail'
+  }
+</script>
+</body></html>

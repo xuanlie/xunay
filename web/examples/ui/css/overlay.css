@@ -1,0 +1,1491 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · overlay.css
+   浮层组件 · 1000+ 行完整版
+   ───────────────────────────────────────────────────────────────────────
+   对齐 JS 组件生成类名：
+     overlay.js → Tooltip / Popover / Dropdown / Drawer / Popconfirm
+                  Message / Notification / Tour
+   目录：
+     01 · 提示 Tooltip · 基础
+     02 · 提示 Tooltip · 变体 / 方位
+     03 · 弹出 Popover · 基础
+     04 · 弹出 Popover · 变体
+     05 · 下拉 Dropdown · 基础
+     06 · 下拉 Dropdown · 变体
+     07 · 抽屉 Drawer · 基础
+     08 · 抽屉 Drawer · 方位 / 尺寸
+     09 · 确认 Popconfirm
+     10 · 消息 Message
+     11 · 通知 Notification
+     12 · 引导 Tour
+     13 · 遮罩 Mask
+     14 · 通用浮层定位
+     15 · 关键帧
+     16 · 响应式
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   01 · 提示 Tooltip · 基础
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tooltip {
+  position: absolute;
+  z-index: var(--x-z-tooltip, 1700);
+  padding: 6px 10px;
+  background: var(--x-fg, #1a1a1a);
+  color: var(--x-bg, #fff);
+  font-size: var(--x-fs-sm, 12.5px);
+  line-height: 1.4;
+  border-radius: var(--x-r-sm, 6px);
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--x-sh-md, 0 4px 12px rgba(0,0,0,.08));
+  max-width: 320px;
+  animation: x-fade-in var(--x-dur-1) var(--x-ease);
+  font-weight: var(--x-fw-r, 400);
+  letter-spacing: 0;
+}
+
+.tooltip-content {
+  display: block;
+}
+
+/* 箭头 */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.tooltip[data-side="top"]::after {
+  left: 50%;
+  bottom: -4px;
+  margin-left: -4px;
+}
+
+.tooltip[data-side="bottom"]::after {
+  left: 50%;
+  top: -4px;
+  margin-left: -4px;
+}
+
+.tooltip[data-side="left"]::after {
+  right: -4px;
+  top: 50%;
+  margin-top: -4px;
+}
+
+.tooltip[data-side="right"]::after {
+  left: -4px;
+  top: 50%;
+  margin-top: -4px;
+}
+
+/* 无箭头 */
+.tooltip-no-arrow::after { display: none; }
+
+/* 多行 */
+.tooltip-multiline {
+  white-space: normal;
+  text-align: left;
+  max-width: 320px;
+  min-width: 100px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   02 · 提示 Tooltip · 变体 / 方位
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tooltip-primary { background: var(--x-primary, #2563eb); }
+.tooltip-success { background: var(--x-success, #16a34a); }
+.tooltip-warning { background: var(--x-warning, #d97706); color: var(--x-fg-on-warning, #3b2800); }
+.tooltip-danger  { background: var(--x-danger, #dc2626); }
+.tooltip-info    { background: var(--x-info, #0891b2); }
+
+.tooltip-light {
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  border: 1px solid var(--x-line, #e5e5e5);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+}
+
+.tooltip-light::after {
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-top: 0;
+  border-left: 0;
+}
+
+.tooltip-glass {
+  background: var(--x-bg-glass, rgba(255,255,255,.72));
+  color: var(--x-fg, #1a1a1a);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--x-line-inv, rgba(0,0,0,.08));
+}
+
+/* 键盘快捷键提示 */
+.tooltip kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  margin-left: 6px;
+  font-size: 10px;
+  font-family: var(--x-font-mono, monospace);
+  background: rgba(255,255,255,.2);
+  border-radius: 3px;
+  line-height: 1.6;
+}
+
+/* 长文本 */
+.tooltip-lg {
+  padding: 10px 14px;
+  font-size: var(--x-fs, 14px);
+  max-width: 480px;
+}
+
+.tooltip-sm {
+  padding: 3px 6px;
+  font-size: var(--x-fs-xs, 11px);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   03 · 弹出 Popover · 基础
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.popover {
+  position: absolute;
+  z-index: var(--x-z-popover, 1100);
+  min-width: 200px;
+  max-width: 400px;
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+  animation: x-scale-in var(--x-dur-2) var(--x-ease-spring);
+  transform-origin: var(--x-origin, center);
+  overflow: hidden;
+}
+
+.popover-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-sb, 600);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.popover-close {
+  background: none;
+  border: 0;
+  color: var(--x-fg-mute, #999);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px;
+  border-radius: var(--x-r-xs, 4px);
+  transition: all var(--x-dur-1);
+}
+
+.popover-close:hover {
+  background: var(--x-bg-soft, #f5f5f5);
+  color: var(--x-fg, #1a1a1a);
+}
+
+.popover-body {
+  padding: 12px 16px;
+  font-size: var(--x-fs, 14px);
+  line-height: 1.55;
+  color: var(--x-fg, #1a1a1a);
+}
+
+.popover-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-subtle, #fafafa);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 箭头 */
+.popover::before,
+.popover::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.popover::after {
+  z-index: 2;
+}
+
+.popover[data-side="top"]::before,
+.popover[data-side="top"]::after {
+  left: 50%;
+  margin-left: -5px;
+}
+
+.popover[data-side="top"]::before {
+  bottom: -5px;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+}
+
+.popover[data-side="top"]::after {
+  bottom: -4px;
+  border: 0;
+}
+
+.popover[data-side="bottom"]::before,
+.popover[data-side="bottom"]::after {
+  left: 50%;
+  margin-left: -5px;
+}
+
+.popover[data-side="bottom"]::before {
+  top: -5px;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+  border-top: 1px solid var(--x-line, #e5e5e5);
+}
+
+.popover[data-side="bottom"]::after {
+  top: -4px;
+}
+
+.popover[data-side="left"]::before,
+.popover[data-side="left"]::after {
+  top: 50%;
+  margin-top: -5px;
+}
+
+.popover[data-side="left"]::before {
+  right: -5px;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+  border-top: 1px solid var(--x-line, #e5e5e5);
+}
+
+.popover[data-side="left"]::after {
+  right: -4px;
+}
+
+.popover[data-side="right"]::before,
+.popover[data-side="right"]::after {
+  top: 50%;
+  margin-top: -5px;
+}
+
+.popover[data-side="right"]::before {
+  left: -5px;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+}
+
+.popover[data-side="right"]::after {
+  left: -4px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   04 · 弹出 Popover · 变体
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.popover-no-arrow::before,
+.popover-no-arrow::after {
+  display: none;
+}
+
+.popover-dark {
+  background: var(--x-fg, #1a1a1a);
+  color: var(--x-bg, #fff);
+  border-color: transparent;
+}
+
+.popover-dark .popover-header {
+  border-bottom-color: rgba(255,255,255,.1);
+}
+
+.popover-dark .popover-body {
+  color: var(--x-bg, #fff);
+}
+
+.popover-dark .popover-footer {
+  background: rgba(0,0,0,.2);
+  border-top-color: rgba(255,255,255,.1);
+}
+
+.popover-flush {
+  padding: 0;
+}
+
+.popover-flush .popover-body {
+  padding: 0;
+}
+
+.popover-padded {
+  padding: 16px;
+}
+
+.popover-lg {
+  min-width: 320px;
+  max-width: 560px;
+}
+
+.popover-sm {
+  min-width: 140px;
+  max-width: 280px;
+}
+
+.popover-full {
+  min-width: 100%;
+}
+
+/* 卡片式（内容丰富） */
+.popover-card {
+  min-width: 280px;
+}
+.popover-card .popover-body {
+  padding: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   05 · 下拉 Dropdown · 基础
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  max-width: 320px;
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+  padding: 4px;
+  z-index: var(--x-z-dropdown, 500);
+  animation: x-scale-in var(--x-dur-2) var(--x-ease-spring);
+  transform-origin: top left;
+  overflow: hidden;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.dropdown-menu-end {
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+
+.dropdown-menu-center {
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: top center;
+}
+
+.dropdown-menu-up {
+  top: auto;
+  bottom: calc(100% + 6px);
+  transform-origin: bottom left;
+}
+
+.dropdown-menu-up.dropdown-menu-end {
+  transform-origin: bottom right;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: var(--x-fs, 14px);
+  color: var(--x-fg, #1a1a1a);
+  border-radius: var(--x-r-sm, 6px);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--x-dur-1);
+  text-decoration: none;
+  white-space: nowrap;
+  min-height: 34px;
+  position: relative;
+}
+
+.dropdown-item:hover:not(.disabled):not(:disabled) {
+  background: var(--x-bg-hover, #f5f5f5);
+}
+
+.dropdown-item:focus-visible {
+  outline: none;
+  background: var(--x-bg-hover, #f5f5f5);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.dropdown-item.selected,
+.dropdown-item[aria-selected="true"],
+.dropdown-item[aria-current="true"] {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+  font-weight: var(--x-fw-m, 500);
+}
+
+.dropdown-item.active {
+  background: var(--x-primary, #2563eb);
+  color: #fff;
+}
+
+.dropdown-item.disabled,
+.dropdown-item[aria-disabled="true"],
+.dropdown-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.dropdown-item.danger,
+.dropdown-item.dangerous {
+  color: var(--x-danger, #dc2626);
+}
+.dropdown-item.danger:hover {
+  background: var(--x-danger-soft, rgba(220,38,38,.1));
+}
+
+.dropdown-item-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.85;
+}
+
+.dropdown-item .label,
+.dropdown-item-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-item .shortcut {
+  margin-left: auto;
+  font-size: 11px;
+  font-family: var(--x-font-mono, monospace);
+  color: var(--x-fg-mute, #999);
+}
+
+.dropdown-item .badge {
+  margin-left: auto;
+}
+
+.dropdown-item .arrow {
+  margin-left: auto;
+  color: var(--x-fg-mute, #999);
+  font-size: 12px;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--x-line, #e5e5e5);
+  margin: 4px 8px;
+  border: 0;
+}
+
+.dropdown-label {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg-mute, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dropdown-header {
+  padding: 8px 12px;
+  font-size: var(--x-fs-sm, 12.5px);
+  font-weight: var(--x-fw-m, 500);
+  color: var(--x-fg-dim, #666);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  margin-bottom: 4px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   06 · 下拉 Dropdown · 变体
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.dropdown-menu-lg {
+  min-width: 260px;
+}
+
+.dropdown-menu-sm {
+  min-width: 140px;
+  padding: 2px;
+}
+
+.dropdown-menu-sm .dropdown-item {
+  padding: 6px 10px;
+  font-size: var(--x-fs-sm, 12.5px);
+  min-height: 28px;
+}
+
+.dropdown-menu-flush {
+  padding: 0;
+}
+
+.dropdown-menu-flush .dropdown-item {
+  border-radius: 0;
+}
+
+.dropdown-menu-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.dropdown-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  min-width: 320px;
+}
+
+.dropdown-menu-grid .dropdown-item {
+  flex-direction: column;
+  text-align: center;
+  padding: 12px 8px;
+  min-height: 60px;
+  gap: 6px;
+}
+
+.dropdown-menu-grid .dropdown-item-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* 多级菜单 */
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: calc(100% + 4px);
+  margin-top: -4px;
+  transform-origin: top left;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+/* 选中标志 */
+.dropdown-item .check {
+  margin-left: auto;
+  color: var(--x-primary, #2563eb);
+  font-size: 14px;
+  opacity: 0;
+}
+
+.dropdown-item.selected .check {
+  opacity: 1;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   07 · 抽屉 Drawer · 基础
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.drawer-mask {
+  position: fixed;
+  inset: 0;
+  background: var(--x-bg-overlay, rgba(0,0,0,.45));
+  z-index: var(--x-z-drawer, 1200);
+  animation: x-fade var(--x-dur-2) var(--x-ease);
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 90vw;
+  background: var(--x-bg-elev, #fff);
+  box-shadow: var(--x-sh-2xl, 0 24px 56px rgba(0,0,0,.16));
+  z-index: calc(var(--x-z-drawer, 1200) + 1);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--x-dur-4) var(--x-ease-out);
+}
+
+.drawer-right {
+  right: 0;
+  animation: x-slide-left var(--x-dur-4) var(--x-ease-out);
+}
+
+.drawer-left {
+  left: 0;
+  animation: x-slide-right var(--x-dur-4) var(--x-ease-out);
+}
+
+.drawer-top {
+  top: 0;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  width: auto;
+  max-width: none;
+  height: 320px;
+  max-height: 90vh;
+  animation: x-slide-down var(--x-dur-4) var(--x-ease-out);
+}
+
+.drawer-bottom {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: auto;
+  max-width: none;
+  height: auto;
+  max-height: 90vh;
+  border-radius: var(--x-r-xl, 18px) var(--x-r-xl, 18px) 0 0;
+  animation: x-slide-up var(--x-dur-4) var(--x-ease-out);
+  padding-bottom: var(--x-safe-b, 0px);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  font-size: var(--x-fs-lg, 17px);
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.drawer-close {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 0;
+  color: var(--x-fg-mute, #999);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: var(--x-r-sm, 6px);
+  transition: all var(--x-dur-1);
+  flex-shrink: 0;
+}
+
+.drawer-close:hover {
+  background: var(--x-bg-soft, #f5f5f5);
+  color: var(--x-fg, #1a1a1a);
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.drawer-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-subtle, #fafafa);
+  flex-shrink: 0;
+}
+
+.drawer-footer-between {
+  justify-content: space-between;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · 抽屉 Drawer · 方位 / 尺寸
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.drawer-xs { width: 240px; }
+.drawer-sm { width: 320px; }
+.drawer-md { width: 400px; }
+.drawer-lg { width: 560px; }
+.drawer-xl { width: 720px; }
+.drawer-2xl{ width: 900px; }
+.drawer-full {
+  width: 100vw;
+  max-width: 100vw;
+}
+
+/* 无遮罩 */
+.drawer-mask-none {
+  background: transparent;
+  pointer-events: none;
+}
+
+/* 无边框 / 无阴影 */
+.drawer-flat {
+  box-shadow: none;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+}
+.drawer-right.drawer-flat { border-left: 1px solid var(--x-line, #e5e5e5); border-right: 0; }
+.drawer-left.drawer-flat  { border-right: 1px solid var(--x-line, #e5e5e5); border-left: 0; }
+
+/* 已打开（JS 控制） */
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-right:not(.open) {
+  transform: translateX(100%);
+}
+
+.drawer-left:not(.open) {
+  transform: translateX(-100%);
+}
+
+.drawer-top:not(.open) {
+  transform: translateY(-100%);
+}
+
+.drawer-bottom:not(.open) {
+  transform: translateY(100%);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 · 确认 Popconfirm
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.popconfirm {
+  position: absolute;
+  z-index: var(--x-z-popover, 1100);
+  min-width: 220px;
+  max-width: 320px;
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+  padding: 14px 16px;
+  animation: x-scale-in var(--x-dur-2) var(--x-ease-spring);
+}
+
+.popconfirm-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.popconfirm-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--x-warning, #d97706);
+}
+
+.popconfirm-icon.danger {
+  color: var(--x-danger, #dc2626);
+}
+
+.popconfirm-icon.success {
+  color: var(--x-success, #16a34a);
+}
+
+.popconfirm-desc {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.popconfirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* 箭头 */
+.popconfirm::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  border: inherit;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+.popconfirm[data-side="top"]::after {
+  left: 50%;
+  bottom: -5px;
+  margin-left: -4px;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  border-left: 0;
+  border-top: 0;
+}
+
+.popconfirm[data-side="bottom"]::after {
+  left: 50%;
+  top: -5px;
+  margin-left: -4px;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.popconfirm[data-side="left"]::after {
+  top: 50%;
+  right: -5px;
+  margin-top: -4px;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.popconfirm[data-side="right"]::after {
+  top: 50%;
+  left: -5px;
+  margin-top: -4px;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  border-right: 0;
+  border-top: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · 消息 Message
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.message-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--x-z-toast, 1500);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+  max-width: calc(100vw - 32px);
+  padding-top: var(--x-safe-t, 0px);
+}
+
+.message {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+  font-size: var(--x-fs, 14px);
+  line-height: 1.4;
+  pointer-events: auto;
+  animation: x-message-in var(--x-dur-3) var(--x-ease-out);
+  max-width: 480px;
+  min-width: 180px;
+  white-space: nowrap;
+  font-weight: var(--x-fw-m, 500);
+}
+
+.message.hide {
+  animation: x-message-out var(--x-dur-2) var(--x-ease-in) forwards;
+}
+
+.message-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.message-primary { color: var(--x-primary, #2563eb); }
+.message-primary .message-icon { color: var(--x-primary, #2563eb); }
+
+.message-success .message-icon { color: var(--x-success, #16a34a); }
+.message-warning .message-icon { color: var(--x-warning, #d97706); }
+.message-danger  .message-icon { color: var(--x-danger, #dc2626); }
+.message-info    .message-icon { color: var(--x-info, #0891b2); }
+
+.message-error .message-icon { color: var(--x-danger, #dc2626); }
+.message-loading .message-icon {
+  border: 2px solid var(--x-primary, #2563eb);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: x-spin 0.7s linear infinite;
+  width: 14px;
+  height: 14px;
+}
+
+/* 实心 */
+.message-solid {
+  border-color: transparent;
+  color: #fff;
+}
+.message-solid.message-primary { background: var(--x-primary, #2563eb); }
+.message-solid.message-success { background: var(--x-success, #16a34a); }
+.message-solid.message-warning { background: var(--x-warning, #d97706); color: var(--x-fg-on-warning, #3b2800); }
+.message-solid.message-danger  { background: var(--x-danger, #dc2626); }
+.message-solid.message-info    { background: var(--x-info, #0891b2); }
+
+/* 位置 */
+.message-container.message-bottom {
+  top: auto;
+  bottom: 20px;
+}
+
+.message-container.message-top-left {
+  top: 20px;
+  left: 20px;
+  transform: none;
+  align-items: flex-start;
+}
+
+.message-container.message-top-right {
+  top: 20px;
+  left: auto;
+  right: 20px;
+  transform: none;
+  align-items: flex-end;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · 通知 Notification
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: var(--x-z-toast, 1500);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  padding-top: var(--x-safe-t, 0px);
+  pointer-events: none;
+}
+
+.notification {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-xl, 0 16px 40px rgba(0,0,0,.12));
+  animation: x-notification-in var(--x-dur-4) var(--x-ease-out);
+  min-width: 320px;
+  max-width: 400px;
+  position: relative;
+  pointer-events: auto;
+}
+
+.notification.hide {
+  animation: x-notification-out var(--x-dur-3) var(--x-ease-in) forwards;
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.notification-success .notification-icon { color: var(--x-success, #16a34a); }
+.notification-warning .notification-icon { color: var(--x-warning, #d97706); }
+.notification-danger  .notification-icon { color: var(--x-danger, #dc2626); }
+.notification-info    .notification-icon { color: var(--x-info, #0891b2); }
+
+.notification-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.notification-desc {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.notification-close {
+  background: none;
+  border: 0;
+  color: var(--x-fg-mute, #999);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: var(--x-r-xs, 4px);
+  transition: all var(--x-dur-1);
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.notification-close:hover {
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-soft, #f5f5f5);
+}
+
+.notification-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--x-primary, #2563eb);
+  border-radius: 0 0 var(--x-r-md, 10px) var(--x-r-md, 10px);
+  animation: x-notification-progress linear forwards;
+  transform-origin: left;
+}
+
+.notification-success .notification-progress { background: var(--x-success, #16a34a); }
+.notification-warning .notification-progress { background: var(--x-warning, #d97706); }
+.notification-danger .notification-progress  { background: var(--x-danger, #dc2626); }
+.notification-info .notification-progress    { background: var(--x-info, #0891b2); }
+
+/* 位置 */
+.notification-container.notification-bottom-right {
+  top: auto;
+  bottom: 20px;
+}
+
+.notification-container.notification-top-left {
+  right: auto;
+  left: 20px;
+}
+
+.notification-container.notification-bottom-left {
+  top: auto;
+  bottom: 20px;
+  right: auto;
+  left: 20px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · 引导 Tour
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tour-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: var(--x-z-modal, 1000);
+  pointer-events: none;
+}
+
+.tour-spotlight {
+  position: absolute;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,.5);
+  border-radius: var(--x-r-sm, 6px);
+  pointer-events: none;
+  z-index: var(--x-z-modal, 1000);
+  transition: all var(--x-dur-3) var(--x-ease);
+}
+
+.tour-popup {
+  position: absolute;
+  z-index: calc(var(--x-z-modal, 1000) + 10);
+  min-width: 280px;
+  max-width: 400px;
+  padding: 16px;
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-2xl, 0 24px 56px rgba(0,0,0,.16));
+  animation: x-scale-in var(--x-dur-3) var(--x-ease-spring);
+}
+
+.tour-title {
+  font-size: var(--x-fs-md, 15px);
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.tour-desc {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.tour-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tour-step {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-mute, #999);
+  font-variant-numeric: tabular-nums;
+}
+
+.tour-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* 箭头 */
+.tour-popup::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+  border: inherit;
+}
+
+.tour-popup[data-side="top"]::after {
+  left: 50%;
+  bottom: -5px;
+  margin-left: -5px;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  border-top: 0;
+  border-left: 0;
+}
+
+.tour-popup[data-side="bottom"]::after {
+  left: 50%;
+  top: -5px;
+  margin-left: -5px;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.tour-popup[data-side="left"]::after {
+  top: 50%;
+  right: -5px;
+  margin-top: -5px;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.tour-popup[data-side="right"]::after {
+  top: 50%;
+  left: -5px;
+  margin-top: -5px;
+  border-left: 1px solid var(--x-line, #e5e5e5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  border-right: 0;
+  border-top: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · 遮罩 Mask
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.mask {
+  position: fixed;
+  inset: 0;
+  background: var(--x-bg-overlay, rgba(0,0,0,.45));
+  z-index: var(--x-z-overlay, 900);
+  animation: x-fade var(--x-dur-2) var(--x-ease);
+}
+
+.mask-light {
+  background: rgba(0,0,0,.2);
+}
+
+.mask-glass {
+  background: rgba(0,0,0,.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.mask-blur {
+  background: rgba(0,0,0,.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.mask-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: #fff;
+  font-size: var(--x-fs-sm, 12.5px);
+}
+
+.mask-clickable {
+  cursor: pointer;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · 通用浮层定位
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.overlay-anchor {
+  position: relative;
+  display: inline-block;
+}
+
+.overlay-portal {
+  position: absolute;
+  z-index: var(--x-z-popover, 1100);
+}
+
+.overlay-portal-fixed {
+  position: fixed;
+}
+
+.overlay-portal-hidden {
+  display: none;
+}
+
+.overlay-arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* 阻止 body 滚动 */
+body.x-scroll-lock {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 关键帧
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@keyframes x-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes x-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes x-scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes x-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes x-slide-down {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes x-slide-left {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes x-slide-right {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes x-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes x-message-in {
+  from { opacity: 0; transform: translateY(-12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes x-message-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-12px) scale(0.96); }
+}
+
+@keyframes x-notification-in {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes x-notification-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(30px); }
+}
+
+@keyframes x-notification-progress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   16 · 响应式
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .dropdown-menu {
+    min-width: 160px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .dropdown-menu-grid {
+    grid-template-columns: 1fr;
+    min-width: 200px;
+  }
+
+  .drawer,
+  .drawer-left,
+  .drawer-right {
+    width: 100% !important;
+    max-width: 90vw;
+    padding-bottom: var(--x-safe-b, 0px);
+  }
+
+  .drawer-bottom {
+    border-radius: var(--x-r-xl, 18px) var(--x-r-xl, 18px) 0 0;
+    max-height: 85vh;
+  }
+
+  .message-container {
+    left: 16px;
+    right: 16px;
+    max-width: none;
+    transform: none;
+    padding-top: calc(var(--x-safe-t, 0px) + 8px);
+  }
+
+  .message {
+    width: 100%;
+    max-width: none;
+    white-space: normal;
+  }
+
+  .notification-container {
+    left: 16px;
+    right: 16px;
+    max-width: none;
+    top: calc(var(--x-safe-t, 0px) + 8px);
+  }
+
+  .notification {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
+
+  .popover {
+    min-width: 200px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .tour-popup {
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+  }
+
+  .tooltip {
+    max-width: calc(100vw - 32px);
+  }
+}
+
+@media (max-width: 480px) {
+  .popconfirm {
+    min-width: 180px;
+  }
+
+  .dropdown-menu {
+    min-width: 140px;
+  }
+}

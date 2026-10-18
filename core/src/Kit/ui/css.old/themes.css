@@ -1,0 +1,264 @@
+/* XuNay UI · themes.css */
+
+[data-theme="dark"] {
+  --x-bg: #0d1117;
+  --x-bg-soft: #161b22;
+  --x-bg-elev: #1c2128;
+  --x-border: #30363d;
+  --x-border-strong: #484f58;
+  --x-text: #e6edf3;
+  --x-text-dim: #8b949e;
+  --x-text-mute: #6e7681;
+  --x-primary: #58a6ff;
+  --x-primary-hover: #79c0ff;
+  --x-primary-soft: rgba(88,166,255,.1);
+  --x-shadow: 0 1px 3px rgba(0,0,0,.4);
+  --x-shadow-md: 0 4px 12px rgba(0,0,0,.5);
+  --x-shadow-lg: 0 12px 32px rgba(0,0,0,.6);
+}
+
+[data-theme="dark"] .badge-success { background: rgba(22,163,74,.2); color: #4ade80; }
+
+[data-theme="dark"] .badge-danger { background: rgba(220,38,38,.2); color: #f87171; }
+
+[data-theme="dark"] .badge-warning { background: rgba(217,119,6,.2); color: #fbbf24; }
+
+[data-theme="dark"] .alert-success { background: rgba(22,163,74,.15); color: #4ade80; }
+
+[data-theme="dark"] .alert-warning { background: rgba(217,119,6,.15); color: #fbbf24; }
+
+[data-theme="dark"] .alert-danger { background: rgba(220,38,38,.15); color: #f87171; }
+
+[data-theme="dark"] {
+  --x-bg-hover: #374151;
+  --x-danger-soft: rgba(239,68,68,.15);
+  --x-success-soft: rgba(16,185,129,.15);
+  --x-warning-soft: rgba(245,158,11,.15);
+}
+
+/* ---------- 预设主题：Nord ---------- */
+[data-theme="nord"] {
+  --x-bg: #2e3440;
+  --x-bg-soft: #3b4252;
+  --x-bg-elev: #3b4252;
+  --x-bg-hover: #434c5e;
+  --x-border: #434c5e;
+  --x-border-strong: #4c566a;
+  --x-text: #eceff4;
+  --x-text-dim: #d8dee9;
+  --x-text-mute: #7b88a1;
+  --x-text-inverse: #2e3440;
+  --x-primary: #88c0d0;
+  --x-primary-hover: #8fbcbb;
+  --x-primary-soft: rgba(136,192,208,.15);
+  --x-danger: #bf616a;
+  --x-success: #a3be8c;
+  --x-warning: #ebcb8b;
+}
+
+/* ---------- 预设主题：Solarized ---------- */
+[data-theme="solarized"] {
+  --x-bg: #fdf6e3;
+  --x-bg-soft: #eee8d5;
+  --x-bg-elev: #ffffff;
+  --x-bg-hover: #eee8d5;
+  --x-border: #d5cdb6;
+  --x-border-strong: #93a1a1;
+  --x-text: #586e75;
+  --x-text-dim: #657b83;
+  --x-text-mute: #93a1a1;
+  --x-text-inverse: #fdf6e3;
+  --x-primary: #268bd2;
+  --x-primary-hover: #1f7bbf;
+  --x-primary-soft: rgba(38,139,210,.1);
+  --x-danger: #dc322f;
+  --x-success: #859900;
+  --x-warning: #b58900;
+}
+
+/* ---------- 预设主题：Tokyo Night ---------- */
+[data-theme="tokyo"] {
+  --x-bg: #1a1b26;
+  --x-bg-soft: #16161e;
+  --x-bg-elev: #24283b;
+  --x-bg-hover: #2f3349;
+  --x-border: #2f3349;
+  --x-border-strong: #3b4261;
+  --x-text: #c0caf5;
+  --x-text-dim: #a9b1d6;
+  --x-text-mute: #565f89;
+  --x-text-inverse: #1a1b26;
+  --x-primary: #7aa2f7;
+  --x-primary-hover: #89b4fa;
+  --x-primary-soft: rgba(122,162,247,.15);
+  --x-danger: #f7768e;
+  --x-success: #9ece6a;
+  --x-warning: #e0af68;
+}
+
+/* ---------- 预设主题：Monokai ---------- */
+[data-theme="monokai"] {
+  --x-bg: #272822;
+  --x-bg-soft: #1e1f1c;
+  --x-bg-elev: #3e3d32;
+  --x-bg-hover: #4a4940;
+  --x-border: #4a4940;
+  --x-border-strong: #75715e;
+  --x-text: #f8f8f2;
+  --x-text-dim: #cfcfc2;
+  --x-text-mute: #75715e;
+  --x-text-inverse: #272822;
+  --x-primary: #a6e22e;
+  --x-primary-hover: #b6f23e;
+  --x-primary-soft: rgba(166,226,46,.15);
+  --x-danger: #f92672;
+  --x-success: #a6e22e;
+  --x-warning: #e6db74;
+}
+
+/* ---------- 主色变体（data-accent）---------- */
+[data-accent="green"] {
+  --x-primary: #16a34a;
+  --x-primary-hover: #15803d;
+  --x-primary-soft: rgba(22,163,74,.1);
+}
+
+[data-theme="dark"][data-accent="green"], [data-theme="dracula"][data-accent="green"], [data-theme="tokyo"][data-accent="green"] {
+  --x-primary: #4ade80;
+  --x-primary-hover: #6ee7a7;
+  --x-primary-soft: rgba(74,222,128,.15);
+}
+
+[data-accent="red"] {
+  --x-primary: #dc2626;
+  --x-primary-hover: #b91c1c;
+  --x-primary-soft: rgba(220,38,38,.1);
+}
+
+[data-theme="dark"][data-accent="red"], [data-theme="dracula"][data-accent="red"], [data-theme="tokyo"][data-accent="red"] {
+  --x-primary: #f87171;
+  --x-primary-hover: #fca5a5;
+  --x-primary-soft: rgba(248,113,113,.15);
+}
+
+[data-accent="orange"] {
+  --x-primary: #ea580c;
+  --x-primary-hover: #c2410c;
+  --x-primary-soft: rgba(234,88,12,.1);
+}
+
+[data-theme="dark"][data-accent="orange"], [data-theme="dracula"][data-accent="orange"], [data-theme="tokyo"][data-accent="orange"] {
+  --x-primary: #fb923c;
+  --x-primary-hover: #fdba74;
+  --x-primary-soft: rgba(251,146,60,.15);
+}
+
+[data-accent="purple"] {
+  --x-primary: #7c3aed;
+  --x-primary-hover: #6d28d9;
+  --x-primary-soft: rgba(124,58,237,.1);
+}
+
+[data-theme="dark"][data-accent="purple"], [data-theme="dracula"][data-accent="purple"], [data-theme="tokyo"][data-accent="purple"] {
+  --x-primary: #a78bfa;
+  --x-primary-hover: #c4b5fd;
+  --x-primary-soft: rgba(167,139,250,.15);
+}
+
+[data-accent="cyan"] {
+  --x-primary: #0891b2;
+  --x-primary-hover: #0e7490;
+  --x-primary-soft: rgba(8,145,178,.1);
+}
+
+[data-theme="dark"][data-accent="cyan"], [data-theme="dracula"][data-accent="cyan"], [data-theme="tokyo"][data-accent="cyan"] {
+  --x-primary: #22d3ee;
+  --x-primary-hover: #67e8f9;
+  --x-primary-soft: rgba(34,211,238,.15);
+}
+
+[data-accent="pink"] {
+  --x-primary: #db2777;
+  --x-primary-hover: #be185d;
+  --x-primary-soft: rgba(219,39,119,.1);
+}
+
+[data-theme="dark"][data-accent="pink"], [data-theme="dracula"][data-accent="pink"], [data-theme="tokyo"][data-accent="pink"] {
+  --x-primary: #f472b6;
+  --x-primary-hover: #f9a8d4;
+  --x-primary-soft: rgba(244,114,182,.15);
+}
+
+/* ---------- 渐变工具类 ---------- */
+.bg-gradient-blue { background: var(--x-grad-blue); }
+
+.bg-gradient-green { background: var(--x-grad-green); }
+
+.bg-gradient-orange { background: var(--x-grad-orange); }
+
+.bg-gradient-red { background: var(--x-grad-red); }
+
+.bg-gradient-purple { background: var(--x-grad-purple); }
+
+.bg-gradient-cyan { background: var(--x-grad-cyan); }
+
+.bg-gradient-sunset { background: var(--x-grad-sunset); }
+
+.bg-gradient-ocean { background: var(--x-grad-ocean); }
+
+.bg-gradient-forest { background: var(--x-grad-forest); }
+
+.bg-gradient-rainbow { background: var(--x-grad-rainbow); }
+
+.bg-gradient-mesh { background: var(--x-grad-mesh); background-color: var(--x-bg); }
+
+/* 渐变文字 */
+.text-gradient {
+  background: linear-gradient(135deg, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* 渐变边框 */
+.border-gradient {
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+}
+
+.border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 玻璃拟态 */
+.glass {
+  background: rgba(255,255,255,.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+[data-theme="dark"] .glass, [data-theme="dracula"] .glass, [data-theme="tokyo"] .glass {
+  background: rgba(0,0,0,.3);
+  border-color: rgba(255,255,255,.1);
+}
+
+/* 阴影变体 */
+.shadow-colored {
+  box-shadow: 0 8px 24px -8px var(--x-primary);
+}
+
+.glow {
+  box-shadow: 0 0 20px var(--x-primary-soft), 0 0 40px var(--x-primary-soft);
+}

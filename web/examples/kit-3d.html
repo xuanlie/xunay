@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit · 3D 图表</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0e17;color:#e2e8f0;font:14px/1.5 system-ui;
+    display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  header{padding:12px 20px;border-bottom:1px solid #1e293b;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  h1{font-size:16px;font-weight:600}
+  .tab{padding:6px 14px;border:1px solid #1e293b;border-radius:8px;
+    background:#0f172a;color:#94a3b8;cursor:pointer;font-size:13px;
+    transition:all .15s}
+  .tab:hover{border-color:#3b82f6;color:#60a5fa}
+  .tab.active{background:#1e40af;border-color:#3b82f6;color:#fff}
+  #canvas{flex:1;width:100%;display:block;outline:none}
+  #hud{position:absolute;right:16px;top:60px;background:#0f172ad9;
+    padding:10px 14px;border-radius:10px;font-size:12px;
+    border:1px solid #1e293b;backdrop-filter:blur(8px);pointer-events:none}
+  #hud .v{color:#60a5fa;font-weight:600;font-size:16px}
+  #err{position:fixed;bottom:0;left:0;right:0;background:#7f1d1d;
+    color:#fff;padding:10px;font:12px monospace;display:none;
+    max-height:200px;overflow:auto;z-index:100;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header>
+  <h1>Kit · 3D 图表</h1>
+  <div class="tab active" data-chart="bar3d">3D 柱状</div>
+  <div class="tab" data-chart="scatter3d">3D 散点</div>
+  <div class="tab" data-chart="pie3d">3D 饼图</div>
+  <div class="tab" data-chart="surface">3D 曲面</div>
+</header>
+<canvas id="canvas"></canvas>
+<div id="hud">帧率 <span class="v" id="fps">60</span> fps</div>
+<pre id="err"></pre>
+
+<script>
+window.addEventListener('error', e => {
+  const el = document.getElementById('err')
+  el.style.display = 'block'
+  el.textContent += '[ERR] ' + e.message + '\n' + (e.error?.stack || '') + '\n'
+})
+</script>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+<script type="module">
+import {
+  createScene, createLight, createCamera,
+  Box, Sphere, Cylinder, Ground,
+  GridMaterial, StandardMaterial,
+  onPointer, fpsMonitor
+} from './kit/babylon.js'
+
+const BABYLON = window.BABYLON
+const canvas = document.getElementById('canvas')
+const fpsEl = document.getElementById('fps')
+
+const { engine, scene } = createScene({
+  canvas,
+  clearColor: [0.04, 0.06, 0.09, 1],
+  camera: { type: 'arc', radius: 18, alpha: -Math.PI / 4, beta: 1.1,
+    minRadius: 6, maxRadius: 60, wheelPrecision: 40 },
+  light: false,
+  fog: { color: [0.04, 0.06, 0.09], density: 0.01 },
+})
+
+createLight({ type: 'hemi', intensity: 0.5, groundColor: [0.05, 0.05, 0.1] })
+createLight({ type: 'directional', direction: [-1, -2, -1],
+  intensity: 1.2, position: [10, 15, 10],
+  shadows: { shadowMapSize: 1024, shadowBlurKernel: 16 } })
+createLight({ type: 'point', position: [0, 10, 0], intensity: 0.5,
+  diffuse: '#60a5fa', range: 40 })
+
+const gm = GridMaterial({
+  majorUnitFrequency: 4, minorUnitVisibility: 0.2,
+  mainColor: [0.06, 0.09, 0.14], lineColor: [0.3, 0.5, 0.9], opacity: 0.5,
+})
+const ground = Ground({ width: 60, height: 60, position: [0, 0, 0], receiveShadow: true })
+ground.mesh.material = gm
+
+fpsMonitor(engine, v => { fpsEl.textContent = v })
+
+// ============ 数据 ============
+const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
+const DATA = MONTHS.map((m, i) => ({
+  label: m,
+  value: 30 + Math.round(Math.sin(i * 0.6) * 40 + Math.random() * 30 + 60),
+}))
+const PALETTE = ['#3b82f6','#8b5cf6','#ec4899','#f97316','#22c55e','#06b6d4','#eab308','#ef4444']
+
+// ============ 清场 ============
+let group = []
+function clear() {
+  for (const m of group) { try { m.mesh?.dispose?.() ?? m.dispose?.() } catch {} }
+  group = []
+}
+
+// ============ 3D 柱状 ============
+function buildBar3D() {
+  const maxV = Math.max(...DATA.map(d => d.value))
+  const slot = 1.6
+  const startX = -(DATA.length - 1) * slot / 2
+  const scale = 8 / maxV
+
+  DATA.forEach((d, i) => {
+    const h = d.value * scale
+    const color = PALETTE[i % PALETTE.length]
+    const box = Box({
+      name: 'bar' + i,
+      size: 1.2,
+      position: [startX + i * slot, h / 2, 0],
+      color,
+      metallic: 0.4, roughness: 0.4,
+      castShadow: true, receiveShadow: true,
+    })
+    box.mesh.scaling.y = h / 1.2
+    box.mesh.material.emissiveColor = BABYLON.Color3.FromHexString(color).scale(0.15)
+
+    onPointer({
+      mesh: box.mesh,
+      enter: () => { box.mesh.scaling.x = 1.2; box.mesh.scaling.z = 1.2 },
+      leave: () => { box.mesh.scaling.x = 1; box.mesh.scaling.z = 1 },
+      click: () => { box.mesh.material.emissiveColor =
+        BABYLON.Color3.FromHexString(color).scale(0.8) },
+    })
+    group.push(box)
+  })
+}
+
+// ============ 3D 散点 ============
+function buildScatter3D() {
+  for (let i = 0; i < 120; i++) {
+    const x = (Math.random() - 0.5) * 14
+    const y = Math.random() * 10 + 0.5
+    const z = (Math.random() - 0.5) * 14
+    const color = PALETTE[Math.floor(Math.random() * PALETTE.length)]
+    const s = Sphere({
+      name: 'pt' + i,
+      diameter: 0.3 + Math.random() * 0.4,
+      position: [x, y, z],
+      color,
+      metallic: 0.6, roughness: 0.3,
+      emissiveColor: BABYLON.Color3.FromHexString(color).scale(0.3),
+    })
+    s.mesh.material.alpha = 0.85
+    group.push(s)
+  }
+}
+
+// ============ 3D 饼图 ============
+function buildPie3D() {
+  clear()
+  const total = DATA.reduce((a, b) => a + b.value, 0)
+  const R = 5.5          // 半径
+  const H = 1.4          // 厚度
+  const BASE = -0.7      // 底面 y（让饼图贴地）
+  const TOP = BASE + H   // 顶面 y
+  let angle = -Math.PI / 2
+
+  DATA.forEach((d, i) => {
+    const sweep = (d.value / total) * Math.PI * 2
+    const a0 = angle
+    const a1 = angle + sweep
+    angle = a1
+
+    const color = PALETTE[i % PALETTE.length]
+    const c3 = BABYLON.Color3.FromHexString(color)
+    const seg = Math.max(6, Math.ceil(48 * sweep / (Math.PI * 2)))
+
+    const positions = [], indices = [], colors = []
+
+    // 顶面中心
+    positions.push(0, TOP, 0); colors.push(c3.r, c3.g, c3.b, 1)
+    // 顶面圆弧
+    for (let k = 0; k <= seg; k++) {
+      const a = a0 + (a1 - a0) * (k / seg)
+      positions.push(Math.cos(a) * R, TOP, Math.sin(a) * R)
+      colors.push(c3.r, c3.g, c3.b, 1)
+    }
+    // 底面中心
+    const botCenter = positions.length / 3
+    const darkR = c3.r * 0.65, darkG = c3.g * 0.65, darkB = c3.b * 0.65
+    positions.push(0, BASE, 0); colors.push(darkR, darkG, darkB, 1)
+    // 底面圆弧
+    const botStart = positions.length / 3
+    for (let k = 0; k <= seg; k++) {
+      const a = a0 + (a1 - a0) * (k / seg)
+      positions.push(Math.cos(a) * R, BASE, Math.sin(a) * R)
+      colors.push(darkR, darkG, darkB, 1)
+    }
+
+    const topCenter = 0, topStart = 1
+
+    // 顶面三角形（从上方看逆时针）
+    for (let k = 0; k < seg; k++) {
+      indices.push(topCenter, topStart + k, topStart + k + 1)
+    }
+    // 底面三角形（从下方看逆时针）
+    for (let k = 0; k < seg; k++) {
+      indices.push(botCenter, botStart + k + 1, botStart + k)
+    }
+    // 侧面
+    for (let k = 0; k < seg; k++) {
+      const t0 = topStart + k, t1 = topStart + k + 1
+      const b0 = botStart + k, b1 = botStart + k + 1
+      indices.push(t0, b0, b1)
+      indices.push(t0, b1, t1)
+    }
+    // 两个径向面（起止）
+    indices.push(topCenter, botStart, topStart)          // 起始边
+    indices.push(topCenter, topStart + seg, botStart + seg) // 结束边
+
+    const mesh = new BABYLON.Mesh('pie-' + i, scene)
+    const vd = new BABYLON.VertexData()
+    vd.positions = positions
+    vd.indices = indices
+    vd.colors = colors
+    vd.applyToMesh(mesh, true)
+    // 计算法线（光照）
+    const normals = []
+    BABYLON.VertexData.ComputeNormals(positions, indices, normals)
+    mesh.setVerticesData(BABYLON.VertexBuffer.NormalKind, normals)
+
+    const mat = new BABYLON.StandardMaterial('pie-mat-' + i, scene)
+    mat.diffuseColor = c3
+    mat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3)
+    mat.emissiveColor = c3.scale(0.18)
+    mat.backFaceCulling = true
+    mesh.material = mat
+    mesh.receiveShadows = true
+
+    // 悬停时径向弹出
+    const mid = (a0 + a1) / 2
+    const popX = Math.cos(mid) * 0.6
+    const popZ = Math.sin(mid) * 0.6
+    onPointer({
+      mesh,
+      enter: () => { mesh.position = new BABYLON.Vector3(popX, 0.25, popZ) },
+      leave: () => { mesh.position = new BABYLON.Vector3(0, 0, 0) },
+      click: () => { mat.emissiveColor = c3.scale(0.9) },
+    })
+
+    group.push({ mesh, dispose: () => mesh.dispose() })
+  })
+}
+
+// ============ 3D 曲面 ============
+function buildSurface() {
+  const size = 20, seg = 40
+  const positions = [], indices = [], colors = []
+  const colorMap = new Map()
+  let idx = 0
+
+  for (let i = 0; i <= seg; i++) {
+    for (let j = 0; j <= seg; j++) {
+      const x = (i / seg - 0.5) * size
+      const z = (j / seg - 0.5) * size
+      const y = Math.sin(x * 0.4) * Math.cos(z * 0.4) * 3 +
+                Math.sin(x * 0.15 + z * 0.15) * 2 + 3
+      positions.push(x, y, z)
+      const t = (y + 2) / 8
+      const r = t, g = 0.5 + t * 0.3, b = 1 - t * 0.5
+      colors.push(r, g, b, 1)
+    }
+  }
+
+  for (let i = 0; i < seg; i++) {
+    for (let j = 0; j < seg; j++) {
+      const a = i * (seg + 1) + j
+      const b = a + 1
+      const c = a + seg + 1
+      const d = c + 1
+      indices.push(a, b, d, a, d, c)
+    }
+  }
+
+  const mesh = new BABYLON.Mesh('surface', scene)
+  const vd = new BABYLON.VertexData()
+  vd.positions = positions
+  vd.indices = indices
+  vd.colors = colors
+  vd.applyToMesh(mesh, true)
+
+  const mat = new BABYLON.StandardMaterial('surf-mat', scene)
+  mat.diffuseColor = new BABYLON.Color3(0.4, 0.7, 1)
+  mat.emissiveColor = new BABYLON.Color3(0.1, 0.2, 0.4)
+  mat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3)
+  mat.backFaceCulling = false
+  mesh.material = mat
+  mesh.position.y = -1
+
+  group.push({ mesh, dispose: () => mesh.dispose() })
+}
+
+// ============ 切换 ============
+let current = 'bar3d'
+function switchChart(type) {
+  if (type === current) return
+  current = type
+  clear()
+  document.querySelectorAll('.tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.chart === type))
+  if (type === 'bar3d') buildBar3D()
+  else if (type === 'scatter3d') buildScatter3D()
+  else if (type === 'pie3d') buildPie3D()
+  else if (type === 'surface') buildSurface()
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => switchChart(t.dataset.chart)
+})
+
+buildBar3D()
+
+// 自动旋转
+scene.onBeforeRenderObservable.add(() => {
+  const cam = scene.activeCamera
+  if (cam && cam.alpha !== undefined) cam.alpha += 0.002
+})
+</script>
+</body>
+</html>

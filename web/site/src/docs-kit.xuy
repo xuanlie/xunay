@@ -1,6 +1,43 @@
 // docs-kit: 文档构建块
 import { div, span, button, h1, h2, h3, p, ul, ol, li, pre, code, blockquote, table, thead, tbody, tr, th, td, a, signal } from 'xunay'
-import { highlight } from '../../../core/src/hl.js'
+import LineChart from 'xunay/kit/charts/line'
+import BarChart from 'xunay/kit/charts/bar'
+import AreaChart from 'xunay/kit/charts/area'
+import PieChart from 'xunay/kit/charts/pie'
+import SankeyChart from 'xunay/kit/charts/sankey'
+import TreemapChart from 'xunay/kit/charts/treemap'
+import ScatterChart from 'xunay/kit/charts/scatter'
+import RadarChart from 'xunay/kit/charts/radar'
+import BoxplotChart from 'xunay/kit/charts/boxplot'
+import ViolinChart from 'xunay/kit/charts/violin'
+import RidgelineChart from 'xunay/kit/charts/ridgeline'
+import HexbinChart from 'xunay/kit/charts/hexbin'
+import CalendarHeatmap from 'xunay/kit/charts/calendar'
+import WordcloudChart from 'xunay/kit/charts/wordcloud'
+import SunburstChart from 'xunay/kit/charts/sunburst'
+import CirclePackingChart from 'xunay/kit/charts/circlepack'
+import TreeChart from 'xunay/kit/charts/tree'
+import IcicleChart from 'xunay/kit/charts/icicle'
+import MarimekkoChart from 'xunay/kit/charts/marimekko'
+import ChordChart from 'xunay/kit/charts/chord'
+import ParallelChart from 'xunay/kit/charts/parallel'
+import VoronoiChart from 'xunay/kit/charts/voronoi'
+import NetworkChart from 'xunay/kit/charts/network'
+import BumpChart from 'xunay/kit/charts/bump'
+import CandlestickChart from 'xunay/kit/charts/candlestick'
+import GanttChart from 'xunay/kit/charts/gantt'
+import WaterfallChart from 'xunay/kit/charts/waterfall'
+import SlopeChart from 'xunay/kit/charts/slope'
+import DumbbellChart from 'xunay/kit/charts/dumbbell'
+import LollipopChart from 'xunay/kit/charts/lollipop'
+import WaffleChart from 'xunay/kit/charts/waffle'
+import BulletChart from 'xunay/kit/charts/bullet'
+import StreamChart from 'xunay/kit/charts/stream'
+import FunnelChart from 'xunay/kit/charts/funnel'
+import GaugeChart from 'xunay/kit/charts/gauge'
+import HeatmapChart from 'xunay/kit/charts/heatmap'
+import { icons } from 'xunay/kit/icons'
+import { highlight } from 'xunay/hl'
 
 export function D(...children) {
   return div({ class: 'doc' }, ...children)
@@ -142,3 +179,94 @@ export function Demo(code, lang) {
   )
 }
 
+
+// ============ 图表实时渲染 ============
+const _CHART_MAP = {
+  line: LineChart, bar: BarChart, area: AreaChart, pie: PieChart,
+  sankey: SankeyChart, treemap: TreemapChart,
+  scatter: ScatterChart, radar: RadarChart, boxplot: BoxplotChart,
+  violin: ViolinChart, ridgeline: RidgelineChart, hexbin: HexbinChart,
+  calendar: CalendarHeatmap, wordcloud: WordcloudChart,
+  sunburst: SunburstChart, circlepack: CirclePackingChart,
+  tree: TreeChart, icicle: IcicleChart, marimekko: MarimekkoChart,
+  chord: ChordChart, parallel: ParallelChart, voronoi: VoronoiChart,
+  network: NetworkChart, bump: BumpChart,
+  candlestick: CandlestickChart, gantt: GanttChart, waterfall: WaterfallChart,
+  slope: SlopeChart, dumbbell: DumbbellChart, lollipop: LollipopChart,
+  waffle: WaffleChart, bullet: BulletChart, stream: StreamChart,
+  funnel: FunnelChart, gauge: GaugeChart, heatmap: HeatmapChart,
+}
+
+export function ChartDemo(type, opts) {
+  const opt = opts || {}
+  const h = opt.height || 260
+  return div({
+    class: 'doc-chart-demo',
+    style: 'height:' + h + 'px;margin:14px 0;padding:10px;border:1px solid var(--x-border);border-radius:10px;background:var(--x-bg-elev)',
+    ref: (el) => {
+      if (!el || el.__chartLoaded) return
+      el.__chartLoaded = true
+      const C = _CHART_MAP[type]
+      if (!C) { el.textContent = '未知图表: ' + type; return }
+      try { new C(el, opt) } catch (e) { el.textContent = '渲染失败: ' + e.message }
+    },
+  })
+}
+
+// ============ 图标网格 ============
+function _parseSvgBody(body) {
+  const els = []
+  const re = /<(\w+)\b([^>]*?)(?:\/>|>([\s\S]*?)<\/\1>)/g
+  let m
+  while ((m = re.exec(body))) {
+    const attrs = {}
+    const are = /([\w:-]+)\s*=\s*"([^"]*)"/g
+    let am
+    while ((am = are.exec(m[2]))) attrs[am[1]] = am[2]
+    els.push([m[1], attrs, m[3] || null])
+  }
+  return els
+}
+
+function IconSvg(name) {
+  return div({
+    style: 'width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--x-text)',
+    ref: (el) => {
+      if (!el || el.__svgBuilt) return
+      el.__svgBuilt = true
+      const NS = 'http://www.w3.org/2000/svg'
+      const svg = document.createElementNS(NS, 'svg')
+      const attrs = {
+        viewBox: '0 0 24 24', width: '22', height: '22',
+        fill: 'none', stroke: 'currentColor', 'stroke-width': '1.8',
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+      }
+      for (const k in attrs) svg.setAttribute(k, attrs[k])
+      const shapes = _parseSvgBody(icons[name] || '')
+      for (const [tag, a, text] of shapes) {
+        const child = document.createElementNS(NS, tag)
+        for (const k in a) child.setAttribute(k, a[k])
+        if (text) child.textContent = text
+        svg.appendChild(child)
+      }
+      el.appendChild(svg)
+    },
+  })
+}
+
+export function IconGrid(count) {
+  const n = count || 60
+  const names = Object.keys(icons).slice(0, n)
+  return div({
+    class: 'doc-icon-grid',
+    style: 'display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;margin:14px 0;padding:14px;border:1px solid var(--x-border);border-radius:10px;background:var(--x-bg-elev)',
+  },
+    ...names.map((name) => div({
+      title: name,
+      style: 'display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:6px;background:var(--x-bg-soft);cursor:pointer',
+    },
+      IconSvg(name),
+      div({ style: 'font-size:10px;color:var(--x-text-mute);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%' }, name)
+    ))
+  )
+}

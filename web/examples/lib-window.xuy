@@ -1,0 +1,55 @@
+// title: react-window 诊断
+import React from 'xunay/compat'
+import { FixedSizeList } from 'react-window'
+const h = React.createElement
+
+function out(msg) {
+  let el = document.getElementById('__diag')
+  if (!el) {
+    el = document.createElement('pre')
+    el.id = '__diag'
+    el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;padding:10px;font:12px monospace;max-height:40vh;overflow:auto;z-index:99999;white-space:pre-wrap;margin:0'
+    document.body.appendChild(el)
+  }
+  el.textContent += msg + '\n'
+  el.scrollTop = el.scrollHeight
+}
+window.__XUNAY_DEBUG_LOG = out
+
+out('[1] import OK, FixedSizeList=' + typeof FixedSizeList)
+
+const Row = ({ index, style }) => {
+  return h('div', { style: { ...style, padding: '8px 16px', borderBottom: '1px solid #eee' } }, '第 ' + (index + 1) + ' 行')
+}
+
+function App() {
+  out('[2] App 进入')
+  const listRef = React.useRef(null)
+  React.useEffect(() => {
+    out('[3] useEffect 触发, listRef.current=' + (listRef.current ? '有' : '无'))
+    if (listRef.current) {
+      const el = listRef.current
+      out('[4] list DOM 尺寸: w=' + el.offsetWidth + ' h=' + el.offsetHeight)
+      out('[5] list 子节点数: ' + el.children.length)
+    }
+  }, [])
+  return h('div', { style: 'padding:24px;background:#282c34;color:#abb2bf;font-family:system-ui;min-height:100vh' },
+    h('h1', { style: { color: '#61afef' } }, 'react-window'),
+    h('div', { style: 'background:#fff;color:#000;width:100%;height:400px;overflow:hidden' },
+      h(FixedSizeList, {
+        ref: listRef,
+        height: 400,
+        itemCount: 1000,
+        itemSize: 40,
+        width: '100%',
+      }, Row)
+    )
+  )
+}
+
+try {
+  React.createRoot(document.getElementById('app')).render(h(App))
+  out('[6] render 调用完成')
+} catch (e) {
+  out('!! 顶层: ' + (e.stack || e.message))
+}

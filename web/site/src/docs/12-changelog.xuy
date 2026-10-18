@@ -1,9 +1,10 @@
-// 版本历史
+// 版本历史（旧）
 import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("版本历史"),
+    Warn("完整版本历史见「杂项 → 版本（当前）」，本页为早期快照。"),
     H2("v1.2.8（最新）"),
     Ul("dev-server：新增 xuyc-dev 开发服务器（文件监听 + HMR 自动刷新）","create：项目创建模板优化（Logo 内嵌 + 欢迎页 + 3 页面 + 文档链接）","create：品牌名自动追加 \" app\"（项目名 xunay → 显示 xunay app）","site：Logo 接入导航栏和首页 Hero，favicon 自动注入","events：修 mount 后动态元素事件双绑定，toggle 类操作失效","craft：新增 xunay recipe（xunay.config.json + package.json 兜底）"),
     H2("v1.2.4"),

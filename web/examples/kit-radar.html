@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RadarChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>RadarChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-shape">🔷 形状</button>
+  <button id="btn-levels">📐 层数</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-add">➕ 加系列</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">多边形 · 双系列对比</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">圆形 · 单系列</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">五维 · 三系列</div>
+    <div id="c3"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import RadarChart from './kit/charts/radar.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+const IND = ['性能','易用','功能','生态','文档','稳定']
+
+let c1Data = {
+  indicators: IND,
+  max: 100,
+  series: [
+    { name: '产品 A', data: [90, 70, 85, 60, 75, 88] },
+    { name: '产品 B', data: [70, 88, 65, 80, 60, 72] },
+  ],
+}
+
+let c2Data = {
+  indicators: ['攻击','防御','速度','耐力','技巧'],
+  max: 100,
+  series: [{ name: '英雄', data: [80, 65, 92, 75, 88] }],
+}
+
+let c3Data = {
+  indicators: ['成本','质量','交期','服务','创新'],
+  max: 100,
+  series: [
+    { name: '我司', data: [85, 90, 75, 88, 80] },
+    { name: '竞品 A', data: [70, 85, 90, 65, 72] },
+    { name: '竞品 B', data: [90, 60, 70, 75, 88] },
+  ],
+}
+
+const c1 = new RadarChart('#c1', {
+  title: '产品对比',
+  ...c1Data,
+  height: 340,
+  levels: 5,
+  onHover: p => p && log('hover', p.indicator, p.series, p.value),
+  onPointClick: (p, si, di) => log('click', p.indicator, p.value),
+})
+
+const c2 = new RadarChart('#c2', {
+  title: '能力画像',
+  shape: 'circle',
+  gridDash: '3 4',
+  ...c2Data,
+  height: 340,
+})
+
+const c3 = new RadarChart('#c3', {
+  title: '五维竞争',
+  ...c3Data,
+  height: 340,
+  levels: 4,
+})
+
+let dark = false
+const shapes = ['polygon', 'circle']
+let shapeIdx = 0
+let levelsArr = [5, 4, 6, 3]
+let levelsIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2, c3].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-shape').onclick = () => {
+  shapeIdx = (shapeIdx + 1) % shapes.length
+  const s = shapes[shapeIdx]
+  c1.setOptions({ shape: s })
+  c3.setOptions({ shape: s })
+  log('形状 →', s)
+}
+
+document.getElementById('btn-levels').onclick = () => {
+  levelsIdx = (levelsIdx + 1) % levelsArr.length
+  const l = levelsArr[levelsIdx]
+  c1.setOptions({ levels: l })
+  log('层数 →', l)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  c1.setData({
+    indicators: IND,
+    max: 100,
+    series: c1Data.series.map(s => ({ ...s, data: s.data.map(() => rand(40, 100)) })),
+  })
+  c2.setData({
+    indicators: c2Data.indicators,
+    max: 100,
+    series: [{ name: '英雄', data: c2Data.indicators.map(() => rand(40, 100)) }],
+  })
+  c3.setData({
+    indicators: c3Data.indicators,
+    max: 100,
+    series: c3Data.series.map(s => ({ ...s, data: s.data.map(() => rand(40, 100)) })),
+  })
+  log('已刷新')
+}
+
+document.getElementById('btn-add').onclick = () => {
+  if (c1._series.length >= 5) { log('已到上限 5'); return }
+  c1.setData({
+    indicators: IND,
+    max: 100,
+    series: [
+      ...c1._series.map(s => ({ name: s.name, data: s.values })),
+      { name: '产品 ' + String.fromCharCode(65 + c1._series.length), data: IND.map(() => rand(40, 100)) },
+    ],
+  })
+  log('系列数', c1._series.length)
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2, c3].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

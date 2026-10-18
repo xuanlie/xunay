@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PieChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui;
+    padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px;
+    transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>PieChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-shape">🥧 形状</button>
+  <button id="btn-label">🏷 标签</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-add">➕ 加数据</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">环形 · 中心文字 · 弹出</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">饼图 · 外部引导线</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">玫瑰图</div>
+    <div id="c3"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">细环 · 百分比</div>
+    <div id="c4"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import PieChart from './kit/charts/pie.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+const LABELS = ['直接访问','搜索引擎','邮件营销','联盟广告','视频广告','社交网络','其他渠道']
+const mkData = n => LABELS.slice(0, n).map((l, i) => ({ label: l, value: rand(50, 600) }))
+
+let data1 = mkData(5)
+let data2 = mkData(6)
+let data3 = mkData(8)
+let data4 = [{ label: '已完成', value: 72 }, { label: '待处理', value: 28 }]
+
+const c1 = new PieChart('#c1', {
+  title: '流量来源',
+  subtitle: '悬停扇区会弹出来',
+  shape: 'donut',
+  innerRatio: 0.62,
+  centerText: data1.reduce((a, b) => a + b.value, 0),
+  centerSubText: '总计',
+  data: data1,
+  height: 300,
+  onHover: p => p && log('hover', p.data.label, p.percent + '%'),
+  onSliceClick: (d, i) => log('click', d.label, d.value),
+})
+
+const c2 = new PieChart('#c2', {
+  title: '饼图',
+  shape: 'pie',
+  labelStyle: 'outside',
+  data: data2,
+  height: 300,
+})
+
+const c3 = new PieChart('#c3', {
+  title: '玫瑰图',
+  shape: 'rose',
+  labelStyle: 'none',
+  data: data3,
+  height: 300,
+  legend: true,
+  legendPosition: 'bottom',
+})
+
+const c4 = new PieChart('#c4', {
+  title: '进度',
+  shape: 'donut',
+  innerRatio: 0.82,
+  showPercent: true,
+  labelMinAngle: 0.3,
+  data: data4,
+  height: 240,
+  legend: false,
+  explodeOnHover: 4,
+})
+
+let dark = false
+const shapes = ['donut', 'pie', 'rose']
+let shapeIdx = 0
+const labelStyles = ['inside', 'outside', 'none']
+let labelIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2, c3, c4].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-shape').onclick = () => {
+  shapeIdx = (shapeIdx + 1) % shapes.length
+  const s = shapes[shapeIdx]
+  c1.setOptions({ shape: s })
+  log('形状 →', s)
+}
+
+document.getElementById('btn-label').onclick = () => {
+  labelIdx = (labelIdx + 1) % labelStyles.length
+  const s = labelStyles[labelIdx]
+  c2.setOptions({ labelStyle: s })
+  log('标签 →', s)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  data1 = mkData(5)
+  data2 = mkData(6)
+  data3 = mkData(8)
+  c1.setData(data1)
+  c1.setOptions({ centerText: data1.reduce((a, b) => a + b.value, 0) })
+  c2.setData(data2)
+  c3.setData(data3)
+  c4.setData([{ label: '已完成', value: rand(20, 90) }, { label: '待处理', value: rand(10, 50) }])
+  log('已刷新')
+}
+
+document.getElementById('btn-add').onclick = () => {
+  const n = c1._data.length + 1
+  if (n > LABELS.length) { log('已到上限'); return }
+  c1.setData(mkData(n))
+  log('数据项', n)
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2, c3, c4].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

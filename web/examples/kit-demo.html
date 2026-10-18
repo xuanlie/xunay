@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit 图标</title>
+<style>
+  body { margin:0; padding:20px; background:#0f172a; color:#e2e8f0; font:14px/1.5 system-ui; }
+  h1 { font-size:18px; margin:0 0 12px; }
+  .stat { color:#64748b; font-size:13px; margin-left:8px; }
+  input { padding:8px 12px; background:#1e293b; border:1px solid #334155;
+    color:#e2e8f0; border-radius:8px; font-size:13px; width:100%; max-width:420px;
+    margin-bottom:14px; outline:none; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:6px; }
+  .item { background:#1e293b; padding:10px 6px; border-radius:8px;
+    display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;
+    transition:background .15s; }
+  .item:hover { background:#334155; }
+  .item svg { width:26px; height:26px; color:#60a5fa; }
+  .item .name { font-size:10px; color:#64748b; text-align:center;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+</style>
+</head>
+<body>
+<h1>Kit 图标 <span class="stat" id="stat">加载中…</span></h1>
+<input id="q" placeholder="搜索：arrow / file / star / user / cloud …" />
+<div class="grid" id="grid"></div>
+
+<script type="module">
+import { icons } from './kit/icons-data/icons.js'
+
+const NS = 'http://www.w3.org/2000/svg'
+const all = Object.keys(icons)
+const grid = document.getElementById('grid')
+const stat = document.getElementById('stat')
+const q = document.getElementById('q')
+
+function makeSVG(name, size = 26) {
+  const body = icons[name]
+  if (!body) return null
+  const svg = document.createElementNS(NS, 'svg')
+  svg.setAttribute('viewBox', '0 0 24 24')
+  svg.setAttribute('width', size)
+  svg.setAttribute('height', size)
+  svg.setAttribute('fill', 'none')
+  svg.setAttribute('stroke', 'currentColor')
+  svg.setAttribute('stroke-width', '1.8')
+  svg.setAttribute('stroke-linecap', 'round')
+  svg.setAttribute('stroke-linejoin', 'round')
+  svg.innerHTML = body
+  return svg
+}
+
+let _list = []
+let _shown = 0
+const BATCH = 300
+
+function renderItem(name) {
+  const item = document.createElement('div')
+  item.className = 'item'
+  item.title = name
+  const NS = 'http://www.w3.org/2000/svg'
+  const body = icons[name]
+  const svg = document.createElementNS(NS, 'svg')
+  svg.setAttribute('viewBox', '0 0 24 24')
+  svg.setAttribute('width', 26)
+  svg.setAttribute('height', 26)
+  svg.setAttribute('fill', 'none')
+  svg.setAttribute('stroke', 'currentColor')
+  svg.setAttribute('stroke-width', '1.8')
+  svg.setAttribute('stroke-linecap', 'round')
+  svg.setAttribute('stroke-linejoin', 'round')
+  svg.innerHTML = body
+  item.appendChild(svg)
+  const label = document.createElement('div')
+  label.className = 'name'
+  label.textContent = name
+  item.appendChild(label)
+  item.onclick = () => {
+    navigator.clipboard?.writeText(name)
+    item.style.background = '#475569'
+    setTimeout(() => item.style.background = '', 200)
+  }
+  return item
+}
+
+function render(list) {
+  _list = list
+  _shown = 0
+  grid.replaceChildren()
+  loadMore()
+  stat.textContent = list.length === all.length ? `共 ${all.length} 个` : `${list.length} / ${all.length}`
+}
+
+function loadMore() {
+  const end = Math.min(_shown + BATCH, _list.length)
+  const frag = document.createDocumentFragment()
+  for (let i = _shown; i < end; i++) frag.appendChild(renderItem(_list[i]))
+  grid.appendChild(frag)
+  _shown = end
+}
+
+window.addEventListener('scroll', () => {
+  if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 400) {
+    if (_shown < _list.length) loadMore()
+  }
+})
+
+q.oninput = () => {
+  const s = q.value.trim().toLowerCase()
+  render(s ? all.filter(n => n.toLowerCase().includes(s)) : all)
+}
+
+render(all)
+</script>
+</body>
+</html>

@@ -23,7 +23,7 @@ export function Markdown(props) {
     .replace(/^(.+)$/gm, '<p>$1</p>')
   return Row({ gap: 2, style: { height } },
     div({ style: { flex: 1, display: 'flex', flexDirection: 'column' } },
-      div({ style: { fontSize: '11px', color: '#9ca3af', padding: '6px 0' } }, '编辑'),
+      div({ style: { fontSize: '11px', color: 'var(--x-text-mute)', padding: '6px 0' } }, '编辑'),
       textarea( {
         style: { flex: 1, width: '100%', padding: '12px', fontFamily: 'ui-monospace,monospace', fontSize: '13px', border: '1px solid #e5e7eb', borderRadius: '8px', resize: 'none', outline: 'none' },
         value: val(),
@@ -31,7 +31,7 @@ export function Markdown(props) {
       })
     ),
     preview ? div({ style: { flex: 1, display: 'flex', flexDirection: 'column' } },
-      div({ style: { fontSize: '11px', color: '#9ca3af', padding: '6px 0' } }, '预览'),
+      div({ style: { fontSize: '11px', color: 'var(--x-text-mute)', padding: '6px 0' } }, '预览'),
       div({ style: { flex: 1, padding: '12px', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'auto', fontSize: '14px', lineHeight: 1.6 }, html: () => sanitize(parse(val())) })
     ) : null
   )
@@ -59,9 +59,9 @@ export function DiffViewer(props) {
       if (n !== undefined) rows.push({ type: 'add', text: n })
     }
   }
-  const bg = { same: 'transparent', del: '#ffebe9', add: '#e6ffec' }
+  const bg = { same: 'transparent', del: 'var(--x-danger-soft)', add: 'var(--x-success-soft)' }
   const prefix = { same: ' ', del: '-', add: '+' }
-  return pre({ style: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px 0', fontSize: '13px', fontFamily: 'ui-monospace,monospace', overflow: 'auto', margin: 0 } },
+  return pre({ style: { background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px 0', fontSize: '13px', fontFamily: 'ui-monospace,monospace', overflow: 'auto', margin: 0 } },
     ...rows.map(r => div({
       style: { padding: '2px 16px', background: bg[r.type], whiteSpace: 'pre' }
     }, prefix[r.type] + ' ' + r.text))
@@ -118,7 +118,7 @@ export function CommandPalette(props) {
     on: { click: e => e.target.style.position === 'fixed' && onSelect && onSelect(null) }
   },
     div({
-      style: { background: '#fff', borderRadius: '12px', width: '90%', maxWidth: '520px', boxShadow: '0 20px 60px rgba(0,0,0,.3)', overflow: 'hidden' },
+      style: { background: 'var(--x-text-inverse)', borderRadius: '12px', width: '90%', maxWidth: '520px', boxShadow: '0 20px 60px rgba(0,0,0,.3)', overflow: 'hidden' },
       on: { click: e => e.stopPropagation() }
     },
       input({
@@ -128,7 +128,7 @@ export function CommandPalette(props) {
       }),
       div({ style: { maxHeight: '300px', overflow: 'auto' } },
         ...filtered().map((it, i) => div({
-          style: () => ({ padding: '10px 20px', cursor: 'pointer', fontSize: '14px', background: idx() === i ? '#eff6ff' : 'transparent' }),
+          style: () => ({ padding: '10px 20px', cursor: 'pointer', fontSize: '14px', background: idx() === i ? 'var(--x-primary-soft)' : 'transparent' }),
           on: {
             click: () => onSelect && onSelect(it),
             mouseenter: () => idx(i)
@@ -162,7 +162,7 @@ export function ContextMenu(props, ...children) {
     show(visible, () => div({
       style: () => ({
         position: 'fixed', left: pos().x + 'px', top: pos().y + 'px',
-        zIndex: 6000, background: '#fff', border: '1px solid #e5e7eb',
+        zIndex: 6000, background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb',
         borderRadius: '8px', boxShadow: '0 8px 24px rgba(0,0,0,.15)',
         minWidth: '150px', padding: '4px'
       })
@@ -171,7 +171,7 @@ export function ContextMenu(props, ...children) {
         style: { padding: '8px 14px', fontSize: '13px', cursor: 'pointer', borderRadius: '6px' },
         on: {
           click: () => { onSelect && onSelect(it); visible(false) },
-          mouseenter: e => e.currentTarget.style.background = '#f3f4f6',
+          mouseenter: e => e.currentTarget.style.background = 'var(--x-bg-hover)',
           mouseleave: e => e.currentTarget.style.background = 'transparent'
         }
       }, it.label))

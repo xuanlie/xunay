@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>SunburstChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>SunburstChart · 旭日图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">操作系统市场份额（多层）</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">公司组织架构</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import SunburstChart from './kit/charts/sunburst.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const osData = {
+  children: [
+    { label: 'Windows', children: [
+      { label: 'Win 11', value: 30 },
+      { label: 'Win 10', value: 45 },
+      { label: 'Win 7', value: 8 },
+    ]},
+    { label: 'macOS', children: [
+      { label: 'Sonoma', value: 12 },
+      { label: 'Ventura', value: 10 },
+      { label: 'Monterey', value: 6 },
+    ]},
+    { label: 'Linux', children: [
+      { label: 'Ubuntu', value: 8 },
+      { label: 'Debian', value: 4 },
+      { label: 'Arch', value: 3 },
+    ]},
+    { label: 'Android', children: [
+      { label: 'Android 14', value: 22 },
+      { label: 'Android 13', value: 18 },
+      { label: '其他', value: 12 },
+    ]},
+    { label: 'iOS', children: [
+      { label: 'iOS 17', value: 14 },
+      { label: 'iOS 16', value: 8 },
+    ]},
+  ]
+}
+const orgData = {
+  children: [
+    { label: '技术', children: [
+      { label: '前端', value: 25, children: [
+        { label: 'React 组', value: 15 },
+        { label: 'Vue 组', value: 10 },
+      ]},
+      { label: '后端', value: 30, children: [
+        { label: 'Java 组', value: 18 },
+        { label: 'Go 组', value: 12 },
+      ]},
+      { label: '算法', value: 15 },
+    ]},
+    { label: '产品', children: [
+      { label: '设计', value: 12 },
+      { label: '需求', value: 8 },
+    ]},
+    { label: '运营', children: [
+      { label: '市场', value: 15 },
+      { label: '内容', value: 10 },
+    ]},
+    { label: '销售', value: 20 },
+  ]
+}
+const c1 = new SunburstChart('#c1',{
+  title:'系统市场分布',
+  data: osData,
+  height:420,
+  innerRadius:0.2,
+  onHover: n => n && log('hover', n.label, n.value),
+  onSliceClick: (n, l) => log('click', n.label, 'depth='+l),
+})
+const c2 = new SunburstChart('#c2',{
+  title:'组织架构（三层）',
+  data: orgData,
+  height:420,
+  innerRadius:0.25,
+  colors:['#6366f1','#8b5cf6','#ec4899','#f97316','#10b981'],
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(osData);c2.setData(orgData);log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

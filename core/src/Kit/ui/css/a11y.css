@@ -1,0 +1,1144 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · a11y.css
+   无障碍系统 · 1000+ 行完整版
+   ───────────────────────────────────────────────────────────────────────
+   目录：
+     01 · 屏幕阅读器辅助
+     02 · 焦点可见性
+     03 · ARIA 状态
+     04 · 键盘导航
+     05 · 触摸目标
+     06 · 语义角色
+     07 · 颜色对比增强
+     08 · 强制色模式
+     09 · 减弱动效
+     10 · 减弱透明
+     11 · 深色偏好
+     12 · 高 DPI / 打印
+     13 · 阅读优化
+     14 · 焦点陷阱
+     15 · 跳转链接
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   01 · 屏幕阅读器辅助
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.sr-only-focusable:active,
+.sr-only-focusable:focus,
+.sr-only-focusable:focus-within {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: inherit !important;
+  margin: inherit !important;
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  white-space: normal !important;
+}
+
+.not-sr-only {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  white-space: normal !important;
+}
+
+/* 视觉隐藏但保留语义 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* 反向：显示给屏幕阅读器，给视觉用户隐藏 */
+.aria-hidden-visual {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+[aria-hidden="true"] * {
+  pointer-events: none;
+}
+
+/* 允许 aria-hidden 元素接收键盘焦点（不推荐） */
+[aria-hidden="true"][tabindex] {
+  pointer-events: auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   02 · 焦点可见性
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+  border-radius: var(--x-r-xs, 4px);
+  z-index: 1;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* 键盘用户全局焦点 */
+.keyboard-user *:focus {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+.keyboard-user *:focus:not(:focus-visible) {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* 鼠标用户去掉焦点 */
+.mouse-user :focus {
+  outline: none;
+}
+
+/* 输入框内的焦点环改用 box-shadow */
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible,
+.field-box:focus-within,
+.field-el:focus-visible {
+  outline: none;
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+  border-color: var(--x-primary, #2563eb);
+}
+
+/* 按钮 */
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+/* 链接 */
+a:focus-visible {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+  border-radius: var(--x-r-xs, 4px);
+  text-decoration: underline;
+}
+
+/* 卡片 */
+.card:focus-within {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.15));
+}
+
+/* Tab 焦点 */
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28)) inset;
+  border-radius: var(--x-r-sm, 6px);
+}
+
+/* 高对比度下永远显示 */
+@media (forced-colors: active) {
+  :focus,
+  :focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+/* 焦点偏移工具类 */
+.focus-offset-1:focus-visible { outline-offset: 1px; }
+.focus-offset-2:focus-visible { outline-offset: 2px; }
+.focus-offset-4:focus-visible { outline-offset: 4px; }
+.focus-inset:focus-visible { outline-offset: -2px; }
+
+.focus-ring-primary:focus-visible {
+  outline-color: var(--x-primary, #2563eb);
+}
+.focus-ring-danger:focus-visible {
+  outline-color: var(--x-danger, #dc2626);
+}
+.focus-ring-success:focus-visible {
+  outline-color: var(--x-success, #16a34a);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   03 · ARIA 状态
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 按钮状态 */
+.btn[aria-pressed="true"] {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+  border-color: var(--x-primary-border, #bfdbfe);
+}
+
+.btn[aria-pressed="false"] {
+  /* 保持默认 */
+}
+
+.btn[aria-expanded="true"] {
+  background: var(--x-bg-active, #ebebeb);
+}
+
+.btn[aria-busy="true"] {
+  pointer-events: none;
+  cursor: wait;
+  opacity: 0.85;
+}
+
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* 输入框无效 */
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"],
+.select[aria-invalid="true"],
+.field-el[aria-invalid="true"] {
+  border-color: var(--x-danger, #dc2626);
+  background-image: none;
+}
+
+.input[aria-invalid="true"]:focus {
+  box-shadow: var(--x-focus-ring-danger, 0 0 0 3px rgba(220,38,38,.25));
+}
+
+/* 表格排序 */
+.table th[aria-sort="ascending"]::after {
+  content: " ▲";
+  color: var(--x-primary, #2563eb);
+  font-size: 0.75em;
+  margin-left: 4px;
+}
+
+.table th[aria-sort="descending"]::after {
+  content: " ▼";
+  color: var(--x-primary, #2563eb);
+  font-size: 0.75em;
+  margin-left: 4px;
+}
+
+.table th[aria-sort] {
+  cursor: pointer;
+  user-select: none;
+}
+
+.table th[aria-sort]:hover {
+  background: var(--x-bg-hover, #ebebeb);
+}
+
+.table tbody tr[aria-selected="true"] td {
+  background: var(--x-primary-soft, rgba(37,99,235,.08));
+}
+
+.table tbody tr[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Tab */
+.tab[role="tab"][aria-selected="true"] {
+  color: var(--x-primary, #2563eb);
+  border-block-end-color: var(--x-primary, #2563eb);
+}
+
+.tab[role="tab"][aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.tabs[role="tablist"] {
+  position: relative;
+}
+
+.tabs[aria-orientation="vertical"] {
+  flex-direction: column;
+  border-bottom: 0;
+  border-right: 1px solid var(--x-line, #e5e5e5);
+}
+
+/* Accordion */
+.accordion-item[aria-expanded="true"] > .accordion-trigger {
+  color: var(--x-primary, #2563eb);
+}
+
+.accordion-trigger[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+.accordion-trigger[aria-expanded="false"]::after {
+  transform: rotate(0);
+}
+
+/* Menu / Listbox */
+.dropdown-item[aria-selected="true"],
+.dropdown-item[aria-current="true"] {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+}
+
+.dropdown-item[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+[role="listbox"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  outline: none;
+}
+
+[role="option"] {
+  cursor: pointer;
+  border-radius: var(--x-r-sm, 6px);
+  padding: 8px 12px;
+}
+
+[role="option"]:hover:not([aria-disabled="true"]) {
+  background: var(--x-bg-hover, #f5f5f5);
+}
+
+[role="option"][aria-selected="true"] {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+}
+
+[role="option"][aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Switch */
+.switch[role="switch"] {
+  cursor: pointer;
+}
+
+.switch[role="switch"][aria-checked="true"] {
+  background: var(--x-primary, #2563eb);
+}
+
+.switch[role="switch"][aria-checked="false"] {
+  background: var(--x-line-2, #ccc);
+}
+
+.switch[role="switch"][aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Progress */
+[role="progressbar"] {
+  position: relative;
+}
+
+[role="progressbar"][aria-valuenow]::after {
+  content: "";
+}
+
+/* 树 */
+[role="tree"] {
+  outline: none;
+}
+
+[role="treeitem"][aria-selected="true"] > .tree-content,
+[role="treeitem"][aria-selected="true"] {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+}
+
+[role="treeitem"][aria-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+[role="treeitem"][aria-expanded="true"] > .tree-content .tree-arrow {
+  transform: rotate(90deg);
+}
+
+/* Dialog */
+[role="dialog"],
+[role="alertdialog"] {
+  outline: none;
+}
+
+[role="alertdialog"] {
+  border: 2px solid var(--x-danger, #dc2626);
+}
+
+/* Tooltip / Popover 可见性 */
+[role="tooltip"] {
+  position: absolute;
+  z-index: var(--x-z-tooltip, 1700);
+  padding: 6px 10px;
+  font-size: var(--x-fs-sm, 12.5px);
+  background: var(--x-fg, #1a1a1a);
+  color: var(--x-bg, #fff);
+  border-radius: var(--x-r-sm, 6px);
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 320px;
+  opacity: 0;
+  transition: opacity var(--x-dur-1);
+}
+
+[role="tooltip"].visible,
+[role="tooltip"].show {
+  opacity: 1;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   04 · 键盘导航
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Tab 顺序 */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* 焦点陷阱容器 */
+.focus-trap {
+  outline: none;
+}
+
+.focus-trap:focus {
+  outline: none;
+}
+
+/* 键盘快捷键提示（默认隐藏，按 Alt 显示） */
+[data-shortcut] {
+  position: relative;
+}
+
+body.show-shortcuts [data-shortcut]::after {
+  content: attr(data-shortcut);
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--x-fg, #1a1a1a);
+  color: var(--x-bg, #fff);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: var(--x-r-xs, 4px);
+  font-family: var(--x-font-mono, monospace);
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* 键盘可选中项 */
+[data-keyboard-selectable] {
+  outline: none;
+}
+
+[data-keyboard-selectable][data-focused="true"],
+[data-keyboard-selectable]:focus {
+  background: var(--x-bg-hover, #f5f5f5);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+/* Arrow 键导航容器 */
+[role="radiogroup"],
+[role="tablist"],
+[role="menu"],
+[role="menubar"] {
+  outline: none;
+}
+
+/* 空格 / Enter 激活提示 */
+[data-activation-key] {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 键盘选中状态（视觉） */
+[aria-selected="true"],
+[data-selected="true"] {
+  position: relative;
+}
+
+[aria-selected="true"]::before,
+[data-selected="true"]::before {
+  /* 预留 */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   05 · 触摸目标
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 保证最小触摸区 44x44 */
+.touch-target {
+  position: relative;
+}
+
+.touch-target::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+/* 触摸设备上的目标膨胀 */
+@media (pointer: coarse) {
+  button,
+  a,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  input[type="checkbox"],
+  input[type="radio"],
+  .btn,
+  .tab,
+  .menu-item,
+  .dropdown-item {
+    min-height: 44px;
+  }
+
+  .checkbox,
+  .radio {
+    min-height: 44px;
+    padding: 4px 0;
+  }
+
+  .switch {
+    min-height: 32px;
+  }
+
+  .checkbox input,
+  .radio input {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* 表格行 */
+  .table tbody tr {
+    min-height: 44px;
+  }
+
+  .table th,
+  .table td {
+    padding: 12px 10px;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   06 · 语义角色
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[role="button"] {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[role="button"]:not([class]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--x-r, 8px);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line-2, #ccc);
+  font-size: var(--x-fs, 14px);
+  color: var(--x-fg, #1a1a1a);
+  transition: all var(--x-dur-1);
+}
+
+[role="button"]:not([class]):hover {
+  background: var(--x-bg-hover, #f5f5f5);
+}
+
+[role="link"] {
+  color: var(--x-primary, #2563eb);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+[role="link"]:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+[role="heading"] {
+  font-weight: var(--x-fw-sb, 600);
+  line-height: var(--x-lh-tight, 1.2);
+  color: var(--x-fg, #1a1a1a);
+}
+
+[role="img"] {
+  display: inline-block;
+  max-width: 100%;
+}
+
+[role="separator"],
+hr {
+  border: 0;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  margin: var(--x-sp-6, 24px) 0;
+}
+
+[role="status"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[role="alert"] {
+  color: var(--x-danger, #dc2626);
+  font-weight: var(--x-fw-m, 500);
+}
+
+[role="log"] {
+  font-family: var(--x-font-mono, monospace);
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--x-bg-soft, #f5f5f5);
+  border-radius: var(--x-r-sm, 6px);
+  padding: 12px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   07 · 颜色对比增强
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-contrast: more) {
+  :root {
+    --x-fg-dim:  var(--x-fg, #000);
+    --x-fg-mute: var(--x-fg, #000);
+    --x-fg-subtle: var(--x-fg, #000);
+    --x-line:    var(--x-line-strong, #555);
+    --x-line-2:  var(--x-line-strong, #555);
+    --x-line-soft: var(--x-line-strong, #555);
+    --x-line-subtle: var(--x-line-strong, #555);
+    --x-shadow: none;
+    --x-shadow-md: none;
+    --x-shadow-lg: none;
+  }
+
+  .btn,
+  .input,
+  .select,
+  .textarea,
+  .card {
+    border-width: 2px;
+  }
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .btn:focus-visible,
+  .input:focus {
+    outline-width: 3px;
+  }
+
+  code, pre {
+    border: 2px solid var(--x-line, #e5e5e5);
+  }
+
+  /* 弱化阴影 */
+  * {
+    box-shadow: none !important;
+  }
+  .btn:focus-visible,
+  .input:focus {
+    box-shadow: var(--x-focus-ring) !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · 强制色模式
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (forced-colors: active) {
+  *,
+  *::before,
+  *::after {
+    forced-color-adjust: auto;
+  }
+
+  .btn,
+  .input,
+  .select,
+  .textarea,
+  .card,
+  .alert,
+  .table,
+  .dropdown-menu,
+  .modal,
+  .drawer {
+    border: 1px solid CanvasText;
+  }
+
+  .btn-primary,
+  .badge-primary,
+  .alert-info,
+  .tag-primary {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .tab[aria-selected="true"] {
+    border-block-end: 2px solid Highlight;
+  }
+
+  .switch[aria-checked="true"] {
+    background: Highlight;
+  }
+
+  .switch-thumb {
+    background: ButtonText;
+  }
+
+  a {
+    color: LinkText;
+  }
+
+  a:visited {
+    color: VisitedText;
+  }
+
+  ::selection {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  img,
+  svg,
+  video,
+  canvas,
+  [data-theme] {
+    forced-color-adjust: none;
+  }
+
+  /* 去掉装饰性阴影 */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 · 减弱动效
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --x-dur-0:       0ms;
+    --x-dur-instant: 0ms;
+    --x-dur-1:       0ms;
+    --x-dur-2:       0ms;
+    --x-dur-3:       0ms;
+    --x-dur-4:       0ms;
+    --x-dur-5:       0ms;
+    --x-dur-6:       0ms;
+    --x-dur-7:       0ms;
+    --x-dur-8:       0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+    animation-delay: 0ms !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .x-swipe {
+    scroll-snap-type: none;
+  }
+
+  /* 关闭装饰性动画 */
+  .spinner,
+  .spinner-dots i,
+  .spinner-pulse,
+  .progress-bar::after,
+  .progress-striped .progress-bar,
+  .progress-indeterminate .progress-bar,
+  .skeleton,
+  .badge-pulse {
+    animation: none !important;
+  }
+
+  /* 去掉 loading 动画上的旋转 */
+  [data-animate],
+  .animate {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · 减弱透明
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-strong,
+  .glass-light,
+  .glass-dark,
+  .btn-glass,
+  .popover-glass {
+    background: var(--x-bg-elev, #fff);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--x-line, #e5e5e5);
+  }
+
+  .modal-overlay,
+  .drawer-mask,
+  .mask {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(0, 0, 0, .75);
+  }
+
+  .mask-blur,
+  .mask-glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(0, 0, 0, .6);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · 深色偏好
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · 高 DPI / 打印
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (-webkit-min-device-pixel-ratio: 2),
+       (min-resolution: 192dpi) {
+  /* 精细边框 */
+  .border-hairline {
+    border-width: 0.5px;
+  }
+}
+
+@media print {
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #666;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · 阅读优化
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/*  dyslexia 友好：加大行距 */
+.readable {
+  font-size: var(--x-fs-md, 15px);
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+  word-spacing: 0.08em;
+  max-width: 65ch;
+  font-family: var(--x-font-sans, sans-serif);
+}
+
+.readable p {
+  margin-bottom: 1.25em;
+}
+
+.readable h1,
+.readable h2,
+.readable h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+}
+
+.readable ul,
+.readable ol {
+  line-height: 1.9;
+}
+
+/* 高对比阅读 */
+.high-contrast-text {
+  color: #000;
+  background: #fff;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .high-contrast-text,
+[data-theme="dracula"] .high-contrast-text {
+  color: #fff;
+  background: #000;
+}
+
+/* 大字体模式 */
+.font-large {
+  font-size: 1.15em;
+  line-height: 1.7;
+}
+
+.font-xlarge {
+  font-size: 1.35em;
+  line-height: 1.75;
+}
+
+/* 阅读模式：去掉装饰 */
+.reading-mode * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.reading-mode {
+  background: var(--x-bg, #fff);
+  color: var(--x-fg, #000);
+  font-size: 1.1em;
+  line-height: 1.85;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · 焦点陷阱
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[data-focus-trap] {
+  outline: none;
+}
+
+[data-focus-trap] > *:focus-visible {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* 焦点陷阱边界（可视化调试用） */
+.focus-trap-debug {
+  position: relative;
+  outline: 1px dashed rgba(255, 0, 0, .3);
+}
+
+/* 隐藏 tabindex */
+[inert] {
+  pointer-events: none;
+  user-select: none;
+  cursor: default;
+}
+
+[inert] * {
+  pointer-events: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 跳转链接
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 8px;
+  z-index: var(--x-z-max, 9999);
+  padding: 8px 16px;
+  background: var(--x-primary, #2563eb);
+  color: #fff;
+  border-radius: 0 0 var(--x-r, 8px) var(--x-r, 8px);
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-m, 500);
+  text-decoration: none;
+  transition: top var(--x-dur-2) var(--x-ease);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+}
+
+.skip-link-primary {
+  background: var(--x-primary, #2563eb);
+  color: #fff;
+}
+.skip-link-dark {
+  background: var(--x-fg, #1a1a1a);
+  color: var(--x-bg, #fff);
+}
+
+/* 主内容焦点锚 */
+main:focus,
+[role="main"]:focus {
+  outline: none;
+}
+
+main:focus-visible,
+[role="main"]:focus-visible {
+  outline: 2px dashed var(--x-primary, #2563eb);
+  outline-offset: -8px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   补充 · 常用无障碍工具
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 隐藏但保留屏幕阅读器可读 */
+.invisible {
+  visibility: hidden;
+}
+
+/* 屏幕阅读器专用文本 */
+.sr-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* 使用标准边框色表示禁用 */
+[aria-disabled="true"],
+[disabled] {
+  cursor: not-allowed;
+}
+
+/* 展示 tabindex 顺序的可视化（调试） */
+.debug-tabindex [tabindex]::after {
+  content: "[" attr(tabindex) "]";
+  position: absolute;
+  background: rgba(255, 0, 0, .8);
+  color: #fff;
+  font-size: 9px;
+  padding: 1px 3px;
+  border-radius: 2px;
+  z-index: 9999;
+}
+
+/* High DPI 下更清晰的 hairline */
+.hairline {
+  border-width: 1px;
+}
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .hairline {
+    border-width: 0.5px;
+  }
+}
+
+/* 打印专用 */
+.only-print {
+  display: none;
+}
+@media print {
+  .only-print { display: block; }
+  .no-print { display: none !important; }
+}

@@ -1,5 +1,5 @@
 // SSR
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -9,10 +9,10 @@ export function Doc() {
     H2("两个 API"),
     Table(["API","运行环境","作用"], [["renderToString(vnode)","Node / 服务器","vnode 转 HTML 字符串"],["hydrate(vnode, target)","浏览器","接管已有的 HTML"]]),
     H2("renderToString"),
-    Code("import { renderToString, div, h1, p } from 'xunay'\n\nconst html = renderToString(\n  div({ class: 'app' },\n    h1(null, '标题'),\n    p(null, '正文')\n  )\n)\n// html = '<div class=\"app\"><h1>标题</h1><p>正文</p></div>'", "xuy"),
+    Code("import { renderToString } from 'xunay'\n\nconst html = renderToString(\n  div({ class: 'app' },\n    h1(null, '标题'),\n    p(null, '正文')\n  )\n)\n// html = '<div class=\"app\"><h1>标题</h1><p>正文</p></div>'", "xuy"),
     H2("hydrate"),
     P("客户端拿服务端渲染好的 HTML，不重新创建 DOM，而是\"接管\"——绑定事件、建立 effect、恢复响应式。"),
-    Code("import { hydrate, div, h1, p } from 'xunay'\n\nhydrate(\n  div({ class: 'app' },\n    h1(null, '标题'),\n    p(null, '正文')\n  ),\n  '#app'   // 已有的 DOM 容器\n)", "xuy"),
+    Code("import { hydrate } from 'xunay'\n\nhydrate(\n  div({ class: 'app' },\n    h1(null, '标题'),\n    p(null, '正文')\n  ),\n  '#app'   // 已有的 DOM 容器\n)", "xuy"),
     H2("完整流程"),
     Code("// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\napp.get('/', (req, res) => {\n  const html = renderToString(App())\n  res.send(`<!DOCTYPE html>\n<html><body>\n  <div id=\"app\">${html}</div>\n  <script src=\"/app.js\"></script>\n</body></html>`)\n})\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')", "xuy"),
     H2("服务端能做和不能做的"),
@@ -28,6 +28,6 @@ export function Doc() {
     Ul("SEO 重要（博客、电商、新闻）","首屏速度关键","有服务端渲染能力"),
     P("纯后台 / 内部工具不需要 SSR——CSR 更快更简单。"),
     H2("完整示例"),
-    Code("// ===== 共享 App =====\n// App.js\nimport { div, h1, p, button, signal } from 'xunay'\n\nexport function App() {\n  const n = signal(0)\n  return div({ class: 'app' },\n    h1(null, 'SSR 演示'),\n    p(null, () => '计数: ' + n()),\n    button({ on: { click: () => n(v => v + 1) } }, '+1')\n  )\n}\n\n// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\nconst html = renderToString(App())\n// <div class=\"app\"><h1>SSR 演示</h1><p>计数: 0</p><button>+1</button></div>\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')", "xuy"),
+    Code("// ===== 共享 App =====\n// App.js\nimport { signal } from 'xunay'\n\nexport function App() {\n  const n = signal(0)\n  return div({ class: 'app' },\n    h1(null, 'SSR 演示'),\n    p(null, () => '计数: ' + n()),\n    button({ on: { click: () => n(v => v + 1) } }, '+1')\n  )\n}\n\n// ===== 服务端 =====\nimport { renderToString } from 'xunay/ssr'\nimport { App } from './App.js'\n\nconst html = renderToString(App())\n// <div class=\"app\"><h1>SSR 演示</h1><p>计数: 0</p><button>+1</button></div>\n\n// ===== 浏览器 =====\nimport { hydrate } from 'xunay/ssr'\nimport { App } from './App.js'\n\nhydrate(App(), '#app')", "xuy"),
   )
 }

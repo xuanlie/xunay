@@ -29,7 +29,7 @@ export function Doc() {
       ['解构 / 展开', '❌', '不支持 const {a} = x / ...arr'],
       ['Promise.then 链', '❌', '只支持 await'],
       ['xunay/anim 大多数', '❌', '只有几个 preset'],
-      ['xunay/kit 组件', '❌', '用 div/span 等原生标签'],
+      ['xunay/kit/ui 组件', '❌', '用 div/span 等原生标签'],
       ['xunay/ssr', '❌', '没有 SSR'],
       ['CSS :hover', '❌', '无鼠标'],
       ['CSS transition', '❌', '用 animation'],

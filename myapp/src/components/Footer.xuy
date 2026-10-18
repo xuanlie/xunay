@@ -1,0 +1,14 @@
+import { div, a } from 'xunay'
+
+export function Footer() {
+  return div({
+    style: 'padding:24px 32px;text-align:center;border-top:1px solid var(--x-line);font-size:12.5px;color:var(--x-fg-mute);background:var(--x-bg-elev)'
+  },
+    a({ href: 'http://107.172.190.220:12342/', target: '_blank' }, '文档'),
+    ' · ',
+    a({ href: 'http://107.172.190.220:12342/AI.spec', target: '_blank' }, 'AI 文档'),
+    ' · ',
+    a({ href: 'https://github.com/xuanlie/xunay', target: '_blank' }, 'GitHub'),
+    ' · Built with XuNay'
+  )
+}

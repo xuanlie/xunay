@@ -1,0 +1,36 @@
+import { div, a } from 'xunay'
+import { route, go } from '@/router.xuy'
+
+const LINKS = [
+  { path: '/', label: '首页' },
+  { path: '/demo', label: '示例' },
+  { path: '/about', label: '关于' },
+  { path: 'http://107.172.190.220:12342/', label: '文档', external: true },
+  { path: 'http://107.172.190.220:12342/AI.spec', label: 'AI 文档', external: true }
+]
+
+export function Header() {
+  return div({
+    class: 'header-glass',
+    style: 'position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:20px;padding:14px 32px;border-bottom:1px solid var(--x-line)'
+  },
+    div({ class: 'brand', style: 'display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;cursor:pointer;user-select:none', on: { click: () => go('/') } },
+      div({ style: 'width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700' }, 'X'),
+      div({ style: 'background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent' }, 'myapp')
+    ),
+    div({ class: 'nav', style: 'display:flex;gap:4px;margin-left:auto' },
+      ...LINKS.map(link => link.external
+        ? a({
+            class: 'btn btn-sm',
+            href: link.path,
+            target: '_blank'
+          }, link.label)
+        : a({
+            class: () => 'btn btn-sm' + (route() === link.path ? ' btn-primary' : ''),
+            href: '#' + link.path,
+            on: { click: () => go(link.path) }
+          }, link.label)
+      )
+    )
+  )
+}

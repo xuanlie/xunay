@@ -52,3 +52,28 @@ dist/
 .github/
 bench/gen/
 bench/probe/
+
+# xuyg runtime temp
+**/.xuyg-*.mjs
+**/.xuyg-dev-*.mjs
+
+# test artifacts
+kittest-dist/
+test-results/
+playwright-report/
+
+# backups
+backups/
+
+# release cleanup
+*.bak[-a-z0-9.]*
+*.before-*
+*.pre-*
+*.prededup.*
+*.premerge.*
+*.prepatch.*
+*.old
+**/dist-test/
+**/kittest-dist/
+**/test-results/
+**/playwright-report/

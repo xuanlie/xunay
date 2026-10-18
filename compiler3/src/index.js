@@ -3,6 +3,7 @@ import path from 'node:path'
 // XuNay compiler v3 — 真正的 AST 编译器
 import * as acorn from 'acorn'
 import { TAGS, VOID_TAGS } from './tags.js'
+import { transformJSX } from './jsx.js'
 
 let _uid = 0
 const uid = (prefix) => `_${prefix}${_uid++}`
@@ -118,6 +119,7 @@ function collectUsedTagNames(node, bound, out) {
 }
 
 function compileProgram(src) {
+  src = transformJSX(src)
   const ast = acorn.parse(src, {
     ecmaVersion: 2022,
     sourceType: 'module',
@@ -255,9 +257,24 @@ function genTag(node, src, bound) {
 
 function genTagExpr(node, src, bound, lines) {
   const tagName = node.callee.name
+
+  // DocumentFragment 不是 Element，不支持普通 DOM 属性。
+  if (tagName === 'fragment' && node.arguments.length > 0) {
+    const props = node.arguments[0]
+    const isNull = props.type === 'Literal' && props.value === null
+    const isEmptyObject = props.type === 'ObjectExpression' && props.properties.length === 0
+    if (!isNull && !isEmptyObject) {
+      throw new SyntaxError('fragment 不支持属性，请将属性放到实际元素上')
+    }
+  }
+
   const elVar = uid(tagName)
 
-  lines.push(`const ${elVar} = document.createElement(${JSON.stringify(tagName)})`)
+  if (tagName === 'fragment') {
+    lines.push(`const ${elVar} = document.createDocumentFragment()`)
+  } else {
+    lines.push(`const ${elVar} = document.createElement(${JSON.stringify(tagName)})`)
+  }
 
   if (node.arguments.length > 0) {
     const propsNode = node.arguments[0]

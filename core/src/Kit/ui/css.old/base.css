@@ -1,0 +1,349 @@
+/* XuNay UI · base.css */
+
+/* === 按钮 === */
+
+.btn:hover { background: var(--x-bg-soft); border-color: var(--x-text-mute); }
+
+.btn:active { transform: translateY(1px); }
+
+.btn:disabled, .btn.disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+
+.btn-dashed {
+  background: transparent;
+  color: var(--x-text);
+  border: 1px dashed var(--x-border-strong);
+}
+
+.btn-dashed:hover { border-color: var(--x-primary); color: var(--x-primary); }
+
+.btn-primary { background: var(--x-primary); color: var(--x-text-inverse); border-color: var(--x-primary); }
+
+.btn-primary:hover { background: var(--x-primary-hover); border-color: var(--x-primary-hover); }
+
+.btn-danger { background: var(--x-danger); color: var(--x-text-inverse); border-color: var(--x-danger); }
+
+.btn-danger:hover { filter: brightness(1.1); }
+
+.btn-success { background: var(--x-success); color: var(--x-text-inverse); border-color: var(--x-success); }
+
+.btn-success:hover { filter: brightness(1.1); }
+
+.btn-ghost { background: transparent; border-color: transparent; color: var(--x-text-dim); }
+
+.btn-ghost:hover { background: var(--x-bg-soft); color: var(--x-text); border-color: transparent; }
+
+.btn-link { background: none; border: none; color: var(--x-primary); padding: 4px 6px; }
+
+.btn-link:hover { text-decoration: underline; background: none; }
+
+.btn-sm { padding: 4px 10px; font-size: 13px; }
+
+.btn-lg { padding: 12px 24px; font-size: 16px; }
+
+.btn-block { width: 100%; }
+
+.btn-icon { padding: 8px; width: 36px; height: 36px; }
+
+.btn-group { display: inline-flex; }
+
+.btn-group .btn { border-radius: 0; margin-left: -1px; }
+
+.btn-group .btn:first-child { border-radius: var(--x-radius) 0 0 var(--x-radius); margin-left: 0; }
+
+.btn-group .btn:last-child { border-radius: 0 var(--x-radius) var(--x-radius) 0; }
+
+/* === 徽章 === */
+
+.badge-primary { background: var(--x-primary-soft); color: var(--x-primary); }
+
+.badge-success { background: #dcfce7; color: #166534; }
+
+.badge-danger { background: #fee2e2; color: #991b1b; }
+
+.badge-warning { background: #fef3c7; color: #92400e; }
+
+/* === 卡片 === */
+.card {
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border);
+  border-radius: var(--x-radius-lg);
+  padding: 20px;
+  box-shadow: var(--x-shadow);
+}
+
+.card-flat { box-shadow: none; }
+
+.card-hover { transition: all .15s; cursor: pointer; }
+
+.card-hover:hover { box-shadow: var(--x-shadow-md); transform: translateY(-2px); border-color: var(--x-border-strong); }
+
+.card-header { padding: 16px 20px; border-bottom: 1px solid var(--x-border); margin: -20px -20px 16px; }
+
+.card-body { padding: 0; }
+
+.card-footer { padding: 16px 20px; border-top: 1px solid var(--x-border); margin: 16px -20px -20px; }
+
+.card-title { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+
+.card-desc { font-size: 13px; color: var(--x-text-dim); margin: 0; }
+
+/* === 分隔线 === */
+.divider { height: 1px; background: var(--x-border); margin: 20px 0; border: none; }
+
+.divider-vertical { width: 1px; background: var(--x-border); margin: 0 12px; height: 20px; display: inline-block; vertical-align: middle; }
+
+@keyframes x-fade { from { opacity: 0 } to { opacity: 1 } }
+
+@keyframes x-scale { from { transform: scale(.95); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+
+@keyframes x-skeleton {
+  0% { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
+}
+
+/* 移动端滑动动画 */
+@keyframes x-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes x-slide-down {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+/* ============================================================
+   元素默认样式层
+   用法 A（裸标签）：直接写 <button> <input> <table> 就有样式
+   用法 B（class 变体）：加 .primary / .danger / .lg 等精确控制
+   ============================================================ */
+
+/* ---------- 按钮 ---------- */
+button,
+input[type="button"],
+input[type="submit"],
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--x-text);
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border-strong);
+  border-radius: var(--x-radius);
+  cursor: pointer;
+  user-select: none;
+  transition: all .15s;
+  outline: none;
+  white-space: nowrap;
+}
+
+button:hover, .btn:hover {
+  border-color: var(--x-primary);
+  color: var(--x-primary);
+  background: var(--x-primary-soft);
+}
+
+button:active, .btn:active { transform: translateY(1px); }
+
+button:focus-visible, .btn:focus-visible { box-shadow: 0 0 0 3px var(--x-primary-soft); }
+
+button:disabled, .btn:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
+
+button.primary, .btn.primary, .btn-primary {
+  background: var(--x-primary); color: var(--x-text-inverse); border-color: var(--x-primary);
+}
+
+button.primary:hover, .btn.primary:hover, .btn-primary:hover {
+  background: var(--x-primary-hover); color: var(--x-text-inverse); border-color: var(--x-primary-hover);
+}
+
+button.danger, .btn.danger, .btn-danger {
+  background: var(--x-danger); color: var(--x-text-inverse); border-color: var(--x-danger);
+}
+
+button.danger:hover, .btn-danger:hover { filter: brightness(.9); color: var(--x-text-inverse); }
+
+button.success, .btn-success {
+  background: var(--x-success); color: var(--x-text-inverse); border-color: var(--x-success);
+}
+
+button.ghost, .btn-ghost {
+  background: transparent; border-color: transparent;
+}
+
+button.dashed, .btn-dashed {
+  background: transparent; border-style: dashed;
+}
+
+button.sm, .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+button.lg, .btn-lg { padding: 12px 24px; font-size: 16px; }
+
+button.block, .btn-block { display: flex; width: 100%; }
+
+/* ---------- 徽章 ---------- */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  font-size: 12px; font-weight: 500; line-height: 1.4;
+  border-radius: 999px;
+  background: var(--x-bg-soft); color: var(--x-text-dim);
+}
+
+.badge.primary, .badge-primary { background: var(--x-primary-soft); color: var(--x-primary); }
+
+.badge.success, .badge-success { background: rgba(22,163,74,.15); color: var(--x-success); }
+
+.badge.danger, .badge-danger { background: rgba(220,38,38,.15); color: var(--x-danger); }
+
+.badge.warning, .badge-warning { background: rgba(217,119,6,.15); color: var(--x-warning); }
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border);
+  border-radius: var(--x-radius-lg);
+  padding: 16px;
+  transition: box-shadow .2s, transform .2s;
+}
+
+.card.hover:hover { box-shadow: var(--x-shadow-md); transform: translateY(-2px); }
+
+.card.flat { border: 0; box-shadow: none; }
+
+.card-header { margin-bottom: 12px; }
+
+.card-title { font-size: 16px; font-weight: 600; color: var(--x-text); }
+
+.card-desc { font-size: 13px; color: var(--x-text-dim); margin-top: 4px; }
+
+.card-footer { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--x-border); }
+
+/* ---------- 分割线 ---------- */
+.divider { height: 1px; background: var(--x-border); margin: 20px 0; border: 0; }
+
+/* 渐变按钮 */
+.btn-gradient {
+  background: linear-gradient(135deg, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6));
+  color: var(--x-text-inverse);
+  border: 0;
+}
+
+.btn-gradient:hover {
+  filter: brightness(1.1);
+  color: var(--x-text-inverse);
+}
+
+.btn-gradient:active { transform: translateY(1px); }
+
+/* Checkbox / Radio 卡片模式 */
+.checkbox.card, .radio.card { display:flex; align-items:flex-start; gap:12px;
+  padding:14px; border-radius:10px;
+  border:1.5px solid var(--x-border);
+  background:var(--x-bg-elev); cursor:pointer;
+  transition:border-color .15s; user-select:none }
+
+.checkbox.card.on, .radio.card.on { border-color:var(--x-primary) }
+
+.checkbox.card .cb-content, .radio.card .cb-content { display:flex; flex-direction:column; gap:2px; min-width:0 }
+
+.checkbox.card .cb-title, .radio.card .cb-title { font-size:14px; font-weight:500; line-height:1.4 }
+
+.checkbox.card .cb-desc, .radio.card .cb-desc { font-size:12.5px; color:var(--x-text-dim) }
+
+@keyframes x-btn-spin { to { transform: rotate(360deg) } }
+
+/* ── 卡片骨架屏（base.js Card skeleton 依赖） ── */
+@keyframes x-card-shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position:  200% 0; }
+}
+
+/* ── Badge 呼吸脉冲 ── */
+@keyframes x-badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+  50%      { box-shadow: 0 0 0 6px transparent; }
+}
+
+.badge-pulse {
+  animation: x-badge-pulse 1.6s cubic-bezier(.4,0,.6,1) infinite;
+}
+
+/* ── Tag 基础样式（JS 生成 class="tag tag-xxx tag-yyy"） ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  height: 24px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 6px;
+  background: var(--x-bg-soft);
+  color: var(--x-text-dim);
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+/* soft 变体（默认） */
+.tag-default { background: var(--x-bg-soft); color: var(--x-text-dim); }
+
+.tag-primary { background: var(--x-primary-soft); color: var(--x-primary); }
+
+.tag-success { background: var(--x-success-soft, rgba(22,163,74,.1)); color: var(--x-success); }
+
+.tag-warning { background: var(--x-warning-soft, rgba(217,119,6,.1)); color: var(--x-warning); }
+
+.tag-danger  { background: var(--x-danger-soft, rgba(220,38,38,.1));  color: var(--x-danger); }
+
+.tag-info    { background: rgba(59,130,246,.1); color: var(--x-info, #3b82f6); }
+
+/* solid 变体 */
+.tag-solid.tag-primary { background: var(--x-primary); color: var(--x-text-inverse); }
+
+.tag-solid.tag-success { background: var(--x-success); color: var(--x-text-inverse); }
+
+.tag-solid.tag-warning { background: var(--x-warning); color: var(--x-text-inverse); }
+
+.tag-solid.tag-danger  { background: var(--x-danger);  color: var(--x-text-inverse); }
+
+.tag-solid.tag-info    { background: var(--x-info, #3b82f6); color: var(--x-text-inverse); }
+
+/* outline 变体 */
+.tag-outline { background: transparent; box-shadow: inset 0 0 0 1px currentColor; }
+
+.tag-outline.tag-primary { color: var(--x-primary); }
+
+.tag-outline.tag-success { color: var(--x-success); }
+
+.tag-outline.tag-warning { color: var(--x-warning); }
+
+.tag-outline.tag-danger  { color: var(--x-danger); }
+
+.tag-outline.tag-info    { color: var(--x-info, #3b82f6); }
+
+/* ── Card tone 语义色（base.js 生成 card-tone-*） ── */
+.card-tone-primary { --x-card-tone: var(--x-primary); }
+
+.card-tone-info    { --x-card-tone: var(--x-info, #3b82f6); }
+
+.card-tone-success { --x-card-tone: var(--x-success); }
+
+.card-tone-warning { --x-card-tone: var(--x-warning); }
+
+.card-tone-danger  { --x-card-tone: var(--x-danger); }
+
+.card-tone-primary,
+.card-tone-info,
+.card-tone-success,
+.card-tone-warning,
+.card-tone-danger {
+  border-left: 3px solid var(--x-card-tone);
+}

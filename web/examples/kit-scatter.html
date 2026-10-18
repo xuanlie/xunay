@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ScatterChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>ScatterChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-bubble">🔵 气泡</button>
+  <button id="btn-reg">📈 回归</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">身高体重 · 双系列 · 回归线</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">气泡图 · 四分位</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">目标区域 · 达标分析</div>
+    <div id="c3"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import ScatterChart from './kit/charts/scatter.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+function randn(mean, sd) {
+  let u = 0, v = 0
+  while (u === 0) u = Math.random()
+  while (v === 0) v = Math.random()
+  return mean + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+}
+
+function mkHeightWeight(n, gender) {
+  const isMale = gender === 'M'
+  return Array.from({ length: n }, () => {
+    const h = isMale ? randn(175, 7) : randn(162, 6)
+    const w = (h - 100) * (isMale ? 0.9 : 0.85) + randn(0, 6)
+    return { x: +h.toFixed(1), y: +w.toFixed(1), label: null }
+  })
+}
+
+function mkBubble(n) {
+  return Array.from({ length: n }, () => ({
+    x: randn(100, 30),
+    y: randn(100, 30),
+    r: Math.abs(randn(20, 15)) + 5,
+    label: null,
+  }))
+}
+
+function mkTarget(n) {
+  return Array.from({ length: n }, () => {
+    const study = 20 + Math.random() * 60
+    const score = study * 0.8 + randn(0, 12) + 20
+    return { x: +study.toFixed(1), y: +Math.max(0, Math.min(100, score)).toFixed(1) }
+  })
+}
+
+const c1 = new ScatterChart('#c1', {
+  title: '身高 vs 体重',
+  subtitle: '按性别分组 · 线性回归',
+  series: [
+    { name: '男性', data: mkHeightWeight(60, 'M'), color: '#3b82f6' },
+    { name: '女性', data: mkHeightWeight(60, 'F'), color: '#ec4899' },
+  ],
+  height: 380,
+  showRegression: true,
+  xFormat: v => v.toFixed(0) + 'cm',
+  yFormat: v => v.toFixed(0) + 'kg',
+  onHover: p => p && log('hover', p.series.name, p.datum.x, p.datum.y),
+  onPointClick: (d, si, di) => log('click', d.x, d.y),
+})
+
+const c2 = new ScatterChart('#c2', {
+  title: '产品分布',
+  subtitle: '气泡大小表示销量 · 悬停放大',
+  data: mkBubble(40),
+  bubble: true,
+  minR: 4,
+  maxR: 26,
+  pointOpacity: 0.55,
+  height: 380,
+  quadrant: { x: 100, y: 100 },
+  quadrantLabels: true,
+  colors: ['#8b5cf6'],
+})
+
+const c3 = new ScatterChart('#c3', {
+  title: '学习时长 vs 成绩',
+  data: mkTarget(80),
+  height: 380,
+  targetZone: {
+    x1: 50, y1: 60,
+    x2: 80, y2: 100,
+    label: '优秀区',
+    color: '#10b981',
+  },
+  showRegression: true,
+  showR2: true,
+  pointOpacity: 0.6,
+  colors: ['#06b6d4'],
+  onHover: p => p && log('hover', p.datum.x, p.datum.y),
+})
+
+let dark = false
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2, c3].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-bubble').onclick = () => {
+  const v = !c1.opts.bubble
+  c1.setOptions({ bubble: v })
+  log('气泡 →', v)
+}
+
+document.getElementById('btn-reg').onclick = () => {
+  const v = !c1.opts.showRegression
+  c1.setOptions({ showRegression: v })
+  c3.setOptions({ showRegression: v })
+  log('回归线 →', v)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  c1.setData({
+    series: [
+      { name: '男性', data: mkHeightWeight(60, 'M'), color: '#3b82f6' },
+      { name: '女性', data: mkHeightWeight(60, 'F'), color: '#ec4899' },
+    ],
+  })
+  c2.setData({ data: mkBubble(40) })
+  c3.setData({ data: mkTarget(80) })
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2, c3].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

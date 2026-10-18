@@ -1,5 +1,5 @@
 // txt 模板标签
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -8,7 +8,7 @@ export function Doc() {
     H2("签名"),
     Code("txt`文字 ${值}`", "js"),
     H2("示例"),
-    Code("import { txt, signal, span } from 'xunay'\n\nconst n = signal(0)\nspan(null, txt`n = ${n}`)\n// 等价于 span(null, () => 'n = ' + n())", "xuy"),
+    Code("import { txt, signal } from 'xunay'\n\nconst n = signal(0)\nspan(null, txt`n = ${n}`)\n// 等价于 span(null, () => 'n = ' + n())", "xuy"),
     H2("插值形式"),
     Table(["写法","行为"], [["${n}","响应式（signal 或普通值）"],["${n()}","立即求值，不响应式"],["${() => n()}","响应式"]]),
     H2("多个插值"),

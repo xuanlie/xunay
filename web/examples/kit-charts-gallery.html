@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit · 图表总览</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; --accent:#3b82f6; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui;
+    padding:20px; transition:background .2s,color .2s; }
+  header { margin-bottom:18px; }
+  h1 { font-size:22px; margin-bottom:4px; }
+  .sub { color:var(--muted); font-size:13px; }
+  .toolbar { position:sticky; top:0; z-index:20; display:flex; gap:8px; flex-wrap:wrap;
+    padding:10px 0; margin-bottom:14px; background:color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter:blur(8px); }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px;
+    transition:all .15s; }
+  button:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+  button.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(420px, 1fr)); gap:14px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:14px; transition:all .2s; }
+  .card:hover { box-shadow:0 4px 20px rgba(0,0,0,.06); }
+  .card-head { display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; }
+  .card-title { font-size:14px; font-weight:600; }
+  .card-tag { font-size:10.5px; padding:2px 7px; border-radius:4px;
+    background:color-mix(in srgb, var(--accent) 15%, transparent); color:var(--accent);
+    font-weight:600; letter-spacing:0.02em; }
+  .card-body { position:relative; }
+  .card-link { font-size:11px; color:var(--muted); text-decoration:none;
+    margin-left:6px; }
+  .card-link:hover { color:var(--accent); text-decoration:underline; }
+  @media(max-width:600px) { .grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kit · 图表总览 <span style="font-size:13px;color:var(--muted);font-weight:400">16 种精修图表</span></h1>
+  <div class="sub">全部基于原生 SVG · 零依赖 · 深色浅色 · 悬停交互 · 动画</div>
+</header>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 切换主题</button>
+  <button id="btn-replay">▶ 全部重播</button>
+  <button id="btn-mobile">📱 紧凑模式</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script type="module">
+import LineChart from './kit/charts/line.js'
+import BarChart from './kit/charts/bar.js'
+import AreaChart from './kit/charts/area.js'
+import PieChart from './kit/charts/pie.js'
+import ScatterChart from './kit/charts/scatter.js'
+import RadarChart from './kit/charts/radar.js'
+import FunnelChart from './kit/charts/funnel.js'
+import GaugeChart from './kit/charts/gauge.js'
+import HeatmapChart from './kit/charts/heatmap.js'
+import TreemapChart from './kit/charts/treemap.js'
+import SankeyChart from './kit/charts/sankey.js'
+import NetworkChart from './kit/charts/network.js'
+import TreeChart from './kit/charts/tree.js'
+import BoxplotChart from './kit/charts/boxplot.js'
+import CandlestickChart from './kit/charts/candlestick.js'
+import WordcloudChart from './kit/charts/wordcloud.js'
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月']
+const mkSeries = (name, n, base, spread, color) => ({
+  name, color,
+  data: MONTHS.slice(0, n).map(m => ({ label: m, value: rand(base, base + spread), y: rand(base, base + spread) })),
+})
+
+function randn(mean, sd) {
+  let u = 0, v = 0
+  while (u === 0) u = Math.random()
+  while (v === 0) v = Math.random()
+  return mean + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+}
+
+const charts = []
+const grid = document.getElementById('grid')
+
+function addCard(title, tag, link, build) {
+  const card = document.createElement('div')
+  card.className = 'card'
+  const head = document.createElement('div')
+  head.className = 'card-head'
+  head.innerHTML = `<div><span class="card-title">${title}</span><a class="card-link" href="${link}">单独查看 →</a></div><span class="card-tag">${tag}</span>`
+  const body = document.createElement('div')
+  body.className = 'card-body'
+  card.appendChild(head)
+  card.appendChild(body)
+  grid.appendChild(card)
+  const c = build(body)
+  if (c) charts.push(c)
+  return body
+}
+
+// 1. LineChart
+addCard('折线图', 'LineChart', './kit-line.html', (host) => {
+  const chart = new LineChart(host, {
+    series: [
+      mkSeries('收入', 8, 100, 80, '#3b82f6'),
+      mkSeries('支出', 8, 60, 60, '#f59e0b'),
+    ],
+    height: 220, mode: 'smooth', showPoints: true, legend: false, title: null,
+  })
+  return chart
+})
+
+// 2. BarChart
+addCard('柱状图', 'BarChart', './kit-bar.html', (host) => {
+  return new BarChart(host, {
+    series: [
+      mkSeries('本季', 8, 80, 100, '#10b981'),
+      mkSeries('上季', 8, 60, 80, '#06b6d4'),
+    ],
+    height: 220, layout: 'grouped', legend: false,
+  })
+})
+
+// 3. AreaChart
+addCard('面积图', 'AreaChart', './kit-area.html', (host) => {
+  return new AreaChart(host, {
+    series: [
+      mkSeries('移动端', 8, 100, 120, '#8b5cf6'),
+      mkSeries('桌面端', 8, 80, 90, '#ec4899'),
+    ],
+    height: 220, layout: 'stacked', mode: 'smooth', legend: false,
+  })
+})
+
+// 4. PieChart
+addCard('饼图', 'PieChart', './kit-pie.html', (host) => {
+  return new PieChart(host, {
+    data: ['直接访问','搜索引擎','邮件','联盟','视频'].map((label, i) => ({ label, value: rand(50, 400) })),
+    height: 220, shape: 'donut', legend: false,
+  })
+})
+
+// 5. ScatterChart
+addCard('散点图', 'ScatterChart', './kit-scatter.html', (host) => {
+  return new ScatterChart(host, {
+    data: Array.from({ length: 60 }, () => ({ x: randn(50, 15), y: randn(50, 15) })),
+    height: 220, showRegression: true, showR2: false,
+  })
+})
+
+// 6. RadarChart
+addCard('雷达图', 'RadarChart', './kit-radar.html', (host) => {
+  return new RadarChart(host, {
+    indicators: ['性能','易用','功能','生态','文档','稳定'],
+    max: 100,
+    series: [
+      { name: 'A', data: [90, 70, 85, 60, 75, 88], color: '#3b82f6' },
+      { name: 'B', data: [70, 88, 65, 80, 60, 72], color: '#ec4899' },
+    ],
+    height: 220, legend: false,
+  })
+})
+
+// 7. FunnelChart
+addCard('漏斗图', 'FunnelChart', './kit-funnel.html', (host) => {
+  return new FunnelChart(host, {
+    data: [
+      { label: '访问', value: 1000 },
+      { label: '注册', value: 640 },
+      { label: '激活', value: 420 },
+      { label: '付费', value: 180 },
+      { label: '复购', value: 75 },
+    ],
+    height: 220, showPercent: false,
+  })
+})
+
+// 8. GaugeChart
+addCard('仪表盘', 'GaugeChart', './kit-gauge.html', (host) => {
+  return new GaugeChart(host, {
+    value: 72, min: 0, max: 100, unit: '%', valueLabel: 'CPU',
+    sweepAngle: 270, startAngle: 135,
+    thresholds: [
+      { to: 60, color: '#10b981' },
+      { to: 80, color: '#f59e0b' },
+      { to: 100, color: '#ef4444' },
+    ],
+    height: 220,
+  })
+})
+
+// 9. HeatmapChart
+addCard('热力图', 'HeatmapChart', './kit-heatmap.html', (host) => {
+  const DAYS = ['一','二','三','四','五','六','日']
+  return new HeatmapChart(host, {
+    rowLabels: DAYS,
+    colLabels: Array.from({ length: 12 }, (_, i) => i + ''),
+    data: DAYS.map(() => Array.from({ length: 12 }, () => rand(10, 100))),
+    height: 220, cellGap: 3, legend: false, showValues: false,
+  })
+})
+
+// 10. TreemapChart
+addCard('矩形树图', 'TreemapChart', './kit-treemap.html', (host) => {
+  return new TreemapChart(host, {
+    data: [
+      { label: '技术', value: 300, children: [
+        { label: '前端', value: 150 }, { label: '后端', value: 100 }, { label: '算法', value: 50 },
+      ]},
+      { label: '产品', value: 250, children: [
+        { label: '设计', value: 120 }, { label: '需求', value: 80 }, { label: '测试', value: 50 },
+      ]},
+      { label: '运营', value: 180, children: [
+        { label: '市场', value: 100 }, { label: '内容', value: 80 },
+      ]},
+      { label: '行政', value: 120 },
+      { label: '财务', value: 90 },
+    ],
+    height: 220, depth: 1,
+  })
+})
+
+// 11. SankeyChart
+addCard('桑基图', 'SankeyChart', './kit-sankey.html', (host) => {
+  return new SankeyChart(host, {
+    nodes: [
+      { id: 'src', name: '来源' },
+      { id: 'web', name: 'Web' },
+      { id: 'app', name: 'App' },
+      { id: 'paid', name: '付费' },
+      { id: 'free', name: '免费' },
+    ],
+    links: [
+      { source: 'src', target: 'web', value: 600 },
+      { source: 'src', target: 'app', value: 400 },
+      { source: 'web', target: 'paid', value: 200 },
+      { source: 'web', target: 'free', value: 400 },
+      { source: 'app', target: 'paid', value: 280 },
+      { source: 'app', target: 'free', value: 120 },
+    ],
+    height: 260, linkOpacity: 0.35,
+  })
+})
+
+// 12. NetworkChart
+addCard('关系图', 'NetworkChart', './kit-network.html', (host) => {
+  const NAMES = ['A','B','C','D','E','F','G','H','I','J']
+  const nodes = NAMES.map(n => ({ id: n, name: n, value: rand(20, 100) }))
+  const links = []
+  for (let i = 0; i < 20; i++) {
+    const a = NAMES[rand(0, 9)]
+    const b = NAMES[rand(0, 9)]
+    if (a !== b && !links.find(l => l.source === a && l.target === b)) {
+      links.push({ source: a, target: b, value: rand(1, 5) })
+    }
+  }
+  return new NetworkChart(host, { nodes, links, height: 260, layout: 'force' })
+})
+
+// 13. TreeChart
+addCard('树形图', 'TreeChart', './kit-tree.html', (host) => {
+  return new TreeChart(host, {
+    data: {
+      name: 'CEO',
+      children: [
+        { name: 'CTO', children: [
+          { name: '前端', children: [{ name: 'A' }, { name: 'B' }] },
+          { name: '后端', children: [{ name: 'C' }, { name: 'D' }] },
+        ]},
+        { name: 'CFO', children: [{ name: '会计' }, { name: '审计' }] },
+        { name: 'COO', children: [{ name: '运营' }, { name: '市场' }] },
+      ],
+    },
+    height: 240, orientation: 'horizontal', expandAll: true, nodeRadius: 5,
+  })
+})
+
+// 14. BoxplotChart
+addCard('箱线图', 'BoxplotChart', './kit-boxplot.html', (host) => {
+  const mkG = (mean, sd) => Array.from({ length: 40 }, () => randn(mean, sd))
+  return new BoxplotChart(host, {
+    groups: [
+      { label: 'A班', values: mkG(78, 10) },
+      { label: 'B班', values: mkG(72, 15) },
+      { label: 'C班', values: mkG(85, 8) },
+      { label: 'D班', values: mkG(65, 18) },
+    ],
+    height: 240, yFormat: v => v.toFixed(0),
+  })
+})
+
+// 15. CandlestickChart
+addCard('K线图', 'CandlestickChart', './kit-candlestick.html', (host) => {
+  let price = 100
+  const data = []
+  for (let i = 0; i < 30; i++) {
+    const open = price
+    const close = open + (Math.random() - 0.48) * 4
+    const high = Math.max(open, close) + Math.random() * 2
+    const low = Math.min(open, close) - Math.random() * 2
+    price = close
+    data.push({ label: 'D' + (i + 1), open, close, high, low, volume: rand(1000, 5000) })
+  }
+  return new CandlestickChart(host, { data, height: 260, showVolume: true, showMA: true, showLegend: false })
+})
+
+// 16. WordcloudChart
+addCard('词云', 'WordcloudChart', './kit-wordcloud.html', (host) => {
+  return new WordcloudChart(host, {
+    data: 'JavaScript Python TypeScript React Vue Svelte Node Deno Bun Vite Webpack Tailwind GraphQL Rust Go Java'.split(' ').map((t, i) => ({ text: t, value: 100 - i * 4 })),
+    height: 240, minFontSize: 11, maxFontSize: 34, rotateRatio: 0,
+  })
+})
+
+// 全局工具栏
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  charts.forEach(c => c.setOptions && c.setOptions({ theme: t }))
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  charts.forEach(c => c.replay && c.replay())
+}
+
+let compact = false
+document.getElementById('btn-mobile').onclick = (e) => {
+  compact = !compact
+  e.target.classList.toggle('active', compact)
+  document.getElementById('grid').style.gridTemplateColumns = compact ? '1fr' : ''
+}
+
+window.addEventListener('error', (e) => {
+  console.error('[gallery error]', e.message, e.filename, e.lineno)
+})
+</script>
+</body>
+</html>

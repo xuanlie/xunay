@@ -1,0 +1,47 @@
+// title: recharts 诊断
+import React from 'xunay/compat'
+import { LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts'
+
+const diag = document.createElement('pre')
+diag.style.cssText = 'position:fixed;inset:0;background:#000;color:#0f0;padding:16px;font:12px monospace;white-space:pre-wrap;z-index:99999;margin:0;overflow:auto'
+document.body.appendChild(diag)
+function out(msg) { diag.textContent += msg + '\n' }
+
+window.__XUNAY_COMPAT_THROW = true
+window.onerror = function(msg, src, line, col, e) {
+  out('!! ERROR: ' + msg)
+  if (e && e.stack) out(e.stack)
+  return true
+}
+
+out('[1] import OK')
+
+const data = [
+  { name: '一月', uv: 400 },
+  { name: '二月', uv: 300 },
+  { name: '三月', uv: 200 },
+]
+const h = React.createElement
+
+function App() {
+  out('[2] App 进入')
+  return h('div', { style: 'padding:20px;background:#282c34;color:#fff;font-family:system-ui' },
+    h('h1', null, 'recharts 诊断'),
+    h('div', { style: 'background:#fff;padding:12px' },
+      h(LineChart, { width: 400, height: 200, data },
+        h(XAxis, { dataKey: 'name' }),
+        h(YAxis, null),
+        h(Tooltip, null),
+        h(Line, { type: 'monotone', dataKey: 'uv', stroke: '#8884d8' })
+      )
+    )
+  )
+}
+
+try {
+  React.createRoot(document.getElementById('app')).render(h(App))
+  out('[3] render 完成')
+} catch (e) {
+  out('[X] render 崩: ' + e.message)
+  if (e.stack) out(e.stack)
+}

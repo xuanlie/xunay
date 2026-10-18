@@ -1,0 +1,37 @@
+// Kit 图标测试
+import { div, h1, input, span, signal } from 'xunay'
+import { Icon, iconNames } from '../../../../core/src/Kit/icons.js'
+
+export function Doc() {
+  const q = signal('')
+  const all = iconNames()
+  const list = () => {
+    const s = q().toLowerCase()
+    return s ? all.filter(n => n.toLowerCase().includes(s)) : all
+  }
+
+  return div({ style: 'padding:20px' },
+    h1({ style: 'font-size:20px;margin:0 0 12px' },
+      'Kit 图标 ',
+      span({ style: 'color:#64748b;font-size:13px' }, all.length + ' 个')
+    ),
+    input({
+      placeholder: '搜索：arrow / file / star / user / cloud …',
+      value: q,
+      on: { input: e => q(e.target.value) },
+      style: 'padding:8px 12px;border:1px solid #334155;border-radius:8px;font-size:13px;width:100%;max-width:420px;margin-bottom:14px;outline:none',
+    }),
+    div({ style: 'display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px' },
+      ...list().slice(0, 400).map(name =>
+        div({
+          title: name,
+          style: 'padding:10px 6px;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer',
+          on: { click: () => navigator.clipboard?.writeText(name) },
+        },
+          Icon({ name, size: 26, color: '#60a5fa' }),
+          div({ style: 'font-size:10px;color:#64748b;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%' }, name),
+        )
+      )
+    )
+  )
+}

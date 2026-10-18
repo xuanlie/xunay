@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TreeChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>TreeChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-orient">↔ 方向</button>
+  <button id="btn-expand">🔽 全部展开</button>
+  <button id="btn-collapse">🔼 全部折叠</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">目录树 · 点击节点折叠/展开</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">垂直 · 组织架构</div>
+    <div id="c2"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import TreeChart from './kit/charts/tree.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+
+const mkTree = () => ({
+  name: 'src',
+  value: 20,
+  children: [
+    { name: 'components', value: 15, children: [
+      { name: 'Button.tsx', value: 3 },
+      { name: 'Input.tsx', value: 4 },
+      { name: 'Modal.tsx', value: 5 },
+      { name: 'Table.tsx', value: 8, children: [
+        { name: 'Header.tsx', value: 2 },
+        { name: 'Row.tsx', value: 3 },
+        { name: 'Cell.tsx', value: 2 },
+      ]},
+    ]},
+    { name: 'pages', value: 12, children: [
+      { name: 'Home.tsx', value: 4 },
+      { name: 'About.tsx', value: 2 },
+      { name: 'Blog.tsx', value: 3 },
+      { name: 'Post.tsx', value: 5 },
+    ]},
+    { name: 'hooks', value: 6, children: [
+      { name: 'useAuth.ts', value: 2 },
+      { name: 'useFetch.ts', value: 3 },
+      { name: 'useForm.ts', value: 4 },
+    ]},
+    { name: 'utils', value: 8, children: [
+      { name: 'date.ts', value: 2 },
+      { name: 'format.ts', value: 3 },
+      { name: 'request.ts', value: 4 },
+    ]},
+    { name: 'styles', value: 5, children: [
+      { name: 'global.css', value: 2 },
+      { name: 'theme.css', value: 3 },
+    ]},
+  ],
+})
+
+const mkOrg = () => ({
+  name: 'CEO',
+  value: 100,
+  children: [
+    { name: 'CTO', value: 70, children: [
+      { name: '前端', value: 25, children: [
+        { name: 'Alice', value: 8 },
+        { name: 'Bob', value: 9 },
+      ]},
+      { name: '后端', value: 30, children: [
+        { name: 'Carol', value: 10 },
+        { name: 'Dave', value: 8 },
+        { name: 'Eve', value: 12 },
+      ]},
+    ]},
+    { name: 'CFO', value: 40, children: [
+      { name: '会计', value: 15 },
+      { name: '审计', value: 12 },
+    ]},
+    { name: 'COO', value: 55, children: [
+      { name: '运营', value: 20 },
+      { name: '市场', value: 25, children: [
+        { name: 'Frank', value: 8 },
+        { name: 'Grace', value: 7 },
+      ]},
+    ]},
+  ],
+})
+
+const c1 = new TreeChart('#c1', {
+  title: '项目目录',
+  subtitle: '点击节点折叠/展开 · 悬停高亮路径',
+  data: mkTree(),
+  height: 520,
+  orientation: 'horizontal',
+  expandAll: false,
+  defaultExpanded: (n) => (n._depth || 0) < 2,  // 初始展开到第 2 层
+  nodeRadius: 7,
+  edgeCurve: 0.5,
+  onHover: n => n && log('hover', n.name),
+  onNodeClick: n => log('click', n.name),
+  onToggle: (n, expanded) => log('toggle', n.name, expanded ? '展开' : '折叠'),
+})
+
+const c2 = new TreeChart('#c2', {
+  title: '组织架构',
+  data: mkOrg(),
+  height: 480,
+  orientation: 'vertical',
+  expandAll: true,
+  nodeRadiusByValue: true,
+  nodeMinR: 5,
+  nodeMaxR: 16,
+  showValues: true,
+  edgeCurve: 0.4,
+})
+
+let dark = false
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-orient').onclick = () => {
+  const o = c1.opts.orientation === 'horizontal' ? 'vertical' : 'horizontal'
+  c1.setOptions({ orientation: o })
+  log('方向 →', o)
+}
+
+document.getElementById('btn-expand').onclick = () => {
+  c1.expandAll()
+  log('全部展开')
+}
+
+document.getElementById('btn-collapse').onclick = () => {
+  c1.collapseAll()
+  log('全部折叠')
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  c1.setData(mkTree())
+  c2.setData(mkOrg())
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

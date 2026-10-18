@@ -1,0 +1,164 @@
+/* XuNay UI · mobile.css */
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  h1 { font-size: 26px }
+  h2 { font-size: 20px }
+  .md-hidden { display: none }
+  .md-block { display: block }
+  .md-flex { display: flex }
+  .container, .container-sm, .container-lg { padding: 0 16px }
+  .card { padding: 16px; border-radius: var(--x-radius) }
+  .hide-mobile { display: none }
+  .hide-desktop { display: initial }
+  * { -webkit-tap-highlight-color: transparent }
+  button, [role="button"] { min-height: 44px; touch-action: manipulation }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]), textarea, select { font-size: 16px; min-height: 44px }
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch }
+  .modal, .dialog, .popup {
+    position: fixed; inset: 0; max-width: 100%; max-height: 100%; border-radius: 0
+  }
+  img, video, iframe { max-width: 100%; height: auto }
+  [class*="grid-2"], [class*="grid-3"], [class*="grid-4"] { grid-template-columns: 1fr }
+  a, .clickable { touch-action: manipulation }
+  body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right) }
+  /* 全局字号缩放 */
+  html { font-size: 15px; }
+
+  /* 触摸区最小 */
+  .btn, button.btn {
+    min-height: var(--x-touch-min);
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+  .btn-sm { min-height: 36px; padding: 8px 14px; font-size: 14px; }
+
+  /* 输入框 */
+  .input, .textarea, .select {
+    min-height: var(--x-touch-min);
+    font-size: 16px; /* iOS 防自动缩放 */
+    padding: 12px 14px;
+  }
+  .field { margin-bottom: 16px; }
+  .label { font-size: 14px; margin-bottom: 6px; }
+
+  /* 表单字段单列 */
+  .form-row { flex-direction: column !important; }
+
+  /* 复选框 / 单选框触摸区 */
+  .checkbox, .radio {
+    min-height: var(--x-touch-min);
+    display: flex;
+    align-items: center;
+  }
+  .checkbox input, .radio input {
+    width: 20px; height: 20px;
+  }
+  
+  .switch { min-height: 28px; }
+  .switch-label { padding: 8px 0; }
+
+  /* Tabs 可横滑 */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* 分页简化 */
+  .pagination { justify-content: center; gap: 4px; }
+  .pagination button { min-width: 40px; min-height: 40px; }
+
+  /* 卡片内边距 */
+  .card { padding: 16px; border-radius: 10px; }
+
+  /* 描述列表单列 */
+  .descriptions { grid-template-columns: 1fr !important; }
+
+  /* 表格可横滑 */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table { min-width: 600px; }
+
+  /* 模态改为底部弹出 */
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .modal {
+    width: 100% !important;
+    max-width: none !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 90vh;
+    padding-bottom: var(--x-safe-bottom);
+    animation: x-slide-up .3s cubic-bezier(.4,0,.2,1);
+  }
+  .modal-header { padding: 16px 20px; }
+  .modal-body { padding: 16px 20px; max-height: 60vh; overflow-y: auto; }
+  .modal-footer {
+    padding: 12px 20px calc(12px + var(--x-safe-bottom));
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .modal-footer button { width: 100%; }
+
+  /* Drawer 全屏或大宽 */
+  .drawer { width: 100% !important; max-width: 92vw; padding-bottom: var(--x-safe-bottom); }
+
+  /* 下拉菜单/浮层居中 */
+  .dropdown-menu, .popover, .context-menu {
+    left: 16px !important;
+    right: 16px !important;
+    max-width: none !important;
+  }
+
+  /* Toast 调整 */
+  .message, .notification {
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+    max-width: none !important;
+  }
+}
+
+/* === 响应式 === */
+
+@media (min-width: 769px) {
+  .sm-hidden { display: initial }
+}
+
+/* 横屏 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal { max-height: 100vh; border-radius: 0; }
+  .sidebar, .drawer { padding-top: 0; }
+}
+
+/* 触摸设备专属 */
+@media (hover: none) {
+  /* 去掉 hover 效果 */
+  .btn:hover, .nav-item:hover { transform: none !important; background: inherit !important; }
+  /* 加大触摸反馈 */
+  .btn:active { transform: scale(.97); opacity: .9; }
+  .nav-item:active, .tab:active { background: rgba(99,102,241,0.1) !important; }
+  .card:active { transform: scale(.99); }
+}
+
+/* iOS 100vh 问题 → 用 100dvh */
+@supports (height: 100dvh) {
+  .full-height { height: 100dvh; }
+}
+
+@media (max-width: 640px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  button, .btn { min-height: 40px; }
+  input:not([type="checkbox"]):not([type="radio"]), textarea, select { font-size: 16px; }
+}

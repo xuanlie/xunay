@@ -1,0 +1,247 @@
+// title: 全组件挂载测试
+import { mount } from 'xunay'
+import {
+  Btn, Row, Col, Text, Card, Divider, Space, Tag, Badge,
+  Input, Textarea, Select, Checkbox, Radio, Switch, NumberInput,
+  DatePicker, TimePicker, SearchInput, PasswordStrength, Rate,
+  ColorPicker, Slider, Mentions, Transfer, Cascader,
+  Alert, Modal, Spinner, Empty, Progress, Avatar, Result,
+  Skeleton, Count, Stat, Descriptions, ItemCard, QRCode,
+  Typography, Comment, Watermark, Ribbon, Code, Keyboard, Highlight, Ellipsis,
+  Tabs, Breadcrumb, Pagination, Steps, Accordion,
+  Menu, Anchor, BackTop, Collapse,
+  Table, List, Timeline, Tree, TreeSelect, Calendar, SplitPane,
+  Carousel, Image, VirtualTable, Kanban, Gantt,
+  Layout, Grid, Flex, Affix,
+  BarChart, LineChart, PieChart, Sparkline, RingProgress,
+  DonutChart, AreaChart, RadarChart, GaugeChart, ScatterChart,
+  WaterfallChart, FunnelChart, CandlestickChart, Treemap, Heatmap,
+  IconArrowRight, IconArrowLeft, IconArrowUp, IconArrowDown,
+  IconChevronRight, IconChevronLeft, IconChevronDown, IconChevronUp, IconExternalLink,
+  IconCheck, IconClose, IconPlus, IconMinus, IconSearch, IconMenu,
+  IconMoreH, IconMoreV, IconRefresh, IconEdit, IconCopy, IconTrash, IconSave,
+  IconDownload, IconUpload, IconShare, IconBookmark,
+  IconZoomIn, IconZoomOut, IconMaximize, IconMinimize, IconGrid, IconList,
+  IconFilter, IconSort, IconEye, IconEyeOff,
+  IconUser, IconUsers, IconHeart, IconStar, IconMessage, IconBell, IconMail, IconPhone,
+  IconFile, IconFolder, IconImage, IconCalendar, IconClock, IconTag, IconFlag, IconCloud, IconDatabase,
+  IconMap, IconNavigation, IconCompass, IconPin,
+  IconPlay, IconPause, IconCamera, IconMic, IconVolume, IconVolumeOff,
+  IconInfo, IconWarn, IconCheckCircle, IconXCircle, IconLock, IconUnlock, IconShield,
+  IconSun, IconMoon, IconLink, IconHome, IconSettings,
+  IconLayout, IconSidebar, IconColumns, IconRows,
+} from 'xunay/kit'
+
+// 每个测试：[名称, 组件调用]
+const TESTS = [
+  // 基础
+  ['Btn', () => Btn(null, 'x')],
+  ['Tag', () => Tag(null, 'x')],
+  ['Badge', () => Badge(null, 'x')],
+  ['Avatar', () => Avatar({ text: 'X' })],
+  ['Spinner', () => Spinner()],
+  ['Count', () => Count({ value: 5 })],
+  ['Card', () => Card({ title: 'Card' }, 'body')],
+  ['Divider', () => Divider({})],
+  ['Space', () => Space({}, 'a', 'b')],
+  ['Text', () => Text({}, 'text')],
+  // 表单
+  ['Input', () => Input({ placeholder: 'x' })],
+  ['Textarea', () => Textarea({})],
+  ['Select', () => Select({ options: [{ value: 'a', label: 'A' }] })],
+  ['Checkbox', () => Checkbox({ label: 'x' })],
+  ['Radio', () => Radio({ label: 'x' })],
+  ['Switch', () => Switch({ label: 'x' })],
+  ['NumberInput', () => NumberInput({})],
+  ['DatePicker', () => DatePicker({})],
+  ['TimePicker', () => TimePicker({})],
+  ['SearchInput', () => SearchInput({})],
+  ['PasswordStrength', () => PasswordStrength({ value: 'abc' })],
+  ['Rate', () => Rate({ value: 3 })],
+  ['ColorPicker', () => ColorPicker({})],
+  ['Slider', () => Slider({})],
+  ['Mentions', () => Mentions({ options: [] })],
+  ['Transfer', () => Transfer({ data: [{ key: 'a', label: 'A' }] })],
+  ['Cascader', () => Cascader({ options: [] })],
+  // 展示
+  ['Alert', () => Alert({ title: 'A' }, 'a')],
+  ['Progress', () => Progress({ value: 50 })],
+  ['Empty', () => Empty({})],
+  ['Result', () => Result({ status: 'success', title: 'OK' })],
+  ['Skeleton', () => Skeleton({ lines: 2 })],
+  ['Stat', () => Stat({ label: 'L', value: 100 })],
+  ['Descriptions', () => Descriptions({ items: [{ label: 'a', value: '1' }] })],
+  ['ItemCard', () => ItemCard({ title: 'T' })],
+  ['QRCode', () => QRCode({ text: 'x', size: 100 })],
+  ['Typography', () => Typography({}, 'x')],
+  ['Comment', () => Comment({ author: 'a' }, 'c')],
+  ['Watermark', () => Watermark({ text: 'W' }, 'x')],
+  ['Ribbon', () => Ribbon({ text: 'R' }, 'x')],
+  ['Code', () => Code({}, 'code')],
+  ['Keyboard', () => Keyboard(null, 'Ctrl')],
+  ['Highlight', () => Highlight({ text: 'hello world', keyword: 'world' })],
+  ['Ellipsis', () => Ellipsis({}, 'long text here')],
+  // 导航
+  ['Tabs', () => Tabs({ items: [{ key: 'a', title: 'A' }] })],
+  ['Breadcrumb', () => Breadcrumb({ items: [{ label: 'a' }] })],
+  ['Pagination', () => Pagination({ page: 1, total: 100 })],
+  ['Steps', () => Steps({ steps: [{ label: 'a' }] })],
+  ['Accordion', () => Accordion({ items: [{ title: 'a', content: 'b' }] })],
+  ['Menu', () => Menu({ items: [{ key: '1', label: 'a' }] })],
+  ['Anchor', () => Anchor({ items: [] })],
+  ['Collapse', () => Collapse({ items: [{ title: 'a', content: 'b' }] })],
+  // 数据
+  ['Table', () => Table({ columns: [{ title: 'a', key: 'a' }], data: [] })],
+  ['List', () => List({ items: [], render: () => null })],
+  ['Timeline', () => Timeline({ items: [] })],
+  ['Tree', () => Tree({ data: [{ key: 'a', label: 'a' }] })],
+  ['TreeSelect', () => TreeSelect({ data: [] })],
+  ['Calendar', () => Calendar({})],
+  ['SplitPane', () => SplitPane({ left: 'L', right: 'R' })],
+  ['Carousel', () => Carousel({}, 'a', 'b')],
+  ['Image', () => Image({ src: 'x' })],
+  ['VirtualTable', () => VirtualTable({ columns: [], data: [] })],
+  ['Kanban', () => Kanban({ columns: [], items: [] })],
+  ['Gantt', () => Gantt({ tasks: [] })],
+  // 布局
+  ['Layout', () => Layout({}, 'x')],
+  ['Grid', () => Grid({}, 'x')],
+  ['Flex', () => Flex({}, 'x')],
+  ['Affix', () => Affix({}, 'x')],
+  // 图表
+  ['BarChart', () => BarChart({ data: [1,2,3], labels: ['a','b','c'], height: 80 })],
+  ['LineChart', () => LineChart({ data: [1,2,3], labels: ['a','b','c'], height: 80 })],
+  ['PieChart', () => PieChart({ data: [{ value: 1, label: 'a' }], size: 80 })],
+  ['Sparkline', () => Sparkline({ data: [1,2,3] })],
+  ['RingProgress', () => RingProgress({ value: 50, size: 80 })],
+  ['DonutChart', () => DonutChart({ data: [{ value: 1, label: 'a' }], size: 80 })],
+  ['AreaChart', () => AreaChart({ data: [1,2,3], labels: ['a','b','c'], height: 80 })],
+  ['RadarChart', () => RadarChart({ data: [{ label: 'a', value: 1 }], size: 80 })],
+  ['GaugeChart', () => GaugeChart({ value: 50, size: 80 })],
+  ['ScatterChart', () => ScatterChart({ data: [{ x: 1, y: 2 }], height: 80 })],
+  ['Heatmap', () => Heatmap({ data: [[1,2,3]], cell: 15 })],
+  ['WaterfallChart', () => WaterfallChart({ data: [1,2,3], labels: ['a','b','c'], height: 80 })],
+  ['FunnelChart', () => FunnelChart({ data: [{ label: 'a', value: 1 }], height: 80 })],
+  ['Treemap', () => Treemap({ data: [{ label: 'a', value: 1 }], height: 80 })],
+  ['CandlestickChart', () => CandlestickChart({ data: [{ open:1, high:2, low:0, close:1.5 }], height: 80 })],
+  // 图标（全部 64）
+  ['IconArrowRight', () => IconArrowRight({})],
+  ['IconArrowLeft', () => IconArrowLeft({})],
+  ['IconArrowUp', () => IconArrowUp({})],
+  ['IconArrowDown', () => IconArrowDown({})],
+  ['IconChevronRight', () => IconChevronRight({})],
+  ['IconChevronLeft', () => IconChevronLeft({})],
+  ['IconChevronDown', () => IconChevronDown({})],
+  ['IconChevronUp', () => IconChevronUp({})],
+  ['IconExternalLink', () => IconExternalLink({})],
+  ['IconCheck', () => IconCheck({})],
+  ['IconClose', () => IconClose({})],
+  ['IconPlus', () => IconPlus({})],
+  ['IconMinus', () => IconMinus({})],
+  ['IconSearch', () => IconSearch({})],
+  ['IconMenu', () => IconMenu({})],
+  ['IconMoreH', () => IconMoreH({})],
+  ['IconMoreV', () => IconMoreV({})],
+  ['IconRefresh', () => IconRefresh({})],
+  ['IconEdit', () => IconEdit({})],
+  ['IconCopy', () => IconCopy({})],
+  ['IconTrash', () => IconTrash({})],
+  ['IconSave', () => IconSave({})],
+  ['IconDownload', () => IconDownload({})],
+  ['IconUpload', () => IconUpload({})],
+  ['IconShare', () => IconShare({})],
+  ['IconBookmark', () => IconBookmark({})],
+  ['IconZoomIn', () => IconZoomIn({})],
+  ['IconZoomOut', () => IconZoomOut({})],
+  ['IconMaximize', () => IconMaximize({})],
+  ['IconMinimize', () => IconMinimize({})],
+  ['IconGrid', () => IconGrid({})],
+  ['IconList', () => IconList({})],
+  ['IconFilter', () => IconFilter({})],
+  ['IconSort', () => IconSort({})],
+  ['IconEye', () => IconEye({})],
+  ['IconEyeOff', () => IconEyeOff({})],
+  ['IconUser', () => IconUser({})],
+  ['IconUsers', () => IconUsers({})],
+  ['IconHeart', () => IconHeart({})],
+  ['IconStar', () => IconStar({})],
+  ['IconMessage', () => IconMessage({})],
+  ['IconBell', () => IconBell({})],
+  ['IconMail', () => IconMail({})],
+  ['IconPhone', () => IconPhone({})],
+  ['IconFile', () => IconFile({})],
+  ['IconFolder', () => IconFolder({})],
+  ['IconImage', () => IconImage({})],
+  ['IconCalendar', () => IconCalendar({})],
+  ['IconClock', () => IconClock({})],
+  ['IconTag', () => IconTag({})],
+  ['IconFlag', () => IconFlag({})],
+  ['IconCloud', () => IconCloud({})],
+  ['IconDatabase', () => IconDatabase({})],
+  ['IconMap', () => IconMap({})],
+  ['IconNavigation', () => IconNavigation({})],
+  ['IconCompass', () => IconCompass({})],
+  ['IconPin', () => IconPin({})],
+  ['IconPlay', () => IconPlay({})],
+  ['IconPause', () => IconPause({})],
+  ['IconCamera', () => IconCamera({})],
+  ['IconMic', () => IconMic({})],
+  ['IconVolume', () => IconVolume({})],
+  ['IconVolumeOff', () => IconVolumeOff({})],
+  ['IconInfo', () => IconInfo({})],
+  ['IconWarn', () => IconWarn({})],
+  ['IconCheckCircle', () => IconCheckCircle({})],
+  ['IconXCircle', () => IconXCircle({})],
+  ['IconLock', () => IconLock({})],
+  ['IconUnlock', () => IconUnlock({})],
+  ['IconShield', () => IconShield({})],
+  ['IconSun', () => IconSun({})],
+  ['IconMoon', () => IconMoon({})],
+  ['IconLink', () => IconLink({})],
+  ['IconHome', () => IconHome({})],
+  ['IconSettings', () => IconSettings({})],
+  ['IconLayout', () => IconLayout({})],
+  ['IconSidebar', () => IconSidebar({})],
+  ['IconColumns', () => IconColumns({})],
+  ['IconRows', () => IconRows({})],
+]
+
+// 用一个 root 容器
+const container = document.createElement('div')
+container.style.cssText = 'padding:16px;background:#111;color:#0f0;font:12px monospace'
+document.getElementById('app').appendChild(container)
+
+const ok = []
+const fail = []
+
+TESTS.forEach(([name, make]) => {
+  // 每项独立容器
+  const wrap = document.createElement('div')
+  wrap.style.cssText = 'display:inline-block;padding:6px 10px;margin:3px;border:1px solid #333;border-radius:4px;vertical-align:top;text-align:center;min-width:70px;color:#0f0'
+  wrap.textContent = name
+  container.appendChild(wrap)
+
+  const box = document.createElement('div')
+  box.style.cssText = 'margin-top:4px'
+  wrap.appendChild(box)
+
+  try {
+    // 每个挂到独立 div
+    mount(() => {
+      try { return make() } catch (e) { return div({ style: 'color:#f55' }, 'ERR:' + (e.message || e)) }
+    }, box)
+    ok.push(name)
+  } catch (e) {
+    wrap.style.borderColor = '#f55'
+    wrap.style.color = '#f55'
+    box.textContent = 'X ' + (e.message || e)
+    fail.push([name, e.message || String(e)])
+  }
+})
+
+// 汇总
+const summary = document.createElement('div')
+summary.style.cssText = 'margin-top:20px;padding:12px;background:#000;border:1px solid #333;font-size:13px;white-space:pre-wrap'
+summary.textContent = `通过 ${ok.length} / 失败 ${fail.length}\n\n` +
+  (fail.length ? '失败列表：\n' + fail.map(([n, e]) => '  ✗ ' + n + ' — ' + e).join('\n') : '✓ 全部通过')
+container.appendChild(summary)

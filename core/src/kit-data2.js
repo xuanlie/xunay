@@ -19,8 +19,8 @@ export function Carousel(props, ...children) {
   return div({
     style: { position: 'relative', overflow: 'hidden', height, borderRadius: '8px' },
     ref: el => {
-      if (!el || typeof swipe !== 'function') return
-      // V011 修复：注册到 scope，组件卸载时清理
+      if (!el || el.__xSwipeBound || typeof swipe !== 'function') return
+      el.__xSwipeBound = true
       const cleanup = swipe(el, {
         onSwipeLeft: () => idx((idx() + 1) % items.length),
         onSwipeRight: () => idx((idx() - 1 + items.length) % items.length),
@@ -39,17 +39,17 @@ export function Carousel(props, ...children) {
       ...items.map((_, i) => span({
         style: () => ({
           width: '8px', height: '8px', borderRadius: '50%', cursor: 'pointer',
-          background: idx() === i ? '#fff' : 'rgba(255,255,255,.5)'
+          background: idx() === i ? 'var(--x-text-inverse)' : 'rgba(255,255,255,.5)'
         }),
         on: { click: () => idx(i) }
       }))
     ),
     button({
-      style: { position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,.4)', color: '#fff', border: 0, width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' },
+      style: { position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,.4)', color: 'var(--x-text-inverse)', border: 0, width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' },
       on: { click: () => idx((idx() - 1 + items.length) % items.length) }
     }, '‹'),
     button({
-      style: { position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,.4)', color: '#fff', border: 0, width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' },
+      style: { position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,.4)', color: 'var(--x-text-inverse)', border: 0, width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' },
       on: { click: () => idx((idx() + 1) % items.length) }
     }, '›')
   )
@@ -98,7 +98,7 @@ export function VirtualTable(props) {
       })
     } }
   },
-    div({ style: { display: 'flex', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', position: 'sticky', top: 0, zIndex: 1 } },
+    div({ style: { display: 'flex', background: 'var(--x-bg-soft)', borderBottom: '1px solid #e5e7eb', position: 'sticky', top: 0, zIndex: 1 } },
       ...columns.map(c => div({ style: { flex: 1, padding: '10px 12px', fontWeight: '600', fontSize: '13px' } }, c.title))),
     div({ style: { height: (data.length * rowHeight) + 'px', position: 'relative' } },
       div({ style: { transform: `translateY(${offset()}px)` } },
@@ -116,7 +116,7 @@ export function Kanban(props) {
   const [drag, setDrag] = [signal(null), v => drag(v)]
   return div({ style: { display: 'flex', gap: '12px', overflowX: 'auto', padding: '4px' } },
     ...columns.map(col => div({
-      style: { minWidth: '260px', background: '#f9fafb', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' },
+      style: { minWidth: '260px', background: 'var(--x-bg-soft)', borderRadius: '8px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' },
       on: {
         dragover: e => e.preventDefault(),
         drop: e => {
@@ -129,12 +129,12 @@ export function Kanban(props) {
     },
       div({ style: { fontWeight: '600', fontSize: '14px', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' } },
         span(null, col.title),
-        span({ style: { color: '#9ca3af', fontSize: '12px' } }, String(items.filter(i => i.status === col.key).length))
+        span({ style: { color: 'var(--x-text-mute)', fontSize: '12px' } }, String(items.filter(i => i.status === col.key).length))
       ),
       ...items.filter(i => i.status === col.key).map(item =>
         div({
           draggable: true,
-          style: { background: '#fff', padding: '10px 12px', borderRadius: '6px', cursor: 'grab', boxShadow: '0 1px 3px rgba(0,0,0,.06)', fontSize: '13px' },
+          style: { background: 'var(--x-text-inverse)', padding: '10px 12px', borderRadius: '6px', cursor: 'grab', boxShadow: '0 1px 3px rgba(0,0,0,.06)', fontSize: '13px' },
           on: {
             dragstart: () => setDrag(item.id),
             dragend: () => setDrag(null)
@@ -151,8 +151,8 @@ export function Gantt(props) {
   const cellW = 40
   const dayDiff = d => Math.floor((new Date(d) - start) / 86400000)
   return div({ style: { overflow: 'auto', border: '1px solid #e5e7eb', borderRadius: '8px' } },
-    div({ style: { display: 'flex', borderBottom: '1px solid #e5e7eb', background: '#f9fafb', minWidth: days * cellW + 'px' } },
-      ...Array.from({ length: days }, (_, i) => div({ style: { width: cellW + 'px', padding: '8px 0', textAlign: 'center', fontSize: '11px', color: '#6b7280', borderRight: '1px solid #f3f4f6' } }, String(i + 1)))
+    div({ style: { display: 'flex', borderBottom: '1px solid #e5e7eb', background: 'var(--x-bg-soft)', minWidth: days * cellW + 'px' } },
+      ...Array.from({ length: days }, (_, i) => div({ style: { width: cellW + 'px', padding: '8px 0', textAlign: 'center', fontSize: '11px', color: 'var(--x-text-dim)', borderRight: '1px solid #f3f4f6' } }, String(i + 1)))
     ),
     ...tasks.map(t => div({ style: { display: 'flex', borderBottom: '1px solid #f3f4f6', minWidth: days * cellW + 'px', position: 'relative' } },
       div({
@@ -160,8 +160,8 @@ export function Gantt(props) {
           position: 'absolute', top: '8px', height: '24px',
           left: (dayDiff(t.start) * cellW) + 'px',
           width: ((dayDiff(t.end) - dayDiff(t.start) + 1) * cellW - 8) + 'px',
-          background: t.color || '#1f6feb', borderRadius: '4px',
-          color: '#fff', fontSize: '12px', padding: '0 8px', lineHeight: '24px', whiteSpace: 'nowrap', overflow: 'hidden'
+          background: t.color || 'var(--x-primary)', borderRadius: '4px',
+          color: 'var(--x-text-inverse)', fontSize: '12px', padding: '0 8px', lineHeight: '24px', whiteSpace: 'nowrap', overflow: 'hidden'
         }
       }, t.title)
     ))
@@ -182,6 +182,6 @@ export function QRScanner(props) {
   return div({ style: { position: 'relative', width: '100%', maxWidth: '400px', borderRadius: '8px', overflow: 'hidden' } },
     videoEl
       ? video({ ref: el => { el && (el.srcObject = videoEl.srcObject); videoEl.onplay = () => el.play() }, style: { width: '100%', display: 'block' } })
-      : div({ style: { padding: '40px', textAlign: 'center', color: '#9ca3af' } }, '浏览器不支持摄像头')
+      : div({ style: { padding: '40px', textAlign: 'center', color: 'var(--x-text-mute)' } }, '浏览器不支持摄像头')
   )
 }

@@ -1,0 +1,164 @@
+/* ============================================================
+   XuNay UI · a11y 补丁 · 追加到 ui.css 之后
+   - 完整 ARIA 状态样式
+   - 强制色模式 / 高对比度增强
+   - 减少动效增强
+   - 键盘导航可见性
+   ============================================================ */
+
+@layer components {
+
+/* ---------- 按钮 ARIA 状态 ---------- */
+.btn[aria-pressed="true"] {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-fg);
+  border-color: var(--color-primary-default);
+}
+.btn[aria-expanded="true"] { background: var(--color-bg-active); }
+.btn[aria-busy="true"] { pointer-events: none; }
+
+/* ---------- 输入 aria-invalid ---------- */
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"],
+.select[aria-invalid="true"] {
+  border-color: var(--color-danger-default);
+  background-image: none;
+}
+.input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px oklch(0.55 0.215 25 / 0.2);
+}
+/* 错误时 label 也变红（配合 .field.error） */
+.field.error .label { color: var(--color-danger-fg); }
+.field.success .label { color: var(--color-success-fg); }
+
+/* ---------- 表格 aria-selected / aria-sort ---------- */
+.table tbody tr[aria-selected="true"],
+table tbody tr[aria-selected="true"] {
+  background: var(--color-bg-selected);
+}
+.table th[aria-sort="ascending"]::after  { content: " ▲"; color: var(--color-fg-muted); font-size: 0.7em; }
+.table th[aria-sort="descending"]::after { content: " ▼"; color: var(--color-fg-muted); font-size: 0.7em; }
+.table th[aria-sort] { cursor: pointer; user-select: none; }
+
+/* ---------- Tabs 完整 ARIA ---------- */
+.tab[role="tab"][aria-selected="true"] {
+  color: var(--color-primary-fg);
+  border-block-end-color: var(--color-primary-default);
+}
+.tab[role="tab"][aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tabs[role="tablist"] { position: relative; }
+
+/* ---------- Accordion ---------- */
+.accordion-item[aria-expanded="true"] > .accordion-trigger { color: var(--color-primary-fg); }
+.accordion-trigger[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+/* ---------- Menu / Listbox ---------- */
+.dropdown-item[aria-selected="true"],
+.dropdown-item[aria-current="true"] {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary-fg);
+}
+.dropdown-item[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------- Switch 键盘增强 ---------- */
+.switch { outline-offset: 2px; }
+.switch[role="switch"] { cursor: pointer; }
+
+/* ---------- Tooltip / Popover 可见性 ---------- */
+[role="tooltip"] {
+  position: absolute;
+  z-index: var(--z-tooltip);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  background: var(--color-bg-inverse);
+  color: var(--color-fg-inverse);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---------- Focus 全局增强 ---------- */
+*:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+/* 高优先级可见性：卡片 / 面板内的聚焦元素 */
+.card:focus-within {
+  border-color: var(--color-border-emphasis);
+  box-shadow: var(--shadow-md);
+}
+
+} /* /@layer components */
+
+/* ---------- 强制色模式（Windows 高对比度）---------- */
+@media (forced-colors: active) {
+  .btn, .input, .card, .alert, .table, .dropdown-menu {
+    border: 1px solid CanvasText;
+  }
+  .btn-primary, .badge-primary, .alert-info {
+    background: Highlight;
+    color: HighlightText;
+  }
+  .tab[aria-selected="true"] {
+    border-block-end: 2px solid Highlight;
+  }
+  .switch[aria-checked="true"] { background: Highlight; }
+  .switch-thumb { background: ButtonText; }
+}
+
+/* ---------- 减少动效（增强：包括 scroll / 光标）---------- */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-instant: 0ms; --dur-fast: 0ms; --dur-normal: 0ms; --dur-slow: 0ms; --dur-slower: 0ms; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .x-swipe { scroll-snap-type: none; }
+}
+
+/* ---------- 高对比度增强 ---------- */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border-default: var(--c-gray-500);
+    --color-border-strong: var(--c-gray-700);
+    --color-border-muted: var(--c-gray-400);
+    --color-fg-muted: var(--c-gray-800);
+    --color-fg-subtle: var(--c-gray-700);
+    --shadow-sm: none;
+    --shadow-md: none;
+  }
+  .btn, .input, .select, .textarea, .card {
+    border-width: 2px;
+  }
+  .btn:focus-visible, .input:focus {
+    outline-width: 3px;
+  }
+  code, pre { border: 2px solid var(--color-border-default); }
+}
+
+/* ---------- 强制减少透明 ---------- */
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--color-bg-elevated); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .modal-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; background: oklch(0 0 0 / 0.75); }
+}
+
+/* ---------- 键盘导航：Tab 内的方向键提示（视觉）---------- */
+.tab:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -4px;
+  inset-inline: 0;
+  block-size: 2px;
+  background: var(--color-primary-default);
+}

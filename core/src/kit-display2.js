@@ -16,7 +16,7 @@ export function Typography(props, ...children) {
     color: color,
     fontSize: size || sizes[variant]
   }
-  if (isCode) return code({ style: { ...style, background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' } }, ...children)
+  if (isCode) return code({ style: { ...style, background: 'var(--x-bg-hover)', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' } }, ...children)
   return createElement(Tag, { style }, ...children)
 }
 
@@ -25,15 +25,15 @@ export function Comment(props, ...children) {
   return div({ style: { display: 'flex', gap: '12px', padding: '12px 0', borderBottom: '1px solid #f3f4f6' } },
     avatar
       ? img({ src: avatar, style: { width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0 } })
-      : div({ style: { width: '40px', height: '40px', borderRadius: '50%', background: '#1f6feb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: '600' } }, String(author || '?')[0]),
+      : div({ style: { width: '40px', height: '40px', borderRadius: '50%', background: 'var(--x-primary)', color: 'var(--x-text-inverse)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: '600' } }, String(author || '?')[0]),
     div({ style: { flex: 1, minWidth: 0 } },
       Row({ gap: 2, align: 'center' },
         span({ style: { fontWeight: '600', fontSize: '14px' } }, author || ''),
-        time ? span({ style: { fontSize: '12px', color: '#9ca3af' } }, time) : null
+        time ? span({ style: { fontSize: '12px', color: 'var(--x-text-mute)' } }, time) : null
       ),
-      div({ style: { marginTop: '4px', fontSize: '14px', color: '#374151' } }, ...children),
+      div({ style: { marginTop: '4px', fontSize: '14px', color: 'var(--x-text)' } }, ...children),
       actions.length ? Row({ gap: 2, style: { marginTop: '8px' } },
-        ...actions.map(a => span({ style: { fontSize: '12px', color: '#6b7280', cursor: 'pointer' } }, a))
+        ...actions.map(a => span({ style: { fontSize: '12px', color: 'var(--x-text-dim)', cursor: 'pointer' } }, a))
       ) : null
     )
   )
@@ -51,14 +51,14 @@ export function Watermark(props, ...children) {
 }
 
 export function Ribbon(props, ...children) {
-  const { text, color = '#1f6feb', position = 'end' } = px(props)
+  const { text, color = 'var(--x-primary)', position = 'end' } = px(props)
   return div({ style: { position: 'relative' } },
     ...children,
     div({
       style: {
         position: 'absolute', top: 0,
         [position === 'start' ? 'left' : 'right']: 0,
-        background: color, color: '#fff', padding: '4px 12px', fontSize: '12px', fontWeight: '600',
+        background: color, color: 'var(--x-text-inverse)', padding: '4px 12px', fontSize: '12px', fontWeight: '600',
         borderRadius: position === 'start' ? '0 0 6px 0' : '0 0 0 6px'
       }
     }, text)
@@ -86,10 +86,10 @@ export function Code(props) {
 export function Keyboard(props, ...children) {
   return span({
     style: {
-      display: 'inline-block', padding: '2px 8px', background: '#f3f4f6',
+      display: 'inline-block', padding: '2px 8px', background: 'var(--x-bg-hover)',
       border: '1px solid #d1d5db', borderBottom: '2px solid #d1d5db',
       borderRadius: '4px', fontFamily: 'ui-monospace,monospace', fontSize: '12px',
-      fontWeight: '600', color: '#374151', margin: '0 2px'
+      fontWeight: '600', color: 'var(--x-text)', margin: '0 2px'
     }
   }, ...children)
 }
@@ -106,11 +106,13 @@ export function Highlight(props, ...children) {
 
 export function Ellipsis(props, ...children) {
   const { lines = 1, tooltip = true } = px(props)
-  const [hover, setHover] = [signal(false), v => hover(v)]
+  const hoverSignal = signal(false)
+  const setHover = v => hoverSignal(v)
   return span({
     style: lines === 1
       ? { display: 'inline-block', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
       : { display: '-webkit-box', WebkitLineClamp: lines, WebkitBoxOrient: 'vertical', overflow: 'hidden' },
-    on: { mouseenter: () => setHover(true), mouseleave: () => setHover(false) }
+    on: { mouseenter: () => setHover(true), mouseleave: () => setHover(false) },
+    title: tooltip ? undefined : undefined
   }, ...children)
 }

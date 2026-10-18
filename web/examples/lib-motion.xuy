@@ -1,0 +1,33 @@
+// title: framer-motion
+import React from 'xunay/compat'
+import { motion, AnimatePresence } from 'framer-motion'
+const h = React.createElement
+
+function App() {
+  const [show, setShow] = React.useState(true)
+  const [x, setX] = React.useState(0)
+  return h('div', { style: 'padding:24px;background:#282c34;color:#abb2bf;font-family:system-ui;min-height:100vh' },
+    h('h1', { style: { color: '#61afef' } }, 'framer-motion'),
+    h('div', { style: { display: 'flex', gap: '12px', marginBottom: '24px' } },
+      h('button', { onClick: () => setX(x + 50) }, '右移'),
+      h('button', { onClick: () => setX(0) }, '归零'),
+      h('button', { onClick: () => setShow(!show) }, '显示/隐藏')
+    ),
+    h('div', { style: { height: '100px', background: '#21252b', borderRadius: '8px', padding: '16px', marginBottom: '16px', position: 'relative' } },
+      h(motion.div, {
+        animate: { x, rotate: x / 3 },
+        transition: { type: 'spring', stiffness: 200 },
+        style: { width: '60px', height: '60px', background: '#61afef', borderRadius: '8px' },
+      })
+    ),
+    h(AnimatePresence, null,
+      show ? h(motion.div, {
+        initial: { opacity: 0, y: -20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 20 },
+        style: { padding: '16px', background: '#98c379', color: '#282c34', borderRadius: '8px' },
+      }, '会淡入淡出的方块') : null
+    )
+  )
+}
+React.createRoot(document.getElementById('app')).render(h(App))

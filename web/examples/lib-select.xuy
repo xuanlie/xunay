@@ -1,0 +1,41 @@
+// title: 诊断 3
+import React from 'xunay/compat'
+import Select from 'react-select'
+
+const diag = document.createElement('pre')
+diag.style.cssText = 'position:fixed;inset:0;background:#000;color:#0f0;padding:16px;font:12px monospace;white-space:pre-wrap;z-index:99999;margin:0;overflow:auto'
+document.body.appendChild(diag)
+function out(msg) { diag.textContent += msg + '\n' }
+
+// 打开"抛出开关"——compat 内部错误直接冒出来
+window.__XUNAY_COMPAT_THROW = true
+
+// 捕获未处理错误
+window.onerror = function(msg, src, line, col, e) {
+  out('!! ERROR: ' + msg)
+  if (e && e.stack) out(e.stack)
+  return true
+}
+
+out('[1] import OK')
+
+const options = [{ value: 'bj', label: '北京' }, { value: 'sh', label: '上海' }]
+const h = React.createElement
+
+function App() {
+  out('[2] App 进入')
+  return h('div', { style: 'padding:20px;background:#282c34;color:#fff;font-family:system-ui' },
+    h('h1', null, 'Select 诊断'),
+    h('div', { style: 'max-width:400px' },
+      h(Select, { options, placeholder: '选择...' })
+    )
+  )
+}
+
+try {
+  React.createRoot(document.getElementById('app')).render(h(App))
+  out('[3] render 调用完成')
+} catch (e) {
+  out('[X] render 崩: ' + e.message)
+  if (e.stack) out(e.stack)
+}

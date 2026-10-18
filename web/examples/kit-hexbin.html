@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>HexbinChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>HexbinChart · 六边形分箱图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-bins">📐 密度</button>
+<button id="btn-empty">👁 空箱</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">双高斯分布 · 5000 点</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">人口分布</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import HexbinChart from './kit/charts/hexbin.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+function randn(mean, sd) {
+  let u = 0, v = 0
+  while (u === 0) u = Math.random()
+  while (v === 0) v = Math.random()
+  return mean + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+}
+function mkGaussian(n) {
+  const pts = []
+  for (let i = 0; i < n; i++) {
+    // 双峰
+    const cx = Math.random() > 0.5 ? 30 : 70
+    const cy = Math.random() > 0.5 ? 30 : 70
+    pts.push({ x: randn(cx, 8), y: randn(cy, 10) })
+  }
+  return pts
+}
+function mkPop(n) {
+  const pts = []
+  for (let i = 0; i < n; i++) {
+    // 沿海集中
+    const coast = Math.random() > 0.35
+    const x = coast ? randn(80, 8) : randn(40, 25)
+    const y = coast ? randn(20, 12) : randn(60, 18)
+    pts.push({ x, y })
+  }
+  return pts
+}
+const c1 = new HexbinChart('#c1',{
+  title:'双高斯分布',
+  subtitle:'5000 个点 · 六边形分箱',
+  data: mkGaussian(5000),
+  bins: 22,
+  height:480,
+  onHover: p => p && log('hover', p.count + ' 点', '('+p.x.toFixed(0)+','+p.y.toFixed(0)+')'),
+  onHexClick: (h,pts) => log('click', h.count + ' 点'),
+})
+const c2 = new HexbinChart('#c2',{
+  title:'人口分布',
+  data: mkPop(3000),
+  bins: 18,
+  height:400,
+  colorRamp: ['#fef3c7','#fcd34d','#f59e0b','#dc2626','#7f1d1d'],
+  colorRampDark: ['#7f1d1d','#dc2626','#f59e0b','#fcd34d','#fef3c7'],
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let binsArr=[22,12,32,16], bi=0
+document.getElementById('btn-bins').onclick=()=>{bi=(bi+1)%binsArr.length;const b=binsArr[bi];c1.setOptions({bins:b});log('密度 →',b)}
+document.getElementById('btn-empty').onclick=()=>{const v=!c1.opts.showEmpty;c1.setOptions({showEmpty:v});log('空箱 →',v)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(mkGaussian(5000));c2.setData(mkPop(3000));log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

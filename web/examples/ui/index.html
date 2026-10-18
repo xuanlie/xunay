@@ -1,0 +1,2644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>XuNay UI · 全组件展示</title>
+<link rel="stylesheet" href="./ui.css">
+<style>
+  body{padding:0;max-width:none}
+  .layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+  .nav{position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 12px;border-right:1px solid var(--x-line);background:var(--x-bg-elev)}
+  .nav h4{margin:16px 8px 6px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--x-fg-mute);font-weight:600}
+  .nav a{display:block;padding:6px 10px;border-radius:6px;color:var(--x-fg-dim);font-size:13px;text-decoration:none}
+  .nav a:hover{background:var(--x-bg-soft);color:var(--x-primary)}
+  .main{padding:24px 32px;max-width:1280px}
+  section{margin-bottom:36px;padding:20px;border:1px solid var(--x-line);border-radius:12px;background:var(--x-bg-elev)}
+  section>h3{margin:0 0 16px;color:var(--x-primary);font-size:16px;display:flex;align-items:center;gap:8px}
+  section>h3 .n{display:inline-flex;width:24px;height:24px;background:var(--x-primary);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:12px}
+  .demo{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .demo-col{display:flex;flex-direction:column;gap:12px;width:280px}
+  .bar{position:sticky;top:0;z-index:999;background:var(--x-bg-elev);padding:8px 32px;border-bottom:1px solid var(--x-line);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}.nav{display:none}.main{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <strong style="margin-right:8px">XuNay UI</strong>
+  <button class="btn btn-sm" onclick="document.documentElement.removeAttribute('data-theme')">亮</button>
+  <button class="btn btn-sm" onclick="document.documentElement.setAttribute('data-theme','dark')">暗</button>
+  <button class="btn btn-sm" onclick="document.documentElement.setAttribute('data-theme','dracula')">Dracula</button>
+  <button class="btn btn-sm" onclick="document.documentElement.setAttribute('data-theme','nord')">Nord</button>
+  <button class="btn btn-sm" onclick="document.documentElement.setAttribute('data-theme','tokyo')">Tokyo</button>
+  <button class="btn btn-sm" onclick="document.documentElement.setAttribute('data-theme','catppuccin')">Catppuccin</button>
+  <button class="btn btn-sm" onclick="document.documentElement.setAttribute('data-theme','github')">GitHub</button>
+  <span style="flex:1"></span>
+  <select class="select" style="width:130px;height:32px;padding:0 28px 0 10px;font-size:13px" onchange="(e=>{e.target.value?document.documentElement.setAttribute('data-accent',e.target.value):document.documentElement.removeAttribute('data-accent')})(event)">
+    <option value="">默认色</option>
+    <option value="blue">蓝</option><option value="indigo">靛</option>
+    <option value="purple">紫</option><option value="pink">粉</option>
+    <option value="red">红</option><option value="orange">橙</option>
+    <option value="green">绿</option><option value="teal">青</option>
+    <option value="cyan">天青</option>
+  </select>
+</div>
+
+<div class="layout">
+<aside class="nav">
+  <h4>基础</h4>
+  <a href="#btn">按钮</a><a href="#text">排版</a><a href="#layout">布局</a><a href="#icon">图标文本</a>
+  <h4>表单</h4>
+  <a href="#input">输入框</a><a href="#select">选择器</a><a href="#check">勾选/开关</a><a href="#picker">日期/颜色</a><a href="#rate">评分/滑块</a>
+  <h4>展示</h4>
+  <a href="#card">卡片</a><a href="#tag">标签/徽章</a><a href="#alert">提示</a><a href="#avatar">头像</a>
+  <a href="#progress">进度</a><a href="#skeleton">骨架</a><a href="#empty">空状态/结果</a>
+  <h4>数据</h4>
+  <a href="#table">表格</a><a href="#list">列表</a><a href="#timeline">时间线</a><a href="#tree">树</a>
+  <a href="#desc">描述</a><a href="#stat">统计</a>
+  <h4>导航</h4>
+  <a href="#tabs">标签页</a><a href="#step">步骤条</a><a href="#page">分页</a><a href="#crumb">面包屑</a>
+  <a href="#menu">菜单</a><a href="#accordion">折叠面板</a>
+  <h4>浮层</h4>
+  <a href="#drop">下拉</a><a href="#ttip">提示气泡</a>
+  <h4>编辑器</h4>
+  <a href="#code">代码</a><a href="#editor">编辑器</a>
+  <a href="#animate">动画</a>
+  <h4>其他</h4>
+  <a href="#grad">渐变/玻璃</a><a href="#comment">评论</a>
+  <a href="#ribbon">丝带/水印</a><a href="#interactive">交互演示</a>
+  <a href="#misc">杂项</a>
+</aside>
+
+<main class="main">
+
+<!-- ═══════ 1. 按钮 ═══════ -->
+<section id="btn"><h3><span class="n">1</span>按钮 Btn</h3>
+  <div class="demo" style="margin-bottom:14px">
+    <button class="btn">默认</button>
+    <button class="btn btn-primary">主色</button>
+    <button class="btn btn-success">成功</button>
+    <button class="btn btn-warning">警告</button>
+    <button class="btn btn-danger">危险</button>
+    <button class="btn btn-info">信息</button>
+    <button class="btn btn-ghost">幽灵</button>
+    <button class="btn btn-dashed">虚线</button>
+    <button class="btn btn-link">链接</button>
+    <button class="btn btn-text">纯文本</button>
+  </div>
+  <div class="demo" style="margin-bottom:14px">
+    <button class="btn btn-xs btn-primary">XS</button>
+    <button class="btn btn-sm btn-primary">SM</button>
+    <button class="btn btn-primary">MD</button>
+    <button class="btn btn-lg btn-primary">LG</button>
+    <button class="btn btn-xl btn-primary">XL</button>
+  </div>
+  <div class="demo" style="margin-bottom:14px">
+    <button class="btn btn-primary btn-pill">药丸</button>
+    <button class="btn btn-circle btn-primary">+</button>
+    <button class="btn btn-primary btn-icon">★</button>
+    <button class="btn btn-block btn-primary" style="width:200px">块级</button>
+    <button class="btn btn-primary" disabled>禁用</button>
+    <button class="btn btn-primary btn-badge">消息</button>
+  </div>
+  <div class="demo">
+    <div class="btn-group">
+      <button class="btn">左</button><button class="btn active">中</button><button class="btn">右</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary">保存</button>
+      <button class="btn btn-primary">另存</button>
+      <button class="btn btn-primary">导出</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 2. 排版 ═══════ -->
+<section id="text"><h3><span class="n">2</span>排版 Typography</h3>
+  <h1>H1 · 主标题</h1>
+  <h2>H2 · 副标题</h2>
+  <h3>H3 · 三级标题</h3>
+  <h4>H4 · 四级标题</h4>
+  <h5>H5 · 五级标题</h5>
+  <h6>H6 · 六级标题</h6>
+  <p>正文段落：这是一段说明文字，展示 <strong>加粗</strong>、<em>斜体</em>、<a href="#">链接</a>、<code>code</code>、<kbd>Ctrl</kbd> 等内联样式，还有 <mark>高亮</mark> 和 <del>删除线</del>。</p>
+  <p class="lead">导语文字，比正文字号略大、颜色略淡。</p>
+  <p class="muted">次要文字 muted</p>
+  <p class="small">小字 small · 12.5px</p>
+  <blockquote>"这是一段引用文字" <cite>— 某人</cite></blockquote>
+  <hr>
+  <div class="demo">
+    <span class="text-primary">主色</span>
+    <span class="text-danger">危险</span>
+    <span class="text-success">成功</span>
+    <span class="text-warning">警告</span>
+    <span class="text-info">信息</span>
+    <span class="text-dim">次要</span>
+    <span class="text-mute">弱化</span>
+    <span class="text-gradient">渐变文字</span>
+    <span class="font-bold">加粗</span>
+    <span class="mono">等宽</span>
+  </div>
+</section>
+
+<!-- ═══════ 3. 布局 ═══════ -->
+<section id="layout"><h3><span class="n">3</span>布局 Layout</h3>
+  <div class="panel" style="margin-bottom:12px">
+    <div class="row between">
+      <span>flex 布局 + between</span>
+      <button class="btn btn-sm">操作</button>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:12px">
+    <div class="panel">grid-2 左</div>
+    <div class="panel">grid-2 右</div>
+  </div>
+  <div class="grid-3">
+    <div class="panel">grid-3</div>
+    <div class="panel">grid-3</div>
+    <div class="panel">grid-3</div>
+  </div>
+  <div class="divider-text">分割线带文字</div>
+  <div class="demo">
+    <span>上</span><span class="divider-vertical"></span><span>下</span>
+    <span class="divider-dot"></span>
+    <span>A</span><span class="divider-dot"></span><span>B</span>
+  </div>
+</section>
+
+<!-- ═══════ 4. 输入框 ═══════ -->
+<section id="input"><h3><span class="n">4</span>输入框 Input</h3>
+  <div class="demo">
+    <div class="demo-col">
+      <div class="field">
+        <label class="label">用户名 <span class="required">*</span></label>
+        <div class="field-box md"><input class="field-el" placeholder="请输入用户名"></div>
+        <div class="hint">支持中英文</div>
+      </div>
+      <div class="field">
+        <label class="label">邮箱（错误）</label>
+        <div class="field-box md error"><input class="field-el" value="bad-email"></div>
+        <div class="error-msg">邮箱格式不正确</div>
+      </div>
+      <div class="field">
+        <label class="label">带前缀</label>
+        <div class="field-box md">
+          <span class="field-prefix">￥</span>
+          <input class="field-el" placeholder="0.00">
+          <span class="field-suffix">元</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">原生 input</label>
+        <input class="input" placeholder=".input">
+      </div>
+      <div class="field">
+        <label class="label">搜索框</label>
+        <div class="search-input">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M20 20l-4-4"/>
+          </svg>
+          <input placeholder="搜索...">
+          <button class="search-clear" type="button" style="display:none">×</button>
+        </div>
+    </div>
+    <div class="demo-col">
+      <div class="field">
+        <label class="label">文本域</label>
+        <textarea class="textarea" placeholder="多行输入"></textarea>
+      </div>
+      <div class="field">
+        <label class="label">数字输入</label>
+        <div class="number-input">
+          <button class="num-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><path d="M3 8h10"/></svg></button>
+          <input class="num-field" value="1" type="number">
+          <button class="num-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><path d="M3 8h10M8 3v10"/></svg></button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">密码强度</label>
+        <input class="input" type="password" value="abc123">
+        <div class="pwd-strength">
+          <div class="pwd-bars">
+            <div class="pwd-bar active-mid"></div>
+            <div class="pwd-bar active-mid"></div>
+            <div class="pwd-bar"></div>
+            <div class="pwd-bar"></div>
+          </div>
+          <div class="pwd-text mid">强度：中等</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 5. 选择器 ═══════ -->
+<section id="select"><h3><span class="n">5</span>选择器 Select</h3>
+  <div class="demo">
+    <div class="demo-col">
+      <label class="label">下拉选择</label>
+      <select class="select">
+        <option>选项一</option><option>选项二</option><option>选项三</option>
+      </select>
+      <label class="label">尺寸：小</label>
+      <select class="select select-sm">
+        <option>小尺寸</option>
+      </select>
+      <label class="label">尺寸：大</label>
+      <select class="select select-lg">
+        <option>大尺寸</option>
+      </select>
+    </div>
+    <div class="demo-col">
+      <label class="label">日期时间选择</label>
+      <div class="picker" id="dtp">
+        <button type="button" class="picker-input">
+          <svg class="picker-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="12" height="11" rx="2"/>
+            <path d="M2 6h12M5 1.5V4M11 1.5V4"/>
+          </svg>
+          <span class="picker-text"></span>
+          <span class="picker-clear"></span>
+        </button>
+
+        <div class="picker-panel">
+          <!-- Tab -->
+          <div class="picker-tabs">
+            <button class="picker-tab active" data-tab="date">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="3" width="12" height="11" rx="2"/>
+                <path d="M2 6h12M5 1.5V4M11 1.5V4"/>
+              </svg>
+              日期
+            </button>
+            <button class="picker-tab" data-tab="time">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 4v4l2.5 1.5"/>
+              </svg>
+              时间
+            </button>
+          </div>
+
+          <!-- 日期视图 -->
+          <div class="picker-view active" data-view="date">
+            <div class="picker-header">
+              <button class="picker-nav" data-nav="prev">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg>
+              </button>
+              <div class="picker-title">
+                <button id="btn-year">2026 年</button>
+                <span class="sep">·</span>
+                <button id="btn-month">10 月</button>
+              </div>
+              <button class="picker-nav" data-nav="next">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg>
+              </button>
+            </div>
+
+            <!-- 年视图 -->
+            <div class="picker-sub" data-sub="year">
+              <div class="picker-year-range" id="year-range">2020 — 2029</div>
+              <div class="picker-years" id="year-grid"></div>
+            </div>
+
+            <!-- 月视图 -->
+            <div class="picker-sub" data-sub="month">
+              <div class="picker-months" id="month-grid"></div>
+            </div>
+
+            <!-- 日视图 -->
+            <div class="picker-sub active" data-sub="day">
+              <div class="picker-weekdays">
+                <span class="picker-weekday wk">日</span>
+                <span class="picker-weekday">一</span>
+                <span class="picker-weekday">二</span>
+                <span class="picker-weekday">三</span>
+                <span class="picker-weekday">四</span>
+                <span class="picker-weekday">五</span>
+                <span class="picker-weekday wk">六</span>
+              </div>
+              <div class="picker-grid" id="day-grid"></div>
+            </div>
+          </div>
+
+          <!-- 时间视图 -->
+          <div class="picker-view" data-view="time">
+            <div class="clock-wrap">
+              <svg class="clock-svg" viewBox="0 0 240 240" id="clock">
+                <defs>
+                  <linearGradient id="clock-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2563eb"/>
+                    <stop offset="100%" stop-color="#4f46e5"/>
+                  </linearGradient>
+                </defs>
+                <circle class="clock-bg" cx="120" cy="120" r="115"/>
+                <g id="clock-ticks"></g>
+                <g id="clock-numbers"></g>
+                <line class="clock-hand" id="clock-hand" x1="120" y1="120" x2="120" y2="40"/>
+                <circle class="clock-hand-dot" id="clock-hand-dot" cx="120" cy="40" r="4"/>
+                <circle class="clock-center-ring" cx="120" cy="120" r="6"/>
+                <circle class="clock-center" cx="120" cy="120" r="3"/>
+              </svg>
+            </div>
+            <div class="clock-value">
+              <span id="v-h" class="active">11</span>
+              <span class="sep">:</span>
+              <span id="v-m">30</span>
+            </div>
+            <div class="clock-ampm">
+              <button data-ampm="am" class="active">AM</button>
+              <button data-ampm="pm">PM</button>
+            </div>
+          </div>
+
+          <!-- 底部 -->
+          <div class="picker-footer">
+            <button class="picker-link" data-now>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="8" cy="8" r="6"/>
+                <path d="M8 4v4l2.5 1.5"/>
+              </svg>
+              现在
+            </button>
+            <button class="picker-ok" data-ok>确定</button>
+          </div>
+        </div>
+      </div>
+      <label class="label">颜色</label>
+      <div class="cpicker" id="cp">
+        <button type="button" class="cpicker-input">
+          <span class="cpicker-swatch">
+            <span class="cpicker-swatch-fill"></span>
+          </span>
+          <span class="cpicker-text">#2563EB</span>
+          <svg class="cpicker-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </button>
+
+        <div class="cpicker-panel">
+          <!-- 饱和度-明度 -->
+          <div class="cpicker-sv" id="cp-sv">
+            <div class="cpicker-sv-bg"></div>
+            <div class="cpicker-sv-pointer" id="cp-sv-pointer"></div>
+          </div>
+
+          <!-- 色相 -->
+          <div class="cpicker-hue" id="cp-hue">
+            <div class="cpicker-hue-pointer" id="cp-hue-pointer"></div>
+          </div>
+
+          <!-- 透明度 -->
+          <div class="cpicker-alpha" id="cp-alpha">
+            <div class="cpicker-alpha-fill"></div>
+            <div class="cpicker-alpha-pointer" id="cp-alpha-pointer"></div>
+          </div>
+
+          <!-- 数值 -->
+          <div class="cpicker-values">
+            <div class="cpicker-field">
+              <span class="cpicker-field-label">HEX</span>
+              <input type="text" id="cp-hex" value="2563EB" maxlength="6">
+            </div>
+            <div class="cpicker-field">
+              <span class="cpicker-field-label">R</span>
+              <input type="number" id="cp-r" value="37" min="0" max="255">
+            </div>
+            <div class="cpicker-field">
+              <span class="cpicker-field-label">G</span>
+              <input type="number" id="cp-g" value="99" min="0" max="255">
+            </div>
+            <div class="cpicker-field">
+              <span class="cpicker-field-label">B</span>
+              <input type="number" id="cp-b" value="235" min="0" max="255">
+            </div>
+          </div>
+
+          <!-- 预设 -->
+          <div class="cpicker-presets">
+            <div class="cpicker-presets-title">常用色</div>
+            <div class="cpicker-presets-grid" id="cp-presets"></div>
+          </div>
+
+          <!-- 底部 -->
+          <div class="cpicker-footer">
+            <button class="cpicker-eyedropper" id="cp-eye">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 2l3 3-8 8-4 1 1-4 8-8z"/>
+                <path d="M9 4l3 3"/>
+              </svg>
+              吸管
+            </button>
+            <button class="cpicker-ok" id="cp-ok">确定</button>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<!-- ═══════ 6. 勾选/开关 ═══════ -->
+<section id="check"><h3><span class="n">6</span>勾选 / 单选 / 开关</h3>
+  <div class="demo">
+    <div class="demo-col">
+      <label class="checkbox"><input type="checkbox" checked> 已勾选</label>
+      <label class="checkbox"><input type="checkbox"> 未勾选</label>
+      <label class="radio"><input type="radio" name="r1" checked> 单选 A</label>
+      <label class="radio"><input type="radio" name="r1"> 单选 B</label>
+      <label class="switch-label">
+        <button class="switch on" onclick="this.classList.toggle('on')"><span class="switch-thumb"></span></button>
+        启用
+      </label>
+      <label class="switch-label">
+        <button class="switch" onclick="this.classList.toggle('on')"><span class="switch-thumb"></span></button>
+        关闭
+      </label>
+    </div>
+    <div class="demo-col">
+      <label class="checkbox card on">
+        <input type="checkbox" checked>
+        <div class="cb-content">
+          <div class="cb-title">卡片勾选</div>
+          <div class="cb-desc">说明文字</div>
+        </div>
+      </label>
+      <label class="checkbox card">
+        <input type="checkbox">
+        <div class="cb-content">
+          <div class="cb-title">未选中卡片</div>
+          <div class="cb-desc">说明文字</div>
+        </div>
+      </label>
+    </div>
+    <div class="demo-col">
+      <div class="radio-group">
+        <button class="rd-button on">日</button>
+        <button class="rd-button">周</button>
+        <button class="rd-button">月</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 7. 评分/滑块 ═══════ -->
+<section id="rate"><h3><span class="n">7</span>评分 / 滑块</h3>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="rate">
+      <span class="rate-star active">★</span>
+      <span class="rate-star active">★</span>
+      <span class="rate-star active">★</span>
+      <span class="rate-star active">★</span>
+      <span class="rate-star">★</span>
+      <span class="rate-text">4.0 分</span>
+    </div>
+    <div class="rate rate-lg">
+      <span class="rate-star active">★</span>
+      <span class="rate-star active">★</span>
+      <span class="rate-star">★</span>
+      <span class="rate-star">★</span>
+      <span class="rate-star">★</span>
+    </div>
+  </div>
+  <div class="demo-col" style="width:100%;max-width:400px">
+    <label class="label">音量</label>
+    <div class="slider">
+      <input type="range" min="0" max="100" value="65">
+      <span class="slider-value">65%</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 8. 卡片 ═══════ -->
+<section id="card"><h3><span class="n">8</span>卡片 Card</h3>
+  <div class="grid-auto">
+    <div class="card">
+      <div class="card-title">普通卡片</div>
+      <div class="card-desc">基础样式</div>
+    </div>
+    <div class="card card-hover">
+      <div class="card-title">悬停卡片</div>
+      <div class="card-desc">鼠标移上来浮起</div>
+    </div>
+    <div class="card card-flat">
+      <div class="card-title">扁平卡片</div>
+      <div class="card-desc">灰底无边框</div>
+    </div>
+    <div class="card card-tone-primary">
+      <div class="card-title">主色卡片</div>
+      <div class="card-desc">左侧色条</div>
+    </div>
+    <div class="card card-tone-success">
+      <div class="card-title">成功卡片</div>
+      <div class="card-desc">左侧色条</div>
+    </div>
+    <div class="card card-tone-warning">
+      <div class="card-title">警告卡片</div>
+      <div class="card-desc">左侧色条</div>
+    </div>
+    <div class="card card-tone-danger">
+      <div class="card-title">危险卡片</div>
+      <div class="card-desc">左侧色条</div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">带头部</span>
+        <span class="tag tag-primary">NEW</span>
+      </div>
+      <div class="card-desc">头部有分隔线</div>
+      <div class="card-footer">
+        <button class="btn btn-sm">取消</button>
+        <button class="btn btn-sm btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 9. 标签/徽章 ═══════ -->
+<section id="tag"><h3><span class="n">9</span>标签 / 徽章</h3>
+  <h4 style="margin:8px 0">Tag</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <span class="tag">默认</span>
+    <span class="tag tag-primary">主色</span>
+    <span class="tag tag-success">成功</span>
+    <span class="tag tag-warning">警告</span>
+    <span class="tag tag-danger">危险</span>
+    <span class="tag tag-info">信息</span>
+    <span class="tag tag-purple">紫</span>
+    <span class="tag tag-pink">粉</span>
+    <span class="tag tag-primary tag-solid">实心</span>
+    <span class="tag tag-success tag-solid">实心</span>
+    <span class="tag tag-primary tag-outline">描边</span>
+    <span class="tag tag-danger tag-round">圆角</span>
+    <span class="tag tag-primary tag-lg">大号</span>
+    <span class="tag tag-primary tag-sm">小号</span>
+    <span class="tag tag-primary tag-xs">超小</span>
+    <span class="tag tag-primary"><span class="tag-dot"></span>圆点</span>
+    <span class="tag tag-primary">可关闭<span class="tag-close">×</span></span>
+  </div>
+  <h4 style="margin:8px 0">Badge</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <span class="badge">5</span>
+    <span class="badge badge-primary">8</span>
+    <span class="badge badge-success">12</span>
+    <span class="badge badge-warning">99+</span>
+    <span class="badge badge-danger">3</span>
+    <span class="badge badge-info">新</span>
+    <span class="badge badge-muted">灰</span>
+    <span class="badge badge-dot"></span>
+    <span class="badge badge-primary badge-dot"></span>
+    <span class="badge badge-success badge-dot"></span>
+    <span class="badge badge-danger badge-pulse">脉冲</span>
+    <span class="badge badge-lg badge-primary">大</span>
+    <span class="badge badge-sm badge-danger">小</span>
+  </div>
+  <h4 style="margin:8px 0">定位徽章</h4>
+  <div class="demo">
+    <span class="badge-wrap"><button class="btn">消息</button><span class="badge">5</span></span>
+    <span class="badge-wrap"><button class="btn btn-primary">通知</button><span class="badge badge-success">99+</span></span>
+    <span class="badge-wrap"><div class="avatar">AB</div><span class="badge badge-danger badge-dot"></span></span>
+    <span class="badge-wrap"><div class="avatar">CD</div><span class="badge badge-success">3</span></span>
+  </div>
+</section>
+
+<!-- ═══════ 10. 提示 ═══════ -->
+<section id="alert"><h3><span class="n">10</span>提示 Alert</h3>
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:680px">
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ</span>
+      <div class="alert-body"><div class="alert-title">信息提示</div><div class="alert-desc">这是一段说明文字。</div></div>
+    </div>
+    <div class="alert alert-success">
+      <span class="alert-icon">✓</span>
+      <div class="alert-body"><div class="alert-title">操作成功</div></div>
+    </div>
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠</span>
+      <div class="alert-body"><div class="alert-title">注意</div><div class="alert-desc">操作不可撤销。</div></div>
+    </div>
+    <div class="alert alert-danger">
+      <span class="alert-icon">✕</span>
+      <div class="alert-body"><div class="alert-title">错误</div></div>
+      <button class="alert-close">×</button>
+    </div>
+    <div class="alert alert-info alert-solid">
+      <span class="alert-icon">ℹ</span>
+      <div class="alert-body">实心样式</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 11. 头像 ═══════ -->
+<section id="avatar"><h3><span class="n">11</span>头像 Avatar</h3>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="avatar avatar-xs">XS</div>
+    <div class="avatar avatar-sm">S</div>
+    <div class="avatar">MD</div>
+    <div class="avatar avatar-lg">LG</div>
+    <div class="avatar avatar-xl">XL</div>
+    <div class="avatar avatar-square">方</div>
+    <div class="avatar avatar-muted">灰</div>
+  </div>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="avatar-group">
+      <div class="avatar">A</div><div class="avatar">B</div>
+      <div class="avatar">C</div><div class="avatar">D</div>
+      <div class="avatar avatar-more">+5</div>
+    </div>
+  </div>
+  <div class="demo">
+    <div class="avatar avatar-status">在线</div>
+    <div class="avatar avatar-status offline">离线</div>
+    <div class="avatar avatar-status busy">忙</div>
+    <div class="avatar avatar-status away">暂</div>
+  </div>
+</section>
+
+<!-- ═══════ 12. 进度 ═══════ -->
+<section id="progress"><h3><span class="n">12</span>进度 Progress</h3>
+  <div style="display:flex;flex-direction:column;gap:14px;max-width:600px">
+    <div class="progress"><div class="progress-bar" style="width:65%"></div></div>
+    <div class="progress progress-sm"><div class="progress-bar" style="width:40%"></div></div>
+    <div class="progress progress-lg"><div class="progress-bar" style="width:75%"></div></div>
+    <div class="progress progress-xl"><div class="progress-bar" data-pct="85%" style="width:85%"></div></div>
+    <div class="progress progress-success"><div class="progress-bar" style="width:100%"></div></div>
+    <div class="progress progress-warning"><div class="progress-bar" style="width:60%"></div></div>
+    <div class="progress progress-danger"><div class="progress-bar" style="width:30%"></div></div>
+    <div class="progress progress-info progress-striped"><div class="progress-bar" style="width:70%"></div></div>
+    <div class="progress progress-indeterminate"><div class="progress-bar"></div></div>
+  </div>
+  <div class="demo" style="margin-top:20px;gap:28px">
+    <div class="progress-line" style="width:280px">
+      <div class="progress"><div class="progress-bar" style="width:65%"></div></div>
+      <span class="progress-label">65%</span>
+    </div>
+    <div class="progress-circle">
+      <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="157" stroke-dashoffset="39"/></svg>
+      <span class="val">75%</span>
+    </div>
+    <div class="progress-circle success">
+      <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="157" stroke-dashoffset="16"/></svg>
+      <span class="val">90%</span>
+    </div>
+    <div class="progress-circle danger">
+      <svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="25"/><circle class="fg" cx="28" cy="28" r="25" stroke-dasharray="157" stroke-dashoffset="110"/></svg>
+      <span class="val">30%</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 13. 骨架 ═══════ -->
+<section id="skeleton"><h3><span class="n">13</span>骨架 Skeleton</h3>
+  <div class="demo">
+    <div style="width:280px">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text" style="width:80%"></div>
+      <div class="skeleton skeleton-text" style="width:60%"></div>
+    </div>
+    <div class="skeleton-group" style="width:280px">
+      <div class="skeleton skeleton-avatar"></div>
+      <div class="skeleton-content">
+        <div class="skeleton skeleton-text" style="width:40%"></div>
+        <div class="skeleton skeleton-text" style="width:90%"></div>
+      </div>
+    </div>
+    <div style="width:200px">
+      <div class="skeleton skeleton-image"></div>
+    </div>
+  </div>
+  <div class="demo" style="margin-top:16px">
+    <div class="spinner"></div>
+    <div class="spinner spinner-sm"></div>
+    <div class="spinner spinner-lg"></div>
+    <div class="spinner-dots"><i></i><i></i><i></i></div>
+    <div class="spinner-pulse"></div>
+  </div>
+</section>
+
+<!-- ═══════ 14. 空状态/结果 ═══════ -->
+<section id="empty"><h3><span class="n">14</span>空状态 / 结果</h3>
+  <div class="demo" style="align-items:flex-start">
+    <div class="empty" style="width:280px">
+      <div class="empty-icon">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" width="56" height="56">
+          <path d="M8 20L32 8l24 12v24L32 56 8 44V20z"/>
+          <path d="M8 20l24 12 24-12M32 32v24"/>
+        </svg>
+      </div>
+      <div class="empty-title">暂无数据</div>
+      <div class="empty-desc">还没有任何内容</div>
+      <button class="btn btn-primary btn-sm">新建</button>
+    </div>
+    <div class="result" style="width:280px">
+      <div class="result-icon success">✓</div>
+      <div class="result-title">操作成功</div>
+      <div class="result-desc">所有数据已保存</div>
+      <div class="result-actions">
+        <button class="btn">返回</button>
+        <button class="btn btn-primary">继续</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 15. 表格 ═══════ -->
+<section id="table"><h3><span class="n">15</span>表格 Table</h3>
+  <div class="table-wrap" style="margin-bottom:16px">
+    <table class="table">
+      <thead><tr><th>名称</th><th>状态</th><th>金额</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td>张三</td><td><span class="badge badge-success">正常</span></td><td class="num">￥1,280</td><td class="actions"><a href="#">详情</a></td></tr>
+        <tr><td>李四</td><td><span class="badge badge-warning">待审</span></td><td class="num">￥860</td><td class="actions"><a href="#">详情</a></td></tr>
+        <tr><td>王五</td><td><span class="badge badge-danger">冻结</span></td><td class="num">￥3,420</td><td class="actions"><a href="#">详情</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h4 style="margin:12px 0">斑马纹</h4>
+  <table class="table table-striped">
+    <thead><tr><th>ID</th><th>名称</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>项目 A</td><td>进行中</td></tr>
+      <tr><td>2</td><td>项目 B</td><td>已完成</td></tr>
+      <tr><td>3</td><td>项目 C</td><td>已取消</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══════ 16. 列表 ═══════ -->
+<section id="list"><h3><span class="n">16</span>列表 List</h3>
+  <div class="list" style="max-width:560px;border:1px solid var(--x-line);border-radius:10px">
+    <div class="list-item">
+      <div class="avatar">张</div>
+      <div class="list-item-main">
+        <div class="list-item-title">张三</div>
+        <div class="list-item-desc">项目经理 · 3 小时前</div>
+      </div>
+      <div class="list-item-action"><span class="badge badge-success">在线</span></div>
+    </div>
+    <div class="list-item">
+      <div class="avatar avatar-info">李</div>
+      <div class="list-item-main">
+        <div class="list-item-title">李四</div>
+        <div class="list-item-desc">设计师 · 昨天</div>
+      </div>
+      <div class="list-item-action"><span class="badge badge-muted">离线</span></div>
+    </div>
+    <div class="list-item">
+      <div class="avatar avatar-warning">王</div>
+      <div class="list-item-main">
+        <div class="list-item-title">王五</div>
+        <div class="list-item-desc">开发 · 2 天前</div>
+      </div>
+      <div class="list-item-action"><span class="badge badge-warning">忙</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 17. 时间线 ═══════ -->
+<section id="timeline"><h3><span class="n">17</span>时间线 Timeline</h3>
+  <div class="demo" style="align-items:flex-start">
+    <ul class="timeline" style="width:320px">
+      <li class="timeline-item done">
+        <div class="timeline-time">2026-10-15 09:12</div>
+        <div class="timeline-title">创建订单</div>
+        <div class="timeline-desc">订单已创建，等待支付</div>
+      </li>
+      <li class="timeline-item done">
+        <div class="timeline-time">2026-10-15 10:30</div>
+        <div class="timeline-title">支付成功</div>
+        <div class="timeline-desc">已支付 ￥1,280</div>
+      </li>
+      <li class="timeline-item active">
+        <div class="timeline-time">2026-10-16 11:30</div>
+        <div class="timeline-title">派送中</div>
+        <div class="timeline-desc">配送员已取件</div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-time">预计今天</div>
+        <div class="timeline-title">送达</div>
+      </li>
+    </ul>
+    <ul class="timeline" style="width:320px">
+      <li class="timeline-item"><div class="timeline-title">默认节点</div></li>
+      <li class="timeline-item done"><div class="timeline-title">成功节点</div></li>
+      <li class="timeline-item warning"><div class="timeline-title">警告节点</div></li>
+      <li class="timeline-item error"><div class="timeline-title">错误节点</div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════ 18. 树 ═══════ -->
+<section id="tree"><h3><span class="n">18</span>树 Tree</h3>
+  <ul class="tree" style="max-width:400px;padding:12px;border:1px solid var(--x-line);border-radius:10px">
+    <li class="tree-node open">
+      <div class="tree-content"><span class="tree-arrow">›</span><span class="tree-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 4a1 1 0 011-1h3l2 2h5a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/></svg></span><span class="tree-label">src</span></div>
+      <ul class="tree-children">
+        <li class="tree-node open">
+          <div class="tree-content"><span class="tree-arrow">›</span><span class="tree-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M2 4a1 1 0 011-1h3l2 2h5a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/></svg></span><span class="tree-label">Kit</span></div>
+          <ul class="tree-children">
+            <li class="tree-node"><div class="tree-content selected"><span class="tree-arrow leaf">›</span><span class="tree-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5L9 1z"/><path d="M9 1v4h4"/></svg></span><span class="tree-label">base.js</span></div></li>
+            <li class="tree-node"><div class="tree-content"><span class="tree-arrow leaf">›</span><span class="tree-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5L9 1z"/><path d="M9 1v4h4"/></svg></span><span class="tree-label">form.js</span></div></li>
+          </ul>
+        </li>
+        <li class="tree-node"><div class="tree-content"><span class="tree-arrow leaf">›</span><span class="tree-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5L9 1z"/><path d="M9 1v4h4"/></svg></span><span class="tree-label">index.js</span></div></li>
+      </ul>
+    </li>
+  </ul>
+</section>
+
+<!-- ═══════ 19. 描述列表 ═══════ -->
+<section id="desc"><h3><span class="n">19</span>描述列表 Descriptions</h3>
+  <div class="descriptions descriptions-3" style="max-width:800px">
+    <div class="descriptions-item"><div class="descriptions-label">用户名</div><div class="descriptions-value">zhangsan</div></div>
+    <div class="descriptions-item"><div class="descriptions-label">邮箱</div><div class="descriptions-value">z@example.com</div></div>
+    <div class="descriptions-item"><div class="descriptions-label">角色</div><div class="descriptions-value">管理员</div></div>
+    <div class="descriptions-item"><div class="descriptions-label">部门</div><div class="descriptions-value">技术部</div></div>
+    <div class="descriptions-item"><div class="descriptions-label">创建时间</div><div class="descriptions-value">2026-10-15 09:12</div></div>
+    <div class="descriptions-item"><div class="descriptions-label">状态</div><div class="descriptions-value"><span class="badge badge-success">正常</span></div></div>
+  </div>
+</section>
+
+<!-- ═══════ 20. 统计 ═══════ -->
+<section id="stat"><h3><span class="n">20</span>统计 Stat / Count</h3>
+  <div class="stat-grid" style="margin-bottom:16px">
+    <div class="stat">
+      <div class="stat-title">总销售额</div>
+      <div class="stat-value">￥128,640</div>
+      <div class="stat-footer"><span class="stat-trend up">↑ 12.5%</span> 较上月</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">订单数</div>
+      <div class="stat-value">1,286</div>
+      <div class="stat-footer"><span class="stat-trend down">↓ 3.2%</span> 较上月</div>
+    </div>
+    <div class="stat stat-inline">
+      <div class="stat-icon">👥</div>
+      <div class="stat-body">
+        <div class="stat-title">用户数</div>
+        <div class="stat-value">8,942</div>
+      </div>
+    </div>
+  </div>
+  <div class="demo">
+    <span class="count count-xl count-primary">128,640</span>
+    <span class="count count-lg count-success">99.9%</span>
+    <span class="count count-md count-danger">−3.2%</span>
+    <span class="count count-sm">1,286</span>
+  </div>
+</section>
+
+<!-- ═══════ 21. 标签页 ═══════ -->
+<section id="tabs"><h3><span class="n">21</span>标签页 Tabs</h3>
+  <div class="tabs" style="margin-bottom:16px">
+    <button class="tab active">全部 <span class="badge badge-primary">12</span></button>
+    <button class="tab">未读 <span class="badge">3</span></button>
+    <button class="tab">已读</button>
+    <button class="tab">垃圾</button>
+  </div>
+  <div class="tabs-pill" style="margin-bottom:16px;display:inline-flex">
+    <button class="tab active">日</button><button class="tab">周</button>
+    <button class="tab">月</button><button class="tab">年</button>
+  </div>
+  <div class="segment" style="display:inline-flex">
+    <button class="segment-item active">列表</button>
+    <button class="segment-item">网格</button>
+    <button class="segment-item">时间</button>
+  </div>
+</section>
+
+<!-- ═══════ 22. 步骤条 ═══════ -->
+<section id="step"><h3><span class="n">22</span>步骤条 Steps</h3>
+  <div class="steps" style="margin-bottom:24px">
+    <div class="step done"><span class="step-num">✓</span><div class="step-body"><div class="step-title">填写信息</div><div class="step-desc">已完成</div></div></div>
+    <div class="step active"><span class="step-num">2</span><div class="step-body"><div class="step-title">确认订单</div><div class="step-desc">进行中</div></div></div>
+    <div class="step"><span class="step-num">3</span><div class="step-body"><div class="step-title">支付</div></div></div>
+    <div class="step"><span class="step-num">4</span><div class="step-body"><div class="step-title">完成</div></div></div>
+  </div>
+  <div class="steps" style="margin-bottom:24px">
+    <div class="step done"><span class="step-num">✓</span><div class="step-body"><div class="step-title">步骤一</div></div></div>
+    <div class="step error"><span class="step-num">✕</span><div class="step-body"><div class="step-title">步骤二出错</div></div></div>
+    <div class="step"><span class="step-num">3</span><div class="step-body"><div class="step-title">步骤三</div></div></div>
+  </div>
+  <div class="steps steps-dot" style="max-width:400px">
+    <div class="step done"><span class="step-num"></span><div class="step-body"><div class="step-title">一</div></div></div>
+    <div class="step active"><span class="step-num"></span><div class="step-body"><div class="step-title">二</div></div></div>
+    <div class="step"><span class="step-num"></span><div class="step-body"><div class="step-title">三</div></div></div>
+  </div>
+</section>
+
+<!-- ═══════ 23. 分页 ═══════ -->
+<section id="page"><h3><span class="n">23</span>分页 Pagination</h3>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="pagination">
+      <button disabled>‹</button>
+      <button class="active">1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>›</button>
+    </div>
+  </div>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="pagination">
+      <button>‹</button><button class="active">1</button><button>2</button><button>3</button>
+      <span class="page-ellipsis">…</span><button>20</button><button>›</button>
+    </div>
+  </div>
+  <div class="pagination-bar" style="max-width:680px">
+    <span class="page-total">共 248 条</span>
+    <div class="pagination pagination-sm">
+      <button>‹</button><button class="active">1</button><button>2</button><button>›</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 24. 面包屑 ═══════ -->
+<section id="crumb"><h3><span class="n">24</span>面包屑 Breadcrumb</h3>
+  <div class="breadcrumb breadcrumb-slash" style="margin-bottom:12px">
+    <div class="breadcrumb-item"><a href="#">首页</a></div>
+    <div class="breadcrumb-sep"></div>
+    <div class="breadcrumb-item"><a href="#">列表</a></div>
+    <div class="breadcrumb-sep"></div>
+    <div class="breadcrumb-item current">详情</div>
+  </div>
+  <div class="breadcrumb breadcrumb-chevron breadcrumb-bg">
+    <div class="breadcrumb-item"><a href="#">🏠 首页</a></div>
+    <div class="breadcrumb-sep"></div>
+    <div class="breadcrumb-item"><a href="#">产品</a></div>
+    <div class="breadcrumb-sep"></div>
+    <div class="breadcrumb-item current">iPhone 16</div>
+  </div>
+</section>
+
+<!-- ═══════ 25. 菜单 ═══════ -->
+<section id="menu"><h3><span class="n">25</span>菜单 Menu</h3>
+  <div class="demo" style="align-items:flex-start;gap:20px">
+    <div class="menu" style="width:200px;border:1px solid var(--x-line);border-radius:10px">
+      <div class="menu-label">文件</div>
+      <div class="menu-item active"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M9 1H4a1 1 0 00-1 1v12a1 1 0 001 1h8a1 1 0 001-1V5L9 1z"/><path d="M9 1v4h4"/></svg></span>新建<span class="menu-shortcut">⌘N</span></div>
+      <div class="menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M2 4a1 1 0 011-1h3l2 2h5a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/></svg></span>打开<span class="menu-shortcut">⌘O</span></div>
+      <div class="menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M3 2h8l3 3v9H3V2z"/><path d="M6 2v5h4V2M6 12h4"/></svg></span>保存<span class="menu-shortcut">⌘S</span></div>
+      <div class="menu-divider"></div>
+      <div class="menu-label">编辑</div>
+      <div class="menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><path d="M4 10L11 3M12 10L5 3"/></svg></span>剪切</div>
+      <div class="menu-item disabled"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="4" y="3" width="9" height="12" rx="1"/><path d="M6 3V2a1 1 0 011-1h3a1 1 0 011 1v1"/></svg></span>粘贴</div>
+    </div>
+    <div class="menu-popup" style="position:relative;display:inline-block">
+      <div class="menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><circle cx="8" cy="5.5" r="3"/><path d="M2 15c0-3 3-5 6-5s6 2 6 5"/></svg></span>个人资料</div>
+      <div class="menu-item"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M3 13l1.5-1.5M11.5 4.5L13 3"/></svg></span>设置</div>
+      <div class="menu-divider"></div>
+      <div class="menu-item danger" style="color:var(--x-danger)"><span class="menu-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M6 2H3v12h3M11 5l4 3-4 3M7 8h8"/></svg></span>退出登录</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 26. 折叠面板 ═══════ -->
+<section id="accordion"><h3><span class="n">26</span>折叠面板 Accordion</h3>
+  <div class="accordion" style="max-width:640px">
+    <div class="accordion-item open" aria-expanded="true">
+      <button class="accordion-trigger">什么是 XuNay？<span class="accordion-arrow">▾</span></button>
+      <div class="accordion-body">XuNay 是一个现代化的前端框架，支持响应式、信号式状态管理。</div>
+    </div>
+    <div class="accordion-item" aria-expanded="false">
+      <button class="accordion-trigger">如何安装？<span class="accordion-arrow">▾</span></button>
+      <div class="accordion-body">npm install xunay</div>
+    </div>
+    <div class="accordion-item" aria-expanded="false">
+      <button class="accordion-trigger">许可协议<span class="accordion-arrow">▾</span></button>
+      <div class="accordion-body">MIT License</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 27. 下拉菜单 ═══════ -->
+<section id="drop"><h3><span class="n">27</span>下拉菜单 Dropdown</h3>
+  <div class="dropdown" style="position:relative;display:inline-block">
+    <button class="btn btn-primary" data-dropdown>操作 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="10" height="10" style="margin-left:4px"><path d="M4 6l4 4 4-4"/></svg></button>
+    <div class="dropdown-menu" style="position:absolute;top:100%;left:0;margin-top:6px">
+      <div class="dropdown-item"><span class="dropdown-item-icon">✏</span>编辑</div>
+      <div class="dropdown-item"><span class="dropdown-item-icon">📋</span>复制<span class="shortcut">⌘C</span></div>
+      <div class="dropdown-item"><span class="dropdown-item-icon">📤</span>导出</div>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-item danger" style="color:var(--x-danger)"><span class="dropdown-item-icon">🗑</span>删除</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 28. 提示气泡 ═══════ -->
+<section id="ttip"><h3><span class="n">28</span>提示气泡 / 弹出</h3>
+  <div class="demo" style="align-items:flex-start;gap:20px;flex-wrap:wrap">
+    <button class="btn" data-tooltip="这是提示信息" data-side="top">鼠标悬停看提示</button>
+    <button class="btn btn-primary" data-tooltip="主色提示" data-side="bottom">下方提示</button>
+    <button class="btn" data-tooltip="支持 ⌘K 快捷键" data-side="top">带快捷键</button>
+    <div class="popover" style="position:relative;display:inline-block;width:240px" data-side="bottom">
+      <div class="popover-header">弹出标题<button class="popover-close">×</button></div>
+      <div class="popover-body">这是弹出层内容。</div>
+      <div class="popover-footer"><button class="btn btn-sm">取消</button><button class="btn btn-sm btn-primary">确定</button></div>
+    </div>
+    <div class="popconfirm" style="position:relative;display:inline-block">
+      <div class="popconfirm-title"><span class="popconfirm-icon">⚠</span>确定删除？</div>
+      <div class="popconfirm-desc">删除后不可恢复。</div>
+      <div class="popconfirm-actions"><button class="btn btn-sm">取消</button><button class="btn btn-sm btn-danger">删除</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 29. 代码 / 编辑器 ═══════ -->
+<section id="code"><h3><span class="n">29</span>代码 / JSON</h3>
+
+  <p style="margin:8px 0">行内代码：<code>const a = 1</code>，快捷键 <kbd>Ctrl</kbd>+<kbd>S</kbd></p>
+
+  <div class="code-block" style="margin-top:16px">
+    <div class="code-block-header">
+      <div class="code-block-dots"><span></span><span></span><span></span></div>
+      <span class="code-block-title">hello.js</span>
+      <span class="code-block-lang">JavaScript</span>
+      <button class="code-block-copy">复制</button>
+    </div>
+    <pre class="code-pre code-lines"><code><span class="line"><span class="tok-comment">// 打招呼函数</span></span><span class="line"><span class="tok-keyword">function</span> <span class="tok-function">hello</span><span class="tok-punctuation">(</span><span class="tok-variable">name</span><span class="tok-punctuation">)</span> <span class="tok-punctuation">{</span></span><span class="line">  <span class="tok-keyword">const</span> <span class="tok-variable">msg</span> <span class="tok-operator">=</span> <span class="tok-string">`Hello, ${name}!`</span><span class="tok-punctuation">;</span></span><span class="line">  <span class="tok-builtin">console</span><span class="tok-punctuation">.</span><span class="tok-function">log</span><span class="tok-punctuation">(</span><span class="tok-variable">msg</span><span class="tok-punctuation">);</span></span><span class="line">  <span class="tok-keyword">return</span> <span class="tok-punctuation">{</span> <span class="tok-property">ok</span><span class="tok-punctuation">:</span> <span class="tok-boolean">true</span><span class="tok-punctuation">,</span> <span class="tok-property">data</span><span class="tok-punctuation">:</span> <span class="tok-punctuation">[</span><span class="tok-number">1</span><span class="tok-punctuation">,</span> <span class="tok-number">2</span><span class="tok-punctuation">,</span> <span class="tok-number">3</span><span class="tok-punctuation">]</span> <span class="tok-punctuation">};</span></span><span class="line"><span class="tok-punctuation">}</span></span></code></pre>
+  </div>
+
+  <div class="code-block dark" style="margin-top:16px">
+    <div class="code-block-header">
+      <div class="code-block-dots"><span></span><span></span><span></span></div>
+      <span class="code-block-title">dark.py</span>
+      <span class="code-block-lang">Python</span>
+      <button class="code-block-copy">复制</button>
+    </div>
+    <pre class="code-pre"><code><span class="tok-keyword">def</span> <span class="tok-function">fib</span><span class="tok-punctuation">(</span><span class="tok-variable">n</span><span class="tok-punctuation">):</span>
+    <span class="tok-keyword">if</span> <span class="tok-variable">n</span> <span class="tok-operator">&lt;</span> <span class="tok-number">2</span><span class="tok-punctuation">:</span>
+        <span class="tok-keyword">return</span> <span class="tok-variable">n</span>
+    <span class="tok-keyword">return</span> <span class="tok-function">fib</span><span class="tok-punctuation">(</span><span class="tok-variable">n</span><span class="tok-operator">-</span><span class="tok-number">1</span><span class="tok-punctuation">)</span> <span class="tok-operator">+</span> <span class="tok-function">fib</span><span class="tok-punctuation">(</span><span class="tok-variable">n</span><span class="tok-operator">-</span><span class="tok-number">2</span><span class="tok-punctuation">)</span></code></pre>
+  </div>
+
+  <h4 style="margin:20px 0 8px">JSON 查看</h4>
+  <div class="json-viewer" style="max-height:220px">
+<span class="json-punct">{</span>
+  <span class="json-key">"name"</span><span class="json-punct">:</span> <span class="json-string">"张三"</span><span class="json-punct">,</span>
+  <span class="json-key">"age"</span><span class="json-punct">:</span> <span class="json-number">28</span><span class="json-punct">,</span>
+  <span class="json-key">"active"</span><span class="json-punct">:</span> <span class="json-boolean">true</span><span class="json-punct">,</span>
+  <span class="json-key">"tags"</span><span class="json-punct">:</span> <span class="json-bracket">[</span><span class="json-string">"admin"</span><span class="json-punct">,</span> <span class="json-string">"dev"</span><span class="json-bracket">]</span>
+<span class="json-punct">}</span>
+  </div>
+</section>
+
+<!-- ═══════ 30. 编辑器 ═══════ -->
+<section id="editor"><h3><span class="n">30</span>编辑器 Editor</h3>
+  <div class="rich-text" style="max-width:680px;margin-bottom:16px">
+    <div class="rich-text-toolbar">
+      <button class="rich-text-tool active">B</button>
+      <button class="rich-text-tool"><em>I</em></button>
+      <button class="rich-text-tool"><u>U</u></button>
+      <span class="rich-text-divider"></span>
+      <button class="rich-text-tool">H1</button>
+      <button class="rich-text-tool">H2</button>
+      <span class="rich-text-divider"></span>
+      <button class="rich-text-tool">≡</button>
+      <button class="rich-text-tool">1.</button>
+      <span class="rich-text-divider"></span>
+      <button class="rich-text-tool">🔗</button>
+      <button class="rich-text-tool">📷</button>
+    </div>
+    <div class="rich-text-body" contenteditable="true">
+      <h2>富文本编辑器</h2>
+      <p>这是一个<b>富文本</b>编辑器示例，支持 <i>斜体</i>、<u>下划线</u>、<a href="#">链接</a> 等格式。</p>
+      <ul><li>支持列表</li><li>支持引用</li></ul>
+    </div>
+  </div>
+
+  <div class="terminal" style="max-width:680px;margin-bottom:16px">
+    <div class="terminal-header">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">bash — ~/xunay</span>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-command">npm run build</span></div>
+      <div class="terminal-line terminal-info">› 编译中...</div>
+      <div class="terminal-line terminal-success">✓ 构建完成 (1.28s)</div>
+      <div class="terminal-line"><span class="terminal-prompt">$</span><span class="terminal-cursor"></span></div>
+    </div>
+  </div>
+
+  <div class="demo">
+    <button class="copy-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="4" y="3" width="9" height="12" rx="1"/><path d="M6 3V2a1 1 0 011-1h3a1 1 0 011 1v1"/></svg> 复制</button>
+    <button class="copy-btn copy-btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="4" y="3" width="9" height="12" rx="1"/><path d="M6 3V2a1 1 0 011-1h3a1 1 0 011 1v1"/></svg></button>
+    <div class="split-btn">
+      <button class="split-btn-main"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><path d="M3 2h8l3 3v9H3V2z"/><path d="M6 2v5h4V2M6 12h4"/></svg> 保存</button>
+      <span class="split-btn-divider"></span>
+      <button class="split-btn-arrow">▾</button>
+    </div>
+    <div class="split-btn split-btn-primary">
+      <button class="split-btn-main">部署</button>
+      <span class="split-btn-divider"></span>
+      <button class="split-btn-arrow">▾</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 31. 渐变/玻璃 ═══════ -->
+<section id="animate"><h3><span class="n">✦</span>动画 Animation</h3>
+
+  <p style="margin:8px 0;color:var(--x-fg-dim);font-size:13px">
+    用法：<code>&lt;div class="animate-fade-in"&gt;</code> 加 class 就动
+  </p>
+
+  <h4 style="margin:20px 0 8px">进入动画 · 淡入</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="animate-fade-in-up delay-100" style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">fade-in-up</div>
+    <div class="animate-fade-in-down delay-200" style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">fade-in-down</div>
+    <div class="animate-fade-in-left delay-300" style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">fade-in-left</div>
+    <div class="animate-fade-in-right delay-400" style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">fade-in-right</div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">进入 · 缩放 / 翻转 / 弹跳</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="animate-zoom-in delay-100" style="padding:12px 20px;background:var(--x-success-soft);border-radius:8px;color:var(--x-success)">zoom-in</div>
+    <div class="animate-flip-in-x delay-200" style="padding:12px 20px;background:var(--x-warning-soft);border-radius:8px;color:var(--x-warning)">flip-in-x</div>
+    <div class="animate-rotate-in delay-300" style="padding:12px 20px;background:var(--x-warning-soft);border-radius:8px;color:var(--x-warning)">rotate-in</div>
+    <div class="animate-bounce-in delay-400" style="padding:12px 20px;background:var(--x-danger-soft);border-radius:8px;color:var(--x-danger)">bounce-in</div>
+    <div class="animate-rubber-band delay-500" style="padding:12px 20px;background:var(--x-danger-soft);border-radius:8px;color:var(--x-danger)">rubber-band</div>
+    <div class="animate-blur-in delay-700" style="padding:12px 20px;background:var(--x-info-soft);border-radius:8px;color:var(--x-info)">blur-in</div>
+    <div class="animate-jack-in-box delay-1000" style="padding:12px 20px;background:var(--x-purple-soft);border-radius:8px;color:var(--x-purple)">jack-in-box</div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">注意力</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="animate-shake" style="padding:12px 20px;background:var(--x-warning-soft);border-radius:8px;color:var(--x-warning)">shake</div>
+    <div class="animate-pulse" style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">pulse</div>
+    <div class="animate-bounce" style="padding:12px 20px;background:var(--x-success-soft);border-radius:8px;color:var(--x-success)">bounce</div>
+    <div class="animate-tada" style="padding:12px 20px;background:var(--x-purple-soft);border-radius:8px;color:var(--x-purple)">tada</div>
+    <div class="animate-heartbeat" style="padding:12px 20px;background:var(--x-danger-soft);border-radius:8px;color:var(--x-danger)">heartbeat</div>
+    <div class="animate-jello" style="padding:12px 20px;background:var(--x-pink-soft);border-radius:8px;color:var(--x-pink)">jello</div>
+    <div class="animate-blink" style="padding:12px 20px;background:var(--x-warning-soft);border-radius:8px;color:var(--x-warning)">blink</div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">循环</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="animate-spin" style="width:40px;height:40px;border:3px solid var(--x-line);border-top-color:var(--x-primary);border-radius:50%"></div>
+    <div class="animate-float" style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">float</div>
+    <div class="animate-float-x" style="padding:12px 20px;background:var(--x-success-soft);border-radius:8px;color:var(--x-success)">float-x</div>
+    <div class="animate-swing" style="font-size:24px">→</div>
+    <div class="animate-breathe" style="padding:12px 20px;background:var(--x-info-soft);border-radius:8px;color:var(--x-info)">breathe</div>
+    <div class="animate-glow" style="padding:12px 20px;background:var(--x-primary);color:#fff;border-radius:8px">glow</div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">加载</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="loader-dots" style="color:var(--x-primary)"><span></span><span></span><span></span></div>
+    <div class="loader-bars" style="color:var(--x-primary)"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="loader-ring" style="color:var(--x-primary)"></div>
+    <div class="loader-ring-2x" style="color:var(--x-primary)"></div>
+    <div class="loader-pulse" style="color:var(--x-primary)"></div>
+    <div class="loader-spiral" style="color:var(--x-primary)"></div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">悬停（鼠标移上）</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <button class="btn hover-scale">放大</button>
+    <button class="btn btn-primary hover-scale-lg">大放大</button>
+    <button class="btn hover-lift">上浮</button>
+    <button class="btn hover-glow">发光</button>
+    <button class="btn hover-rotate">旋转</button>
+    <button class="btn hover-shake">抖动</button>
+    <button class="btn hover-bounce">弹跳</button>
+    <button class="btn hover-tada">tada</button>
+    <button class="btn hover-brighten">变亮</button>
+    <button class="btn hover-grayscale">灰度</button>
+  </div>
+
+  <h4 style="margin:20px 0 8px">悬停卡片</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="hover-card" style="width:180px;padding:16px;background:var(--x-bg-elev);border:1px solid var(--x-line);border-radius:12px">
+      <div style="font-weight:600;margin-bottom:4px">上浮卡片</div>
+      <div style="font-size:13px;color:var(--x-fg-dim)">鼠标移上会浮起</div>
+    </div>
+    <div class="hover-tilt-3d" style="width:180px;padding:16px;background:var(--x-bg-elev);border:1px solid var(--x-line);border-radius:12px">
+      <div style="font-weight:600;margin-bottom:4px">3D 倾斜</div>
+      <div style="font-size:13px;color:var(--x-fg-dim)">鼠标移上会倾斜</div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">文字</h4>
+  <div style="margin-bottom:16px">
+    <h3 class="shimmer-text" style="font-size:26px;margin-bottom:12px">流光文字效果</h3>
+    <h3 class="text-gradient-sweep" style="font-size:26px;margin-bottom:12px">渐变扫过文字</h3>
+    <h3 class="text-3d" style="font-size:26px;margin-bottom:12px">3D 立体文字</h3>
+    <h3 class="text-neon" style="font-size:26px;margin-bottom:12px">霓虹灯文字</h3>
+  </div>
+
+  <h4 style="margin:20px 0 8px">3D 立方体</h4>
+  <div class="demo" style="margin-bottom:16px;justify-content:center">
+    <div style="perspective:800px;width:120px;height:120px">
+      <div class="cube" style="width:120px;height:120px">
+        <div class="cube-face" style="transform:translateZ(60px)">前</div>
+        <div class="cube-face" style="transform:translateZ(-60px) rotateY(180deg)">后</div>
+        <div class="cube-face" style="transform:rotateY(90deg) translateZ(60px)">右</div>
+        <div class="cube-face" style="transform:rotateY(-90deg) translateZ(60px)">左</div>
+        <div class="cube-face" style="transform:rotateX(90deg) translateZ(60px)">上</div>
+        <div class="cube-face" style="transform:rotateX(-90deg) translateZ(60px)">下</div>
+      </div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">序列动画（错开）</h4>
+  <div class="anim-seq" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+    <div style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">一</div>
+    <div style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">二</div>
+    <div style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">三</div>
+    <div style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">四</div>
+    <div style="padding:12px 20px;background:var(--x-primary-soft);border-radius:8px;color:var(--x-primary)">五</div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">滚动触发（往下滚）</h4>
+  <div class="scroll-reveal-up" style="padding:20px;background:var(--x-bg-soft);border-radius:12px;margin-bottom:8px">scroll-reveal-up</div>
+  <div class="scroll-reveal-left" style="padding:20px;background:var(--x-bg-soft);border-radius:12px;margin-bottom:8px">scroll-reveal-left</div>
+  <div class="scroll-reveal-right" style="padding:20px;background:var(--x-bg-soft);border-radius:12px;margin-bottom:8px">scroll-reveal-right</div>
+  <div class="scroll-reveal-zoom" style="padding:20px;background:var(--x-bg-soft);border-radius:12px;margin-bottom:8px">scroll-reveal-zoom</div>
+  <div class="scroll-reveal-blur" style="padding:20px;background:var(--x-bg-soft);border-radius:12px;margin-bottom:8px">scroll-reveal-blur</div>
+
+  <h4 style="margin:20px 0 8px">SVG 描边 / 绘制</h4>
+  <div class="demo" style="margin-bottom:16px;gap:28px;align-items:center">
+    <div style="text-align:center">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--x-primary)" stroke-width="2" stroke-linecap="round">
+        <circle class="svg-draw-circle" pathLength="100" cx="12" cy="12" r="10"/>
+      </svg>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">圆环</div>
+    </div>
+    <div style="text-align:center">
+      <svg width="80" height="60" viewBox="0 0 30 24" fill="none" stroke="var(--x-success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path class="svg-check" pathLength="100" d="M3 12l6 6L27 3"/>
+      </svg>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">打勾</div>
+    </div>
+    <div style="text-align:center">
+      <svg width="80" height="60" viewBox="0 0 30 24" fill="none" stroke="var(--x-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-draw-seq">
+        <path pathLength="100" d="M4 20L10 4l6 16"/>
+        <path pathLength="100" d="M6 14h8"/>
+      </svg>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">字母 A</div>
+    </div>
+    <div style="text-align:center">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="var(--x-danger)">
+        <circle class="svg-pop" cx="12" cy="12" r="10"/>
+      </svg>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">弹入</div>
+    </div>
+    <div style="text-align:center">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--x-primary)" stroke-width="3" stroke-linecap="round">
+        <circle class="svg-draw-circle-loop" pathLength="100" cx="12" cy="12" r="10"/>
+      </svg>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">循环</div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">数字滚动</h4>
+  <div class="demo" style="margin-bottom:16px;gap:28px;align-items:center;flex-wrap:wrap">
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:700;color:var(--x-primary)" id="count-demo">0</div>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">count-up 数字滚动</div>
+      <button class="btn btn-xs" id="replay-count" style="margin-top:6px">重播</button>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:700" id="num-inc">1,236</div>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">数字递增</div>
+      <button class="btn btn-xs btn-success" id="btn-inc" style="margin-top:6px">+128</button>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:32px;font-weight:700" id="num-dec">1,236</div>
+      <div style="font-size:11px;color:var(--x-fg-mute);margin-top:4px">数字递减</div>
+      <button class="btn btn-xs btn-danger" id="btn-dec" style="margin-top:6px">−56</button>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">骨架屏</h4>
+  <div class="demo" style="margin-bottom:16px;gap:20px;align-items:flex-start">
+    <div style="width:200px">
+      <div class="skeleton-shimmer" style="height:16px;margin-bottom:8px"></div>
+      <div class="skeleton-shimmer" style="height:16px;margin-bottom:8px;width:80%"></div>
+      <div class="skeleton-shimmer" style="height:16px;width:60%"></div>
+    </div>
+    <div style="width:200px">
+      <div class="skeleton-wave" style="height:16px;margin-bottom:8px"></div>
+      <div class="skeleton-wave" style="height:16px;margin-bottom:8px;width:80%"></div>
+      <div class="skeleton-wave" style="height:16px;width:60%"></div>
+    </div>
+    <div style="width:200px">
+      <div class="skeleton-pulse" style="height:16px;margin-bottom:8px"></div>
+      <div class="skeleton-pulse" style="height:16px;margin-bottom:8px;width:80%"></div>
+      <div class="skeleton-pulse" style="height:16px;width:60%"></div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">进度条</h4>
+  <div class="demo" style="margin-bottom:16px;flex-direction:column;gap:12px;align-items:stretch;max-width:500px">
+    <div>
+      <div style="font-size:12px;margin-bottom:4px;color:var(--x-fg-dim)">indeterminate</div>
+      <div class="progress-indeterminate" style="height:6px;background:var(--x-bg-soft);border-radius:3px"></div>
+    </div>
+    <div>
+      <div style="font-size:12px;margin-bottom:4px;color:var(--x-fg-dim)">striped</div>
+      <div class="progress-striped" style="height:12px;background:var(--x-primary);border-radius:6px;width:60%"></div>
+    </div>
+    <div>
+      <div style="font-size:12px;margin-bottom:4px;color:var(--x-fg-dim)">glow</div>
+      <div class="progress-glow" style="height:8px;background:var(--x-primary);border-radius:4px;width:75%;color:var(--x-primary)"></div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">点赞 / 心形爆裂</h4>
+  <div class="demo" style="margin-bottom:16px;gap:20px">
+    <div class="like-btn" id="like-1">
+      <svg class="like-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/>
+      </svg>
+      <span>1,236</span>
+    </div>
+    <div class="like-btn like-burst" id="like-2">
+      <svg class="like-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/>
+      </svg>
+      <span>爆裂</span>
+    </div>
+    <div style="position:relative;width:200px;height:120px;background:var(--x-bg-soft);border-radius:12px;overflow:hidden;cursor:pointer" id="dbltap-zone">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--x-fg-mute);font-size:13px">双击试试点赞</div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">聊天消息</h4>
+  <div class="demo" style="margin-bottom:16px;flex-direction:column;gap:8px;align-items:flex-start;max-width:400px">
+    <div class="chat-msg-in-left" style="padding:8px 14px;background:var(--x-bg-soft);border-radius:14px 14px 14px 4px;font-size:14px">你好！</div>
+    <div class="chat-msg-in-right" style="padding:8px 14px;background:var(--x-primary);color:#fff;border-radius:14px 14px 4px 14px;font-size:14px;align-self:flex-end">在的，怎么了？</div>
+    <div class="typing-bubble"><span></span><span></span><span></span></div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">Toast 进出</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <button class="btn btn-sm btn-primary" onclick="showToast('success','操作成功！')">成功提示</button>
+    <button class="btn btn-sm btn-danger" onclick="showToast('error','操作失败！')">错误提示</button>
+    <button class="btn btn-sm" onclick="showToast('info','这是一条信息')">信息</button>
+  </div>
+
+  <h4 style="margin:20px 0 8px">状态切换</h4>
+  <div class="demo" style="margin-bottom:16px;gap:16px">
+    <button class="btn btn-sm btn-primary" onclick="doStateSwitch('loading')">Loading</button>
+    <button class="btn btn-sm btn-success" onclick="doStateSwitch('success')">Success</button>
+    <button class="btn btn-sm btn-danger" onclick="doStateSwitch('error')">Error</button>
+    <div id="state-switch-demo" style="padding:12px 20px;background:var(--x-bg-soft);border-radius:8px;display:inline-flex;align-items:center;gap:8px;min-width:100px;justify-content:center;font-size:14px">
+      <span>点击按钮</span>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">表格行反馈</h4>
+  <div class="demo" style="margin-bottom:16px;flex-direction:column;gap:8px;align-items:stretch;max-width:500px">
+    <div id="table-demo">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--x-bg-soft);border-radius:8px;margin-bottom:6px" data-row>
+        <span style="flex:1;font-size:14px">张三 · 管理员</span>
+        <button class="btn btn-xs" onclick="removeRow(this)">删除</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--x-bg-soft);border-radius:8px;margin-bottom:6px" data-row>
+        <span style="flex:1;font-size:14px">李四 · 编辑</span>
+        <button class="btn btn-xs" onclick="removeRow(this)">删除</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--x-bg-soft);border-radius:8px;margin-bottom:6px" data-row>
+        <span style="flex:1;font-size:14px">王五 · 访客</span>
+        <button class="btn btn-xs" onclick="removeRow(this)">删除</button>
+      </div>
+    </div>
+    <button class="btn btn-sm" onclick="addRow()">+ 添加一行</button>
+  </div>
+
+  <h4 style="margin:20px 0 8px">输入反馈</h4>
+  <div class="demo" style="margin-bottom:16px;flex-direction:column;gap:12px;align-items:stretch;max-width:300px">
+    <input class="input" id="input-shake-demo" placeholder="点下面按钮抖动">
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm btn-danger" onclick="document.getElementById('input-shake-demo').classList.remove('input-shake');void document.getElementById('input-shake-demo').offsetHeight;document.getElementById('input-shake-demo').classList.add('input-shake')">抖动</button>
+      <button class="btn btn-sm btn-success" onclick="document.getElementById('input-shake-demo').classList.remove('input-success-pulse');void document.getElementById('input-shake-demo').offsetHeight;document.getElementById('input-shake-demo').classList.add('input-success-pulse')">成功脉冲</button>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">图片揭示</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="img-reveal-right" style="width:200px;height:120px;border-radius:12px;overflow:hidden">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--x-primary),var(--x-purple))"></div>
+    </div>
+    <div class="img-reveal-down" style="width:200px;height:120px;border-radius:12px;overflow:hidden">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,var(--x-success),var(--x-info))"></div>
+    </div>
+    <div style="width:200px;height:120px;border-radius:12px;overflow:hidden">
+      <div class="img-ken-burns" style="width:100%;height:100%;background:linear-gradient(135deg,var(--x-warning),var(--x-danger))"></div>
+    </div>
+  </div>
+
+  <h4 style="margin:20px 0 8px">重播</h4>
+  <button class="btn btn-primary" id="replay-btn">重播上面动画</button>
+
+</section>
+
+<style>#animate{padding-bottom:30vh}</style>
+
+<section id="grad"><h3><span class="n">31</span>渐变 / 玻璃</h3>
+  <div class="demo" style="margin-bottom:16px">
+    <div class="bg-gradient-primary" style="width:110px;height:70px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center">主色</div>
+    <div class="bg-gradient-sunset" style="width:110px;height:70px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center">日落</div>
+    <div class="bg-gradient-ocean" style="width:110px;height:70px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center">海洋</div>
+    <div class="bg-gradient-forest" style="width:110px;height:70px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center">森林</div>
+    <div class="bg-gradient-rainbow" style="width:110px;height:70px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center">彩虹</div>
+    <div class="bg-gradient-mesh" style="width:110px;height:70px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center">网格</div>
+  </div>
+  <div class="demo">
+    <button class="btn btn-gradient">渐变按钮</button>
+    <span class="text-gradient" style="font-size:24px;font-weight:700">渐变文字</span>
+    <div class="border-gradient" style="padding:10px 20px;border-radius:10px;background:var(--x-bg-elev)">渐变边框</div>
+    <div class="glass" style="padding:14px 20px;border-radius:10px">玻璃拟态</div>
+    <div class="bg-gradient-primary" style="padding:14px 20px;border-radius:10px">
+      <div class="glass" style="padding:10px 16px;border-radius:8px;color:#fff">玻璃 + 渐变</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 32. 评论 ═══════ -->
+<section id="comment"><h3><span class="n">32</span>评论 Comment</h3>
+  <div class="comment-feed">
+
+    <div class="comment-feed-header">全部评论 <span class="count">· 128</span></div>
+
+    <div class="comment">
+      <div class="comment-avatar"><div class="av" style="background:linear-gradient(135deg,#667eea,#764ba2)">小明</div></div>
+      <div class="comment-body">
+        <div class="comment-head">
+          <span class="comment-author">小明同学</span>
+          <span class="comment-badge author">作者</span>
+        </div>
+        <div class="comment-content">这个 UI 系统做得真不错，<span class="mention">产品经理</span> 建议全站统一改用这套 👍🎉</div>
+        <div class="comment-meta">
+          <span class="comment-time">3 小时前</span>
+          <span class="comment-location">北京</span>
+          <div class="comment-actions">
+            <button class="comment-action like liked"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>1,236</button>
+            <button class="comment-action"><span class="icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M2 8a5 5 0 015-5h2a5 5 0 015 5v0a5 5 0 01-5 5H7l-3 2v-2H4a2 2 0 01-2-2V8z"/></svg></span>48</button>
+          </div>
+        </div>
+
+        <div class="comment-replies">
+          <div class="comment">
+            <div class="comment-avatar"><div class="av" style="background:linear-gradient(135deg,#f093fb,#f5576c)">李</div></div>
+            <div class="comment-body">
+              <div class="comment-head"><span class="comment-author">李四</span></div>
+              <div class="comment-content">同意，我这边也在用 😊</div>
+              <div class="comment-meta">
+                <span class="comment-time">2 小时前</span>
+                <div class="comment-actions">
+                  <button class="comment-action like"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>86</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="comment more-hidden">
+            <div class="comment-avatar"><div class="av" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">赵</div></div>
+            <div class="comment-body">
+              <div class="comment-head"><span class="comment-author">赵六</span></div>
+              <div class="comment-content">已 star ⭐</div>
+              <div class="comment-meta">
+                <span class="comment-time">1 小时前</span>
+                <div class="comment-actions">
+                  <button class="comment-action like"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>12</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="comment more-hidden">
+            <div class="comment-avatar"><div class="av" style="background:linear-gradient(135deg,#fa709a,#fee140)">钱</div></div>
+            <div class="comment-body">
+              <div class="comment-head"><span class="comment-author">钱七</span></div>
+              <div class="comment-content">收藏了 📌</div>
+              <div class="comment-meta">
+                <span class="comment-time">45 分钟前</span>
+                <div class="comment-actions">
+                  <button class="comment-action like"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>8</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="comment more-hidden">
+            <div class="comment-avatar"><div class="av" style="background:linear-gradient(135deg,#30cfd0,#330867)">孙</div></div>
+            <div class="comment-body">
+              <div class="comment-head"><span class="comment-author">孙八</span></div>
+              <div class="comment-content">顶一下 🔥</div>
+              <div class="comment-meta">
+                <span class="comment-time">30 分钟前</span>
+                <div class="comment-actions">
+                  <button class="comment-action like"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>5</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="comment-more">展开 3 条回复</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="comment-avatar"><div class="av" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">王</div></div>
+      <div class="comment-body">
+        <div class="comment-head">
+          <span class="comment-author">王五</span>
+          <span class="comment-badge vip">VIP</span>
+          <span class="comment-badge hot">热评</span>
+        </div>
+        <div class="comment-content">样式真的很精细，配色也很舒服 ✨ 期待更多组件</div>
+        <div class="comment-meta">
+          <span class="comment-time">昨天</span>
+          <div class="comment-actions">
+            <button class="comment-action like"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>892</button>
+            <button class="comment-action"><span class="icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M2 8a5 5 0 015-5h2a5 5 0 015 5v0a5 5 0 01-5 5H7l-3 2v-2H4a2 2 0 01-2-2V8z"/></svg></span>12</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment">
+      <div class="comment-avatar"><div class="av" style="background:#e5e7eb;color:#666">匿</div></div>
+      <div class="comment-body">
+        <div class="comment-head"><span class="comment-author">匿名用户</span></div>
+        <div class="comment-content">想问下移动端适配如何？</div>
+        <div class="comment-meta">
+          <span class="comment-time">2 天前</span>
+          <span class="comment-location">上海</span>
+          <div class="comment-actions">
+            <button class="comment-action like"><span class="icon"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M8 14s-5-3.5-5-7.5a3 3 0 015-2 3 3 0 015 2c0 4-5 7.5-5 7.5z"/></svg></span>23</button>
+            <button class="comment-action"><span class="icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M2 8a5 5 0 015-5h2a5 5 0 015 5v0a5 5 0 01-5 5H7l-3 2v-2H4a2 2 0 01-2-2V8z"/></svg></span>5</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment-input-bar">
+      <div class="av">我</div>
+      <input class="comment-input" placeholder="留下你的评论...">
+      <button class="comment-send">发送</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════ 33. 丝带/水印 ═══════ -->
+<section id="ribbon"><h3><span class="n">33</span>丝带 / 水印</h3>
+  <div class="demo" style="gap:20px">
+    <div class="ribbon ribbon-top-right" style="width:200px;height:120px;background:var(--x-bg-soft);border-radius:10px;padding:16px">
+      <div class="ribbon-tag">NEW</div>
+      <div style="color:var(--x-fg-dim);font-size:13px">普通卡片</div>
+    </div>
+    <div class="ribbon ribbon-top-left ribbon-success" style="width:200px;height:120px;background:var(--x-bg-soft);border-radius:10px;padding:16px">
+      <div class="ribbon-tag">HOT</div>
+      <div style="color:var(--x-fg-dim);font-size:13px">推荐</div>
+    </div>
+    <div class="ribbon ribbon-corner-right ribbon-danger" style="width:200px;height:120px;background:var(--x-bg-soft);border-radius:10px;overflow:hidden;padding:16px">
+      <div class="ribbon-tag">限时</div>
+      <div style="color:var(--x-fg-dim);font-size:13px">角标丝带</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 交互演示 ═══════ -->
+<section id="interactive"><h3><span class="n">✦</span>交互演示（点击有反应）</h3>
+
+  <h4 style="margin:8px 0">Message 消息</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <button class="btn btn-primary btn-sm" data-message="操作成功" data-type="success">成功</button>
+    <button class="btn btn-sm" data-message="这是一条信息" data-type="info">信息</button>
+    <button class="btn btn-warning btn-sm" data-message="注意警告" data-type="warning">警告</button>
+    <button class="btn btn-danger btn-sm" data-message="操作失败" data-type="danger">错误</button>
+  </div>
+
+  <h4 style="margin:8px 0">Notification 通知</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <button class="btn btn-primary btn-sm" data-notification="新消息" data-type="success">成功通知</button>
+    <button class="btn btn-sm" data-notification="系统更新" data-type="info">信息通知</button>
+    <button class="btn btn-danger btn-sm" data-notification="错误提醒" data-type="danger">错误通知</button>
+  </div>
+
+  <h4 style="margin:8px 0">Modal 模态框</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <button class="btn btn-primary" data-open="demo-modal">打开模态框</button>
+    <button class="btn" data-open="demo-drawer">打开抽屉</button>
+  </div>
+
+  <h4 style="margin:8px 0">Popconfirm 确认框</h4>
+  <div class="demo" style="margin-bottom:16px">
+    <button class="btn btn-danger btn-sm" data-confirm="确定删除这条记录吗？">删除记录</button>
+    <button class="btn btn-warning btn-sm" data-confirm="确定要归档吗？">归档</button>
+  </div>
+
+  <h4 style="margin:8px 0">复制</h4>
+  <div class="demo">
+    <button class="copy-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="4" y="3" width="9" height="12" rx="1"/><path d="M6 3V2a1 1 0 011-1h3a1 1 0 011 1v1"/></svg> 点击复制</button>
+    <button class="copy-btn" data-copy="const a = 1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12" height="12"><rect x="4" y="3" width="9" height="12" rx="1"/><path d="M6 3V2a1 1 0 011-1h3a1 1 0 011 1v1"/></svg> 复制代码</button>
+  </div>
+</section>
+
+<!-- Modal / Drawer 容器 -->
+<div id="demo-modal" class="modal-overlay" style="display:none">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <h3 class="modal-title">提示</h3>
+      <button class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p>这是一个模态框。点击右上角 × 或下方的按钮关闭。</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-close>取消</button>
+      <button class="btn btn-primary" data-close onclick="alert('确定')">确定</button>
+    </div>
+  </div>
+</div>
+
+<div id="demo-drawer" class="drawer drawer-right" style="display:none">
+  <div class="drawer-header">
+    <h3 class="drawer-title">抽屉标题</h3>
+    <button class="drawer-close" data-close>×</button>
+  </div>
+  <div class="drawer-body">
+    <p>这是抽屉内容。点 × 关闭。</p>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn" data-close>取消</button>
+    <button class="btn btn-primary" data-close>确定</button>
+  </div>
+</div>
+
+<style>
+  .modal-overlay.open, .modal-overlay.visible { display: flex !important; }
+  .drawer.open, .drawer.visible { display: flex !important; }
+  .dropdown-menu.open { display: block !important; }
+  .popover.open { display: block !important; }
+  .dropdown-menu { display: none; }
+  .popover { display: none; }
+</style>
+
+<!-- ═══════ 34. 杂项 ═══════ -->
+<section id="misc"><h3><span class="n">34</span>杂项</h3>
+  <h4 style="margin:8px 0">高亮</h4>
+  <div class="demo" style="margin-bottom:12px">
+    <p>普通的 <mark>黄色高亮</mark>，还有 <mark class="mark-primary">主色高亮</mark>，<span class="highlight">渐变高亮</span>。</p>
+  </div>
+  <h4 style="margin:8px 0">省略</h4>
+  <div class="demo" style="margin-bottom:12px;max-width:300px;display:block">
+    <div class="ellipsis">这是一段很长的文字，会被省略号截断显示</div>
+    <div class="ellipsis-2" style="margin-top:8px">多行省略：这是一段很长的文字内容，展示多行文本超出后自动添加省略号的效果，超出两行之后的文字将会被隐藏。</div>
+  </div>
+  <h4 style="margin:8px 0">键盘键</h4>
+  <div class="demo" style="margin-bottom:12px">
+    <span class="keyboard"><kbd>⌘</kbd><span class="kbd-sep">+</span><kbd>K</kbd></span>
+    <span class="keyboard"><kbd>Ctrl</kbd><span class="kbd-sep">+</span><kbd>Shift</kbd><span class="kbd-sep">+</span><kbd>P</kbd></span>
+    <kbd class="kbd-lg">Enter</kbd>
+    <kbd class="kbd-primary">Esc</kbd>
+  </div>
+  <h4 style="margin:8px 0">图标卡片</h4>
+  <div class="grid-auto">
+    <div class="item-card">
+      <div class="item-card-media">📦</div>
+      <div class="item-card-body">
+        <div class="item-card-title">产品 A</div>
+        <div class="item-card-desc">描述信息</div>
+      </div>
+    </div>
+    <div class="item-card">
+      <div class="item-card-media">🎨</div>
+      <div class="item-card-body">
+        <div class="item-card-title">产品 B</div>
+        <div class="item-card-desc">描述信息</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:32px 0;color:var(--x-fg-mute);font-size:12.5px;border-top:1px solid var(--x-line);margin-top:32px">
+  XuNay UI · 全组件展示 · 2026
+</footer>
+
+</main>
+</div>
+
+<script>
+// 导航点击平滑滚动
+document.querySelectorAll('.nav a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+
+<script src="./main.js"></script>
+<script>
+// 日期选择器
+(function(){
+  const picker = document.getElementById('date-picker');
+  if (!picker) return;
+  const grid = picker.querySelector('#date-grid');
+  const title = picker.querySelector('.picker-title');
+  let year = 2026, month = 9; // 0-indexed
+
+  function render(){
+    title.textContent = `${year} 年 ${month+1} 月`;
+    grid.innerHTML = '';
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+    const today = new Date(2026, 9, 16);
+
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const c = document.createElement('button');
+      c.className = 'picker-cell other-month';
+      c.textContent = prevDays - i;
+      grid.appendChild(c);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const c = document.createElement('button');
+      c.className = 'picker-cell';
+      c.textContent = d;
+      if (year === 2026 && month === 9 && d === 16) c.classList.add('selected');
+      if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === d) c.classList.add('today');
+      c.onclick = e => {
+        e.stopPropagation();
+        grid.querySelectorAll('.picker-cell').forEach(x => x.classList.remove('selected'));
+        c.classList.add('selected');
+        picker.querySelector('.picker-input').value = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      };
+      grid.appendChild(c);
+    }
+  }
+
+  picker.querySelector('.picker-input').onclick = e => {
+    e.stopPropagation();
+    picker.classList.toggle('open');
+    if (picker.classList.contains('open')) render();
+  };
+  picker.querySelector('[data-prev]').onclick = e => {
+    e.stopPropagation();
+    month--; if (month < 0) { month = 11; year--; }
+    render();
+  };
+  picker.querySelector('[data-next]').onclick = e => {
+    e.stopPropagation();
+    month++; if (month > 11) { month = 0; year++; }
+    render();
+  };
+  document.addEventListener('click', () => picker.classList.remove('open'));
+  picker.querySelector('.picker-panel').onclick = e => e.stopPropagation();
+})();
+</script>
+<script>
+
+
+
+
+// ─── 颜色选择器 ───
+(function(){
+  const el = document.getElementById('cp');
+  if (!el) return;
+
+  const input = el.querySelector('.cpicker-input');
+  const panel = el.querySelector('.cpicker-panel');
+  const swatchFill = el.querySelector('.cpicker-swatch-fill');
+  const textEl = el.querySelector('.cpicker-text');
+  const sv = el.querySelector('#cp-sv');
+  const svPointer = el.querySelector('#cp-sv-pointer');
+  const hue = el.querySelector('#cp-hue');
+  const huePointer = el.querySelector('#cp-hue-pointer');
+  const alpha = el.querySelector('#cp-alpha');
+  const alphaPointer = el.querySelector('#cp-alpha-pointer');
+  const presetsEl = el.querySelector('#cp-presets');
+  const hexInput = el.querySelector('#cp-hex');
+  const rInput = el.querySelector('#cp-r');
+  const gInput = el.querySelector('#cp-g');
+  const bInput = el.querySelector('#cp-b');
+
+  let state = { h: 221, s: 84, v: 100, a: 100 };  // HSV + Alpha
+
+  // ─── 工具 ───
+  const p2 = n => String(Math.round(n)).padStart(2, '0');
+
+  function hsvToRgb(h, s, v) {
+    s /= 100; v /= 100;
+    const c = v * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = v - c;
+    let r, g, b;
+    if (h < 60) { r = c; g = x; b = 0; }
+    else if (h < 120) { r = x; g = c; b = 0; }
+    else if (h < 180) { r = 0; g = c; b = x; }
+    else if (h < 240) { r = 0; g = x; b = c; }
+    else if (h < 300) { r = x; g = 0; b = c; }
+    else { r = c; g = 0; b = x; }
+    return {
+      r: Math.round((r + m) * 255),
+      g: Math.round((g + m) * 255),
+      b: Math.round((b + m) * 255),
+    };
+  }
+
+  function rgbToHsv(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      if (max === r) h = 60 * (((g - b) / d) % 6);
+      else if (max === g) h = 60 * ((b - r) / d + 2);
+      else h = 60 * ((r - g) / d + 4);
+    }
+    if (h < 0) h += 360;
+    return {
+      h,
+      s: max === 0 ? 0 : (d / max) * 100,
+      v: max * 100,
+    };
+  }
+
+  function rgbToHex(r, g, b) {
+    return (p2(r) + p2(g) + p2(b)).toUpperCase();
+  }
+
+  function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const n = parseInt(hex, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  // ─── 更新 UI ───
+  function update(from = 'hsv') {
+    const { h, s, v, a } = state;
+    const rgb = hsvToRgb(h, s, v);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    const pureHue = hsvToRgb(h, 100, 100);
+
+    // 背景色相
+    sv.style.background = `hsl(${h}, 100%, 50%)`;
+    // 指针位置
+    svPointer.style.left = s + '%';
+    svPointer.style.top = (100 - v) + '%';
+    // 色相指针
+    huePointer.style.left = (h / 360 * 100) + '%';
+    huePointer.style.setProperty('--cp-hue', `hsl(${h}, 100%, 50%)`);
+    // 透明度
+    alpha.style.setProperty('--cp-hue', `rgb(${pureHue.r}, ${pureHue.g}, ${pureHue.b})`);
+    alphaPointer.style.left = a + '%';
+    alphaPointer.style.setProperty('--cp-color', `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`);
+    // 触发框
+    swatchFill.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a / 100})`;
+    textEl.textContent = '#' + hex;
+    // 数值
+    if (from !== 'hex') hexInput.value = hex;
+    if (from !== 'rgb') {
+      rInput.value = rgb.r;
+      gInput.value = rgb.g;
+      bInput.value = rgb.b;
+    }
+    // 预设高亮
+    presetsEl.querySelectorAll('.cpicker-preset').forEach(b => {
+      b.classList.toggle('selected', b.dataset.hex === hex);
+    });
+  }
+
+  // ─── 拖动 SV ───
+  let dragSV = false;
+  function setSV(e) {
+    const r = sv.getBoundingClientRect();
+    let x = ((e.clientX != null ? e.clientX : e.touches[0].clientX) - r.left) / r.width;
+    let y = ((e.clientY != null ? e.clientY : e.touches[0].clientY) - r.top) / r.height;
+    x = Math.max(0, Math.min(1, x));
+    y = Math.max(0, Math.min(1, y));
+    state.s = x * 100;
+    state.v = (1 - y) * 100;
+    update();
+  }
+  sv.addEventListener('pointerdown', e => {
+    dragSV = true;
+    sv.setPointerCapture(e.pointerId);
+    setSV(e);
+  });
+  sv.addEventListener('pointermove', e => { if (dragSV) setSV(e); });
+  sv.addEventListener('pointerup', () => { dragSV = false; });
+
+  // ─── 拖动色相 ───
+  let dragHue = false;
+  function setHue(e) {
+    const r = hue.getBoundingClientRect();
+    let x = ((e.clientX != null ? e.clientX : e.touches[0].clientX) - r.left) / r.width;
+    x = Math.max(0, Math.min(1, x));
+    state.h = x * 360;
+    update();
+  }
+  hue.addEventListener('pointerdown', e => {
+    dragHue = true;
+    hue.setPointerCapture(e.pointerId);
+    setHue(e);
+  });
+  hue.addEventListener('pointermove', e => { if (dragHue) setHue(e); });
+  hue.addEventListener('pointerup', () => { dragHue = false; });
+
+  // ─── 拖动透明度 ───
+  let dragAlpha = false;
+  function setAlpha(e) {
+    const r = alpha.getBoundingClientRect();
+    let x = ((e.clientX != null ? e.clientX : e.touches[0].clientX) - r.left) / r.width;
+    x = Math.max(0, Math.min(1, x));
+    state.a = x * 100;
+    update();
+  }
+  alpha.addEventListener('pointerdown', e => {
+    dragAlpha = true;
+    alpha.setPointerCapture(e.pointerId);
+    setAlpha(e);
+  });
+  alpha.addEventListener('pointermove', e => { if (dragAlpha) setAlpha(e); });
+  alpha.addEventListener('pointerup', () => { dragAlpha = false; });
+
+  // ─── 输入框联动 ───
+  hexInput.addEventListener('input', () => {
+    const v = hexInput.value.replace(/[^0-9a-f]/gi, '').slice(0, 6);
+    hexInput.value = v;
+    if (v.length === 6) {
+      const { r, g, b } = hexToRgb(v);
+      const hsv = rgbToHsv(r, g, b);
+      state.h = hsv.h;
+      state.s = hsv.s;
+      state.v = hsv.v;
+      update('hex');
+    }
+  });
+  [rInput, gInput, bInput].forEach(inp => {
+    inp.addEventListener('input', () => {
+      let r = Math.max(0, Math.min(255, Number(rInput.value) || 0));
+      let g = Math.max(0, Math.min(255, Number(gInput.value) || 0));
+      let b = Math.max(0, Math.min(255, Number(bInput.value) || 0));
+      const hsv = rgbToHsv(r, g, b);
+      state.h = hsv.h;
+      state.s = hsv.s;
+      state.v = hsv.v;
+      update('rgb');
+    });
+  });
+
+  // ─── 预设色 ───
+  const PRESETS = [
+    'EF4444','F97316','F59E0B','EAB308','84CC16',
+    '22C55E','10B981','14B8A6','06B6D4','0EA5E9',
+    '3B82F6','6366F1','8B5CF6','A855F7','D946EF',
+    'EC4899','F43F5E','64748B','1E293B','000000',
+  ];
+  PRESETS.forEach(hex => {
+    const b = document.createElement('button');
+    b.className = 'cpicker-preset';
+    b.dataset.hex = hex;
+    b.style.background = '#' + hex;
+    b.title = '#' + hex;
+    b.onclick = e => {
+      e.stopPropagation();
+      const { r, g, b: bb } = hexToRgb(hex);
+      const hsv = rgbToHsv(r, g, bb);
+      state.h = hsv.h;
+      state.s = hsv.s;
+      state.v = hsv.v;
+      update();
+    };
+    presetsEl.appendChild(b);
+  });
+
+  // ─── 吸管 ───
+  el.querySelector('#cp-eye').onclick = async e => {
+    e.stopPropagation();
+    if ('EyeDropper' in window) {
+      try {
+        const result = await new window.EyeDropper().open();
+        const { r, g, b } = hexToRgb(result.sRGBHex);
+        const hsv = rgbToHsv(r, g, b);
+        state.h = hsv.h;
+        state.s = hsv.s;
+        state.v = hsv.v;
+        update();
+      } catch {}
+    } else {
+      alert('当前浏览器不支持吸管（需 Chrome 95+）');
+    }
+  };
+
+  // ─── 打开 / 关闭 ───
+  input.onclick = e => {
+    e.stopPropagation();
+    const open = panel.classList.toggle('open');
+    input.classList.toggle('open', open);
+    if (open) update();
+  };
+  el.querySelector('#cp-ok').onclick = e => {
+    e.stopPropagation();
+    panel.classList.remove('open');
+    input.classList.remove('open');
+  };
+  panel.onclick = e => e.stopPropagation();
+  document.addEventListener('click', () => {
+    panel.classList.remove('open');
+    input.classList.remove('open');
+  });
+
+  update();
+})();
+
+// ─── 点赞切换 ───
+document.addEventListener('click', e => {
+  const like = e.target.closest('.comment-action.like');
+  if (like) {
+    like.classList.toggle('liked');
+    const icon = like.querySelector('.icon');
+    const num = like.childNodes[1];
+    if (num && num.nodeType === 3) {
+      let n = parseInt(num.textContent.replace(/[,\s]/g,'')) || 0;
+      n += like.classList.contains('liked') ? 1 : -1;
+      num.textContent = n.toLocaleString();
+    }
+  }
+});
+
+// ─── 复制代码 ───
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.code-block-copy');
+  if (btn) {
+    const block = btn.closest('.code-block');
+    const code = block.querySelector('.code-pre').textContent;
+    navigator.clipboard?.writeText(code);
+    btn.classList.add('copied');
+    btn.textContent = '✓ 已复制';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '复制'; }, 1500);
+  }
+});
+
+// ─── 展开回复 ───
+document.addEventListener('click', e => {
+  const more = e.target.closest('.comment-more');
+  if (more) more.classList.toggle('open');
+});
+</script>
+<script>
+// ─── 日期时间选择器 ───
+(function(){
+  const el = document.getElementById('dtp');
+  if (!el) return;
+
+  const input = el.querySelector('.picker-input');
+  const textEl = el.querySelector('.picker-text');
+  const clearBtn = el.querySelector('.picker-clear');
+  const panel = el.querySelector('.picker-panel');
+  const tabs = el.querySelectorAll('.picker-tab');
+  const views = el.querySelectorAll('.picker-view');
+
+  const btnYear = el.querySelector('#btn-year');
+  const btnMonth = el.querySelector('#btn-month');
+  const yearRange = el.querySelector('#year-range');
+  const yearGrid = el.querySelector('#year-grid');
+  const monthGrid = el.querySelector('#month-grid');
+  const dayGrid = el.querySelector('#day-grid');
+  const subs = el.querySelectorAll('.picker-sub');
+
+  const clockNums = el.querySelector('#clock-numbers');
+  const clockTicks = el.querySelector('#clock-ticks');
+  const clockHand = el.querySelector('#clock-hand');
+  const clockHandDot = el.querySelector('#clock-hand-dot');
+  const vH = el.querySelector('#v-h');
+  const vM = el.querySelector('#v-m');
+
+  const now = new Date();
+  let val = {
+    y: now.getFullYear(),
+    m: now.getMonth(),
+    d: now.getDate(),
+    h: now.getHours(),
+    mi: now.getMinutes(),
+  };
+  let view = { y: val.y, m: val.m };
+  let activeTab = 'date';
+  let activeSub = 'day';
+  let timeMode = 'hour';
+  let yearStart = Math.floor(val.y / 10) * 10;
+
+  const p2 = n => String(n).padStart(2, '0');
+  const RAD = deg => (deg - 90) * Math.PI / 180;
+  const CX = 120, CY = 120;
+
+  // ─── 触发框显示 ───
+  function updateTrigger() {
+    textEl.textContent = `${val.y}-${p2(val.m+1)}-${p2(val.d)} ${p2(val.h)}:${p2(val.mi)}`;
+    textEl.classList.remove('placeholder');
+    clearBtn.textContent = '×';
+  }
+
+  // ─── 日期：头部标题 ───
+  function updateTitle() {
+    btnYear.textContent = view.y + ' 年';
+    btnMonth.textContent = (view.m + 1) + ' 月';
+    btnYear.classList.toggle('active', activeSub === 'year');
+    btnMonth.classList.toggle('active', activeSub === 'month');
+  }
+
+  // ─── 切换子视图 ───
+  function switchSub(name) {
+    activeSub = name;
+    subs.forEach(s => s.classList.toggle('active', s.dataset.sub === name));
+    updateTitle();
+    if (name === 'year') renderYear();
+    else if (name === 'month') renderMonth();
+    else renderDay();
+  }
+
+  // ─── 年视图 ───
+  function renderYear() {
+    yearStart = Math.floor(view.y / 10) * 10;
+    yearRange.textContent = `${yearStart} — ${yearStart + 9}`;
+    yearGrid.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+      const y = yearStart + i;
+      const b = document.createElement('button');
+      b.className = 'picker-year';
+      b.textContent = y;
+      if (y === view.y) b.classList.add('selected');
+      if (y === now.getFullYear() && y !== view.y) b.classList.add('current');
+      b.onclick = e => {
+        e.stopPropagation();
+        view.y = y;
+        if (view.y === val.y) { /* 同年 */ }
+        switchSub('month');
+      };
+      yearGrid.appendChild(b);
+    }
+  }
+
+  // ─── 月视图 ───
+  function renderMonth() {
+    monthGrid.innerHTML = '';
+    for (let i = 0; i < 12; i++) {
+      const b = document.createElement('button');
+      b.className = 'picker-month';
+      b.textContent = (i + 1) + ' 月';
+      if (view.y === val.y && i === val.m) b.classList.add('selected');
+      if (view.y === now.getFullYear() && i === now.getMonth() && !(view.y === val.y && i === val.m)) b.classList.add('current');
+      b.onclick = e => {
+        e.stopPropagation();
+        view.m = i;
+        if (view.y === val.y) val.m = i;
+        switchSub('day');
+      };
+      monthGrid.appendChild(b);
+    }
+  }
+
+  // ─── 日视图 ───
+  function renderDay() {
+    dayGrid.innerHTML = '';
+    const first = new Date(view.y, view.m, 1).getDay();
+    const days = new Date(view.y, view.m + 1, 0).getDate();
+    const prevDays = new Date(view.y, view.m, 0).getDate();
+    const totalCells = Math.ceil((first + days) / 7) * 7;
+
+    for (let i = 0; i < totalCells; i++) {
+      const dayNum = i - first + 1;
+      const c = document.createElement('button');
+
+      if (dayNum < 1) {
+        c.className = 'picker-cell other';
+        c.textContent = prevDays + dayNum;
+        c.onclick = e => {
+          e.stopPropagation();
+          view.m--; if (view.m < 0) { view.m = 11; view.y--; }
+          const d = prevDays + dayNum;
+          if (view.y === val.y && view.m === val.m) val.d = d;
+          switchSub('day');
+        };
+      } else if (dayNum > days) {
+        c.className = 'picker-cell other';
+        c.textContent = dayNum - days;
+        const overflow = dayNum - days;
+        c.onclick = e => {
+          e.stopPropagation();
+          view.m++; if (view.m > 11) { view.m = 0; view.y++; }
+          if (view.y === val.y && view.m === val.m) val.d = overflow;
+          switchSub('day');
+        };
+      } else {
+        c.className = 'picker-cell';
+        c.textContent = dayNum;
+        const dow = new Date(view.y, view.m, dayNum).getDay();
+        if (dow === 0 || dow === 6) c.classList.add('wk');
+        if (view.y === now.getFullYear() && view.m === now.getMonth() && dayNum === now.getDate())
+          c.classList.add('today');
+        if (view.y === val.y && view.m === val.m && dayNum === val.d)
+          c.classList.add('selected');
+        c.onclick = e => {
+          e.stopPropagation();
+          val.y = view.y;
+          val.m = view.m;
+          val.d = dayNum;
+          renderDay();
+          updateTrigger();
+        };
+      }
+      dayGrid.appendChild(c);
+    }
+  }
+
+  // ─── 头部导航 ───
+  el.querySelector('[data-nav="prev"]').onclick = e => {
+    e.stopPropagation();
+    if (activeSub === 'year') yearStart -= 10;
+    else if (activeSub === 'month') view.y--;
+    else {
+      view.m--; if (view.m < 0) { view.m = 11; view.y--; }
+    }
+    switchSub(activeSub);
+  };
+  el.querySelector('[data-nav="next"]').onclick = e => {
+    e.stopPropagation();
+    if (activeSub === 'year') yearStart += 10;
+    else if (activeSub === 'month') view.y++;
+    else {
+      view.m++; if (view.m > 11) { view.m = 0; view.y++; }
+    }
+    switchSub(activeSub);
+  };
+
+  btnYear.onclick = e => { e.stopPropagation(); switchSub('year'); };
+  btnMonth.onclick = e => { e.stopPropagation(); switchSub('month'); };
+
+  // ═══════════ 时间视图 · SVG 钟表 ═══════════
+  function renderTicks() {
+    clockTicks.innerHTML = '';
+    for (let i = 0; i < 60; i++) {
+      const rad = RAD(i * 6);
+      const r1 = i % 5 === 0 ? 100 : 104;
+      const r2 = 110;
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', CX + Math.cos(rad) * r1);
+      line.setAttribute('y1', CY + Math.sin(rad) * r1);
+      line.setAttribute('x2', CX + Math.cos(rad) * r2);
+      line.setAttribute('y2', CY + Math.sin(rad) * r2);
+      line.setAttribute('class', i % 5 === 0 ? 'clock-tick clock-tick-major' : 'clock-tick');
+      clockTicks.appendChild(line);
+    }
+  }
+
+  function renderClock() {
+    clockNums.innerHTML = '';
+    const R_OUT = 85;
+    const R_IN = 55;
+
+    if (timeMode === 'hour') {
+      // 24 小时，内外双环
+      for (let i = 0; i < 24; i++) {
+        const rad = RAD((i % 12) * 30);
+        const r = i < 12 ? R_IN : R_OUT;
+        const x = CX + Math.cos(rad) * r;
+        const y = CY + Math.sin(rad) * r;
+
+        // 背景圆（点击热区 + 选中背景）
+        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        bg.setAttribute('cx', x);
+        bg.setAttribute('cy', y);
+        bg.setAttribute('r', 15);
+        bg.setAttribute('class', 'clock-num-bg' + (i === val.h ? ' selected' : ''));
+        bg.dataset.value = i;
+        clockNums.appendChild(bg);
+
+        // 数字
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', x);
+        t.setAttribute('y', y);
+        t.setAttribute('class', 'clock-num' + (i >= 12 ? ' inner' : '') + (i === val.h ? ' selected' : ''));
+        t.textContent = p2(i);
+        clockNums.appendChild(t);
+      }
+    } else {
+      // 分钟：12 个数字 00,05,...,55
+      for (let i = 0; i < 12; i++) {
+        const m = i * 5;
+        const rad = RAD(i * 30);
+        const x = CX + Math.cos(rad) * R_OUT;
+        const y = CY + Math.sin(rad) * R_OUT;
+
+        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        bg.setAttribute('cx', x);
+        bg.setAttribute('cy', y);
+        bg.setAttribute('r', 15);
+        bg.setAttribute('class', 'clock-num-bg' + (m === val.mi ? ' selected' : ''));
+        bg.dataset.value = m;
+        clockNums.appendChild(bg);
+
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', x);
+        t.setAttribute('y', y);
+        t.setAttribute('class', 'clock-num' + (m === val.mi ? ' selected' : ''));
+        t.textContent = p2(m);
+        clockNums.appendChild(t);
+      }
+    }
+
+    // 指针
+    let angle;
+    if (timeMode === 'hour') {
+      angle = (val.h % 12) * 30;
+    } else {
+      angle = val.mi * 6;
+    }
+    const rad = RAD(angle);
+    const rEnd = timeMode === 'hour' ? 50 : 78;
+    const ex = CX + Math.cos(rad) * rEnd;
+    const ey = CY + Math.sin(rad) * rEnd;
+    clockHand.setAttribute('x2', ex);
+    clockHand.setAttribute('y2', ey);
+    clockHandDot.setAttribute('cx', ex);
+    clockHandDot.setAttribute('cy', ey);
+
+    // 底部状态
+    vH.textContent = p2(val.h);
+    vM.textContent = p2(val.mi);
+    vH.classList.toggle('active', timeMode === 'hour');
+    vM.classList.toggle('active', timeMode === 'minute');
+
+    // AM/PM
+    el.querySelectorAll('.clock-ampm button').forEach(b => {
+      b.classList.toggle('active', b.dataset.ampm === (val.h < 12 ? 'am' : 'pm'));
+    });
+  }
+
+  // 点击钟表数字
+  clockNums.addEventListener('click', e => {
+    e.stopPropagation();
+    const target = e.target.closest('[data-value]');
+    if (!target) return;
+    const v = Number(target.dataset.value);
+    if (timeMode === 'hour') {
+      val.h = v;
+      renderClock();
+      updateTrigger();
+      setTimeout(() => { timeMode = 'minute'; renderClock(); }, 350);
+    } else {
+      val.mi = v;
+      renderClock();
+      updateTrigger();
+    }
+  });
+
+  // 底部"时/分"点击
+  vH.onclick = e => { e.stopPropagation(); timeMode = 'hour'; renderClock(); };
+  vM.onclick = e => { e.stopPropagation(); timeMode = 'minute'; renderClock(); };
+
+  // AM / PM
+  el.querySelectorAll('.clock-ampm button').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      const isPM = b.dataset.ampm === 'pm';
+      if (isPM && val.h < 12) val.h += 12;
+      if (!isPM && val.h >= 12) val.h -= 12;
+      renderClock();
+      updateTrigger();
+    };
+  });
+
+  // ─── Tab 切换 ───
+  tabs.forEach(t => {
+    t.onclick = e => {
+      e.stopPropagation();
+      activeTab = t.dataset.tab;
+      tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === activeTab));
+      views.forEach(x => x.classList.toggle('active', x.dataset.view === activeTab));
+      if (activeTab === 'date') switchSub(activeSub);
+      else { timeMode = 'hour'; renderClock(); }
+    };
+  });
+
+  // ─── 打开 / 关闭 ───
+  input.onclick = e => {
+    e.stopPropagation();
+    const open = panel.classList.toggle('open');
+    input.classList.toggle('open', open);
+    if (open) {
+      if (activeTab === 'date') switchSub('day');
+      else renderClock();
+    }
+  };
+  clearBtn.onclick = e => {
+    e.stopPropagation();
+    val = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate(), h: now.getHours(), mi: now.getMinutes() };
+    view = { y: val.y, m: val.m };
+    textEl.textContent = '';
+    textEl.classList.add('placeholder');
+    clearBtn.textContent = '';
+    renderDay();
+    renderClock();
+  };
+  el.querySelector('[data-now]').onclick = e => {
+    e.stopPropagation();
+    val = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate(), h: now.getHours(), mi: now.getMinutes() };
+    view = { y: val.y, m: val.m };
+    updateTrigger();
+    switchSub('day');
+    renderClock();
+  };
+  el.querySelector('[data-ok]').onclick = e => {
+    e.stopPropagation();
+    updateTrigger();
+    panel.classList.remove('open');
+    input.classList.remove('open');
+  };
+  panel.onclick = e => e.stopPropagation();
+  document.addEventListener('click', () => {
+    panel.classList.remove('open');
+    input.classList.remove('open');
+  });
+
+  // ─── 初始化 ───
+  renderTicks();
+  updateTrigger();
+  switchSub('day');
+})();
+
+// ─── 评论展开 / 收起 ───
+(function(){
+  document.querySelectorAll('.comment-more').forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const list = btn.closest('.comment-replies');
+      if (!list) return;
+      const expanded = list.classList.toggle('expanded');
+      const hidden = list.querySelectorAll('.comment.more-hidden');
+      btn.textContent = expanded ? '收起' : `展开 ${hidden.length} 条回复`;
+    };
+  });
+})();
+
+</script>
+<script>
+// 搜索框清除按钮 /* data-search-bound */
+document.querySelectorAll('.search-input input').forEach(inp => {
+  const btn = inp.parentElement.querySelector('.search-clear');
+  if (!btn) return;
+  const toggle = () => { btn.style.display = inp.value ? 'inline-flex' : 'none'; };
+  inp.addEventListener('input', toggle);
+  btn.addEventListener('click', () => { inp.value = ''; toggle(); inp.focus(); });
+  toggle();
+});
+</script>
+<script>
+// 滚动触发
+(function(){
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.scroll-reveal, .scroll-reveal-up, .scroll-reveal-down, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-zoom, .scroll-reveal-rotate, .scroll-reveal-blur, .scroll-reveal-fade')
+    .forEach(el => io.observe(el));
+})();
+
+// 重播
+document.addEventListener('click', e => {
+  if (e.target.id !== 'replay-btn') return;
+  document.querySelectorAll('#animate [class*="animate-"], #animate [class^="loader-"], #animate .anim-seq > *').forEach(el => {
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = '';
+  });
+});
+</script>
+<script>
+// 数字滚动
+(function(){
+  const el = document.getElementById('count-demo');
+  if (!el) return;
+  function count() {
+    let n = 0;
+    const target = 128640;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      n += step;
+      if (n >= target) { n = target; clearInterval(timer); }
+      el.textContent = Math.floor(n).toLocaleString();
+    }, 20);
+  }
+  count();
+  document.getElementById('replay-count')?.addEventListener('click', count);
+})();
+
+// 数字递增
+let incVal = 1236;
+document.getElementById('btn-inc')?.addEventListener('click', function() {
+  incVal += 128;
+  const el = document.getElementById('num-inc');
+  el.textContent = incVal.toLocaleString();
+  el.classList.remove('number-increment');
+  void el.offsetHeight;
+  el.classList.add('number-increment');
+});
+
+// 数字递减
+let decVal = 1236;
+document.getElementById('btn-dec')?.addEventListener('click', function() {
+  decVal -= 56;
+  const el = document.getElementById('num-dec');
+  el.textContent = decVal.toLocaleString();
+  el.classList.remove('number-decrement');
+  void el.offsetHeight;
+  el.classList.add('number-decrement');
+});
+
+// 点赞
+document.getElementById('like-1')?.addEventListener('click', function(){
+  this.classList.toggle('liked');
+  const span = this.querySelector('span');
+  const n = parseInt(span.textContent.replace(/[,\s]/g,'')) || 0;
+  span.textContent = (n + (this.classList.contains('liked') ? 1 : -1)).toLocaleString();
+});
+
+document.getElementById('like-2')?.addEventListener('click', function(){
+  this.classList.toggle('liked');
+  if (this.classList.contains('liked')) {
+    this.classList.add('burst');
+    setTimeout(() => this.classList.remove('burst'), 700);
+  }
+});
+
+// 双击点赞
+(function(){
+  const zone = document.getElementById('dbltap-zone');
+  if (!zone) return;
+  zone.addEventListener('dblclick', e => {
+    const heart = document.createElement('div');
+    heart.className = 'double-tap-heart';
+    heart.textContent = '❤';
+    heart.style.top = (e.offsetY) + 'px';
+    heart.style.left = (e.offsetX) + 'px';
+    zone.appendChild(heart);
+    setTimeout(() => heart.remove(), 900);
+  });
+})();
+
+// Toast
+function showToast(type, msg) {
+  const colors = {
+    success: 'var(--x-success)',
+    error: 'var(--x-danger)',
+    info: 'var(--x-primary)',
+  };
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  const el = document.createElement('div');
+  el.className = 'toast-enter-top';
+  el.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 20px;background:${colors[type]};color:#fff;border-radius:10px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 8px 24px -4px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px`;
+  el.innerHTML = `<span style="font-size:16px">${icons[type]}</span>${msg}`;
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.className = 'toast-exit-top';
+    setTimeout(() => el.remove(), 300);
+  }, 2200);
+}
+
+// 状态切换
+function doStateSwitch(state) {
+  const el = document.getElementById('state-switch-demo');
+  if (!el) return;
+  el.innerHTML = '';
+  if (state === 'loading') {
+    el.innerHTML = '<div class="spinner spinner-sm"></div><span style="color:var(--x-fg-dim)">加载中...</span>';
+  } else if (state === 'success') {
+    el.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--x-success)" stroke-width="3" stroke-linecap="round" class="check-mark"><path d="M5 13l4 4L19 7"/></svg><span style="color:var(--x-success);font-weight:600">成功</span>';
+    el.classList.add('state-success');
+    setTimeout(() => el.classList.remove('state-success'), 900);
+  } else {
+    el.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--x-danger)" stroke-width="3" stroke-linecap="round" class="cross-mark"><path d="M6 6l12 12"/><path d="M6 18L18 6"/></svg><span style="color:var(--x-danger);font-weight:600">出错</span>';
+    el.classList.add('state-error');
+    setTimeout(() => el.classList.remove('state-error'), 600);
+  }
+}
+
+// 表格行
+function removeRow(btn) {
+  const row = btn.closest('[data-row]');
+  row.classList.add('row-removing');
+  setTimeout(() => row.remove(), 400);
+}
+
+let rowN = 3;
+function addRow() {
+  const box = document.getElementById('table-demo');
+  const names = ['赵六 · 访客', '钱七 · 编辑', '孙八 · 管理员'];
+  const row = document.createElement('div');
+  row.setAttribute('data-row', '');
+  row.className = 'row-new';
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px;background:var(--x-bg-soft);border-radius:8px;margin-bottom:6px';
+  row.innerHTML = `<span style="flex:1;font-size:14px">${names[rowN % 3]}</span><button class="btn btn-xs" onclick="removeRow(this)">删除</button>`;
+  box.appendChild(row);
+  rowN++;
+}
+</script>
+</body>
+</html>

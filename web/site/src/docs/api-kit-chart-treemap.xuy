@@ -1,0 +1,18 @@
+// kit: 矩形树图
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: 矩形树图"),
+    P("squarified 算法（分类：层级）"),
+    H2("引入"),
+    Code("import Kit from 'xunay/kit/charts/treemap'", "js"),
+    H2("实时预览"),
+    ChartDemo("treemap", {"height": 280, "depth": 1, "data": [{"label": "技术", "value": 300, "children": [{"label": "前端", "value": 150}, {"label": "后端", "value": 150}]}, {"label": "产品", "value": 250}, {"label": "运营", "value": 180}]}),
+    H2("示例"),
+    Code("const chart = new Kit('#app', { title: '矩形树图' })\nchart.setData([...])\nchart.setOptions({ theme: 'dark' })\nchart.replay()\nchart.destroy()", "js"),
+    H2("通用方法"),
+    Table(["方法","说明"], [["setData(data)","替换数据"],["setOptions(opts)","更新配置"],["render({animate})","手动重绘"],["replay()","重播动画"],["destroy()","销毁"]]),
+    Tip("完整清单见「Kit 组件 → Kit 总览」。"),
+  )
+}

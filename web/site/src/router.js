@@ -1,0 +1,81 @@
+// 自动生成，请勿手改
+// 源：src/pages/
+// 用 node bin/scan-pages.js 或 xuyc build 同步
+
+import { signal, show, div } from '/tmp/xuyg-test/xunay.js'
+
+export const route = signal(norm(location.hash))
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', () => {
+    route(norm(location.hash))
+    window.scrollTo(0, 0)
+  })
+}
+
+function norm(h) {
+  h = (h || '').replace(/^#/, '')
+  if (!h) return '/'
+  if (!h.startsWith('/')) h = '/' + h
+  return h
+}
+
+export function go(p) {
+  location.hash = p.startsWith('/') ? p : '/' + p
+}
+
+const TABLE = [
+  { url: "/home", load: () => import("./pages/Home.js"), params: [] },
+  { url: "/kittest", load: () => import("./pages/KitTest.js"), params: [] },
+]
+
+const _pageCache = new Map()
+const _loading = new Map()
+
+export function match(path) {
+  for (const r of TABLE) {
+    const m = parse(r, path)
+    if (m) return { url: r.url, load: r.load, params: m.params }
+  }
+  return null
+}
+
+export function LazyPage(m) {
+  const comp = signal(_pageCache.get(m.url))
+  if (!comp() && !_loading.has(m.url)) {
+    _loading.set(m.url, true)
+    m.load().then((mod) => {
+      const fn = Object.values(mod).find((v) => typeof v === "function")
+      _pageCache.set(m.url, fn)
+      comp(fn)
+    }).catch((e) => {
+      console.error("[router] lazy load failed:", m.url, e)
+      _loading.delete(m.url)
+    })
+  }
+  return show(
+    () => comp() !== undefined && comp() !== null,
+    () => { const C = comp(); return C ? C(m.params) : (() => {
+  const _div0 = document.createElement("div")
+  _div0.className = "x-empty"
+  _div0.appendChild(document.createTextNode(""))
+  return _div0
+})() }
+  )
+}
+
+function parse(r, path) {
+  if (r.params.length === 0) {
+    return r.url === path ? { params: {} } : null
+  }
+  const parts = path.split('/').filter(Boolean)
+  const tpl = r.url.split('/').filter(Boolean)
+  if (parts.length !== tpl.length) return null
+  const params = {}
+  for (let i = 0; i < tpl.length; i++) {
+    const t = tpl[i]
+    if (t.startsWith(':')) params[t.slice(1)] = decodeURIComponent(parts[i])
+    else if (t !== parts[i]) return null
+  }
+  return { params }
+}

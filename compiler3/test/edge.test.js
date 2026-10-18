@@ -10,7 +10,11 @@ const nonVoid = allTags.filter(t => !VOID_TAGS.has(t))
 for (const tag of nonVoid) {
   test(`[${tag}] 空 children null`, () => {
     const out = compile(`const el = ${tag}(null)`)
-    assert.match(out, new RegExp(`createElement\\("${tag}"\\)`))
+    if (tag === 'fragment') {
+      assert.match(out, /createDocumentFragment\(\)/)
+    } else {
+      assert.match(out, new RegExp(`createElement\\("${tag}"\\)`))
+    }
     assert.doesNotMatch(out, /appendChild/)
   })
 }
@@ -71,12 +75,19 @@ for (const tag of nonVoid) {
 }
 
 // 属性同时有：class + style + event + id
-for (const tag of allTags.slice(0, 20)) {
+for (const tag of allTags.slice(0, 20).filter(t => t !== 'fragment')) {
   test(`[${tag}] 全属性混合`, () => {
     const out = compile(`const el = ${tag}({ id: 'x', class: 'c', style: { color: 'red' }, on: { click: () => go() } })`)
     assert.ok(out.length > 0)
   })
 }
+
+test('[fragment] 拒绝普通属性', () => {
+  assert.throws(
+    () => compile(`const el = fragment({ id: 'x' })`),
+    /fragment 不支持属性/
+  )
+})
 
 // 深层属性嵌套
 test('深层属性链', () => {
@@ -97,7 +108,7 @@ test('50 个静态子节点', () => {
 for (const tag of nonVoid.slice(0, 30)) {
   test(`[${tag}] 三个子节点`, () => {
     const out = compile(`const el = ${tag}(null, span(null, 'a'), span(null, 'b'), span(null, 'c'))`)
-    const count = (out.match(/createElement/g) || []).length
+    const count = (out.match(/create(?:Element|DocumentFragment)/g) || []).length
     assert.equal(count, 4)
   })
 }

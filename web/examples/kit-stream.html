@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>StreamChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>StreamChart · 流图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-baseline">🌊 基线</button>
+<button id="btn-mode">〰 曲线</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">主题流行度 · wiggle 基线</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">流量来源 · 100% 堆叠</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import StreamChart from './kit/charts/stream.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>a+Math.random()*(b-a)
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+const THEMES = ['React','Vue','Svelte','Angular','Solid','Qwik','Astro','Next']
+function mkData() {
+  return THEMES.map((name, i) => ({
+    name,
+    color: ['#61dafb','#41b883','#ff3e00','#dd0031','#446b9e','#18b6f6','#ff5d01','#000'][i] || undefined,
+    data: MONTHS.map((m, j) => ({
+      label: m,
+      value: Math.round(30 + Math.sin((j + i) * 0.7) * 25 + Math.random() * 40 + (i < 3 ? 50 : 10)),
+    })),
+  }))
+}
+const TRAFFIC = ['直接访问','搜索引擎','社交媒体','邮件','联盟','广告']
+function mkTraffic() {
+  return TRAFFIC.map((name, i) => ({
+    name,
+    data: MONTHS.map((m, j) => ({
+      label: m,
+      value: Math.round(50 + Math.sin((j + i * 1.5) * 0.6) * 30 + Math.random() * 60),
+    })),
+  }))
+}
+const c1 = new StreamChart('#c1',{
+  title:'主题流行度',
+  subtitle:'wiggle 基线 · 悬停查看分层',
+  series: mkData(),
+  height:400,
+  baseline:'wiggle',
+  onHover: p => p && log('hover', p.label, '共 '+p.total.toFixed(0)),
+  onStreamClick: (s) => log('click', s.name),
+})
+const c2 = new StreamChart('#c2',{
+  title:'流量来源',
+  subtitle:'100% 归一化 · silhouette 居中',
+  series: mkTraffic(),
+  height:360,
+  baseline:'silhouette',
+  legendPosition:'bottom',
+  yFormat: v => (v * 100).toFixed(0) + '%',
+  labels: MONTHS,
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let baselines=['wiggle','silhouette','zero','expand'], bi=0
+document.getElementById('btn-baseline').onclick=()=>{bi=(bi+1)%baselines.length;const b=baselines[bi];c1.setOptions({baseline:b});log('基线 →',b)}
+let modes=['smooth','line'], mi=0
+document.getElementById('btn-mode').onclick=()=>{mi=(mi+1)%modes.length;c1.setOptions({mode:modes[mi]});log('曲线 →',modes[mi])}
+document.getElementById('btn-rand').onclick=()=>{c1.setData({series:mkData()});c2.setData({series:mkTraffic()});log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

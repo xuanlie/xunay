@@ -1,0 +1,15 @@
+// 内置模板
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("Xuyg · 20 个内置 sdu 模板"),
+    P("所有内置模板编译期内联展开，零运行时依赖。用了任意内置模板，编译产物自动注入 BUILTIN_CSS。"),
+    H2("电商"),
+    Table(["模板","参数"], [["NavBar","{ brand, search, ops }"],["Hero","{ slides, index }"],["CateGrid","{ items }"],["GoodsCard","{ item }"],["GoodsList","{ items }"],["SeckillBar","{ title, sec }"],["Footer","{ cols, copy }"],["SideBar","{ items }"]]),
+    H2("通用"),
+    Table(["模板","参数"], [["StatCard","{ label, value }"],["StatRow","{ items }"],["UserCard","{ item }"],["UserRow","{ item }"],["ListItem","{ title, desc, icon }"],["Tabs","{ items, model }"],["Breadcrumb","{ items }"],["Empty","{ icon, text }"],["Loading","{ text }"],["Table","{ rows, cols }"],["Modal","{ title, open }"],["Form","{ fields }"]]),
+    H2("用法"),
+    Code("pag Home() {\n  div(null,\n    sdu NavBar({ brand: 'ShopX', search: '搜索' }),\n    sdu GoodsList({ items: goods(12) }),\n    sdu Footer({ cols: [], copy: '© 2026' })\n  )\n}", "js"),
+  )
+}

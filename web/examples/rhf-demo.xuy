@@ -1,0 +1,54 @@
+// title: react-hook-form 测试
+import { mount } from 'xunay'
+import React from 'xunay/compat'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+const h = React.createElement
+
+const schema = z.object({
+  name: z.string().min(2, '名字至少 2 个字'),
+  email: z.string().email('邮箱格式不对'),
+})
+
+function Form() {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { name: '', email: '' },
+  })
+
+  const onSubmit = (data) => {
+    alert('提交成功: ' + JSON.stringify(data))
+  }
+
+  const inputStyle = {
+    width: '100%', padding: '8px 12px', margin: '4px 0 12px',
+    background: '#21252b', border: '1px solid #3b4048', color: '#abb2bf',
+    borderRadius: '4px', fontFamily: 'inherit', boxSizing: 'border-box',
+  }
+
+  return h('form', { onSubmit: handleSubmit(onSubmit), style: { maxWidth: '400px' } },
+    h('label', { style: { color: '#98c379' } }, '姓名'),
+    h('input', { ...register('name'), style: inputStyle }),
+    errors.name ? h('div', { style: { color: '#e06c75', marginTop: '-8px', marginBottom: '8px', fontSize: '12px' } }, errors.name.message) : null,
+
+    h('label', { style: { color: '#98c379' } }, '邮箱'),
+    h('input', { ...register('email'), style: inputStyle }),
+    errors.email ? h('div', { style: { color: '#e06c75', marginTop: '-8px', marginBottom: '8px', fontSize: '12px' } }, errors.email.message) : null,
+
+    h('button', { type: 'submit', style: 'padding:8px 20px;background:#61afef;color:#fff;border:0;border-radius:4px;cursor:pointer;font-family:inherit' }, '提交')
+  )
+}
+
+function App() {
+  return h('div', {
+    style: { padding: '24px', background: '#282c34', color: '#abb2bf', fontFamily: 'system-ui', minHeight: '100vh' },
+  },
+    h('h1', { style: { color: '#61afef' } }, 'react-hook-form + zod'),
+    h('div', { style: { color: '#98c379', marginBottom: '16px' } }, 'React Hook Form 加载成功'),
+    h(Form)
+  )
+}
+
+React.createRoot(document.getElementById('app')).render(h(App))

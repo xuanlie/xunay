@@ -1,5 +1,5 @@
 // 贡献指南
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -18,7 +18,7 @@ export function Doc() {
     P("改核心代码必须加测试。"),
     Code("import { test } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { signal } from '../core/src/core.js'\n\ntest('改动说明', () => {\n  const s = signal(1)\n  s(2)\n  assert.equal(s(), 2)\n})", "js"),
     H2("项目结构"),
-    Code("core/          核心运行时\ncompiler2/     .xuy 编译器\nbin/           命令行工具\nbackends/      四套后端\nsite/          文档站\ndocs/          Markdown 文档\nexamples/      示例\ntest/          测试", "txt"),
+    Code("core/          核心运行时\ncompiler2/     .xuy 编译器\nbin/           命令行工具\nbackends/      五套后端\nsite/          文档站\ndocs/          Markdown 文档\nexamples/      示例\ntest/          测试", "txt"),
     H2("Commit 规范"),
     Table(["前缀","用途"], [["feat:","新功能"],["fix:","修 bug"],["docs:","文档"],["refactor:","重构"],["perf:","性能"],["test:","测试"],["chore:","杂项"]]),
     H2("License"),

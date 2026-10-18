@@ -1,0 +1,52 @@
+// title: ref 最小测试
+import React from 'xunay/compat'
+const h = React.createElement
+
+function out(msg) {
+  let el = document.getElementById('__diag')
+  if (!el) {
+    el = document.createElement('pre')
+    el.id = '__diag'
+    el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;padding:10px;font:12px monospace;max-height:60vh;overflow:auto;z-index:99999;white-space:pre-wrap;margin:0'
+    document.body.appendChild(el)
+  }
+  el.textContent += msg + '\n'
+  el.scrollTop = el.scrollHeight
+}
+
+out('[1] import OK')
+
+// 测试 1：类组件 + ref
+function MyClass(props) {}
+MyClass.prototype = Object.create(React.Component.prototype)
+MyClass.prototype.constructor = MyClass
+MyClass.prototype.isReactComponent = {}
+MyClass.prototype.render = function() {
+  return h('div', null, 'class 组件内容')
+}
+
+// 测试 2：forwardRef 包裹
+const MyFwd = React.forwardRef((props, ref) => {
+  out('[FWD] 收到 ref: ' + typeof ref)
+  return h(MyClass, { ref: ref })
+})
+
+let captured1 = null
+let captured2 = null
+
+function App() {
+  React.useEffect(() => {
+    out('[3] useEffect: captured1=' + (captured1 ? '有' : '无') + ', captured2=' + (captured2 ? '有' : '无'))
+  }, [])
+  return h('div', null,
+    h(MyClass, { ref: inst => { out('[REF1] 类组件 ref 回调'); captured1 = inst } }),
+    h(MyFwd, { ref: inst => { out('[REF2] forwardRef ref 回调'); captured2 = inst } })
+  )
+}
+
+try {
+  React.createRoot(document.getElementById('app')).render(h(App))
+  out('[4] render 完成')
+} catch (e) {
+  out('!! 顶层: ' + (e.stack || e.message))
+}

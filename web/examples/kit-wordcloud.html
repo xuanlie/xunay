@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordcloudChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>WordcloudChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-color">🎨 配色</button>
+  <button id="btn-rotate">🔄 旋转比例</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">编程语言热度</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">单色 · 无旋转</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">色阶 · 密集词</div>
+    <div id="c3"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import WordcloudChart from './kit/charts/wordcloud.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const LANG_DATA = [
+  { text: 'JavaScript', value: 100 },
+  { text: 'Python', value: 95 },
+  { text: 'TypeScript', value: 88 },
+  { text: 'Java', value: 82 },
+  { text: 'C++', value: 78 },
+  { text: 'C#', value: 72 },
+  { text: 'Go', value: 68 },
+  { text: 'Rust', value: 65 },
+  { text: 'PHP', value: 60 },
+  { text: 'Ruby', value: 52 },
+  { text: 'Swift', value: 48 },
+  { text: 'Kotlin', value: 44 },
+  { text: 'Scala', value: 32 },
+  { text: 'Dart', value: 30 },
+  { text: 'Elixir', value: 22 },
+  { text: 'Haskell', value: 20 },
+  { text: 'Lua', value: 26 },
+  { text: 'Perl', value: 18 },
+  { text: 'R', value: 38 },
+  { text: 'MATLAB', value: 24 },
+  { text: 'Zig', value: 16 },
+  { text: 'Nim', value: 12 },
+  { text: 'Crystal', value: 10 },
+  { text: 'Erlang', value: 14 },
+  { text: 'Clojure', value: 12 },
+]
+
+const TECH_DATA = [
+  { text: 'React', value: 95 },
+  { text: 'Vue', value: 85 },
+  { text: 'Svelte', value: 65 },
+  { text: 'Angular', value: 70 },
+  { text: 'Next.js', value: 88 },
+  { text: 'Nuxt', value: 55 },
+  { text: 'Vite', value: 78 },
+  { text: 'Webpack', value: 62 },
+  { text: 'Tailwind', value: 82 },
+  { text: 'Vue Router', value: 45 },
+  { text: 'Redux', value: 58 },
+  { text: 'Zustand', value: 52 },
+  { text: 'Pinia', value: 48 },
+  { text: 'RxJS', value: 40 },
+  { text: 'GraphQL', value: 60 },
+  { text: 'Apollo', value: 42 },
+  { text: 'Prisma', value: 46 },
+  { text: 'Zod', value: 44 },
+  { text: 'Axios', value: 50 },
+  { text: 'Fetch', value: 68 },
+]
+
+const WORDS_DATA = '中国 美国 日本 德国 英国 法国 印度 巴西 俄罗斯 加拿大 澳大利亚 意大利 西班牙 韩国 墨西哥 印尼 荷兰 沙特 瑞士 土耳其 波兰 比利时 阿根廷 瑞典 挪威 丹麦 芬兰 爱尔兰 葡萄牙 希腊 埃及 南非 越南 泰国 菲律宾 马来西亚 新加坡 新西兰 智利 秘鲁'
+  .split(' ').map((w, i) => ({ text: w, value: 100 - i * 2 }))
+
+const c1 = new WordcloudChart('#c1', {
+  title: '编程语言',
+  subtitle: '悬停放大 · 点击查看',
+  data: LANG_DATA,
+  height: 380,
+  rotateRatio: 0.25,
+  colorMode: 'palette',
+  onHover: w => w && log('hover', w.text, w.value),
+  onWordClick: (w) => log('click', w.text),
+})
+
+const c2 = new WordcloudChart('#c2', {
+  title: '技术栈',
+  data: TECH_DATA,
+  height: 340,
+  rotateRatio: 0,
+  colorMode: 'single',
+  singleColor: '#8b5cf6',
+})
+
+const c3 = new WordcloudChart('#c3', {
+  title: '国家热度',
+  data: WORDS_DATA,
+  height: 340,
+  rotateRatio: 0.15,
+  colorMode: 'ramp',
+  ramp: ['#c7d2fe', '#6366f1', '#312e81'],
+  minFontSize: 11,
+  maxFontSize: 46,
+})
+
+let dark = false
+const modes = ['palette', 'ramp', 'single']
+let modeIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2, c3].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-color').onclick = () => {
+  modeIdx = (modeIdx + 1) % modes.length
+  const m = modes[modeIdx]
+  c1.setOptions({ colorMode: m })
+  log('配色 →', m)
+}
+
+document.getElementById('btn-rotate').onclick = () => {
+  const r = c1.opts.rotateRatio
+  const next = r === 0 ? 0.25 : r === 0.25 ? 0.5 : 0
+  c1.setOptions({ rotateRatio: next })
+  log('旋转比例 →', next)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  const shuffle = (arr) => arr.map(d => ({ ...d, value: Math.round(d.value * (0.6 + Math.random() * 0.8)) }))
+  c1.setData(shuffle(LANG_DATA))
+  c2.setData(shuffle(TECH_DATA))
+  c3.setData(shuffle(WORDS_DATA))
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2, c3].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

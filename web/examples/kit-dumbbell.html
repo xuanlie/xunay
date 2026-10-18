@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>DumbbellChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>DumbbellChart · 哑铃图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-dir">🔁 方向</button>
+<button id="btn-sort">↕ 排序</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">各国 GDP 20年变化（万亿）</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">员工满意度 · 培训前后</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import DumbbellChart from './kit/charts/dumbbell.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const COUNTRIES = ['美国','中国','日本','德国','英国','印度','法国','意大利','巴西','加拿大']
+function mkGDP() {
+  return COUNTRIES.map(name => {
+    const a = rand(2, 15)
+    const b = Math.max(1, a + (Math.random() - 0.35) * 10)
+    return { label: name, a, b }
+  })
+}
+const DEPTS = ['研发部','市场部','销售部','客服部','财务部','人事部','运营部','设计部']
+function mkSatisfaction() {
+  return DEPTS.map(name => {
+    const a = rand(50, 75)
+    const b = Math.min(100, a + (Math.random() - 0.3) * 30)
+    return { label: name, a, b }
+  })
+}
+const c1 = new DumbbellChart('#c1',{
+  title:'各国 GDP 变化',
+  subtitle:'20 年前 vs 现在',
+  data: mkGDP(),
+  rowHeight:38,
+  valueFormat: v => v.toFixed(1) + 'T',
+  valueDecimals: 1,
+  sort:'absDesc',
+  onHover: d => d && log('hover', d.label, d.a+'→'+d.b),
+  onRowClick: (d,i) => log('click', d.label),
+  onDotClick: (d,i) => log('dot', d.label, d.type, d.type==='a'?d.a:d.b),
+})
+const c2 = new DumbbellChart('#c2',{
+  title:'员工满意度 · 培训前后',
+  data: mkSatisfaction(),
+  rowHeight:34,
+  valueFormat: v => v.toFixed(0),
+})
+// 加自定义 labelA/labelB 到 raw data，让图例显示中文
+c1._data.forEach(d => { d._raw.labelA = '20年前'; d._raw.labelB = '现在' })
+c1._renderLegend()
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-dir').onclick=()=>{const d=c1.opts.direction==='horizontal'?'vertical':'horizontal';c1.setOptions({direction:d});log('方向 →',d)}
+let sorts=['none','absAsc','absDesc','deltaDesc'], si=2
+document.getElementById('btn-sort').onclick=()=>{si=(si+1)%sorts.length;const s=sorts[si];c1.setOptions({sort:s});c1.setData(mkGDP());c1._data.forEach(d=>{d._raw.labelA='20年前';d._raw.labelB='现在'});c1._renderLegend();log('排序 →',s)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(mkGDP());c1._data.forEach(d=>{d._raw.labelA='20年前';d._raw.labelB='现在'});c1._renderLegend();c2.setData(mkSatisfaction());log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

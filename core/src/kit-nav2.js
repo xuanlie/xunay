@@ -11,13 +11,13 @@ export function Menu(props) {
     style: {
       padding: '10px 16px', paddingLeft: (16 + depth * 16) + 'px',
       cursor: 'pointer', borderRadius: '6px', fontSize: '14px',
-      background: sel() === it.key ? '#eff6ff' : 'transparent',
-      color: sel() === it.key ? '#1f6feb' : '#374151',
+      background: sel() === it.key ? 'var(--x-primary-soft)' : 'transparent',
+      color: sel() === it.key ? 'var(--x-primary)' : 'var(--x-text)',
       fontWeight: sel() === it.key ? '600' : '400'
     },
     on: {
       click: () => onSelect && onSelect(it.key),
-      mouseenter: e => { if (sel() !== it.key) e.currentTarget.style.background = '#f3f4f6' },
+      mouseenter: e => { if (sel() !== it.key) e.currentTarget.style.background = 'var(--x-bg-hover)' },
       mouseleave: e => { if (sel() !== it.key) e.currentTarget.style.background = 'transparent' }
     }
   }, it.icon ? span({ style: { marginRight: '8px' } }, it.icon) : null, it.label)
@@ -49,8 +49,8 @@ export function Anchor(props) {
       href: it.href,
       style: () => ({
         padding: '6px 12px', fontSize: '13px', textDecoration: 'none',
-        color: active() === it.href ? '#1f6feb' : '#6b7280',
-        borderLeft: '2px solid ' + (active() === it.href ? '#1f6feb' : 'transparent'),
+        color: active() === it.href ? 'var(--x-primary)' : 'var(--x-text-dim)',
+        borderLeft: '2px solid ' + (active() === it.href ? 'var(--x-primary)' : 'transparent'),
         fontWeight: active() === it.href ? '600' : '400'
       })
     }, it.label))
@@ -70,7 +70,7 @@ export function BackTop(props) {
     style: {
       position: 'fixed', right: right + 'px', bottom: bottom + 'px',
       width: '44px', height: '44px', borderRadius: '50%',
-      background: '#1f6feb', color: '#fff', border: 0, cursor: 'pointer',
+      background: 'var(--x-primary)', color: 'var(--x-text-inverse)', border: 0, cursor: 'pointer',
       boxShadow: '0 4px 12px rgba(31,111,235,.4)', fontSize: '18px', zIndex: 100
     },
     on: { click: () => window.scrollTo({ top: 0, behavior: 'smooth' }) }
@@ -87,7 +87,7 @@ export function Collapse(props, ...children) {
       div({
         style: {
           padding: '12px 16px', cursor: 'pointer', fontWeight: '500',
-          background: openIdx() === i ? '#f9fafb' : '#fff',
+          background: openIdx() === i ? 'var(--x-bg-soft)' : 'var(--x-text-inverse)',
           display: 'flex', justifyContent: 'space-between'
         },
         on: { click: () => openIdx(openIdx() === i ? -1 : i) }

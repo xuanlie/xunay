@@ -1,0 +1,29 @@
+// title: 下半部分
+import { mount } from 'xunay'
+import {
+  Btn, Row, Col, Text, Card, Tag, Badge,
+  BarChart, LineChart, PieChart, Sparkline, RingProgress,
+  DonutChart, AreaChart, RadarChart, GaugeChart, ScatterChart,
+  WaterfallChart, FunnelChart, CandlestickChart, Treemap, Heatmap,
+  IconCheck, IconClose, IconSearch, IconUser, IconHome, IconSettings,
+  IconHeart, IconStar, IconSun, IconMoon, IconArrowRight, IconFile, IconMap,
+} from 'xunay/kit'
+
+mount(() => div({ style: 'padding:24px;background:#111;color:#0f0;font:14px monospace' },
+  div(null, '=== 下半：图表 / 图标 ==='),
+  div(null, '1. BarChart:'), BarChart({ data: [1,2,3], labels: ['a','b','c'], height: 100 }),
+  div(null, '2. LineChart:'), LineChart({ data: [1,2,3], labels: ['a','b','c'], height: 100 }),
+  div(null, '3. PieChart:'), PieChart({ data: [{ value: 1, label: 'a' }], size: 100 }),
+  div(null, '4. DonutChart:'), DonutChart({ data: [{ value: 1, label: 'a' }], size: 100 }),
+  div(null, '5. RingProgress:'), RingProgress({ value: 50, size: 100 }),
+  div(null, '6. GaugeChart:'), GaugeChart({ value: 50, size: 100 }),
+  div(null, '7. RadarChart:'), RadarChart({ data: [{ label: 'a', value: 1 }], size: 100 }),
+  div(null, '8. Heatmap:'), Heatmap({ data: [[1,2,3]] }),
+  div(null, '9. FunnelChart:'), FunnelChart({ data: [{ label: 'a', value: 1 }] }),
+  div(null, '10. Treemap:'), Treemap({ data: [{ label: 'a', value: 1 }] }),
+  div(null, '11. CandlestickChart:'), CandlestickChart({ data: [{ open:1, high:2, low:0, close:1.5 }], height: 100 }),
+  div(null, '12. IconCheck:'), IconCheck({ size: 24 }),
+  div(null, '13. IconSun:'), IconSun({ size: 24 }),
+  div(null, '14. IconArrowRight:'), IconArrowRight({ size: 24 }),
+  div(null, '=== 下半通过 ===')
+), '#app')

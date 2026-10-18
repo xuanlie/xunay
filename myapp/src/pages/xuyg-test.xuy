@@ -1,0 +1,21 @@
+// title: Xuyg 测试
+
+dt goods(3) {
+  id: seq
+  name: '商品 ' + seq
+  price: rand(99, 9999)
+}
+
+cpt Card(p) {
+  div({ class: 'card' },
+    div({ class: 'name' }, p.name),
+    div({ class: 'price' }, '¥' + p.price)
+  )
+}
+
+pag Test() {
+  div({ class: 'test' },
+    h1(null, 'Xuyg 测试'),
+    ...goods().map(g => Card(g))
+  )
+}

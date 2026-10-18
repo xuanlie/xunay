@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>BulletChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>BulletChart · 子弹图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">销售 KPI 达成</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">系统性能指标</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import BulletChart from './kit/charts/bullet.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const mkSales=()=>[
+  { label:'Q1 收入', value: 85, target: 80, max: 100, unit:' 万' },
+  { label:'Q2 收入', value: 92, target: 85, max: 120, unit:' 万' },
+  { label:'Q3 收入', value: 78, target: 90, max: 120, unit:' 万' },
+  { label:'Q4 收入', value: 110, target: 100, max: 130, unit:' 万' },
+  { label:'新客户', value: 45, target: 50, max: 80, unit:' 个' },
+  { label:'续约率', value: 88, target: 90, max: 100, unit:' %' },
+]
+const mkPerf=()=>[
+  { label:'CPU 使用', value: 62, target: 70, max: 100, unit:' %', ranges:[50, 80, 100] },
+  { label:'内存', value: 78, target: 75, max: 100, unit:' %', ranges:[60, 85, 100] },
+  { label:'响应时间', value: 120, target: 150, max: 300, unit:' ms', ranges:[100, 200, 300], color:'#06b6d4' },
+  { label:'QPS', value: 8500, target: 10000, max: 15000, unit:'', ranges:[5000, 10000, 15000], color:'#10b981' },
+  { label:'错误率', value: 0.8, target: 1.0, max: 5, unit:' %', ranges:[1, 3, 5], valueDecimals:2, color:'#f59e0b' },
+]
+const c1 = new BulletChart('#c1',{
+  title:'季度 KPI',
+  subtitle:'深灰竖线 = 目标值 · 背景色阶 = 差/中/好',
+  data: mkSales(),
+  valueDecimals: 0,
+  rangeColors:['#f1f5f9', '#e2e8f0', '#cbd5e1'],
+  onHover: d => d && log('hover', d.label, d.value),
+  onBarClick: (d,i) => log('click', d.label),
+})
+const c2 = new BulletChart('#c2',{
+  title:'监控指标',
+  data: mkPerf(),
+  rowHeight: 68,
+  onHover: d => d && log('hover', d.label),
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-rand').onclick=()=>{
+  const s=mkSales().map(d=>({...d, value: rand(Math.round(d.max*0.3), d.max), target: rand(Math.round(d.max*0.5), Math.round(d.max*0.9))}))
+  const p=mkPerf().map(d=>({...d, value: rand(1, d.max)}))
+  c1.setData(s); c2.setData(p); log('已刷新')
+}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

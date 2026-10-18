@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>XuNay Kit · 19 种图表</title>
+<style>
+  :root {
+    --bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+    --accent:#3b82f6;--accent-soft:#eff6ff;
+  }
+  [data-theme="dark"] {
+    --bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--border:#1e293b;
+    --accent-soft:#1e293b;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0;padding:20px;background:var(--bg);color:var(--text);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    transition:background 200ms ease,color 200ms ease;
+  }
+  header { margin-bottom:18px; }
+  h1 { margin:0 0 4px;font-size:22px;letter-spacing:-0.01em; }
+  .sub { color:var(--muted); font-size:13px; }
+  .toolbar {
+    position:sticky;top:0;z-index:50;margin:12px -20px 18px;padding:10px 20px;
+    background:color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
+    display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  }
+  .toolbar button {
+    padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+    background:var(--card);color:var(--text);cursor:pointer;font-size:13px;
+    transition:all 120ms ease;
+  }
+  .toolbar button:hover { border-color:var(--accent);color:var(--accent);transform:translateY(-1px); }
+  .toolbar button:active { transform:translateY(0); }
+  .section-title {
+    grid-column:1/-1;margin:14px 0 0;font-size:15px;font-weight:600;
+    color:var(--muted);letter-spacing:0.03em;text-transform:uppercase;
+    padding-left:2px;
+  }
+  .grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px; }
+  .card {
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:14px;transition:background 200ms ease,border-color 200ms ease,box-shadow 200ms ease;
+    box-shadow:0 1px 2px rgba(0,0,0,0.02);
+  }
+  .card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+  .card h3 { margin:0 0 10px;font-size:13px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;align-items:center; }
+  .card h3 .tag { font-weight:400;font-size:11px;padding:2px 6px;background:var(--accent-soft);color:var(--accent);border-radius:4px; }
+  .chart-host { width:100%; }
+  #log {
+    position:fixed;right:16px;bottom:16px;width:340px;max-height:36vh;overflow:auto;
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:10px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;
+    color:var(--muted);box-shadow:0 8px 32px rgba(0,0,0,0.12);
+    white-space:pre-wrap;z-index:99;
+  }
+  #log header { position:sticky;top:-10px;margin:-10px -12px 6px;padding:6px 12px;background:var(--card);
+    border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px; }
+  #log .close { cursor:pointer;color:var(--muted);background:none;border:none;font-size:14px;padding:0 4px; }
+  #log pre { margin:0; }
+  .stat { display:inline-block;padding:2px 6px;background:var(--accent-soft);color:var(--accent);border-radius:4px;font-size:11px;margin-left:6px; }
+  @media(max-width:600px){ .grid{grid-template-columns:1fr;} #log{width:calc(100% - 32px);} }
+</style>
+</head>
+<body>
+  <header>
+    <h1>XuNay Kit · Charts <span class="stat">19 种</span></h1>
+    <div class="sub">折线 · 面积 · 阶梯 · 柱状 · 水平柱 · 堆叠 · 直方 · 散点 · 气泡 · 饼 · 环 · 玫瑰 · 极坐标 · 雷达 · 漏斗 · 仪表盘 · 热力</div>
+  </header>
+
+  <div class="toolbar">
+    <button data-theme-btn="light">☀ 浅色</button>
+    <button data-theme-btn="dark">🌙 深色</button>
+    <button id="btn-random">🎲 随机数据</button>
+    <button id="btn-anim">▶ 重播动画</button>
+    <button id="btn-export">💾 导出 PNG</button>
+    <button id="btn-log">📋 日志</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div id="log" style="display:none">
+    <header>
+      <span>事件日志</span>
+      <button class="close" id="log-close">✕</button>
+    </header>
+    <pre id="log-body"></pre>
+  </div>
+
+<script type="module">
+import {
+  LineChart, AreaChart, StackedAreaChart, StepChart,
+  BarChart, HBarChart, StackedBarChart, StackedHBarChart, HistogramChart,
+  ScatterChart, BubbleChart,
+  PieChart, DonutChart, RoseChart, PolarChart,
+  RadarChart, FunnelChart, GaugeChart, HeatmapChart,
+  registerTheme
+} from './kit/charts/index.js'
+
+// ============== 日志 ==============
+const logEl = document.getElementById('log')
+const logBody = document.getElementById('log-body')
+function say(...args) {
+  const line = `[${new Date().toLocaleTimeString()}] ` + args.map(a =>
+    typeof a === 'object' ? JSON.stringify(a) : String(a)
+  ).join(' ')
+  logBody.textContent = line + '\n' + logBody.textContent
+  if (logBody.textContent.length > 6000) logBody.textContent = logBody.textContent.slice(0, 6000)
+}
+document.getElementById('btn-log').onclick = () => {
+  logEl.style.display = logEl.style.display === 'none' ? 'block' : 'none'
+}
+document.getElementById('log-close').onclick = () => { logEl.style.display = 'none' }
+
+// ============== 数据 ==============
+const months = ['一月','二月','三月','四月','五月','六月','七月','八月']
+const rnd = (a, b) => Math.round(a + Math.random() * (b - a))
+const seed = () => months.map((m, i) => ({ label: m, y: rnd(40, 240) }))
+
+const lineSeries = [
+  { name:'收入', data: seed() },
+  { name:'支出', data: seed() },
+  { name:'利润', data: seed() }
+]
+const stackedSeries = [
+  { name:'移动端', data: seed() },
+  { name:'桌面端', data: seed() },
+  { name:'平板', data: seed() }
+]
+const pieData = [
+  { label:'直接访问', value:335 },
+  { label:'搜索引擎', value:548 },
+  { label:'邮件营销', value:234 },
+  { label:'联盟广告', value:135 },
+  { label:'视频广告', value:148 }
+]
+const scatterData = [
+  { name:'A 组', data: Array.from({length:40}, (_,i)=>({ x: rnd(0,100), y: rnd(0,100) })) },
+  { name:'B 组', data: Array.from({length:40}, (_,i)=>({ x: rnd(0,100), y: rnd(0,100) })) }
+]
+const bubbleData = [
+  { name:'市场', data: Array.from({length:18}, ()=>({ x: rnd(10,90), y: rnd(20,200), r: rnd(6,26) })) }
+]
+const histData = [3,7,12,18,25,34,42,51,58,62,64,61,55,48,40,32,24,16,10,6].map((v,i)=>({ label:String(i*5), y:v }))
+const radarData = {
+  labels: ['性能','易用','功能','生态','文档','稳定'],
+  series: [
+    { name:'产品 A', data:[90,70,85,60,75,88] },
+    { name:'产品 B', data:[70,88,65,80,60,72] }
+  ]
+}
+const funnelData = [
+  { label:'访问', value:1000 },
+  { label:'注册', value:640 },
+  { label:'激活', value:420 },
+  { label:'付费', value:180 },
+  { label:'复购', value:75 }
+]
+const heatmapData = Array.from({length:7}, (_,r) =>
+  Array.from({length:12}, (_,c) => Math.round(20 + Math.sin(r*0.7 + c*0.5) * 40 + Math.random() * 30))
+)
+
+// ============== 主题 ==============
+registerTheme('brand', {
+  colors: ['#2563eb','#059669','#d97706','#dc2626','#7c3aed','#db2777','#0891b2','#65a30d']
+})
+
+// ============== 通用事件 ==============
+const ev = (name) => ({
+  onHover: (p) => p && say(name, 'hover', `s=${p.seriesIndex} i=${p.dataIndex}`),
+  onPointClick: (pt, si, di) => say(name, 'click', `s=${si} i=${di} y=${pt.y}`),
+  onBarClick: (d, i) => say(name, 'bar', `${d.label}=${d.y}`),
+  onSliceClick: (d, i) => say(name, 'slice', `${d.label}=${d.value}`)
+})
+
+// ============== 布局 ==============
+const grid = document.getElementById('grid')
+const charts = []
+
+function addCard(title, tag, mount) {
+  const card = document.createElement('div')
+  card.className = 'card'
+  const h = document.createElement('h3')
+  h.innerHTML = `<span>${title}</span><span class="tag">${tag}</span>`
+  card.appendChild(h)
+  const host = document.createElement('div')
+  host.className = 'chart-host'
+  card.appendChild(host)
+  grid.appendChild(card)
+  mount(host)
+}
+
+function addSection(name) {
+  const el = document.createElement('div')
+  el.className = 'section-title'
+  el.textContent = name
+  grid.appendChild(el)
+}
+
+const base = { theme:'brand', height:300, animation:{ duration:750, easing:'easeOutCubic' } }
+
+// ============== 折线家族 ==============
+addSection('折线家族')
+addCard('折线图 LineChart', 'line', (h) => {
+  charts.push(new LineChart(h, { ...base, title:'月度趋势', series:lineSeries, ...ev('line') }))
+})
+addCard('面积图 AreaChart', 'area', (h) => {
+  charts.push(new AreaChart(h, { ...base, title:'面积趋势', series:lineSeries, ...ev('area') }))
+})
+addCard('堆叠面积 StackedAreaChart', 'stacked-area', (h) => {
+  charts.push(new StackedAreaChart(h, { ...base, title:'堆叠面积', series:stackedSeries, ...ev('sarea') }))
+})
+addCard('阶梯图 StepChart', 'step', (h) => {
+  charts.push(new StepChart(h, { ...base, title:'阶梯变化', series:[{ name:'状态', data:seed() }], ...ev('step') }))
+})
+
+// ============== 柱状家族 ==============
+addSection('柱状家族')
+addCard('柱状图 BarChart', 'bar', (h) => {
+  charts.push(new BarChart(h, { ...base, title:'柱状对比', series:lineSeries.slice(0,2), ...ev('bar') }))
+})
+addCard('水平柱 HBarChart', 'hbar', (h) => {
+  charts.push(new HBarChart(h, { ...base, title:'水平柱', series:[{ name:'类别', data:seed() }], ...ev('hbar') }))
+})
+addCard('堆叠柱 StackedBarChart', 'stacked-bar', (h) => {
+  charts.push(new StackedBarChart(h, { ...base, title:'堆叠柱', series:stackedSeries, ...ev('sbar') }))
+})
+addCard('堆叠水平柱 StackedHBarChart', 'stacked-hbar', (h) => {
+  charts.push(new StackedHBarChart(h, { ...base, title:'堆叠水平柱', series:stackedSeries, ...ev('shbar') }))
+})
+addCard('直方图 HistogramChart', 'histogram', (h) => {
+  charts.push(new HistogramChart(h, { ...base, title:'分布直方图', data:histData, ...ev('hist') }))
+})
+
+// ============== 散点 / 气泡 ==============
+addSection('散点 / 气泡')
+addCard('散点图 ScatterChart', 'scatter', (h) => {
+  charts.push(new ScatterChart(h, { ...base, title:'散点分布', series:scatterData, ...ev('scatter') }))
+})
+addCard('气泡图 BubbleChart', 'bubble', (h) => {
+  charts.push(new BubbleChart(h, { ...base, title:'气泡对比', series:bubbleData, ...ev('bubble') }))
+})
+
+// ============== 圆形家族 ==============
+addSection('圆形家族')
+addCard('饼图 PieChart', 'pie', (h) => {
+  charts.push(new PieChart(h, { ...base, title:'占比', data:pieData, ...ev('pie') }))
+})
+addCard('环形图 DonutChart', 'donut', (h) => {
+  charts.push(new DonutChart(h, { ...base, title:'环形占比', data:pieData, ...ev('donut') }))
+})
+addCard('玫瑰图 RoseChart', 'rose', (h) => {
+  charts.push(new RoseChart(h, { ...base, title:'玫瑰图', data:pieData, ...ev('rose') }))
+})
+addCard('极坐标 PolarChart', 'polar', (h) => {
+  charts.push(new PolarChart(h, { ...base, title:'极坐标', data:pieData, ...ev('polar') }))
+})
+
+// ============== 其他 ==============
+addSection('其他')
+addCard('雷达图 RadarChart', 'radar', (h) => {
+  charts.push(new RadarChart(h, { ...base, title:'多维对比', labels:radarData.labels, series:radarData.series, ...ev('radar') }))
+})
+addCard('漏斗图 FunnelChart', 'funnel', (h) => {
+  charts.push(new FunnelChart(h, { ...base, title:'转化漏斗', data:funnelData, ...ev('funnel') }))
+})
+addCard('仪表盘 GaugeChart', 'gauge', (h) => {
+  charts.push(new GaugeChart(h, { ...base, title:'实时仪表', value:72, min:0, max:100, label:'CPU 使用率', ...ev('gauge') }))
+})
+addCard('热力图 HeatmapChart', 'heatmap', (h) => {
+  charts.push(new HeatmapChart(h, { ...base, title:'热力分布', data:heatmapData, ...ev('heat') }))
+})
+
+say('已创建', charts.length, '个图表')
+
+// ============== 工具栏 ==============
+document.querySelectorAll('[data-theme-btn]').forEach((btn) => {
+  btn.onclick = () => {
+    const t = btn.dataset.themeBtn
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark')
+    else document.documentElement.removeAttribute('data-theme')
+    charts.forEach((c) => c.update({ theme: t }))
+    say('主题 →', t)
+  }
+})
+
+document.getElementById('btn-random').onclick = () => {
+  const newLine = lineSeries.map((s) => ({ ...s, data: seed() }))
+  const newStack = stackedSeries.map((s) => ({ ...s, data: seed() }))
+  const newPie = pieData.map((d) => ({ ...d, value: rnd(80, 600) }))
+  let i = 0
+  for (const c of charts) {
+    if (['line','area','step'].includes(c.type)) c.setData({ series:newLine }, { animate:true })
+    else if (['bar','hbar','stacked-bar','stacked-hbar','stacked-area'].includes(c.type)) c.setData({ series:newStack }, { animate:true })
+    else if (['pie','donut','rose','polar'].includes(c.type)) c.setData({ data:newPie }, { animate:true })
+    else if (c.type === 'radar') c.setData({ labels:radarData.labels, series:radarData.series.map(s => ({...s, data:s.data.map(v=>Math.round(v + rnd(-15,15))) })) }, { animate:true })
+    else if (c.type === 'gauge') c.update({ value: rnd(10, 95) })
+    i++
+  }
+  say('数据已刷新', i, '个图表')
+}
+
+document.getElementById('btn-anim').onclick = () => {
+  charts.forEach((c) => c.render({ animate:true }))
+  say('重播动画')
+}
+
+document.getElementById('btn-export').onclick = async () => {
+  if (charts[0]) {
+    await charts[0].exportPNG('xunay-chart.png')
+    say('已导出 xunay-chart.png')
+  }
+}
+
+// 全局错误
+window.addEventListener('error', (e) => say('ERR', e.message, e.filename + ':' + e.lineno))
+window.addEventListener('unhandledrejection', (e) => say('REJ', String(e.reason)))
+</script>
+</body>
+</html>

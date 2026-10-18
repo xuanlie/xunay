@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>XuNay Kit · 1000 图标</title>
+<style>
+  :root { --bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--accent:#3b82f6; }
+  [data-theme="dark"] { --bg:#0b1220;--card:#0f172a;--text:#e2e8f0;--muted:#94a3b8;--border:#1e293b; }
+  * { box-sizing: border-box; }
+  body { margin:0;padding:20px;background:var(--bg);color:var(--text);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  h1 { margin:0 0 6px;font-size:20px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:14px; }
+  .toolbar { position:sticky;top:0;z-index:10;display:flex;gap:8px;flex-wrap:wrap;padding:10px 0;
+    background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(6px);margin-bottom:14px; }
+  input,button { padding:6px 10px;border:1px solid var(--border);background:var(--card);color:var(--text);
+    border-radius:8px;font-size:13px;outline:none; }
+  input { flex:1; min-width:200px; }
+  button { cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  .stat { color:var(--muted); font-size:12px; align-self:center; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:6px; }
+  .item { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:10px 6px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+    transition:all 120ms ease; }
+  .item:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+  .item svg { width:26px;height:26px; }
+  .item .name { font-size:10px;color:var(--muted); text-align:center; overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;max-width:100%; }
+  #log { position:fixed;right:16px;bottom:16px;background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted);
+    box-shadow:0 8px 24px rgba(0,0,0,0.1);display:none;max-width:300px; }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+  <h1>XuNay Kit · Icons <span id="total" style="font-size:14px;color:var(--muted)"></span></h1>
+  <div class="sub">点击任意图标复制名称 · 支持 SVG 字符串 / DOM 元素 / 挂载</div>
+
+  <div class="toolbar">
+    <input id="q" placeholder="搜索图标，例如 arrow / user / badge- / wave" />
+    <button data-size="16">16</button>
+    <button data-size="24">24</button>
+    <button data-size="32">32</button>
+    <button data-size="48">48</button>
+    <button id="theme">🌓 主题</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div id="log"></div>
+
+<script type="module">
+import { icons, iconNames, renderIcon, iconToSVG } from './kit/icons/index.js'
+
+const grid = document.getElementById('grid')
+const total = document.getElementById('total')
+const q = document.getElementById('q')
+const log = document.getElementById('log')
+let size = 24
+
+total.textContent = `共 ${iconNames().length} 个`
+
+function render(list) {
+  const frag = document.createDocumentFragment()
+  for (const name of list) {
+    const item = document.createElement('div')
+    item.className = 'item'
+    item.title = name
+    const svg = renderIcon(name, { size })
+    if (svg) item.appendChild(svg)
+    const label = document.createElement('div')
+    label.className = 'name'
+    label.textContent = name
+    item.appendChild(label)
+    item.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(name)
+        showLog(`已复制: ${name}`)
+      } catch { showLog(`名称: ${name}`) }
+    }
+    frag.appendChild(item)
+  }
+  grid.replaceChildren(frag)
+}
+
+function showLog(msg) {
+  log.textContent = msg
+  log.classList.add('show')
+  clearTimeout(showLog._t)
+  showLog._t = setTimeout(() => log.classList.remove('show'), 1500)
+}
+
+function refresh() {
+  const s = q.value.trim()
+  const list = s ? iconNames().filter((n) => n.toLowerCase().includes(s.toLowerCase())) : iconNames()
+  render(list)
+}
+
+q.oninput = refresh
+document.querySelectorAll('[data-size]').forEach((b) => {
+  b.onclick = () => { size = +b.dataset.size; refresh() }
+})
+document.getElementById('theme').onclick = () => {
+  document.documentElement.toggleAttribute('data-theme')
+  if (document.documentElement.hasAttribute('data-theme')) {
+    document.documentElement.setAttribute('data-theme', 'dark')
+  } else {
+    document.documentElement.removeAttribute('data-theme')
+  }
+}
+
+refresh()
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+// title: Kit 图标测试
+import { mount } from 'xunay'
+import { Icon, iconNames } from '../../../core/src/Kit/icons.js'
+
+mount('#app', () => {
+  const names = ['home','user','search','heart','star','bell','mail','settings','cloud','moon','rocket','zap']
+  return (
+    <div style="padding:24px;background:#0f172a;color:#e2e8f0;font-family:system-ui;min-height:100vh">
+      <h1 style="font-size:20px">Kit 图标总数: {iconNames().length}</h1>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px">
+        {names.map(n => (
+          <div style="background:#1e293b;padding:12px;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <Icon name={n} size={28} color="#60a5fa" />
+            <div style="font-size:10px;color:#64748b">{n}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+})

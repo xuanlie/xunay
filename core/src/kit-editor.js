@@ -121,8 +121,8 @@ export function RichText(props) {
     ),
     div({
       contenteditable: true,
+      ref: el => { if (el && !el.__xInit) { el.__xInit = true; el.innerHTML = sanitize(val()) } },
       style: { padding: '12px', minHeight: '120px', outline: 'none', fontSize: '14px', lineHeight: '1.6' },
-      html: sanitize(val()),
       on: { input: e => onChange && onChange(e.target.innerHTML) }
     })
   )
@@ -169,6 +169,12 @@ export function useHotkey(combo, handler) {
     handler(e)
   }
   window.addEventListener('keydown', fn)
+  // 注册到当前 scope，组件卸载时自动清理
+  const sc = runtime.currentScope
+  if (sc) {
+    if (!sc.unmountFns) sc.unmountFns = []
+    sc.unmountFns.push(() => window.removeEventListener('keydown', fn))
+  }
   return () => window.removeEventListener('keydown', fn)
 }
 
@@ -208,7 +214,7 @@ if (typeof document !== 'undefined' && !document.getElementById('x-code-style'))
     dracula: { bg:'#282a36', ln:'#21222c', lnfg:'#6272a4', fg:'#f8f8f2', k:'#ff79c6', s:'#f1fa8c', c:'#6272a4', n:'#bd93f9', f:'#50fa7b', t:'#8be9fd', m:'#ffb86c', caret:'#f8f8f0', bd:'#44475a', sel:'rgba(255,121,198,.25)' },
     monokai: { bg:'#272822', ln:'#1e1f1c', lnfg:'#75715e', fg:'#f8f8f2', k:'#f92672', s:'#e6db74', c:'#75715e', n:'#ae81ff', f:'#a6e22e', t:'#66d9ef', m:'#fd971f', caret:'#f8f8f0', bd:'#3e3d32', sel:'rgba(249,38,114,.25)' },
     'github-dark': { bg:'#0d1117', ln:'#161b22', lnfg:'#484f58', fg:'#c9d1d9', k:'#ff7b72', s:'#a5d6ff', c:'#8b949e', n:'#79c0ff', f:'#d2a8ff', t:'#ffa657', m:'#7ee787', caret:'#58a6ff', bd:'#30363d', sel:'rgba(88,166,255,.25)' },
-    'github-light': { bg:'#ffffff', ln:'#f6f8fa', lnfg:'#8c959f', fg:'#24292f', k:'#cf222e', s:'#0a3069', c:'#6e7781', n:'#0550ae', f:'#8250df', t:'#953800', m:'#116329', caret:'#0969da', bd:'#d0d7de', sel:'rgba(9,105,218,.15)' },
+    'github-light': { bg:'var(--x-text-inverse)', ln:'#f6f8fa', lnfg:'#8c959f', fg:'#24292f', k:'#cf222e', s:'#0a3069', c:'#6e7781', n:'#0550ae', f:'#8250df', t:'#953800', m:'#116329', caret:'#0969da', bd:'#d0d7de', sel:'rgba(9,105,218,.15)' },
     nord: { bg:'#2e3440', ln:'#3b4252', lnfg:'#616e88', fg:'#d8dee9', k:'#81a1c1', s:'#a3be8c', c:'#616e88', n:'#b48ead', f:'#88c0d0', t:'#ebcb8b', m:'#8fbcbb', caret:'#88c0d0', bd:'#434c5e', sel:'rgba(136,192,208,.25)' },
     'solarized-dark': { bg:'#002b36', ln:'#073642', lnfg:'#586e75', fg:'#839496', k:'#859900', s:'#2aa198', c:'#586e75', n:'#d33682', f:'#268bd2', t:'#b58900', m:'#cb4b16', caret:'#93a1a1', bd:'#073642', sel:'rgba(38,139,210,.25)' },
     'solarized-light': { bg:'#fdf6e3', ln:'#eee8d5', lnfg:'#93a1a1', fg:'#657b83', k:'#859900', s:'#2aa198', c:'#93a1a1', n:'#d33682', f:'#268bd2', t:'#b58900', m:'#cb4b16', caret:'#586e75', bd:'#eee8d5', sel:'rgba(38,139,210,.15)' },

@@ -1,0 +1,152 @@
+// title: XuNay UI · 主题系统验证
+import React, { useState } from 'xunay/compat'
+const h = React.createElement
+
+// 注入 ui.css（与编译产物同目录，编译后会把 ui.css cp 过去）
+if (!document.getElementById('xunay-ui')) {
+  const link = document.createElement('link')
+  link.id = 'xunay-ui'
+  link.rel = 'stylesheet'
+  link.href = './ui.css'
+  document.head.appendChild(link)
+}
+
+const THEMES  = ['light', 'dark', 'dracula', 'nord', 'solarized', 'tokyo', 'monokai']
+const ACCENTS = ['默认', 'green', 'red', 'orange', 'purple', 'cyan', 'pink']
+
+function Chip(p) {
+  return h('button', {
+    className: p.active ? 'btn btn-primary' : 'btn btn-dashed',
+    onClick: p.onClick,
+    style: { margin: '2px' }
+  }, p.label)
+}
+
+function Card(p) {
+  return h('div', { className: 'card mb-4' },
+    h('div', { className: 'card-header' },
+      h('div', { className: 'card-title' }, p.title)
+    ),
+    p.children
+  )
+}
+
+function App() {
+  const [theme,  setTheme]  = useState('light')
+  const [accent, setAccent] = useState('默认')
+
+  const setT = v => {
+    setTheme(v)
+    if (v === 'light') document.documentElement.removeAttribute('data-theme')
+    else document.documentElement.setAttribute('data-theme', v)
+  }
+  const setA = v => {
+    setAccent(v)
+    if (v === '默认') document.documentElement.removeAttribute('data-accent')
+    else document.documentElement.setAttribute('data-accent', v)
+  }
+
+  return h('div', { className: 'container', style: { padding: '24px 20px' } },
+    h('h1', null, 'XuNay UI · 主题系统'),
+
+    h(Card, { title: '切换主题' },
+      h('div', { className: 'row', style: { gap: '8px', flexWrap: 'wrap' } },
+        ...THEMES.map(t => h(Chip, { key: t, label: t, active: theme === t, onClick: () => setT(t) }))
+      )
+    ),
+
+    h(Card, { title: '切换主色 accent' },
+      h('div', { className: 'row', style: { gap: '8px', flexWrap: 'wrap' } },
+        ...ACCENTS.map(a => h(Chip, { key: a, label: a, active: accent === a, onClick: () => setA(a) }))
+      )
+    ),
+
+    h('div', { className: 'grid grid-3 mb-4' },
+      h(Card, { title: '按钮' },
+        h('div', { className: 'stack-sm' },
+          h('button', { className: 'btn-primary' },  'Primary'),
+          h('button', { className: 'btn-danger' },   'Danger'),
+          h('button', { className: 'btn-success' },  'Success'),
+          h('button', { className: 'btn-ghost' },    'Ghost'),
+          h('button', { className: 'btn-dashed' },   'Dashed'),
+          h('button', { className: 'btn-gradient' }, 'Gradient')
+        )
+      ),
+      h(Card, { title: '表单' },
+        h('div', { className: 'field' },
+          h('label', { className: 'label' }, '用户名 ', h('span', { className: 'required' }, '*')),
+          h('input', { className: 'input', placeholder: '请输入用户名' }),
+          h('div', { className: 'hint' }, '3-20 个字符')
+        ),
+        h('div', { className: 'field' },
+          h('label', { className: 'label' }, '主题'),
+          h('select', { className: 'select' },
+            h('option', null, '浅色'),
+            h('option', null, '深色')
+          )
+        ),
+        h('label', { className: 'checkbox' },
+          h('input', { type: 'checkbox', defaultChecked: true }),
+          ' 记住我'
+        )
+      ),
+      h(Card, { title: '徽章 / 提示' },
+        h('div', { className: 'row', style: { gap: '8px', flexWrap: 'wrap', marginBottom: '12px' } },
+          h('span', { className: 'badge' },               '默认'),
+          h('span', { className: 'badge badge-primary' }, '主色'),
+          h('span', { className: 'badge badge-success' }, '成功'),
+          h('span', { className: 'badge badge-danger' },  '危险'),
+          h('span', { className: 'badge badge-warning' }, '警告')
+        ),
+        h('div', { className: 'alert alert-info' },    '信息提示'),
+        h('div', { className: 'alert alert-success' }, '操作成功'),
+        h('div', { className: 'alert alert-danger' },  '出现错误')
+      )
+    ),
+
+    h(Card, { title: '卡片头 / 脚（原 bug 验证）' },
+      h('p', null, '头部应紧贴卡片顶部，footer 紧贴底部，不穿出边界。'),
+      h('div', { className: 'card-footer' }, '这是 footer')
+    ),
+
+    h(Card, { title: '表格' },
+      h('div', { className: 'table-wrap' },
+        h('table', { className: 'table' },
+          h('thead', null, h('tr', null,
+            h('th', null, '名称'), h('th', null, '状态'), h('th', null, '数量')
+          )),
+          h('tbody', null,
+            h('tr', null, h('td', null, '项目 A'), h('td', null, h('span', { className: 'badge badge-success' }, '正常')), h('td', null, '128')),
+            h('tr', null, h('td', null, '项目 B'), h('td', null, h('span', { className: 'badge badge-warning' }, '警告')), h('td', null, '64')),
+            h('tr', null, h('td', null, '项目 C'), h('td', null, h('span', { className: 'badge badge-danger' },  '异常')), h('td', null, '0'))
+          )
+        )
+      )
+    ),
+
+    h(Card, { title: '进度 / 骨架' },
+      h('div', { className: 'progress mb-4' }, h('div', { className: 'progress-bar', style: { width: '62%' } })),
+      h('div', { className: 'progress progress-gradient mb-4' }, h('div', { className: 'progress-bar', style: { width: '40%' } })),
+      h('div', { className: 'skeleton skeleton-title' }),
+      h('div', { className: 'skeleton skeleton-text' }),
+      h('div', { className: 'skeleton skeleton-text', style: { width: '70%' } })
+    ),
+
+    h(Card, { title: '代码块（Solarized 下应改变底色）' },
+      h('pre', null, h('code', null, "const x = 1\nfunction hello() { return 'world' }"))
+    ),
+
+    h(Card, { title: '渐变' },
+      h('div', { className: 'grid grid-4' },
+        h('div', { className: 'bg-gradient-blue',   style: { height: '60px', borderRadius: '8px' } }),
+        h('div', { className: 'bg-gradient-green',  style: { height: '60px', borderRadius: '8px' } }),
+        h('div', { className: 'bg-gradient-purple', style: { height: '60px', borderRadius: '8px' } }),
+        h('div', { className: 'bg-gradient-mesh',   style: { height: '60px', borderRadius: '8px' } })
+      ),
+      h('div', { className: 'text-gradient text-2xl mt-4', style: { fontWeight: 700 } }, '渐变文字效果')
+    )
+  )
+}
+
+const root = React.createRoot(document.getElementById('app'))
+root.render(h(App))

@@ -1,0 +1,11 @@
+.x-input-box:focus-within {
+  z-index: 1;
+}
+.x-input-el::placeholder {
+  color: var(--x-text-mute, #94a3b8);
+  opacity: 0.8;
+}
+.x-input-el::-webkit-search-cancel-button { display: none }
+.x-input-el:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--x-input-bg, #fff) inset;
+}

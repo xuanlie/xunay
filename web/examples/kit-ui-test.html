@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit UI 测试</title>
+<style>
+  :root { --x-bg:#f8fafc; --x-card:#fff; --x-text:#0f172a; --x-muted:#64748b; --x-border:#e2e8f0; --x-primary:#3b82f6; --x-bg-soft:#f1f5f9; }
+  [data-theme="dark"] { --x-bg:#0a0e17; --x-card:#0f172a; --x-text:#e2e8f0; --x-muted:#94a3b8; --x-border:#1e293b; --x-primary:#60a5fa; --x-bg-soft:#1e293b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--x-bg); color:var(--x-text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif; padding:32px; transition:background .2s,color .2s; }
+  h1 { font-size:22px; margin-bottom:6px; }
+  h2 { font-size:12px; color:var(--x-muted); font-weight:500; margin:32px 0 12px; letter-spacing:.08em; text-transform:uppercase; }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+  .toolbar { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .toolbar button { padding:6px 14px; border:1px solid var(--x-border); border-radius:8px; background:var(--x-card); color:var(--x-text); cursor:pointer; font-size:13px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--x-card); border:1px solid var(--x-border); border-radius:10px; padding:10px 14px; font:12px ui-monospace,monospace; color:var(--x-muted); max-width:340px; max-height:200px; overflow:auto; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+</style>
+</head>
+<body>
+  <h1>Kit UI · 6 组件</h1>
+  <div style="color:var(--x-muted);font-size:13px">Btn · Card · Tag · Badge · Avatar · Spinner</div>
+
+  <div class="toolbar">
+    <button id="btn-theme">🌓 主题</button>
+    <button id="btn-clear">清日志</button>
+  </div>
+
+  <h2>Btn</h2>
+  <div class="row" id="r-btn"></div>
+
+  <h2>Tag · 7 色 × 3 variant</h2>
+  <div class="row" id="r-tag1"></div>
+  <div class="row" id="r-tag2"></div>
+  <div class="row" id="r-tag3"></div>
+  <div class="row" id="r-tag4"></div>
+
+  <h2>Badge</h2>
+  <div class="row" id="r-badge"></div>
+
+  <h2>Avatar</h2>
+  <div class="row" id="r-avatar1"></div>
+  <div class="row" id="r-avatar2"></div>
+
+  <h2>Spinner</h2>
+  <div class="row" id="r-spinner"></div>
+
+  <h2>Card</h2>
+  <div class="grid" id="r-card"></div>
+
+  <div id="log">测试交互…</div>
+
+<script type="module">
+// ============ 加载样式 ============
+for (const f of ['btn','card','tag','badge','avatar','spinner']) {
+  const l = document.createElement('link')
+  l.rel = 'stylesheet'
+  l.href = './kit/ui/' + f + '.css'
+  document.head.appendChild(l)
+}
+
+import { Btn, Card, Tag, Badge, Avatar, AvatarGroup, Spinner } from './kit/ui/index.js'
+
+const logEl = document.getElementById('log')
+function say(...a) {
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 4000) logEl.textContent = logEl.textContent.slice(0, 4000)
+}
+
+// ============ mini vnode renderer ============
+function render(vnode, container) {
+  if (vnode == null || vnode === false || vnode === true) return
+  if (Array.isArray(vnode)) { for (const v of vnode) render(v, container); return }
+  if (typeof vnode === 'function') return render(vnode(), container)
+  if (typeof vnode !== 'object') { container.appendChild(document.createTextNode(String(vnode))); return }
+  if (!vnode.type) return
+  const el = document.createElement(vnode.type)
+  const p = vnode.props || {}
+  for (const k in p) {
+    if (k === 'on' && p.on) {
+      for (const ev in p.on) if (typeof p.on[ev] === 'function') el.addEventListener(ev, p.on[ev])
+    }
+    else if (k === 'ref' && typeof p[k] === 'function') p[k](el)
+    else if (k === 'style') {
+      const st = typeof p.style === 'function' ? p.style() : p.style
+      if (typeof st === 'string') el.style.cssText = st
+      else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk]
+    }
+    else if (k === 'class' || k === 'className') {
+      const c = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (c) el.className = c
+    }
+    else if (k.startsWith('aria-') || k.startsWith('data-')) {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (v != null) el.setAttribute(k, v)
+    }
+    else if (k === 'disabled' || k === 'checked' || k === 'selected') {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (v) el.setAttribute(k, '')
+    }
+    else if (k === 'tabindex' || k === 'role' || k === 'title') {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (v != null) el.setAttribute(k, v)
+    }
+    else if (typeof p[k] !== 'function') el.setAttribute(k, p[k])
+  }
+  const ch = vnode.children || []
+  for (const c of ch) render(c, el)
+  container.appendChild(el)
+}
+
+const iconSvg = (d, color) => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
+  svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('width','16'); svg.setAttribute('height','16')
+  svg.setAttribute('fill','none'); svg.setAttribute('stroke',color||'currentColor')
+  svg.setAttribute('stroke-width','2'); svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round')
+  const p = document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',d); svg.appendChild(p); return svg
+}
+
+// ============ Btn ============
+const R = id => document.getElementById(id)
+for (const t of ['default','primary','dashed','text','link','danger'])
+  render(Btn({ type:t, onClick:()=>say('btn',t) }, t), R('r-btn'))
+render(Btn({ type:'primary', icon:iconSvg('plus') }, '新建'), R('r-btn'))
+render(Btn({ type:'primary', badge: 3 }, '消息'), R('r-btn'))
+render(Btn({ disabled: true }, '禁用'), R('r-btn'))
+render(Btn({ loading: true, type:'primary' }, '加载中'), R('r-btn'))
+render(Btn({ type:'primary', shortcut:'⌘S' }, '保存'), R('r-btn'))
+
+// ============ Tag ============
+const TONES = ['default','primary','success','warning','danger','info','purple']
+for (const t of TONES) render(Tag({ tone:t }, t), R('r-tag1'))
+for (const t of TONES) render(Tag({ tone:t, variant:'solid' }, t), R('r-tag2'))
+for (const t of TONES) render(Tag({ tone:t, variant:'outline' }, t), R('r-tag3'))
+render(Tag({ tone:'success', dot: true }, '在线'), R('r-tag4'))
+render(Tag({ tone:'primary', closable: true, onClose: ()=>say('tag closed') }, '可关闭'), R('r-tag4'))
+render(Tag({ tone:'warning', checkable: true, onChange: v => say('tag selected:', v) }, '可选中'), R('r-tag4'))
+render(Tag({ tone:'purple', icon: iconSvg('M13 2L4 14h7l-1 8 9-12h-7z') }, '闪电'), R('r-tag4'))
+
+// ============ Badge ============
+render(Avatar({ text:'A' }), R('r-badge'))
+render(Badge({ count: 5 }, Avatar({ text:'B' })), R('r-badge'))
+render(Badge({ count: 128, max: 99 }, Avatar({ text:'C' })), R('r-badge'))
+render(Badge({ dot: true }, Avatar({ text:'D' })), R('r-badge'))
+render(Badge({ text: 'NEW', tone:'success' }, Avatar({ text:'E' })), R('r-badge'))
+render(Badge({ count: 3, pulse: true }, Avatar({ text:'F' })), R('r-badge'))
+render(Badge({ count: 7, standalone: true }), R('r-badge'))
+
+// ============ Avatar ============
+for (const s of ['xs','sm','md','lg','xl']) render(Avatar({ size:s, text:'AL' }), R('r-avatar1'))
+render(Avatar({ shape:'square', text:'SQ' }), R('r-avatar1'))
+render(Avatar({ shape:'rounded', text:'RD' }), R('r-avatar1'))
+// 用内嵌 SVG data URL 保证能显示（不依赖外网）
+const avatarImg = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f97316"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><circle cx="50" cy="40" r="18" fill="#fff" opacity=".9"/><path d="M20 90 Q50 60 80 90 Z" fill="#fff" opacity=".9"/></svg>`)
+render(Avatar({ src: avatarImg, alt:'User' }), R('r-avatar1'))
+// 故意放一个坏链接看回退效果
+render(Avatar({ src: 'https://invalid.example.com/x.jpg', alt:'Fallback' }), R('r-avatar1'))
+render(Avatar({ status:'online', text:'ON' }), R('r-avatar1'))
+render(Avatar({ status:'busy', text:'BS' }), R('r-avatar1'))
+render(Avatar({ loading: true }), R('r-avatar1'))
+
+render(AvatarGroup({ max: 4 },
+  Avatar({ text:'A' }), Avatar({ text:'B' }), Avatar({ text:'C' }),
+  Avatar({ text:'D' }), Avatar({ text:'E' }), Avatar({ text:'F' })
+), R('r-avatar2'))
+
+// ============ Spinner ============
+render(Spinner({ size:'sm' }), R('r-spinner'))
+render(Spinner({ size:'md' }), R('r-spinner'))
+render(Spinner({ size:'lg', label:'加载中…' }), R('r-spinner'))
+render(Spinner({ variant:'dots', size:'md' }), R('r-spinner'))
+render(Spinner({ variant:'pulse', size:'md' }), R('r-spinner'))
+render(Spinner({ variant:'bars', size:'md' }), R('r-spinner'))
+render(Spinner({ size:'xl', tone:'current' }), R('r-spinner'))
+
+// ============ Card ============
+render(Card({
+  icon: iconSvg('home'),
+  title:'项目 A', desc:'进行中 · 完成 60%',
+  stripe:'left', tone:'brand', hover:true,
+  footer: [Btn({ size:'sm' }, '查看'), Btn({ size:'sm', type:'primary' }, '详情')],
+}, '一段描述文字，展示卡片内容区的排版。'), R('r-card'))
+
+render(Card({
+  cover: 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)',
+  title:'封面卡片', desc:'16:9 封面 + 内容',
+}), R('r-card'))
+
+render(Card({
+  title:'折叠卡片', desc:'点卡片展开',
+  collapsible: true, defaultOpen: false, variant:'outlined',
+}, '这是隐藏的内容，点击卡片展开或收起。'), R('r-card'))
+
+render(Card({
+  title:'加载中', loading: true, variant:'outlined',
+}, '内容模糊 + spinner。'), R('r-card'))
+
+render(Card({
+  title:'骨架', skeleton: true, variant:'outlined',
+}), R('r-card'))
+
+// ============ 主题 ============
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  say('主题', dark ? 'dark' : 'light')
+}
+document.getElementById('btn-clear').onclick = () => { logEl.textContent = '已清空' }
+
+say('全部组件加载完成')
+</script>
+</body>
+</html>

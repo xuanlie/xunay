@@ -1,0 +1,30 @@
+{
+  "name": "myapp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "xuyc-dev",
+    "build": "xuyc build app.xuy --out dist",
+    "preview": "cd dist && python3 -m http.server 8080",
+    "test": "node --test test/",
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,mjs,xuy,css,html,json,md}\"",
+    "build:fix": "xuyc build app.xuy --out dist && sed -i -e 's|/root/xunay/myapp/dist/|./|g' -e 's|/root/xunay/core/src/Kit/|xunay/kit/|g' -e 's|/root/xunay/core/src/|xunay/|g' -e 's|/root/xunay/myapp/src/|./|g' -e 's|/root/xunay/||g' dist/app.js dist/app.js.map"
+  },
+  "xunay": {
+    "alias": {
+      "@": "./src"
+    },
+    "css": [
+      "tw",
+      "ui"
+    ],
+    "devtools": true
+  },
+  "devDependencies": {
+    "xunay": "file:/root/xunay",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0"
+  }
+}

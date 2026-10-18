@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Btn 测试</title>
+<style>
+  :root {
+    --x-bg: #f8fafc; --x-card: #fff; --x-text: #0f172a; --x-muted: #64748b;
+    --x-border: #e2e8f0; --x-primary: #3b82f6;
+  }
+  [data-theme="dark"] {
+    --x-bg: #0a0e17; --x-card: #0f172a; --x-text: #e2e8f0; --x-muted: #94a3b8;
+    --x-border: #1e293b; --x-primary: #60a5fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--x-bg); color: var(--x-text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    padding: 32px; transition: background .2s, color .2s;
+  }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  h2 { font-size: 14px; color: var(--x-muted); font-weight: 500; margin: 28px 0 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .toolbar button {
+    padding: 6px 14px; border: 1px solid var(--x-border); border-radius: 8px;
+    background: var(--x-card); color: var(--x-text); cursor: pointer; font-size: 13px;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
+  .label { font-size: 12px; color: var(--x-muted); margin-right: 8px; min-width: 60px; }
+  #log {
+    position: fixed; bottom: 16px; right: 16px; background: var(--x-card);
+    border: 1px solid var(--x-border); border-radius: 10px; padding: 10px 14px;
+    font: 12px ui-monospace, monospace; color: var(--x-muted); max-width: 340px;
+    max-height: 200px; overflow: auto; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+</style>
+</head>
+<body>
+  <h1>Btn · 精密版</h1>
+  <div style="color: var(--x-muted); font-size: 13px">磁吸 · 涟漪 · 弹簧 · 加载保持 · 徽标 · 快捷键</div>
+
+  <div class="toolbar">
+    <button id="btn-theme">🌓 主题</button>
+    <button id="btn-random">🎲 随机点击</button>
+    <button id="btn-clear">清日志</button>
+  </div>
+
+  <h2>尺寸</h2>
+  <div class="row"><span class="label">xs ~ xl</span></div>
+
+  <h2>类型</h2>
+  <div class="row"><span class="label">6 种</span></div>
+
+  <h2>图标 / 徽标 / 快捷键</h2>
+  <div class="row"><span class="label">组合</span></div>
+
+  <h2>状态</h2>
+  <div class="row"><span class="label">loading</span></div>
+  <div class="row"><span class="label">disabled</span></div>
+
+  <h2>交互测试</h2>
+  <div class="row"><span class="label">hover</span><span style="font-size:12px;color:var(--x-muted)">鼠标移上去看磁吸 + 靠近时朝鼠标偏移；按下去看涟漪</span></div>
+  <div class="row"><span class="label">长按</span><span style="font-size:12px;color:var(--x-muted)">按住 500ms 触发 onLongPress</span></div>
+
+  <div id="log">点击按钮看日志…</div>
+
+<script type="module">
+// 加载样式
+const css = document.createElement('link')
+css.rel = 'stylesheet'
+css.href = './kit/ui/btn.css'
+document.head.appendChild(css)
+
+import { Btn } from './kit/ui/index.js'
+
+const logEl = document.getElementById('log')
+function say(...args) {
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${args.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 4000) logEl.textContent = logEl.textContent.slice(0, 4000)
+}
+
+// 挂载工具：把 xunay 的 vnode 渲染到真 DOM
+function render(vnode, container) {
+  if (vnode == null || vnode === false) return
+  if (typeof vnode === 'function') return render(vnode(), container)
+  if (typeof vnode === 'string' || typeof vnode === 'number') {
+    container.appendChild(document.createTextNode(String(vnode)))
+    return
+  }
+  if (!vnode.type) return
+  const el = document.createElement(vnode.type)
+  const p = vnode.props || {}
+  for (const k in p) {
+    if (k === 'on' && p.on) {
+      for (const ev in p.on) el.addEventListener(ev, p.on[ev])
+    } else if (k === 'ref' && typeof p[k] === 'function') {
+      p[k](el)
+    } else if (k === 'style') {
+      const st = typeof p.style === 'function' ? p.style() : p.style
+      if (typeof st === 'string') el.style.cssText = st
+      else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk]
+    } else if (k === 'class' || k === 'className') {
+      const c = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (c) el.className = c
+    } else if (k === 'disabled' || k === 'checked' || k === 'selected') {
+      if (p[k]) el.setAttribute(k, '')
+    } else if (typeof p[k] !== 'function') {
+      el.setAttribute(k, p[k])
+    }
+  }
+  const children = vnode.children || []
+  for (const c of children) render(c, el)
+  container.appendChild(el)
+}
+
+// 简单图标
+const iconEl = () => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('viewBox', '0 0 24 24')
+  svg.setAttribute('width', '16')
+  svg.setAttribute('height', '16')
+  svg.setAttribute('fill', 'none')
+  svg.setAttribute('stroke', 'currentColor')
+  svg.setAttribute('stroke-width', '2')
+  svg.setAttribute('stroke-linecap', 'round')
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  p.setAttribute('d', 'M12 5v14M5 12h14')
+  svg.appendChild(p)
+  return svg
+}
+
+// —— 尺寸 ——
+const row1 = document.querySelectorAll('.row')[0]
+for (const size of ['xs','sm','md','lg','xl']) {
+  render(Btn({ size, onClick: () => say('click', size) }, size.toUpperCase()), row1)
+}
+
+// —— 类型 ——
+const row2 = document.querySelectorAll('.row')[1]
+for (const type of ['default','primary','dashed','text','link','danger']) {
+  render(Btn({ type, onClick: () => say('click', type) }, type), row2)
+}
+
+// —— 图标/徽标/快捷键 ——
+const row3 = document.querySelectorAll('.row')[2]
+render(Btn({ type: 'primary', icon: iconEl() }, '新建'), row3)
+render(Btn({ type: 'primary', iconRight: iconEl() }, '继续'), row3)
+render(Btn({ type: 'default', badge: 3 }, '消息'), row3)
+render(Btn({ type: 'default', badge: 99 }, '通知'), row3)
+render(Btn({ type: 'default', shortcut: '⌘K' }, '搜索'), row3)
+render(Btn({ type: 'primary', icon: iconEl(), badge: 5, shortcut: '⌘N' }, '新建文件'), row3)
+
+// —— loading ——
+const row4 = document.querySelectorAll('.row')[3]
+const loadBtn = Btn({ type: 'primary', loading: true }, '提交中…')
+render(loadBtn, row4)
+let loading = false
+const toggleBtn = Btn({
+  type: 'default',
+  loading: () => loading,
+  onClick: () => { loading = !loading; loadBtn._update && loadBtn._update() }
+}, '切换 loading')
+render(toggleBtn, row4)
+
+// —— disabled ——
+const row5 = document.querySelectorAll('.row')[4]
+render(Btn({ disabled: true }, '禁用'), row5)
+render(Btn({ type: 'primary', disabled: true }, '禁用主要'), row5)
+
+// —— 长按 ——
+const row6 = document.querySelectorAll('.row')[5]
+render(Btn({ onLongPress: () => say('long press 触发！'), onClick: () => say('click') }, '长按我'), row6)
+
+// —— 主题 ——
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  say('主题', dark ? 'dark' : 'light')
+}
+document.getElementById('btn-random').onclick = () => say('随机点击事件', Math.random().toFixed(3))
+document.getElementById('btn-clear').onclick = () => { logEl.textContent = '已清空' }
+
+say('Btn 组件加载完成')
+</script>
+</body>
+</html>

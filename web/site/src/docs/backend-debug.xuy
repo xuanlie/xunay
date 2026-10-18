@@ -1,10 +1,10 @@
 // 调试
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("调试"),
-    P("四套后端各自的调试方式。"),
+    P("五套后端各自的调试方式。"),
     H2("Node"),
     Code("# 直接跑，输出到终端\nnode backends/node/server.js\n\n# 带调试器\nnode --inspect backends/node/server.js\n# 打开 chrome://inspect", "bash"),
     H2("Python"),

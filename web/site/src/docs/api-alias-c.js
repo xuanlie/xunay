@@ -1,0 +1,13 @@
+// c 别名
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.js'
+
+export function Doc() {
+  return D(
+    H1("c 别名"),
+    P("computed 的短别名。"),
+    H2("等价"),
+    Code("import { c, computed } from '/tmp/xuyg-test/xunay.js'\nc(fn) === computed(fn)", "js"),
+    H2("示例"),
+    Code("import { s, c } from '/tmp/xuyg-test/xunay.js'\n\nconst n = s(2)\nconst double = c(() => n() * 2)\n\ndiv(null, () => String(double()))", "xuy"),
+  )
+}

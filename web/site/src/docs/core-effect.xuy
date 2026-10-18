@@ -1,5 +1,5 @@
 // effect
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -17,7 +17,7 @@ export function Doc() {
     Code("import { signal, effect, onCleanup } from 'xunay'\n\nconst interval = signal(1000)\n\neffect(() => {\n  const id = setInterval(() => console.log('tick'), interval())\n  onCleanup(() => clearInterval(id))   // 下次重跑前清理旧的\n})\n\ninterval(500)\n// 旧定时器被清理，新定时器 500ms\n\n// dispose 时也会清理\nconst stop = effect(() => { ... })\nstop()   // 触发清理", "xuy"),
     H2("与组件生命周期"),
     P("每个 effect 属于某个 scope（作用域）。DOM 节点挂载时创建 scope，卸载时自动 dispose 所有子 effect。所以大部分情况下不用手动清理。"),
-    Code("import { div, effect, onUnmount } from 'xunay'\n\nfunction Timer() {\n  const n = signal(0)\n  // effect 属于这个组件的 scope\n  effect(() => {\n    const id = setInterval(() => n(v => v + 1), 1000)\n    onCleanup(() => clearInterval(id))\n  })\n  return div(null, () => '秒数: ' + n())\n  // 组件卸载时，effect 自动清理\n}", "xuy"),
+    Code("import { effect, onUnmount } from 'xunay'\n\nfunction Timer() {\n  const n = signal(0)\n  // effect 属于这个组件的 scope\n  effect(() => {\n    const id = setInterval(() => n(v => v + 1), 1000)\n    onCleanup(() => clearInterval(id))\n  })\n  return div(null, () => '秒数: ' + n())\n  // 组件卸载时，effect 自动清理\n}", "xuy"),
     H2("什么时候用 effect"),
     Table(["场景","该用什么"], [["计算派生值","computed，不是 effect"],["同步到 localStorage","effect"],["订阅外部事件","effect"],["启动定时器","effect"],["打日志","effect"],["发请求","onMount 或 async 回调"]]),
     H2("effect vs React useEffect"),
@@ -39,7 +39,7 @@ export function Doc() {
     Code("const stop = effect(() => {\n  console.log('running')\n})\n\n// 停止\nstop()\n// 之后的 signal 变化不再触发", "xuy"),
     P("组件 scope 会自动 dispose 内部的 effect。只有顶层 effect（不在组件里）需要手动 stop。"),
     H2("完整示例：自动保存草稿"),
-    Code("import { signal, effect, onCleanup, div, textarea, span, mount } from 'xunay'\n\nfunction Editor() {\n  // 从 localStorage 恢复\n  const draft = signal(localStorage.getItem('draft') || '')\n  const saved = signal('')\n\n  // 每次 draft 变，延迟 500ms 保存\n  effect(() => {\n    const text = draft()\n    const id = setTimeout(() => {\n      localStorage.setItem('draft', text)\n      saved(new Date().toLocaleTimeString())\n    }, 500)\n    onCleanup(() => clearTimeout(id))\n  })\n\n  return div(null,\n    textarea({\n      value: () => draft(),\n      on: { input: e => draft(e.target.value) }\n    }),\n    span(null, () => saved() ? '已保存于 ' + saved() : '未保存')\n  )\n}\n\nmount(() => Editor(), '#app')", "xuy"),
+    Code("import { signal, effect, onCleanup, mount } from 'xunay'\n\nfunction Editor() {\n  // 从 localStorage 恢复\n  const draft = signal(localStorage.getItem('draft') || '')\n  const saved = signal('')\n\n  // 每次 draft 变，延迟 500ms 保存\n  effect(() => {\n    const text = draft()\n    const id = setTimeout(() => {\n      localStorage.setItem('draft', text)\n      saved(new Date().toLocaleTimeString())\n    }, 500)\n    onCleanup(() => clearTimeout(id))\n  })\n\n  return div(null,\n    textarea({\n      value: () => draft(),\n      on: { input: e => draft(e.target.value) }\n    }),\n    span(null, () => saved() ? '已保存于 ' + saved() : '未保存')\n  )\n}\n\nmount(() => Editor(), '#app')", "xuy"),
     H2("下一步"),
     P("读 batch 了解如何把多次 signal 写合并成一次更新。"),
   )

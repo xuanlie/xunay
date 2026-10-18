@@ -1,0 +1,122 @@
+// title: XuNay UI · 主题系统验证
+import { mount, signal } from 'xunay'
+
+const themes = ['', 'dark', 'dracula', 'nord', 'solarized', 'tokyo', 'monokai']
+const accents = ['', 'green', 'red', 'orange', 'purple', 'cyan', 'pink']
+
+const theme  = signal('')
+const accent = signal('')
+
+const apply = () => {
+  const root = document.documentElement
+  theme()  ? root.setAttribute('data-theme',  theme())  : root.removeAttribute('data-theme')
+  accent() ? root.setAttribute('data-accent', accent()) : root.removeAttribute('data-accent')
+}
+
+mount(() => (
+  <div class="container" style="padding:24px 20px">
+    <h1>XuNay UI · 主题系统</h1>
+
+    <div class="card mb-4">
+      <div class="card-title">切换主题</div>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        {themes.map(t => (
+          <button
+            class={theme() === t ? 'btn btn-primary' : 'btn btn-dashed'}
+            onClick={() => { theme(t); apply() }}
+          >{t || 'light'}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-title">切换主色 accent</div>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        {accents.map(a => (
+          <button
+            class={accent() === a ? 'btn btn-primary' : 'btn btn-dashed'}
+            onClick={() => { accent(a); apply() }}
+          >{a || '默认'}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="card">
+        <div class="card-title">按钮</div>
+        <div class="stack-sm">
+          <button class="btn-primary">Primary</button>
+          <button class="btn-danger">Danger</button>
+          <button class="btn-success">Success</button>
+          <button class="btn-ghost">Ghost</button>
+          <button class="btn-dashed">Dashed</button>
+          <button class="btn-gradient">Gradient</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">表单</div>
+        <div class="field">
+          <label class="label">用户名 <span class="required">*</span></label>
+          <input class="input" placeholder="请输入用户名" />
+          <div class="hint">3-20 个字符</div>
+        </div>
+        <div class="field">
+          <label class="label">主题</label>
+          <select class="select">
+            <option>浅色</option><option>深色</option>
+          </select>
+        </div>
+        <label class="checkbox"><input type="checkbox" checked /> 记住我</label>
+      </div>
+
+      <div class="card">
+        <div class="card-title">徽章 / 提示</div>
+        <div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <span class="badge">默认</span>
+          <span class="badge badge-primary">主色</span>
+          <span class="badge badge-success">成功</span>
+          <span class="badge badge-danger">危险</span>
+          <span class="badge badge-warning">警告</span>
+        </div>
+        <div class="alert alert-info">信息提示</div>
+        <div class="alert alert-success">操作成功</div>
+        <div class="alert alert-danger">出现错误</div>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-title">表格</div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>名称</th><th>状态</th><th>数量</th></tr></thead>
+          <tbody>
+            <tr><td>项目 A</td><td><span class="badge badge-success">正常</span></td><td>128</td></tr>
+            <tr><td>项目 B</td><td><span class="badge badge-warning">警告</span></td><td>64</td></tr>
+            <tr><td>项目 C</td><td><span class="badge badge-danger">异常</span></td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-title">进度 / 骨架</div>
+      <div class="progress mb-4"><div class="progress-bar" style="width:62%"></div></div>
+      <div class="progress progress-gradient mb-4"><div class="progress-bar" style="width:40%"></div></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text" style="width:70%"></div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-title">渐变</div>
+      <div class="grid grid-4">
+        <div class="bg-gradient-blue"   style="height:60px;border-radius:8px"></div>
+        <div class="bg-gradient-green"  style="height:60px;border-radius:8px"></div>
+        <div class="bg-gradient-purple" style="height:60px;border-radius:8px"></div>
+        <div class="bg-gradient-mesh"   style="height:60px;border-radius:8px"></div>
+      </div>
+      <div class="text-gradient text-2xl mt-4" style="font-weight:700">渐变文字效果</div>
+    </div>
+  </div>
+))

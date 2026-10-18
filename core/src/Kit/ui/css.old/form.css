@@ -1,0 +1,317 @@
+/* XuNay UI · form.css */
+
+/* === 表单 === */
+.input, .select, .textarea {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--x-text);
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border-strong);
+  border-radius: var(--x-radius);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--x-primary);
+  box-shadow: 0 0 0 3px var(--x-primary-soft);
+}
+
+.input:disabled, .select:disabled, .textarea:disabled {
+  background: var(--x-bg-soft);
+  color: var(--x-text-mute);
+  cursor: not-allowed;
+}
+
+.input::placeholder, .textarea::placeholder { color: var(--x-text-mute); }
+
+.input.error, .textarea.error { border-color: var(--x-danger); }
+
+.input.error:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.15); }
+
+.textarea { min-height: 80px; resize: vertical; }
+
+.select { cursor: pointer; appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--x-text-mute) 50%), linear-gradient(135deg, var(--x-text-mute) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
+
+.input-sm { padding: 4px 8px; font-size: 13px; }
+
+.input-lg { padding: 12px 16px; font-size: 16px; }
+
+.field { margin-bottom: 16px; }
+
+.checkbox, .radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+}
+
+.checkbox input, .radio input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--x-primary); }
+
+/* 去掉点击时的默认轮廓，只保留键盘焦点 */
+.checkbox input, .radio input {
+  outline: none !important;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-focus-ring-color: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.checkbox input:focus-visible, .radio input:focus-visible {
+  outline: 2px solid var(--x-primary) !important;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.checkbox, .radio { outline: none; }
+
+.checkbox *, .radio * { outline: none; }
+
+.checkbox input:focus:not(:focus-visible), .radio input:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.switch:focus-visible { box-shadow: 0 0 0 3px var(--x-primary-soft); }
+
+.switch.on { background: var(--x-primary); }
+
+.switch.disabled { opacity: .4; cursor: not-allowed; }
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  transition: transform .2s;
+}
+
+.switch.on .switch-thumb { transform: translateX(20px); }
+
+.switch-label { cursor: pointer; user-select: none; }
+
+.select-none { user-select: none }
+
+/* ---------- 输入框 ---------- */
+input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="color"]):not([type="range"]),
+textarea,
+select,
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--x-text);
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border-strong);
+  border-radius: var(--x-radius);
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+input:hover:not(:disabled), textarea:hover:not(:disabled), select:hover:not(:disabled), .input:hover {
+  border-color: var(--x-text-mute);
+}
+
+input:focus, textarea:focus, select:focus, .input:focus {
+  border-color: var(--x-primary);
+  box-shadow: 0 0 0 3px var(--x-primary-soft);
+}
+
+input:disabled, textarea:disabled, select:disabled, .input:disabled {
+  opacity: .6; cursor: not-allowed; background: var(--x-bg-soft);
+}
+
+input.error, textarea.error, .input.error {
+  border-color: var(--x-danger);
+}
+
+input.error:focus, .input.error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
+
+input.sm, .input.sm { padding: 4px 8px; font-size: 12px; }
+
+input.lg, .input.lg { padding: 12px 16px; font-size: 16px; }
+
+/* 复选框 / 单选 */
+input[type="checkbox"], input[type="radio"] {
+  width: 16px; height: 16px;
+  accent-color: var(--x-primary);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+input[type="checkbox"]:disabled, input[type="radio"]:disabled { cursor: not-allowed; opacity: .5; }
+
+/* 滑块 */
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--x-primary);
+  cursor: pointer;
+}
+
+/* ---------- 标签 / 表单 ---------- */
+label { font-size: 14px; color: var(--x-text); cursor: pointer; user-select: none; }
+
+form { display: block; }
+
+/* ═══════════════════════════════════════
+   精修 · form 组件（命令式结构）
+   ═══════════════════════════════════════ */
+
+/* Input 容器 */
+.field-box { position:relative; display:flex; align-items:center; gap:8px;
+  border:1.5px solid var(--x-border-strong);
+  border-radius:8px; background:var(--x-bg-elev);
+  transition:border-color .15s, box-shadow .15s, background .15s }
+
+.field-box.sm { height:32px; padding:0 10px; font-size:13px }
+
+.field-box.md { height:40px; padding:0 12px; font-size:14px }
+
+.field-box.lg { height:48px; padding:0 14px; font-size:15px }
+
+.field-box:focus-within { border-color:var(--x-primary);
+  box-shadow:0 0 0 3px var(--x-primary-soft) }
+
+.field-box.error { border-color:var(--x-danger) }
+
+.field-box.error:focus-within { box-shadow:0 0 0 3px rgba(239,68,68,.15) }
+
+.field-box.disabled { opacity:.55; cursor:not-allowed; background:var(--x-bg-soft) }
+
+.field-box .field-icon { color:var(--x-text-mute); flex-shrink:0; display:inline-flex;
+  align-items:center; width:1.1em; height:1.1em }
+
+.field-el { flex:1; min-width:0; border:0; outline:0; background:transparent;
+  color:inherit; font:inherit; padding:0; height:100%; width:100% }
+
+.field-el::placeholder { color:var(--x-text-mute); opacity:.85 }
+
+.field-clear { display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; border:0; border-radius:50%; background:var(--x-text-mute);
+  color:#fff; font-size:11px; line-height:1; padding:0; flex-shrink:0; cursor:pointer }
+
+.field-clear:hover { background:var(--x-text-dim) }
+
+.field-eye { display:inline-flex; align-items:center; justify-content:center;
+  border:0; background:transparent; padding:0; color:var(--x-text-mute);
+  cursor:pointer; flex-shrink:0; font-size:14px }
+
+.field-hint { display:flex; justify-content:space-between; font-size:12px;
+  line-height:1.4; min-height:16px; color:var(--x-text-dim) }
+
+.field-hint.error { color:var(--x-danger) }
+
+.field-count { color:var(--x-text-mute); font-variant-numeric:tabular-nums }
+
+.field-count.over { color:var(--x-danger) }
+
+/* Switch 命令式 */
+.switch { position:relative; display:inline-flex; align-items:center;
+  width:44px; height:24px; border-radius:999px;
+  background:var(--x-border-strong);
+  cursor:pointer; transition:background .25s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink:0; outline:0; border:0; padding:0;
+  -webkit-tap-highlight-color:transparent; touch-action:manipulation }
+
+.switch.on { background:var(--x-primary) }
+
+.switch.success.on { background:#10b981 }
+
+.switch.warning.on { background:#f59e0b }
+
+.switch.danger.on { background:#dc2626 }
+
+.switch.disabled { opacity:.55; cursor:not-allowed }
+
+.switch:focus-visible { box-shadow:0 0 0 3px var(--x-primary-soft) }
+
+.switch-thumb { position:absolute; top:3px; left:3px;
+  width:18px; height:18px; border-radius:50%; background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1);
+  display:flex; align-items:center; justify-content:center }
+
+.switch.on .switch-thumb { transform:translateX(20px) }
+
+.switch.sm { width:36px; height:20px }
+
+.switch.sm .switch-thumb { width:16px; height:16px; top:2px; left:2px }
+
+.switch.sm.on .switch-thumb { transform:translateX(16px) }
+
+.switch.lg { width:52px; height:30px }
+
+.switch.lg .switch-thumb { width:24px; height:24px; top:3px; left:3px }
+
+.switch.lg.on .switch-thumb { transform:translateX(22px) }
+
+.switch-text { position:absolute; top:50%; transform:translateY(-50%);
+  color:#fff; font-size:10px; font-weight:600; pointer-events:none;
+  opacity:0; transition:opacity .15s }
+
+.switch.on .switch-text.on { opacity:1; left:8px }
+
+.switch:not(.on) .switch-text.off { opacity:1; right:8px }
+
+.switch-spinner { width:10px; height:10px; border:2px solid var(--x-primary);
+  border-top-color:transparent; border-radius:50%;
+  animation:x-btn-spin .6s linear infinite }
+
+.checkbox.on .cb-box { background:var(--x-primary); border-color:var(--x-primary) }
+
+.checkbox.on .cb-check { opacity:1 }
+
+.checkbox.on .cb-check path { stroke-dashoffset:0 }
+
+.checkbox.indeterminate .cb-box { background:var(--x-primary); border-color:var(--x-primary) }
+
+.checkbox.indeterminate .cb-mark { opacity:1 }
+
+.checkbox.success.on .cb-box,
+.checkbox.success.indeterminate .cb-box { background:#10b981; border-color:#10b981 }
+
+.checkbox.warning.on .cb-box { background:#f59e0b; border-color:#f59e0b }
+
+.checkbox.danger.on .cb-box { background:#dc2626; border-color:#dc2626 }
+
+.radio.on .rd-dot { border-color:var(--x-primary) }
+
+.radio.on .cb-inner-dot { transform:scale(1); background:var(--x-primary) }
+
+.radio.success.on .rd-dot { border-color:#10b981 }
+
+.radio.success.on .cb-inner-dot { background:#10b981 }
+
+.radio.warning.on .rd-dot { border-color:#f59e0b }
+
+.radio.warning.on .cb-inner-dot { background:#f59e0b }
+
+.radio.danger.on .rd-dot { border-color:#dc2626 }
+
+.radio.danger.on .cb-inner-dot { background:#dc2626 }
+
+.checkbox.disabled, .radio.disabled { opacity:.55; cursor:not-allowed }
+
+/* Radio 按钮模式 */
+.radio.button { display:inline-flex; align-items:center; justify-content:center;
+  height:36px; padding:0 14px; border-radius:8px;
+  border:1.5px solid var(--x-border); background:var(--x-bg-elev);
+  color:var(--x-text); font-size:13.5px; font-weight:500;
+  cursor:pointer; user-select:none; transition:all .15s }
+
+.radio.button.on { background:var(--x-primary); border-color:var(--x-primary); color:#fff }

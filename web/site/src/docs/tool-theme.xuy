@@ -1,5 +1,5 @@
 // theme 主题
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -10,7 +10,7 @@ export function Doc() {
     H2("基础用法"),
     Code("theme.theme()      // 'light' / 'dark'\ntheme.isDark()     // true / false\ntheme.isLight()    // true / false\n\ntheme.toggle()     // 切换\ntheme.set('dark')  // 指定", "js"),
     H2("响应式"),
-    Code("import { div } from 'xunay'\nimport { theme } from 'xunay/theme'\n\ndiv({ class: () => theme.isDark() ? 'dark' : 'light' },\n  '内容'\n)", "js"),
+    Code("import { theme } from 'xunay/theme'\n\ndiv({ class: () => theme.isDark() ? 'dark' : 'light' },\n  '内容'\n)", "js"),
     H2("自定义配置"),
     Code("import { createTheme } from 'xunay/theme'\n\nconst theme = createTheme({\n  themes: ['light', 'dark', 'auto'],\n  default: 'auto',\n  storageKey: 'myapp:theme',\n  attribute: 'data-theme',    // 写到 <html data-theme=\"dark\">\n  persist: true,\n})", "js"),
     H2("跟随系统"),

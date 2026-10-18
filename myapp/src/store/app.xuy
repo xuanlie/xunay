@@ -1,0 +1,16 @@
+import { signal, computed } from 'xunay'
+
+// 全局状态。所有跨组件共享的 signal 放这里。
+export const count = signal(0)
+export const theme = signal('light')
+export const user = signal(null)
+
+// 派生状态
+export const isLoggedIn = computed(() => user() !== null)
+export const doubled = computed(() => count() * 2)
+
+// 动作
+export const inc = () => count(c => c + 1)
+export const dec = () => count(c => c - 1)
+export const reset = () => count(0)
+export const toggleTheme = () => theme(t => t === 'light' ? 'dark' : 'light')

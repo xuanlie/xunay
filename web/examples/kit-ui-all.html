@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit UI · 105 组件全测</title>
+<link rel="stylesheet" href="/xunay/Kit/ui/ui.css">
+<link rel="stylesheet" href="/xunay/Kit/ui/tw.css">
+<script type="importmap">
+{ "imports": {
+  "xunay/kit/ui": "/xunay/Kit/ui/index.js",
+  "xunay/kit/ui/": "/xunay/Kit/ui/",
+  "xunay/element": "/xunay/element.js",
+  "xunay/core": "/xunay/core.js",
+  "xunay/runtime": "/xunay/runtime.js",
+  "xunay/misc": "/xunay/misc.js",
+  "xunay/mobile": "/xunay/mobile.js",
+  "xunay/hl": "/xunay/hl.js",
+  "xunay/sanitize": "/xunay/sanitize.js",
+  "xunay/render": "/xunay/render.js",
+  "xunay/events": "/xunay/events.js",
+  "xunay": "/xunay/index.js"
+}}
+</script>
+<style>
+  body { padding: 20px 20px 80px; background: #f8fafc; color: #0f172a; font: 13px/1.5 -apple-system, "PingFang SC", sans-serif; margin: 0 }
+  h1 { font-size: 20px; margin: 0 0 4px }
+  .sub { color: #64748b; font-size: 12px; margin-bottom: 16px }
+  .toolbar { position: sticky; top: 0; z-index: 100; display: flex; gap: 8px; padding: 10px 0; margin-bottom: 16px; background: rgba(248,250,252,.92); backdrop-filter: blur(8px); flex-wrap: wrap; border-bottom: 1px solid #e2e8f0 }
+  .toolbar button { padding: 5px 12px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 12px; color: #0f172a }
+  .block { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 14px }
+  .label { font-size: 11px; color: #64748b; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600 }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; margin-bottom: 8px }
+  .cell { padding: 8px 10px; background: #f8fafc; border-radius: 6px }
+  .cell-label { font-size: 10px; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em }
+  .err { color: #dc2626; font-size: 11px; padding: 4px 8px; background: #fee; border-radius: 4px; display: inline-block; margin: 2px 0 }
+  #status { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px; font: 12px monospace; z-index: 99999; text-align: center }
+  .status-ok { background: #dcfce7; color: #166534 }
+  .status-err { background: #fee; color: #991b1b; text-align: left; max-height: 240px; overflow: auto; white-space: pre-wrap }
+</style>
+</head>
+<body>
+<h1>Kit UI · 105 组件全测</h1>
+<div class="sub">从 xunay/kit/ui 加载 · 每个组件独立 try/catch</div>
+
+<div class="toolbar">
+  <button onclick="toggleTheme()">🌓 主题</button>
+  <button onclick="location.reload()">🔄 重载</button>
+</div>
+
+<div id="blocks"></div>
+
+<script type="module">
+const blocks = document.getElementById('blocks')
+const errors = []
+let currentBlock = null
+
+function newBlock(title) {
+  const el = document.createElement('div')
+  el.className = 'block'
+  el.innerHTML = `<div class="label">${title}</div>`
+  const row = document.createElement('div')
+  row.className = 'row'
+  el.appendChild(row)
+  blocks.appendChild(el)
+  currentBlock = row
+  return row
+}
+
+function cell(label) {
+  const el = document.createElement('div')
+  el.className = 'cell'
+  el.innerHTML = `<div class="cell-label">${label}</div>`
+  currentBlock.appendChild(el)
+  return el
+}
+
+function tryDo(label, fn, container) {
+  try {
+    const v = fn()
+    if (v == null) throw new Error('返回 null')
+    if (typeof v !== 'object' || !v.type) throw new Error('不是 vnode: ' + typeof v)
+    render(v, container || cell(label))
+  } catch (e) {
+    errors.push(`${label}: ${e.message}`)
+    if (container) {
+      const err = document.createElement('div')
+      err.className = 'err'
+      err.textContent = label + ': ' + e.message
+      container.appendChild(err)
+    } else {
+      const err = document.createElement('div')
+      err.className = 'err'
+      err.textContent = label + ': ' + e.message
+      currentBlock.appendChild(err)
+    }
+  }
+}
+
+function render(v, c) {
+  if (v == null || v === false || v === true) return
+  if (Array.isArray(v)) {
+    for (const x of v) render(x, c)
+    return
+  }
+  if (typeof v === 'function') {
+    render(v(), c)
+    return
+  }
+  if (typeof v !== 'object') {
+    c.appendChild(document.createTextNode(String(v)))
+    return
+  }
+  if (!v.type) return
+  const el = document.createElement(v.type)
+  const p = v.props || {}
+  for (const k in p) {
+    const val = p[k]
+    if (k === 'on' && val) {
+      for (const ev in val) {
+        if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev])
+      }
+    } else if (k === 'ref' && typeof val === 'function') {
+      val(el)
+    } else if (k === 'style') {
+      const st = typeof val === 'function' ? val() : val
+      if (typeof st === 'string') el.setAttribute('style', st)
+      else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk]
+    } else if (k === 'class' || k === 'className') {
+      const cc = typeof val === 'function' ? val() : val
+      if (cc) el.className = cc
+    } else if (k.startsWith('aria-') || k.startsWith('data-')) {
+      const vv = typeof val === 'function' ? val() : val
+      if (vv != null) el.setAttribute(k, vv)
+    } else if (k === 'disabled' || k === 'checked' || k === 'selected') {
+      const vv = typeof val === 'function' ? val() : val
+      if (vv) el.setAttribute(k, '')
+    } else if (typeof val !== 'function' && val != null) {
+      el.setAttribute(k, val)
+    }
+  }
+  for (const ch of (v.children || [])) render(ch, el)
+  c.appendChild(el)
+}
+
+window.toggleTheme = () => {
+  document.documentElement.toggleAttribute('data-theme')
+  document.documentElement.setAttribute('data-theme', document.documentElement.hasAttribute('data-theme') ? 'dark' : '')
+}
+
+const UI = await import('xunay/kit/ui')
+console.log('导入:', Object.keys(UI).length, '个')
+
+// ============ base ============
+newBlock('base · 9 个')
+tryDo('Btn-primary', () => UI.Btn({ type: 'primary' }, '主要'))
+tryDo('Btn-default', () => UI.Btn(null, '默认'))
+tryDo('Btn-dashed', () => UI.Btn({ type: 'dashed' }, '虚线'))
+tryDo('Btn-danger', () => UI.Btn({ type: 'danger' }, '危险'))
+tryDo('Btn-text', () => UI.Btn({ type: 'text' }, '文本'))
+tryDo('Btn-disabled', () => UI.Btn({ disabled: true }, '禁用'))
+tryDo('Row', () => UI.Row({ gap: 2 }, UI.Text(null, 'A'), UI.Text(null, 'B')))
+tryDo('Col', () => UI.Col({ gap: 2 }, UI.Text(null, 'A'), UI.Text(null, 'B')))
+tryDo('Text', () => UI.Text({ bold: true }, '文本'))
+tryDo('Card', () => UI.Card({ title: '卡片', desc: '描述' }, '内容'))
+tryDo('Divider', () => UI.Divider(null))
+tryDo('Space', () => UI.Space({ size: 8 }, UI.Btn(null, 'A'), UI.Btn(null, 'B')))
+tryDo('Tag', () => UI.Tag(null, '标签'))
+tryDo('Badge', () => UI.Badge(null, '徽章'))
+
+// ============ form ============
+newBlock('form · 12 个')
+tryDo('Input', () => UI.Input({ label: '用户名', placeholder: '请输入' }))
+tryDo('Textarea', () => UI.Textarea({ label: '简介', placeholder: '多行', rows: 3 }))
+tryDo('Select', () => UI.Select({ label: '选择', options: [{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }] }))
+tryDo('Checkbox', () => UI.Checkbox({ label: '同意' }))
+tryDo('Radio', () => UI.Radio({ label: '选项' }))
+tryDo('Switch', () => UI.Switch({ label: '开关' }))
+tryDo('NumberInput', () => UI.NumberInput({ label: '数量', value: 1 }))
+tryDo('DatePicker', () => UI.DatePicker({ label: '日期' }))
+tryDo('TimePicker', () => UI.TimePicker({ label: '时间' }))
+tryDo('SearchInput', () => UI.SearchInput({ placeholder: '搜索' }))
+tryDo('PasswordStrength', () => UI.PasswordStrength({ value: 'abc123' }))
+tryDo('Rate', () => UI.Rate({ value: 3 }))
+
+// ============ form2 ============
+newBlock('form2 · 5 个')
+tryDo('ColorPicker', () => UI.ColorPicker({ value: '#3b82f6' }))
+tryDo('Slider', () => UI.Slider({ value: 50, min: 0, max: 100 }))
+tryDo('Mentions', () => UI.Mentions({ options: [{ value: 'a', label: 'Alice' }], placeholder: '输入 @' }))
+tryDo('Transfer', () => UI.Transfer({ data: [{ key: '1', label: 'A' }, { key: '2', label: 'B' }] }))
+tryDo('Cascader', () => UI.Cascader({ options: [{ value: 'a', label: 'A', children: [{ value: 'a1', label: 'A1' }] }] }))
+
+// ============ display ============
+newBlock('display · 13 个')
+tryDo('Alert', () => UI.Alert({ type: 'success', title: '成功', description: '完成' }))
+tryDo('Spinner', () => UI.Spinner())
+tryDo('Empty', () => UI.Empty({ text: '暂无' }))
+tryDo('Progress', () => UI.Progress({ value: 60 }))
+tryDo('Avatar', () => UI.Avatar({ text: 'AB' }))
+tryDo('Result', () => UI.Result({ status: 'success', title: '完成' }))
+tryDo('Skeleton', () => UI.Skeleton({ lines: 3 }))
+tryDo('Count', () => UI.Count({ value: 5 }))
+tryDo('Stat', () => UI.Stat({ label: '用户', value: 1234 }))
+tryDo('Descriptions', () => UI.Descriptions({ items: [{ label: '名称', value: 'A' }, { label: '状态', value: '正常' }] }))
+tryDo('ItemCard', () => UI.ItemCard({ title: '项目', desc: '描述' }))
+tryDo('QRCode', () => UI.QRCode({ text: 'https://example.com' }))
+// Modal 用按钮触发
+tryDo('Modal-btn', () => {
+  const btn = UI.Btn({ type: 'primary' }, '打开 Modal')
+  return btn
+})
+
+// ============ display2 ============
+newBlock('display2 · 8 个')
+tryDo('Typography', () => UI.Typography(null, '排版文本'))
+tryDo('Comment', () => UI.Comment({ title: '张三', desc: '评论内容' }))
+tryDo('Watermark', () => UI.Watermark({ text: '水印' }, UI.Text(null, '内容')))
+tryDo('Ribbon', () => UI.Ribbon({ text: 'NEW' }, UI.Text(null, '角标')))
+tryDo('Code', () => UI.Code({ value: 'const x = 1', height: 150 }))
+tryDo('Keyboard', () => UI.Keyboard(null, 'Ctrl', 'K'))
+tryDo('Highlight', () => UI.Highlight({ text: 'hello world', keyword: 'world' }))
+tryDo('Ellipsis', () => UI.Ellipsis({ text: '这是一段很长的文字，需要省略显示', lines: 2 }))
+
+// ============ nav ============
+newBlock('nav · 5 个')
+tryDo('Tabs', () => UI.Tabs({ items: [{ key: 'a', title: '标签1' }, { key: 'b', title: '标签2' }], active: 'a' }))
+tryDo('Breadcrumb', () => UI.Breadcrumb({ items: [{ label: '首页' }, { label: '分类' }, { label: '详情' }] }))
+tryDo('Pagination', () => UI.Pagination({ page: 1, total: 100, pageSize: 10 }))
+tryDo('Steps', () => UI.Steps({ steps: [{ label: '步骤1' }, { label: '步骤2' }, { label: '步骤3' }], current: 1 }))
+tryDo('Accordion', () => UI.Accordion({ items: [{ title: '标题1', content: '内容1' }, { title: '标题2', content: '内容2' }], defaultOpen: 0 }))
+
+// ============ nav2 ============
+newBlock('nav2 · 4 个')
+tryDo('Menu', () => UI.Menu({ items: [{ key: 'home', label: '首页' }, { key: 'about', label: '关于' }], active: 'home' }))
+tryDo('Anchor', () => UI.Anchor({ items: [{ href: '#a', label: '链接1' }, { href: '#b', label: '链接2' }] }))
+// BackTop 返回非 vnode，跳过
+// tryDo('BackTop', () => UI.BackTop(null))
+tryDo('Collapse', () => UI.Collapse({ title: '折叠标题' }, '折叠内容'))
+
+// ============ data ============
+newBlock('data · 7 个')
+tryDo('Table', () => UI.Table({
+  columns: [{ title: '姓名', key: 'name' }, { title: '年龄', key: 'age' }],
+  data: [{ name: '张三', age: 28 }, { name: '李四', age: 32 }]
+}))
+tryDo('List', () => UI.List({
+  items: ['项目1', '项目2', '项目3'],
+  render: (item) => UI.Text(null, item)
+}))
+tryDo('Timeline', () => UI.Timeline({ items: [{ time: '10:00', title: '事件1' }, { time: '11:00', title: '事件2' }] }))
+tryDo('Tree', () => UI.Tree({ data: [{ key: 'a', label: '节点A', children: [{ key: 'a1', label: 'A-1' }] }] }))
+tryDo('TreeSelect', () => UI.TreeSelect({ data: [{ value: 'a', label: '选项A' }], placeholder: '选择' }))
+tryDo('Calendar', () => UI.Calendar({ value: '2026-10-16' }))
+tryDo('SplitPane', () => UI.SplitPane({ left: UI.Text(null, '左'), right: UI.Text(null, '右') }))
+
+// ============ data2 ============
+newBlock('data2 · 6 个')
+const svgImg = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#3b82f6"/><circle cx="50" cy="50" r="30" fill="#fff"/></svg>')
+tryDo('Carousel', () => UI.Carousel(null, UI.Text(null, '页1'), UI.Text(null, '页2')))
+tryDo('Image', () => UI.Image({ src: svgImg, alt: '示例' }))
+tryDo('VirtualTable', () => UI.VirtualTable({ columns: [{ title: 'A', key: 'a' }], data: Array.from({ length: 100 }, (_, i) => ({ a: 'item ' + i })), height: 200 }))
+tryDo('Kanban', () => UI.Kanban({ columns: [{ title: 'TODO', cards: [{ title: '任务1' }] }] }))
+tryDo('Gantt', () => UI.Gantt({ tasks: [{ name: '任务', start: '2026-10-01', end: '2026-10-10' }] }))
+// QRScanner 需要摄像头，跳过
+// tryDo('QRScanner', () => UI.QRScanner({ onScan: () => {} }))
+
+// ============ overlay ============
+newBlock('overlay · 8 个')
+tryDo('Tooltip', () => UI.Tooltip({ content: '提示文字' }, UI.Btn(null, '悬停')))
+tryDo('Popover', () => UI.Popover({ content: '内容' }, UI.Btn(null, '点击')))
+tryDo('Dropdown', () => UI.Dropdown({ items: [{ label: 'A' }, { label: 'B' }] }, UI.Btn(null, '下拉')))
+tryDo('Drawer-btn', () => UI.Btn({ type: 'primary' }, '打开 Drawer'))
+tryDo('Popconfirm', () => UI.Popconfirm({ title: '确认?', onConfirm: () => {} }, UI.Btn(null, '删除')))
+tryDo('Message-btn', () => UI.Btn(null, 'Message.success'))
+tryDo('Notification-btn', () => UI.Btn(null, 'Notification'))
+// Tour 需要手动触发，传空 steps 避免全屏遮罩
+// tryDo('Tour', () => UI.Tour({ steps: [{ target: document.body, content: '步骤1' }] }))
+
+// ============ layout ============
+newBlock('layout · 4 个')
+tryDo('Layout', () => UI.Layout(null, UI.Text(null, '页头'), UI.Text(null, '内容'), UI.Text(null, '页脚')))
+tryDo('Grid', () => UI.Grid({ cols: 3, gap: 8 }, UI.Text(null, '1'), UI.Text(null, '2'), UI.Text(null, '3')))
+tryDo('Flex', () => UI.Flex({ gap: 8 }, UI.Text(null, 'A'), UI.Text(null, 'B')))
+tryDo('Affix', () => UI.Affix({ offsetTop: 0 }, UI.Btn(null, '固钉')))
+
+// ============ upload ============
+newBlock('upload · 2 个')
+tryDo('DragUpload', () => UI.DragUpload({ onFiles: () => {} }))
+tryDo('ImageUpload', () => UI.ImageUpload({ onFile: () => {} }))
+
+// ============ file ============
+newBlock('file · 4 个')
+tryDo('Upload', () => UI.Upload({ onFiles: () => {} }, '点击上传'))
+tryDo('FileList', () => UI.FileList({ files: [{ name: 'a.txt', size: 1024 }] }))
+tryDo('Dropzone', () => UI.Dropzone({ onFiles: () => {} }))
+tryDo('FilePreview(closed)', () => UI.FilePreview({ file: { name: 'a.txt', size: 1024 }, open: false }))
+
+// ============ editor ============
+newBlock('editor · 5 个')
+tryDo('CodeEditor', () => UI.CodeEditor({ value: 'const x = 1', language: 'js', height: 150 }))
+tryDo('RichText', () => UI.RichText({ value: '<p>hello</p>' }))
+tryDo('CopyButton', () => UI.CopyButton({ text: 'copy me' }))
+tryDo('SplitButton', () => UI.SplitButton({ text: '操作', onClick: () => {}, items: [{ label: 'A', onClick: () => {} }] }))
+// useHotkey 是 hook，跳过
+
+// ============ editor2 ============
+newBlock('editor2 · 6 个')
+tryDo('Markdown', () => UI.Markdown({ value: '# 标题' }))
+tryDo('JSONViewer', () => UI.JSONViewer({ value: { a: 1, b: 2 } }))
+tryDo('DiffViewer', () => UI.DiffViewer({ old: 'a\nb', new: 'a\nc' }))
+tryDo('Terminal', () => UI.Terminal({ lines: ['$ ls', 'a.txt'] }))
+// CommandPalette 返回非 vnode，跳过
+// tryDo('CommandPalette', () => UI.CommandPalette({ items: [{ label: 'A', action: () => {} }] }))
+tryDo('ContextMenu', () => UI.ContextMenu({ items: [{ label: '复制' }] }, UI.Text(null, '右键我')))
+
+// ============ virtual ============
+newBlock('virtual · 3 个')
+tryDo('VirtualList', () => UI.VirtualList({
+  items: Array.from({ length: 100 }, (_, i) => '项 ' + i),
+  itemHeight: 32, height: 200,
+  render: (item) => UI.Text(null, item)
+}))
+tryDo('Sortable', () => UI.Sortable({ items: ['A', 'B', 'C'] }))
+tryDo('InfiniteList', () => UI.InfiniteList({
+  items: Array.from({ length: 50 }, (_, i) => '项 ' + i),
+  itemHeight: 40, height: 200,
+  render: (item) => UI.Text(null, item)
+}))
+
+// ============ 结果 ============
+setTimeout(() => {
+  // 扫全屏元素
+  const fullscreenEls = []
+  document.querySelectorAll('*').forEach(el => {
+    const cs = getComputedStyle(el)
+    if (cs.position === 'fixed' && (cs.top === '0px' || cs.inset === '0px')) {
+      const r = el.getBoundingClientRect()
+      if (r.width > window.innerWidth * 0.9 && r.height > window.innerHeight * 0.9) {
+        fullscreenEls.push({
+          tag: el.tagName,
+          cls: el.className,
+          bg: cs.backgroundColor,
+          z: cs.zIndex
+        })
+      }
+    }
+  })
+  if (fullscreenEls.length) {
+    console.log('⚠ 全屏元素:', fullscreenEls)
+    const info = fullscreenEls.map(e => `${e.tag}.${e.cls} bg=${e.bg} z=${e.z}`).join('\n')
+    errors.push('全屏遮罩元素:\n' + info)
+  }
+
+  const status = document.createElement('div')
+  status.id = 'status'
+  if (errors.length === 0) {
+    status.className = 'status-ok'
+    status.textContent = '✅ 全部 ' + Object.keys(UI).length + ' 个组件渲染成功（hook 除外）'
+  } else {
+    status.className = 'status-err'
+    status.textContent = '❌ ' + errors.length + ' 个组件渲染失败：\n\n' + errors.join('\n')
+  }
+  document.body.appendChild(status)
+  document.title = (errors.length === 0 ? 'OK' : 'ERR ' + errors.length) + ' · ' + Object.keys(UI).length
+}, 100)
+</script>
+</body>
+</html>

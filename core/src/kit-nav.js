@@ -56,7 +56,7 @@ export function Steps(props) {
   return Row({ gap: 3, align: 'center' },
     ...steps.map((s, i) =>
       Row({ gap: 2, align: 'center' },
-        div({ style: { width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', background: i < current ? 'var(--x-success)' : i === current ? 'var(--x-primary)' : 'var(--x-bg-soft)', color: i <= current ? '#fff' : 'var(--x-text-mute)' } }, i < current ? '✓' : String(i + 1)),
+        div({ style: { width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: '600', background: i < current ? 'var(--x-success)' : i === current ? 'var(--x-primary)' : 'var(--x-bg-soft)', color: i <= current ? 'var(--x-text-inverse)' : 'var(--x-text-mute)' } }, i < current ? '✓' : String(i + 1)),
         span({ style: { fontSize: '14px', color: i <= current ? 'var(--x-text)' : 'var(--x-text-mute)', fontWeight: i === current ? '600' : '400' } }, s.label || s),
         i < steps.length - 1 ? div({ style: { width: '40px', height: '1px', background: 'var(--x-border)' } }) : null
       )

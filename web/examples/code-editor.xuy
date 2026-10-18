@@ -1,0 +1,540 @@
+// title: XuNay Code Editor
+import { signal, effect, onMount, onCleanup, mount, frag, list, show } from 'xunay'
+import { EditorState, Compartment } from '@codemirror/state'
+import { EditorView } from '@codemirror/view'
+import { basicSetup } from 'codemirror'
+import { HighlightStyle, syntaxHighlighting, StreamLanguage } from '@codemirror/language'
+import { javascript } from '@codemirror/lang-javascript'
+import { python } from '@codemirror/lang-python'
+import { css as cssL } from '@codemirror/lang-css'
+import { html as htmlL } from '@codemirror/lang-html'
+import { json as jsonL } from '@codemirror/lang-json'
+import { markdown as mdL } from '@codemirror/lang-markdown'
+import { sql as sqlL } from '@codemirror/lang-sql'
+import { yaml as yamlL } from '@codemirror/lang-yaml'
+import { xml as xmlL } from '@codemirror/lang-xml'
+import { rust as rustL } from '@codemirror/lang-rust'
+import { java as javaL } from '@codemirror/lang-java'
+import { cpp as cppL } from '@codemirror/lang-cpp'
+import { php as phpL } from '@codemirror/lang-php'
+import { go as goLegacy } from '@codemirror/legacy-modes/mode/go'
+import { shell as shLegacy } from '@codemirror/legacy-modes/mode/shell'
+import { dockerFile as dockerLegacy } from '@codemirror/legacy-modes/mode/dockerfile'
+import { toml as tomlLegacy } from '@codemirror/legacy-modes/mode/toml'
+import { ruby as rubyLegacy } from '@codemirror/legacy-modes/mode/ruby'
+import { swift as swiftLegacy } from '@codemirror/legacy-modes/mode/swift'
+import { lua as luaLegacy } from '@codemirror/legacy-modes/mode/lua'
+import { r as rLegacy } from '@codemirror/legacy-modes/mode/r'
+import { perl as perlLegacy } from '@codemirror/legacy-modes/mode/perl'
+import { powerShell as psLegacy } from '@codemirror/legacy-modes/mode/powershell'
+import { cmake as cmakeLegacy } from '@codemirror/legacy-modes/mode/cmake'
+import { nginx as nginxLegacy } from '@codemirror/legacy-modes/mode/nginx'
+import { protobuf as protobufLegacy } from '@codemirror/legacy-modes/mode/protobuf'
+import { diff as diffLegacy } from '@codemirror/legacy-modes/mode/diff'
+import { pascal as pascalLegacy } from '@codemirror/legacy-modes/mode/pascal'
+import { haskell as haskellLegacy } from '@codemirror/legacy-modes/mode/haskell'
+import { clojure as clojureLegacy } from '@codemirror/legacy-modes/mode/clojure'
+import { julia as juliaLegacy } from '@codemirror/legacy-modes/mode/julia'
+import { erlang as erlangLegacy } from '@codemirror/legacy-modes/mode/erlang'
+import { coffeeScript as coffeeLegacy } from '@codemirror/legacy-modes/mode/coffeescript'
+import { sass as sassLegacy } from '@codemirror/legacy-modes/mode/sass'
+import { stylus as stylusLegacy } from '@codemirror/legacy-modes/mode/stylus'
+import { tcl as tclLegacy } from '@codemirror/legacy-modes/mode/tcl'
+import { vb as vbLegacy } from '@codemirror/legacy-modes/mode/vb'
+import { tags as t } from '@lezer/highlight'
+
+const INIT = `// XuNay Code Editor · CodeMirror 6
+//
+// 全部快捷键由 CodeMirror basicSetup 提供:
+//   Ctrl+F 搜索  Ctrl+H 替换  Ctrl+G 跳行
+//   Ctrl+Z 撤销  Ctrl+Y 重做  Ctrl+/ 注释
+//   Ctrl+D 选下一处  Alt+点击 多光标
+//   Alt+↑/↓ 移动行  Shift+Alt+↓ 复制行
+//   折叠 · 括号匹配 · 自动补全 · 智能缩进
+
+import { signal, computed, mount } from 'xunay'
+
+function App() {
+  const n = signal(0)
+  const double = computed(() => n() * 2)
+
+  return div({ class: 'app' },
+    h1(null, '计数器'),
+    button({ on: { click: () => n(v => v - 1) } }, '-'),
+    span(null, () => 'n = ' + n()),
+    button({ on: { click: () => n(v => v + 1) } }, '+'),
+    p(null, () => '双倍: ' + double())
+  )
+}
+
+mount(() => App(), '#app')
+`
+
+// ============ 语言表 ============
+const LANGS = {
+  // === 核心 ===
+  xuy:  { label: 'XUY',  load: () => javascript() },
+  js:   { label: 'JS',   load: () => javascript() },
+  ts:   { label: 'TS',   load: () => javascript({ typescript: true }) },
+  jsx:  { label: 'JSX',  load: () => javascript({ jsx: true }) },
+  tsx:  { label: 'TSX',  load: () => javascript({ typescript: true, jsx: true }) },
+  // === Web ===
+  html: { label: 'HTML', load: () => htmlL() },
+  css:  { label: 'CSS',  load: () => cssL() },
+  sass: { label: 'SASS', load: () => StreamLanguage.define(sassLegacy) },
+  stylus:{ label: 'STYL',load: () => StreamLanguage.define(stylusLegacy) },
+  vue:  { label: 'VUE',  load: () => htmlL() },
+  svelte:{ label: 'SVEL', load: () => htmlL() },
+  // === 数据 ===
+  json: { label: 'JSON', load: () => jsonL() },
+  yaml: { label: 'YAML', load: () => yamlL() },
+  toml: { label: 'TOML', load: () => StreamLanguage.define(tomlLegacy) },
+  xml:  { label: 'XML',  load: () => xmlL() },
+  sql:  { label: 'SQL',  load: () => sqlL() },
+  proto:{ label: 'PROTO',load: () => StreamLanguage.define(protobufLegacy) },
+  // === 文档 ===
+  md:   { label: 'MD',   load: () => mdL() },
+  diff: { label: 'DIFF', load: () => StreamLanguage.define(diffLegacy) },
+  // === 后端 ===
+  py:   { label: 'PY',   load: () => python() },
+  go:   { label: 'Go',   load: () => StreamLanguage.define(goLegacy) },
+  rust: { label: 'Rust', load: () => rustL() },
+  java: { label: 'Java', load: () => javaL() },
+  cpp:  { label: 'C++',  load: () => cppL() },
+  php:  { label: 'PHP',  load: () => phpL() },
+  ruby: { label: 'Ruby', load: () => StreamLanguage.define(rubyLegacy) },
+  swift:{ label: 'Swift',load: () => StreamLanguage.define(swiftLegacy) },
+  lua:  { label: 'Lua',  load: () => StreamLanguage.define(luaLegacy) },
+  perl: { label: 'Perl', load: () => StreamLanguage.define(perlLegacy) },
+  r:    { label: 'R',    load: () => StreamLanguage.define(rLegacy) },
+  julia:{ label: 'Julia',load: () => StreamLanguage.define(juliaLegacy) },
+  haskell:{ label: 'Hsk',load: () => StreamLanguage.define(haskellLegacy) },
+  clojure:{ label: 'Clj',load: () => StreamLanguage.define(clojureLegacy) },
+  erlang:{ label: 'Erl', load: () => StreamLanguage.define(erlangLegacy) },
+  pascal:{ label: 'Pas', load: () => StreamLanguage.define(pascalLegacy) },
+  coffee:{ label: 'Coff',load: () => StreamLanguage.define(coffeeLegacy) },
+  vb:   { label: 'VB',   load: () => StreamLanguage.define(vbLegacy) },
+  // === 脚本 ===
+  sh:   { label: 'Shell',load: () => StreamLanguage.define(shLegacy) },
+  ps:   { label: 'Psh',  load: () => StreamLanguage.define(psLegacy) },
+  tcl:  { label: 'Tcl',  load: () => StreamLanguage.define(tclLegacy) },
+  // === 运维 ===
+  docker:{ label: 'Docker',load: () => StreamLanguage.define(dockerLegacy) },
+  cmake:{ label: 'CMake', load: () => StreamLanguage.define(cmakeLegacy) },
+  nginx:{ label: 'Nginx', load: () => StreamLanguage.define(nginxLegacy) },
+}
+
+// ============ 主题色 ============
+const COLORS = {
+  onedark:  { bg:'#282c34', gutter:'#21252b', bd:'#181a1f', fg:'#abb2bf', dim:'#5c6370',
+              k:'#c678dd', s:'#98c379', c:'#5c6370', n:'#d19a66', f:'#61afef', t:'#e5c07b',
+              m:'#56b6c2', o:'#56b6c2', cur:'#2c313a', acc:'#61afef', sel:'rgba(97,175,239,.28)',
+              hit:'rgba(229,192,123,.25)', hitOn:'rgba(229,192,123,.55)' },
+  dracula:  { bg:'#282a36', gutter:'#21222c', bd:'#191a21', fg:'#f8f8f2', dim:'#6272a4',
+              k:'#ff79c6', s:'#f1fa8c', c:'#6272a4', n:'#bd93f9', f:'#50fa7b', t:'#8be9fd',
+              m:'#ffb86c', o:'#ff79c6', cur:'#44475a', acc:'#bd93f9', sel:'rgba(189,147,249,.28)',
+              hit:'rgba(241,250,140,.2)', hitOn:'rgba(241,250,140,.5)' },
+  tokyo:    { bg:'#1a1b26', gutter:'#16161e', bd:'#101014', fg:'#a9b1d6', dim:'#565f89',
+              k:'#bb9af7', s:'#9ece6a', c:'#565f89', n:'#ff9e64', f:'#7aa2f7', t:'#e0af68',
+              m:'#7dcfff', o:'#89ddff', cur:'#24283b', acc:'#7aa2f7', sel:'rgba(122,162,247,.28)',
+              hit:'rgba(224,175,104,.2)', hitOn:'rgba(224,175,104,.5)' },
+  github:   { bg:'#0d1117', gutter:'#010409', bd:'#21262d', fg:'#c9d1d9', dim:'#8b949e',
+              k:'#ff7b72', s:'#a5d6ff', c:'#8b949e', n:'#79c0ff', f:'#d2a8ff', t:'#ffa657',
+              m:'#7ee787', o:'#ff7b72', cur:'#161b22', acc:'#58a6ff', sel:'rgba(88,166,255,.28)',
+              hit:'rgba(210,168,255,.2)', hitOn:'rgba(210,168,255,.5)' },
+  monokai:  { bg:'#272822', gutter:'#1e1f1c', bd:'#151513', fg:'#f8f8f2', dim:'#75715e',
+              k:'#f92672', s:'#e6db74', c:'#75715e', n:'#ae81ff', f:'#a6e22e', t:'#66d9ef',
+              m:'#fd971f', o:'#f92672', cur:'#3e3d32', acc:'#a6e22e', sel:'rgba(166,226,46,.25)',
+              hit:'rgba(230,219,116,.2)', hitOn:'rgba(230,219,116,.5)' },
+  nord:     { bg:'#2e3440', gutter:'#292e39', bd:'#1e222a', fg:'#d8dee9', dim:'#616e88',
+              k:'#81a1c1', s:'#a3be8c', c:'#616e88', n:'#b48ead', f:'#88c0d0', t:'#ebcb8b',
+              m:'#8fbcbb', o:'#81a1c1', cur:'#3b4252', acc:'#88c0d0', sel:'rgba(136,192,208,.25)',
+              hit:'rgba(235,203,139,.2)', hitOn:'rgba(235,203,139,.5)' },
+  catppuccin:{ bg:'#1e1e2e', gutter:'#181825', bd:'#11111b', fg:'#cdd6f4', dim:'#6c7086',
+              k:'#cba6f7', s:'#a6e3a1', c:'#6c7086', n:'#fab387', f:'#89b4fa', t:'#f9e2af',
+              m:'#94e2d5', o:'#cba6f7', cur:'#313244', acc:'#89b4fa', sel:'rgba(137,180,250,.25)',
+              hit:'rgba(249,226,175,.2)', hitOn:'rgba(249,226,175,.5)' },
+  solarized:{ bg:'#002b36', gutter:'#073642', bd:'#001f27', fg:'#839496', dim:'#586e75',
+              k:'#859900', s:'#2aa198', c:'#586e75', n:'#d33682', f:'#268bd2', t:'#b58900',
+              m:'#cb4b16', o:'#859900', cur:'#073642', acc:'#268bd2', sel:'rgba(38,139,210,.25)',
+              hit:'rgba(181,137,0,.2)', hitOn:'rgba(181,137,0,.5)' },
+  light:    { bg:'#ffffff', gutter:'#f6f8fa', bd:'#d0d7de', fg:'#24292f', dim:'#8c959f',
+              k:'#cf222e', s:'#0a3069', c:'#6e7781', n:'#0550ae', f:'#8250df', t:'#953800',
+              m:'#116329', o:'#cf222e', cur:'#eaeef2', acc:'#0969da', sel:'rgba(9,105,218,.15)',
+              hit:'rgba(255,193,7,.35)', hitOn:'rgba(255,193,7,.65)' },
+}
+
+// 主题用 CSS 变量驱动
+const THEMES = Object.keys(COLORS)
+
+const baseTheme = EditorView.theme({
+  '&': { backgroundColor: 'var(--xe-bg)', color: 'var(--xe-fg)', height: '100%' },
+  '.cm-content': { caretColor: 'var(--xe-acc)',
+    fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace',
+    fontSize: '13.5px', lineHeight: '1.6' },
+  '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--xe-acc)', borderLeftWidth: '2px' },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': { backgroundColor: 'var(--xe-sel)' },
+  '.cm-activeLine': { backgroundColor: 'var(--xe-cur)' },
+  '.cm-selectionMatch': { backgroundColor: 'var(--xe-sel)' },
+  '.cm-gutters': { backgroundColor: 'var(--xe-gutter)', color: 'var(--xe-dim)', border: 'none' },
+  '.cm-gutterElement': { padding: '0 8px' },
+  '.cm-activeLineGutter': { backgroundColor: 'var(--xe-cur)', color: 'var(--xe-fg)' },
+  '.cm-foldPlaceholder': { backgroundColor: 'var(--xe-bd)', color: 'var(--xe-fg)', border: 'none', padding: '0 6px', borderRadius: '3px' },
+  '.cm-tooltip': { backgroundColor: 'var(--xe-gutter)', border: '1px solid var(--xe-bd)', color: 'var(--xe-fg)' },
+  '.cm-tooltip-autocomplete > ul > li[aria-selected]': { backgroundColor: 'var(--xe-acc)', color: 'var(--xe-bg)' },
+  '.cm-panels': { backgroundColor: 'var(--xe-gutter)', color: 'var(--xe-fg)' },
+  '.cm-panels.cm-panels-top': { borderBottomColor: 'var(--xe-bd)' },
+  '.cm-panels.cm-panels-bottom': { borderTopColor: 'var(--xe-bd)' },
+  '.cm-searchMatch': { backgroundColor: 'var(--xe-hit)', outline: 'none' },
+  '.cm-searchMatch.cm-searchMatch-selected': { backgroundColor: 'var(--xe-hitOn)' },
+  '.cm-matchingBracket, .cm-nonmatchingBracket': {
+    backgroundColor: 'var(--xe-bracket)',
+    outline: '1px solid var(--xe-bracket-bd)',
+  },
+})
+
+const hiStyle = HighlightStyle.define([
+  { tag: t.keyword, color: 'var(--xe-k)' },
+  { tag: [t.name, t.deleted, t.character, t.macroName], color: 'var(--xe-fg)' },
+  { tag: [t.propertyName], color: 'var(--xe-f)' },
+  { tag: [t.function(t.variableName), t.labelName], color: 'var(--xe-f)' },
+  { tag: [t.color, t.constant(t.name), t.standard(t.name)], color: 'var(--xe-n)' },
+  { tag: [t.definition(t.name), t.separator], color: 'var(--xe-fg)' },
+  { tag: [t.typeName, t.className, t.changed, t.annotation, t.modifier, t.self, t.namespace], color: 'var(--xe-t)' },
+  { tag: [t.operator, t.operatorKeyword, t.url, t.escape, t.regexp, t.link, t.special(t.string)], color: 'var(--xe-o)' },
+  { tag: [t.meta, t.comment], color: 'var(--xe-c)', fontStyle: 'italic' },
+  { tag: t.strong, fontWeight: 'bold' },
+  { tag: t.emphasis, fontStyle: 'italic' },
+  { tag: t.strikethrough, textDecoration: 'line-through' },
+  { tag: t.link, color: 'var(--xe-f)', textDecoration: 'underline' },
+  { tag: t.heading, fontWeight: 'bold', color: 'var(--xe-k)' },
+  { tag: [t.atom, t.bool, t.special(t.variableName)], color: 'var(--xe-n)' },
+  { tag: [t.processingInstruction, t.string, t.inserted], color: 'var(--xe-s)' },
+  { tag: t.invalid, color: '#ff5555' },
+  { tag: [t.string, t.special(t.string)], color: 'var(--xe-s)' },
+  { tag: t.number, color: 'var(--xe-n)' },
+  { tag: [t.variableName], color: 'var(--xe-fg)' },
+  { tag: [t.bracket, t.squareBracket, t.paren, t.brace], color: 'var(--xe-m)' },
+])
+
+const themeExt = [baseTheme, syntaxHighlighting(hiStyle)]
+
+// ============ 状态 ============
+const doc      = signal(INIT)
+const lang     = signal('js')
+const theme    = signal('onedark')
+const cursor   = signal({ line: 1, col: 1, lines: 1, chars: 0, sel: 0 })
+const dirty    = signal(false)
+const showLangs = signal(false)
+
+// ============ CSS ============
+if (typeof document !== 'undefined' && !document.getElementById('xe-css')) {
+  const s = document.createElement('style')
+  s.id = 'xe-css'
+  s.textContent = `
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+.xe{display:flex;flex-direction:column;height:100dvh;
+  font-family:"JetBrains Mono","Fira Code",ui-monospace,monospace;
+  font-size:13.5px;position:relative}
+.xe-top{display:flex;align-items:center;gap:4px;padding:0 10px;height:40px;flex-shrink:0;
+  background:var(--xe-gutter);border-bottom:1px solid var(--xe-bd);z-index:10;
+  overflow-x:auto;scrollbar-width:none}
+.xe-top::-webkit-scrollbar{display:none}
+.xe-logo{font-weight:700;font-size:12px;margin-right:8px;white-space:nowrap}
+.xe-btn{display:inline-flex;align-items:center;padding:4px 10px;height:26px;
+  background:transparent;border:1px solid transparent;border-radius:5px;
+  font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;color:inherit;opacity:.75}
+.xe-btn:hover{background:var(--xe-cur);opacity:1}
+.xe-btn.on{background:var(--xe-cur);opacity:1;font-weight:600}
+.xe-spacer{flex:1;min-width:8px}
+.xe-host{flex:1;min-height:0;position:relative;overflow:hidden}
+.xe-host .cm-editor{height:100%}
+.xe-host .cm-scroller{overflow:auto}
+.xe-foot{display:flex;align-items:center;gap:14px;padding:0 14px;height:28px;flex-shrink:0;
+  background:var(--xe-gutter);border-top:1px solid var(--xe-bd);font-size:11.5px;
+  color:var(--xe-dim);overflow:hidden}
+.xe-foot span{white-space:nowrap}
+.xe-foot .acc{color:var(--xe-acc)}
+.xe-mask{position:fixed;top:40px;left:0;right:0;bottom:0;z-index:150;background:rgba(0,0,0,.3)}
+.xe-menu{position:fixed;top:44px;z-index:210;background:var(--xe-gutter);
+  border:1px solid var(--xe-bd);border-radius:8px;padding:6px;
+  box-shadow:0 8px 32px rgba(0,0,0,.7);font-size:12.5px;min-width:200px;
+  max-height:70vh;overflow-y:auto}
+.xe-menu.right{right:12px}
+.xe-menu.left{left:8px;right:8px}
+.xe-menu .title{padding:6px 12px;color:var(--xe-dim);font-size:11px;
+  text-transform:uppercase;letter-spacing:.5px}
+.xe-menu button{display:block;width:100%;text-align:left;padding:9px 12px;
+  background:transparent;border:0;color:inherit;font:inherit;font-size:12.5px;
+  cursor:pointer;border-radius:5px}
+.xe-menu button:hover{background:var(--xe-cur)}
+.xe-menu button.on{color:var(--xe-acc);font-weight:600}
+.xe-langs{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.xe-langs button{text-align:center;padding:6px 8px;font-size:11.5px}
+@media (max-width:640px){
+  .xe-top{height:44px;padding:0 6px;gap:2px}
+  .xe-btn{padding:5px 8px;font-size:11px}
+  .xe-menu.left{left:8px;right:8px}
+}
+`
+  document.head.appendChild(s)
+}
+
+function applyCSSVars(name) {
+  const c = COLORS[name] || COLORS.onedark
+  const r = document.documentElement.style
+  r.setProperty('--xe-bg', c.bg)
+  r.setProperty('--xe-gutter', c.gutter)
+  r.setProperty('--xe-bd', c.bd)
+  r.setProperty('--xe-fg', c.fg)
+  r.setProperty('--xe-dim', c.dim)
+  r.setProperty('--xe-cur', c.cur)
+  r.setProperty('--xe-acc', c.acc)
+  r.setProperty('--xe-sel', c.sel)
+  r.setProperty('--xe-k', c.k)
+  r.setProperty('--xe-s', c.s)
+  r.setProperty('--xe-c', c.c)
+  r.setProperty('--xe-n', c.n)
+  r.setProperty('--xe-f', c.f)
+  r.setProperty('--xe-t', c.t)
+  r.setProperty('--xe-m', c.m)
+  r.setProperty('--xe-o', c.o)
+  r.setProperty('--xe-hit', c.hit)
+  r.setProperty('--xe-hitOn', c.hitOn)
+  r.setProperty('--xe-bracket', 'rgba(127,127,255,.3)')
+  r.setProperty('--xe-bracket-bd', 'rgba(127,127,255,.5)')
+  document.body.style.background = c.bg
+}
+
+// ============ 组件 ============
+function Editor() {
+  let view = null
+  let hostEl = null
+  let applyingRemote = false
+  let firstRun = true
+
+  const langConf  = new Compartment()
+
+  const updateCursor = () => {
+    if (!view) return
+    const st = view.state
+    const pos = st.selection.main
+    const line = st.doc.lineAt(pos.head)
+    cursor({
+      line: line.number,
+      col: pos.head - line.from + 1,
+      lines: st.doc.lines,
+      chars: st.doc.length,
+      sel: pos.to - pos.from,
+    })
+  }
+
+  onMount(() => {
+    hostEl = document.querySelector('.xe-host')
+    if (!hostEl) { console.error('[cm] host not found'); return }
+
+    applyCSSVars(theme())
+
+    const startState = EditorState.create({
+      doc: doc(),
+      extensions: [
+        basicSetup,
+        langConf.of((LANGS[lang()] || LANGS.js).load()),
+        themeExt,
+        EditorView.updateListener.of(u => {
+          if (u.docChanged && !applyingRemote) {
+            doc(u.state.doc.toString())
+            dirty(true)
+          }
+          if (u.docChanged || u.selectionSet) updateCursor()
+        }),
+      ],
+    })
+
+    view = new EditorView({ state: startState, parent: hostEl })
+    updateCursor()
+
+    effect(() => {
+      const v = doc()
+      if (firstRun) { firstRun = false; return }
+      if (!view) return
+      if (view.state.doc.toString() === v) return
+      applyingRemote = true
+      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: v } })
+      applyingRemote = false
+    })
+
+    onCleanup(() => { if (view) { view.destroy(); view = null } })
+  })
+
+  const switchLang = l => {
+    if (!LANGS[l]) return
+    lang(l)
+    if (view) view.dispatch({ effects: langConf.reconfigure((LANGS[l]).load()) })
+    showLangs(false)
+  }
+  const switchTheme = name => {
+    if (!COLORS[name]) return
+    theme(name)
+    applyCSSVars(name)
+  }
+  const cycleTheme = () => {
+    const ks = Object.keys(COLORS)
+    const i = ks.indexOf(theme())
+    switchTheme(ks[(i + 1) % ks.length])
+  }
+  const save = () => {
+    try {
+      localStorage.setItem('xe-doc', doc())
+      localStorage.setItem('xe-lang', lang())
+      localStorage.setItem('xe-theme', theme())
+      dirty(false)
+    } catch (e) { console.warn(e) }
+  }
+  const load = () => {
+    try {
+      const d = localStorage.getItem('xe-doc')
+      const l = localStorage.getItem('xe-lang')
+      const th = localStorage.getItem('xe-theme')
+      if (d) doc(d)
+      if (l && LANGS[l]) { lang(l); if (view) view.dispatch({ effects: langConf.reconfigure(LANGS[l].load()) }) }
+      if (th && COLORS[th]) { theme(th); applyCSSVars(th) }
+      dirty(false)
+    } catch (e) { console.warn(e) }
+  }
+  const exportFile = () => {
+    const ext = {
+      xuy:'xuy', js:'js', ts:'ts', jsx:'jsx', tsx:'tsx',
+      html:'html', css:'css', sass:'scss', stylus:'styl', vue:'vue', svelte:'svelte',
+      json:'json', yaml:'yml', toml:'toml', xml:'xml', sql:'sql', proto:'proto',
+      md:'md', diff:'diff',
+      py:'py', go:'go', rust:'rs', java:'java', cpp:'cpp', php:'php',
+      ruby:'rb', swift:'swift', lua:'lua', perl:'pl', r:'r', julia:'jl',
+      haskell:'hs', clojure:'clj', erlang:'erl', pascal:'pas', coffee:'coffee', vb:'vb',
+      sh:'sh', ps:'ps1', tcl:'tcl',
+      docker:'Dockerfile', cmake:'cmake', nginx:'conf',
+    }[lang()] || 'txt'
+    const blob = new Blob([doc()], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'snippet.' + ext
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+  const importFile = () => {
+    const inp = document.createElement('input')
+    inp.type = 'file'
+    inp.accept = '.js,.ts,.jsx,.tsx,.py,.css,.html,.json,.md,.sql,.yaml,.yml,.xml,.rs,.java,.cpp,.php,.go,.sh,.txt'
+    inp.onchange = e => {
+      const f = e.target.files && e.target.files[0]
+      if (!f) return
+      const reader = new FileReader()
+      reader.onload = () => {
+        const text = String(reader.result || '')
+        doc(text)
+        // 猜语言
+        const ext = f.name.split('.').pop().toLowerCase()
+        const guess = {
+          xuy:'xuy', js:'js', mjs:'js', cjs:'js', ts:'ts', tsx:'tsx', jsx:'jsx',
+          html:'html', htm:'html', css:'css', scss:'sass', styl:'stylus', vue:'vue', svelte:'svelte',
+          json:'json', yaml:'yaml', yml:'yaml', toml:'toml', xml:'xml',
+          sql:'sql', proto:'proto', md:'md', markdown:'md', diff:'diff',
+          py:'py', go:'go', rs:'rust', java:'java',
+          cpp:'cpp', cc:'cpp', cxx:'cpp', h:'cpp', hpp:'cpp', c:'cpp',
+          php:'php', rb:'ruby', swift:'swift', lua:'lua', pl:'perl', r:'r',
+          jl:'julia', hs:'haskell', clj:'clojure', erl:'erlang', pas:'pascal',
+          coffee:'coffee', vb:'vb', sh:'sh', bash:'sh', zsh:'sh', ps1:'ps', tcl:'tcl',
+          dockerfile:'docker', cmake:'cmake', conf:'nginx',
+        }[ext]
+        if (guess) switchLang(guess)
+      }
+      reader.readAsText(f)
+    }
+    inp.click()
+  }
+  const shareURL = () => {
+    try {
+      const data = btoa(unescape(encodeURIComponent(JSON.stringify({ d: doc(), l: lang(), t: theme() }))))
+      const url = location.origin + location.pathname + '#s=' + data
+      navigator.clipboard.writeText(url).then(
+        () => alert('链接已复制'),
+        () => prompt('复制链接:', url)
+      )
+    } catch (e) { alert('生成失败') }
+  }
+
+  // 载入本地存储 + URL 分享
+  onMount(() => {
+    const hash = location.hash
+    if (hash.startsWith('#s=')) {
+      try {
+        const data = JSON.parse(decodeURIComponent(escape(atob(hash.slice(3)))))
+        if (data.d) doc(data.d)
+        if (data.l && LANGS[data.l]) lang(data.l)
+        if (data.t && COLORS[data.t]) theme(data.t)
+        return
+      } catch (e) {}
+    }
+    load()
+  })
+
+  const langKeys = Object.keys(LANGS)
+  const themeKeys = Object.keys(COLORS)
+
+  return div({ class: 'xe' },
+    div({ class: 'xe-top' },
+      span({ class: 'xe-logo' }, 'XUNAY · CM6'),
+      button({
+        class: () => 'xe-btn' + (showLangs() ? ' on' : ''),
+        on: { click: e => {
+          e.stopPropagation()
+          _lastOpen = Date.now()
+          showLangs(!showLangs())
+        } }
+      }, () => LANGS[lang()].label + ' ▾'),
+      button({
+        class: 'xe-btn',
+        on: { click: e => { e.stopPropagation(); cycleTheme() } }
+      }, () => '◐ ' + theme()),
+      button({ class: 'xe-btn', on: { click: e => { e.stopPropagation(); save() } } }, '💾 保存'),
+      button({ class: 'xe-btn', on: { click: e => { e.stopPropagation(); exportFile() } } }, '⬇ 导出'),
+      button({ class: 'xe-btn', on: { click: e => { e.stopPropagation(); importFile() } } }, '⬆ 导入'),
+      button({ class: 'xe-btn', on: { click: e => { e.stopPropagation(); shareURL() } } }, '🔗 分享'),
+      span({ class: 'xe-spacer' })
+    ),
+    show(showLangs, () => frag(
+
+      div({ class: 'xe-mask', on: { click: e => { e.stopPropagation(); showLangs(false) } } }),
+      div({ class: 'xe-menu left', on: { click: e => e.stopPropagation() } },
+        div({ class: 'title' }, '语言'),
+        div({ class: 'xe-langs' },
+          ...langKeys.map(k =>
+            button({
+              class: () => lang() === k ? 'on' : '',
+              on: { click: () => switchLang(k) }
+            }, LANGS[k].label)
+          )
+        )
+      )
+        )),
+    div({ class: 'xe-host' }),
+    div({ class: 'xe-foot' },
+      span({ class: 'acc' }, () => LANGS[lang()].label),
+      span(null, () => '行 ' + cursor().line + '，列 ' + cursor().col),
+      cursor().sel > 0 ? span(null, () => '选中 ' + cursor().sel) : null,
+      span({ style: 'flex:1' }),
+      span(null, () => cursor().lines + ' 行'),
+      span(null, () => cursor().chars + ' 字符'),
+      dirty() ? span({ class: 'acc' }, '● 未保存') : span(null, '已保存')
+    )
+  )
+}
+
+let _lastOpen = 0
+document.addEventListener('click', () => {
+  if (Date.now() - _lastOpen < 200) return
+  showLangs(false)
+})
+
+mount(() => Editor(), '#app')

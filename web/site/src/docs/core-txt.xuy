@@ -1,5 +1,5 @@
 // txt 模板
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -22,7 +22,7 @@ export function Doc() {
     H2("txt vs 函数返回字符串"),
     Code("// 两种等价\nspan(null, txt`n = ${n}`)\nspan(null, () => 'n = ' + n())\n\n// txt 适合 3 个以上插值\nspan(null, txt`${a} + ${b} = ${c}`)", "xuy"),
     H2("完整示例"),
-    Code("import { div, h1, p, button, signal, txt, mount } from 'xunay'\n\nfunction Stats() {\n  const online = signal(128)\n  const total = signal(200)\n\n  return div(null,\n    h1(null, txt`在线用户 ${online} / ${total}`),\n    p(null, txt`占比 ${() => Math.round(online() / total() * 100)}%`),\n    button({ on: { click: () => online(online() + 1) } }, '+1'),\n    button({ on: { click: () => total(total() + 1) } }, '总数+1')\n  )\n}\n\nmount(() => Stats(), '#app')", "xuy"),
+    Code("import { signal, txt, mount } from 'xunay'\n\nfunction Stats() {\n  const online = signal(128)\n  const total = signal(200)\n\n  return div(null,\n    h1(null, txt`在线用户 ${online} / ${total}`),\n    p(null, txt`占比 ${() => Math.round(online() / total() * 100)}%`),\n    button({ on: { click: () => online(online() + 1) } }, '+1'),\n    button({ on: { click: () => total(total() + 1) } }, '总数+1')\n  )\n}\n\nmount(() => Stats(), '#app')", "xuy"),
     H2("常见陷阱"),
     H3("陷阱 1：不用手动加 ()"),
     Code("// txt 内部自动包函数\nspan(null, txt`n = ${n}`)     // 响应式\nspan(null, txt`n = ${n()}`)   // 也可以，但没必要", "xuy"),

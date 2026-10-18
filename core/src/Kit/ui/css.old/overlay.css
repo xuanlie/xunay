@@ -1,0 +1,29 @@
+/* XuNay UI · overlay.css */
+
+/* === 下拉菜单 === */
+.dropdown { position: relative; display: inline-block; }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 180px;
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border);
+  border-radius: var(--x-radius);
+  box-shadow: var(--x-shadow-md);
+  padding: 4px;
+  z-index: 100;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--x-text);
+}
+
+.dropdown-item:hover { background: var(--x-bg-soft); }
+
+.dropdown-divider { height: 1px; background: var(--x-border); margin: 4px 0; }

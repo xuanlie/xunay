@@ -1,0 +1,1530 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · form.css
+   表单系统 · 1000+ 行完整版
+   ───────────────────────────────────────────────────────────────────────
+   对齐 JS 组件生成类名：
+     form.js  → Input / Textarea / Select / Checkbox / Radio / Switch
+                NumberInput / DatePicker / TimePicker / SearchInput
+                PasswordStrength / Rate
+     form2.js → ColorPicker / Slider / Mentions / Transfer / Cascader
+   目录：
+     01 · 字段容器 field
+     02 · 标签 label
+     03 · 提示 / 错误 hint / error
+     04 · 输入框 field-box
+     05 · 输入元素 field-el
+     06 · 图标 / 清除 / 密码可见
+     07 · 原生输入 input
+     08 · 文本域 textarea
+     09 · 下拉 select
+     10 · 复选 / 单选 checkbox / radio
+     11 · 复选卡片 / 单选按钮
+     12 · 开关 switch
+     13 · 数字输入 number
+     14 · 日期 / 时间 picker
+     15 · 搜索框 search
+     16 · 密码强度 password
+     17 · 评分 rate
+     18 · 颜色选择 color-picker
+     19 · 滑块 slider
+     20 · 提及 mentions
+     21 · 穿梭框 transfer
+     22 · 级联选择 cascader
+     23 · 表单组 / 布局
+     24 · 内联 / 横向表单
+     25 · 表单状态
+     26 · 响应式
+     27 · 关键帧
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   01 · 字段容器 field
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--x-sp-4, 16px);
+  min-width: 0;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--x-sp-3, 12px);
+}
+
+.field-horizontal {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--x-sp-4, 16px);
+}
+
+.field-horizontal > .label {
+  flex: 0 0 auto;
+  min-width: 100px;
+  padding-top: 8px;
+  margin-bottom: 0;
+  text-align: right;
+}
+
+.field-horizontal > .field-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   02 · 标签 label
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.label {
+  display: block;
+  font-size: var(--x-fs-sm, 12.5px);
+  font-weight: var(--x-fw-m, 500);
+  color: var(--x-fg, #1a1a1a);
+  line-height: 1.4;
+  margin-bottom: 0;
+  user-select: none;
+}
+
+.label .required,
+.label-required {
+  color: var(--x-danger, #dc2626);
+  margin-left: 2px;
+  font-weight: var(--x-fw-r, 400);
+}
+
+.label-optional {
+  color: var(--x-fg-mute, #999);
+  font-weight: var(--x-fw-r, 400);
+  font-size: 0.9em;
+  margin-left: 4px;
+}
+
+.label-hint {
+  color: var(--x-fg-mute, #999);
+  font-weight: var(--x-fw-r, 400);
+  margin-left: 6px;
+  font-size: 0.9em;
+}
+
+.label-lg {
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-sb, 600);
+}
+
+.label-sm {
+  font-size: var(--x-fs-xs, 11px);
+  color: var(--x-fg-dim, #666);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   03 · 提示 / 错误 hint / error
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.hint {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-mute, #999);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.hint-warning {
+  color: var(--x-warning-fg, #92400e);
+}
+
+.hint-success {
+  color: var(--x-success, #16a34a);
+}
+
+.error-msg {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-danger, #dc2626);
+  line-height: 1.4;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.error-msg::before {
+  content: "⚠";
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.field-hint {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  line-height: 1.4;
+  min-height: 16px;
+  margin-top: 2px;
+}
+
+.field-hint.error,
+.field-hint.is-error {
+  color: var(--x-danger, #dc2626);
+}
+
+.field-count {
+  color: var(--x-fg-mute, #999);
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.field-count.over,
+.field-count.is-over {
+  color: var(--x-danger, #dc2626);
+  font-weight: var(--x-fw-m, 500);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   04 · 输入框 field-box
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.field-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--x-input-bg, #fff);
+  border: 1px solid var(--x-input-border, #ccc);
+  border-radius: var(--x-input-radius, 8px);
+  padding: 0 var(--x-input-px, 12px);
+  transition:
+    border-color var(--x-dur-1, 100ms) var(--x-ease),
+    box-shadow var(--x-dur-1, 100ms) var(--x-ease),
+    background var(--x-dur-1, 100ms) var(--x-ease);
+  min-width: 0;
+}
+
+.field-box:hover:not(.disabled):not(.is-disabled) {
+  border-color: var(--x-line-strong, #888);
+}
+
+.field-box:focus-within {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.field-box.error,
+.field-box.is-error {
+  border-color: var(--x-danger, #dc2626);
+}
+
+.field-box.error:focus-within,
+.field-box.is-error:focus-within {
+  box-shadow: var(--x-focus-ring-danger, 0 0 0 3px rgba(220,38,38,.25));
+}
+
+.field-box.success,
+.field-box.is-success {
+  border-color: var(--x-success, #16a34a);
+}
+
+.field-box.warning,
+.field-box.is-warning {
+  border-color: var(--x-warning, #d97706);
+}
+
+.field-box.disabled,
+.field-box.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--x-bg-soft, #f5f5f5);
+  pointer-events: none;
+}
+
+.field-box.readonly {
+  background: var(--x-bg-soft, #f5f5f5);
+  cursor: default;
+}
+
+.field-box.filled {
+  background: var(--x-bg-soft, #f5f5f5);
+}
+
+.field-box.underline {
+  border: 0;
+  border-bottom: 1px solid var(--x-line-2, #ccc);
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+.field-box.underline:focus-within {
+  border-bottom-color: var(--x-primary, #2563eb);
+  box-shadow: none;
+}
+
+.field-box.flush {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.field-box.flush:focus-within {
+  box-shadow: none;
+}
+
+/* 尺寸 */
+.field-box.xs { height: 26px; padding: 0 8px;  font-size: var(--x-fs-xs, 11px); border-radius: var(--x-r-xs, 4px); }
+.field-box.sm { height: 32px; padding: 0 10px; font-size: var(--x-fs-sm, 12.5px); border-radius: var(--x-r-sm, 6px); }
+.field-box.md { height: 38px; padding: 0 12px; font-size: var(--x-fs, 14px);    border-radius: var(--x-r, 8px); }
+.field-box.lg { height: 44px; padding: 0 14px; font-size: var(--x-fs-md, 15px); border-radius: var(--x-r-md, 10px); }
+.field-box.xl { height: 52px; padding: 0 16px; font-size: var(--x-fs-lg, 17px); border-radius: var(--x-r-md, 10px); }
+
+.field-box.block { width: 100%; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   05 · 输入元素 field-el
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.field-el {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  width: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border-radius: 0;
+}
+
+.field-el::-webkit-search-decoration,
+.field-el::-webkit-search-cancel-button,
+.field-el::-webkit-inner-spin-button,
+.field-el::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.field-el::placeholder {
+  color: var(--x-fg-subtle, #bbb);
+  opacity: 1;
+}
+
+.field-el:disabled {
+  cursor: not-allowed;
+}
+
+.field-el[readonly] {
+  cursor: default;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   06 · 图标 / 清除 / 密码可见
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.field-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--x-fg-mute, #999);
+  flex-shrink: 0;
+  width: 1.1em;
+  height: 1.1em;
+  font-size: 1em;
+  transition: color var(--x-dur-1, 100ms);
+}
+
+.field-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.field-box:focus-within .field-icon {
+  color: var(--x-primary, #2563eb);
+}
+
+.field-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--x-fg-mute, #999);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity var(--x-dur-1), background var(--x-dur-1);
+}
+
+.field-clear:hover {
+  background: var(--x-fg-dim, #666);
+  opacity: 1;
+}
+
+.field-eye {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--x-fg-mute, #999);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 14px;
+  width: 1.2em;
+  height: 1.2em;
+  transition: color var(--x-dur-1);
+}
+
+.field-eye:hover {
+  color: var(--x-fg, #1a1a1a);
+}
+
+.field-prefix,
+.field-suffix {
+  display: inline-flex;
+  align-items: center;
+  color: var(--x-fg-mute, #999);
+  font-size: 0.95em;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.field-prefix {
+  padding-right: 4px;
+  margin-left: -4px;
+}
+
+.field-suffix {
+  padding-left: 4px;
+  margin-right: -4px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   07 · 原生输入 input
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.input {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: var(--x-fs, 14px);
+  line-height: 1.4;
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: var(--x-r, 8px);
+  outline: none;
+  transition:
+    border-color var(--x-dur-1) var(--x-ease),
+    box-shadow var(--x-dur-1) var(--x-ease);
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--x-line-strong, #888);
+}
+
+.input:focus {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--x-bg-soft, #f5f5f5);
+}
+
+.input.error {
+  border-color: var(--x-danger, #dc2626);
+}
+
+.input.error:focus {
+  box-shadow: var(--x-focus-ring-danger, 0 0 0 3px rgba(220,38,38,.25));
+}
+
+.input.success {
+  border-color: var(--x-success, #16a34a);
+}
+
+.input-sm { padding: 5px 10px; font-size: var(--x-fs-sm, 12.5px); border-radius: var(--x-r-sm, 6px); }
+.input-lg { padding: 12px 16px; font-size: var(--x-fs-md, 15px); border-radius: var(--x-r-md, 10px); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · 文本域 textarea
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: 88px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: var(--x-fs, 14px);
+  line-height: 1.6;
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: var(--x-r, 8px);
+  outline: none;
+  resize: vertical;
+  transition:
+    border-color var(--x-dur-1) var(--x-ease),
+    box-shadow var(--x-dur-1) var(--x-ease);
+  box-sizing: border-box;
+}
+
+.textarea:hover:not(:disabled) {
+  border-color: var(--x-line-strong, #888);
+}
+
+.textarea:focus {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--x-bg-soft, #f5f5f5);
+}
+
+.textarea.error {
+  border-color: var(--x-danger, #dc2626);
+}
+
+.textarea.error:focus {
+  box-shadow: var(--x-focus-ring-danger, 0 0 0 3px rgba(220,38,38,.25));
+}
+
+.textarea.autosize {
+  resize: none;
+  overflow-y: hidden;
+}
+
+.textarea.no-resize {
+  resize: none;
+}
+
+.textarea-h { min-height: 48px; }
+.textarea-xl { min-height: 180px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 · 下拉 select
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.select {
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0 40px 0 14px;
+  font-family: inherit;
+  font-size: var(--x-fs, 14px);
+  line-height: 1.4;
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s, background-color .15s;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%236b7280' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+}
+.select:hover:not(:disabled) {
+  border-color: var(--x-line-strong, #888);
+}
+.select:focus {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28));
+}
+.select:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  background-color: var(--x-bg-soft, #f5f5f5);
+}
+.select.error {
+  border-color: var(--x-danger, #dc2626);
+}
+.select-sm {
+  height: 32px;
+  padding: 0 32px 0 10px;
+  font-size: var(--x-fs-sm, 12.5px);
+  border-radius: 8px;
+  background-size: 14px 14px;
+  background-position: right 10px center;
+}
+.select-lg {
+  height: 46px;
+  padding: 0 44px 0 16px;
+  font-size: var(--x-fs-md, 15px);
+  border-radius: 12px;
+  background-size: 18px 18px;
+  background-position: right 14px center;
+}
+.select-multiple {
+  height: auto;
+  padding: 8px 14px;
+  background-image: none;
+  min-height: 40px;
+}
+
+.select:hover:not(:disabled) {
+  border-color: var(--x-line-strong, #888);
+}
+
+.select:focus {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background-color: var(--x-bg-soft, #f5f5f5);
+}
+
+.select.error {
+  border-color: var(--x-danger, #dc2626);
+}
+
+.select-sm { height: 32px; padding: 0 28px 0 10px; font-size: var(--x-fs-sm, 12.5px); border-radius: var(--x-r-sm, 6px); }
+.select-lg { height: 44px; padding: 0 36px 0 14px; font-size: var(--x-fs-md, 15px); border-radius: var(--x-r-md, 10px); }
+
+.select-multiple {
+  height: auto;
+  padding: 6px 12px;
+  background-image: none;
+  min-height: 38px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · 复选 / 单选 checkbox / radio
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.checkbox,
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--x-fs, 14px);
+  color: var(--x-fg, #1a1a1a);
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.4;
+  min-height: 24px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 尺寸交给 reset.css；此处只做包裹布局 */
+.checkbox,
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox input,
+.radio input {
+  margin: 0;
+  accent-color: var(--x-primary, #2563eb);
+}
+
+.checkbox input:focus-visible,
+.radio input:focus-visible {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.checkbox.disabled,
+.radio.disabled,
+.checkbox input:disabled + span,
+.radio input:disabled + span {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-lg input,
+.radio-lg input {
+  width: 20px;
+  height: 20px;
+}
+
+.checkbox-sm input,
+.radio-sm input {
+  width: 14px;
+  height: 14px;
+}
+
+.checkbox-block,
+.radio-block {
+  display: flex;
+  width: 100%;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · 复选卡片 / 单选按钮
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.checkbox.card,
+.radio.card,
+.cb-card,
+.rd-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--x-r-md, 10px);
+  border: 1.5px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-elev, #fff);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--x-dur-2) var(--x-ease);
+  min-height: 44px;
+}
+
+.checkbox.card:hover,
+.cb-card:hover {
+  border-color: var(--x-line-2, #ccc);
+}
+
+.checkbox.card.on,
+.checkbox.card.is-checked,
+.cb-card.on {
+  border-color: var(--x-primary, #2563eb);
+  background: var(--x-primary-tint, rgba(37,99,235,.06));
+  box-shadow: 0 0 0 1px var(--x-primary, #2563eb);
+}
+
+.checkbox.card .cb-content,
+.cb-card .cb-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.checkbox.card .cb-title,
+.cb-card .cb-title {
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-m, 500);
+  line-height: 1.4;
+  color: var(--x-fg, #1a1a1a);
+}
+
+.checkbox.card .cb-desc,
+.cb-card .cb-desc {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  line-height: 1.5;
+}
+
+/* 单选按钮组 */
+.radio.button,
+.rd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--x-r, 8px);
+  border: 1.5px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  font-size: 13.5px;
+  font-weight: var(--x-fw-m, 500);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--x-dur-2) var(--x-ease);
+  min-height: 36px;
+}
+
+.radio.button:hover,
+.rd-button:hover {
+  border-color: var(--x-primary, #2563eb);
+  color: var(--x-primary, #2563eb);
+}
+
+.radio.button.on,
+.rd-button.on {
+  background: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+  color: #fff;
+}
+
+.radio-group,
+.rd-group {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · 开关 switch
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--x-r-full, 9999px);
+  background: var(--x-line-2, #ccc);
+  cursor: pointer;
+  transition: background var(--x-dur-2) var(--x-ease);
+  flex-shrink: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  vertical-align: middle;
+}
+
+.switch.on {
+  background: var(--x-primary, #2563eb);
+}
+
+.switch:focus-visible {
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.switch.disabled,
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  transition: transform var(--x-dur-2) var(--x-ease-spring);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--x-fg-mute, #999);
+}
+
+.switch.on .switch-thumb {
+  transform: translateX(18px);
+}
+
+/* 尺寸 */
+.switch.xs { width: 28px; height: 16px; }
+.switch.xs .switch-thumb { width: 12px; height: 12px; top: 2px; left: 2px; }
+.switch.xs.on .switch-thumb { transform: translateX(12px); }
+
+.switch.sm { width: 32px; height: 18px; }
+.switch.sm .switch-thumb { width: 14px; height: 14px; top: 2px; left: 2px; }
+.switch.sm.on .switch-thumb { transform: translateX(14px); }
+
+.switch.md { width: 40px; height: 22px; }
+
+.switch.lg { width: 50px; height: 28px; }
+.switch.lg .switch-thumb { width: 24px; height: 24px; top: 2px; left: 2px; }
+.switch.lg.on .switch-thumb { transform: translateX(22px); }
+
+/* 颜色变体 */
+.switch.success.on { background: var(--x-success, #16a34a); }
+.switch.warning.on { background: var(--x-warning, #d97706); }
+.switch.danger.on  { background: var(--x-danger, #dc2626); }
+
+/* 内嵌文字 */
+.switch-text {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--x-fw-sb, 600);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--x-dur-1);
+}
+
+.switch.on .switch-text.on { opacity: 1; left: 8px; }
+.switch:not(.on) .switch-text.off { opacity: 1; right: 8px; }
+
+/* 带标签的开关 */
+.switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  min-height: 32px;
+}
+
+.switch-label .switch { pointer-events: auto; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · 数字输入 number
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.number-input {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: var(--x-r, 8px);
+  background: var(--x-bg-elev, #fff);
+  overflow: hidden;
+}
+
+.number-input .num-btn {
+  width: 36px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--x-fg-dim, #666);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background var(--x-dur-1);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.number-input .num-btn:hover:not(:disabled) {
+  background: var(--x-bg-hover, #f5f5f5);
+  color: var(--x-fg, #1a1a1a);
+}
+
+.number-input .num-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.number-input .num-field {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.number-input .num-field::-webkit-outer-spin-button,
+.number-input .num-field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-input:focus-within {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · 日期 / 时间 picker
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.picker {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.picker .picker-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: var(--x-r, 8px);
+  background: var(--x-bg-elev, #fff);
+  font: inherit;
+  color: var(--x-fg, #1a1a1a);
+  cursor: pointer;
+  outline: 0;
+}
+
+.picker .picker-input:focus {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: var(--x-focus-ring, 0 0 0 3px rgba(37,99,235,.28));
+}
+
+.picker-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: var(--x-z-dropdown, 500);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+  padding: 12px;
+  min-width: 280px;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  margin-bottom: 10px;
+  font-weight: var(--x-fw-sb, 600);
+  font-size: var(--x-fs, 14px);
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.picker-cell {
+  aspect-ratio: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--x-fg, #1a1a1a);
+  font-size: var(--x-fs-sm, 12.5px);
+  border-radius: var(--x-r-sm, 6px);
+  cursor: pointer;
+  transition: background var(--x-dur-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.picker-cell:hover:not(:disabled) {
+  background: var(--x-bg-hover, #f5f5f5);
+}
+
+.picker-cell.today {
+  color: var(--x-primary, #2563eb);
+  font-weight: var(--x-fw-b, 700);
+}
+
+.picker-cell.selected {
+  background: var(--x-primary, #2563eb);
+  color: #fff;
+  font-weight: var(--x-fw-sb, 600);
+}
+
+.picker-cell.other-month {
+  color: var(--x-fg-subtle, #bbb);
+}
+
+.picker-cell:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 搜索框 search
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 14px 0 42px;
+  background: var(--x-bg-soft, #f5f5f5);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: all .15s;
+  box-sizing: border-box;
+}
+.search-input:hover:not(.disabled) {
+  background: var(--x-bg-hover, #ebebeb);
+}
+.search-input:focus-within {
+  background: var(--x-bg-elev, #fff);
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.15));
+}
+.search-input .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--x-fg-mute, #999);
+  pointer-events: none;
+  transition: color .15s;
+  display: block;
+}
+.search-input:focus-within .search-icon {
+  color: var(--x-primary, #2563eb);
+}
+.search-input input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: inherit;
+  padding: 0;
+}
+.search-input input::placeholder {
+  color: var(--x-fg-mute, #999);
+}
+.search-input .search-clear {
+  margin-left: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--x-fg-mute, #999);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  opacity: .6;
+  transition: opacity .15s, background .15s;
+}
+.search-input .search-clear:hover {
+  opacity: 1;
+  background: var(--x-fg-dim, #666);
+}
+.search-input-lg {
+  height: 46px;
+  padding-left: 46px;
+  border-radius: 12px;
+}
+.search-input-lg .search-icon {
+  left: 16px;
+  width: 18px;
+  height: 18px;
+}
+
+
+.number-input .num-field {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* field-box 内的任何 input/textarea：清空原生 */
+.field-box input,
+.field-box textarea {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.field-box input:focus,
+.field-box textarea:focus {
+  outline: 0;
+  box-shadow: none;
+  border: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · 命令式 Checkbox / Radio / Switch（对齐 Kit/ui/form.js 生成的 DOM）
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Checkbox 命令式结构 ─── */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+  min-height: 24px;
+}
+.cb-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--x-line-2, #ccc);
+  border-radius: 5px;
+  background: var(--x-bg-elev, #fff);
+  transition: background-color .2s cubic-bezier(.34,1.56,.64,1),
+              border-color .15s ease;
+}
+.checkbox:hover .cb-box { border-color: var(--x-primary, #2563eb); }
+.cb-check {
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.cb-check path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset .28s cubic-bezier(.4,0,.2,1) .05s;
+}
+.cb-mark {
+  position: absolute;
+  width: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: #fff;
+  opacity: 0;
+  transition: opacity .15s;
+}
+
+/* Checkbox 选中 */
+.checkbox.on .cb-box {
+  background: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+}
+.checkbox.on .cb-check { opacity: 1; }
+.checkbox.on .cb-check path { stroke-dashoffset: 0; }
+
+/* 半选 */
+.checkbox.indeterminate .cb-box {
+  background: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+}
+.checkbox.indeterminate .cb-mark { opacity: 1; }
+
+/* Checkbox 色调 */
+.checkbox.success.on .cb-box,
+.checkbox.success.indeterminate .cb-box {
+  background: var(--x-success, #16a34a);
+  border-color: var(--x-success, #16a34a);
+}
+.checkbox.warning.on .cb-box {
+  background: var(--x-warning, #d97706);
+  border-color: var(--x-warning, #d97706);
+}
+.checkbox.danger.on .cb-box {
+  background: var(--x-danger, #dc2626);
+  border-color: var(--x-danger, #dc2626);
+}
+
+/* Checkbox 尺寸 */
+.checkbox.sm .cb-box { width: 14px; height: 14px; border-radius: 4px; }
+.checkbox.sm .cb-check { padding: 1px; }
+.checkbox.lg .cb-box { width: 22px; height: 22px; border-radius: 6px; }
+.checkbox.lg .cb-check { padding: 3px; }
+
+/* Checkbox 内容区 */
+.cb-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cb-title {
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-m, 500);
+  line-height: 1.4;
+  color: var(--x-fg, #1a1a1a);
+}
+.cb-desc {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  line-height: 1.5;
+}
+
+/* Checkbox 卡片模式 */
+.checkbox.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-elev, #fff);
+  transition: border-color .15s, background .15s;
+}
+.checkbox.card:hover { border-color: var(--x-line-2, #ccc); }
+.checkbox.card.on {
+  border-color: var(--x-primary, #2563eb);
+  background: var(--x-primary-soft, rgba(37,99,235,.06));
+  box-shadow: 0 0 0 1px var(--x-primary, #2563eb);
+}
+.checkbox.card .cb-title { font-size: var(--x-fs, 14px); font-weight: var(--x-fw-m, 500); }
+.checkbox.card .cb-desc { font-size: var(--x-fs-sm, 12.5px); }
+
+/* Checkbox 禁用 */
+.checkbox.disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Checkbox 焦点 */
+.checkbox:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28));
+  border-radius: var(--x-r-sm, 6px);
+}
+
+
+/* ─── Radio 命令式结构 ─── */
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  padding: 2px 0;
+  min-height: 24px;
+}
+.rd-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--x-line-2, #ccc);
+  border-radius: 50%;
+  background: var(--x-bg-elev, #fff);
+  transition: border-color .15s;
+}
+.radio:hover .rd-dot { border-color: var(--x-primary, #2563eb); }
+.cb-inner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--x-primary, #2563eb);
+  transform: scale(0);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.radio.on .rd-dot {
+  border-color: var(--x-primary, #2563eb);
+  background: var(--x-primary, #2563eb);
+  box-shadow: inset 0 0 0 3px var(--x-bg-elev, #fff);
+}
+.radio.on .cb-inner-dot {
+  transform: scale(1);
+  background: transparent;
+}
+.radio.success.on .rd-dot { border-color: var(--x-success, #16a34a); background: var(--x-success, #16a34a); }
+.radio.warning.on .rd-dot { border-color: var(--x-warning, #d97706); background: var(--x-warning, #d97706); }
+.radio.danger.on .rd-dot { border-color: var(--x-danger, #dc2626); background: var(--x-danger, #dc2626); }
+
+.radio.sm .rd-dot { width: 14px; height: 14px; }
+.radio.sm .cb-inner-dot { width: 6px; height: 6px; }
+.radio.lg .rd-dot { width: 22px; height: 22px; }
+.radio.lg .cb-inner-dot { width: 10px; height: 10px; }
+
+.radio.disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.radio:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28));
+  border-radius: var(--x-r-sm, 6px);
+}
+
+/* Radio 卡片 */
+.radio.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-elev, #fff);
+  transition: border-color .15s, background .15s;
+}
+.radio.card:hover { border-color: var(--x-line-2, #ccc); }
+.radio.card.on {
+  border-color: var(--x-primary, #2563eb);
+  background: var(--x-primary-soft, rgba(37,99,235,.06));
+  box-shadow: 0 0 0 1px var(--x-primary, #2563eb);
+}
+
+/* Radio 按钮模式 */
+.radio.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  border: 1.5px solid var(--x-line, #e5e5e5);
+  border-radius: 8px;
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #1a1a1a);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all .15s;
+}
+.radio.button:hover { border-color: var(--x-primary, #2563eb); color: var(--x-primary, #2563eb); }
+.radio.button.on {
+  background: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+  color: #fff;
+}
+
+
+/* ─── Switch 命令式 ─── */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--x-line-2, #ccc);
+  cursor: pointer;
+  transition: background .25s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  vertical-align: middle;
+}
+.switch.on { background: var(--x-primary, #2563eb); }
+.switch.success.on { background: var(--x-success, #16a34a); }
+.switch.warning.on { background: var(--x-warning, #d97706); }
+.switch.danger.on  { background: var(--x-danger, #dc2626); }
+.switch:focus-visible { box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28)); }
+.switch.disabled,
+.switch:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.switch.on .switch-thumb { transform: translateX(20px); }
+
+/* Switch 尺寸 */
+.switch.sm { width: 36px; height: 20px; }
+.switch.sm .switch-thumb { width: 16px; height: 16px; top: 2px; left: 2px; }
+.switch.sm.on .switch-thumb { transform: translateX(16px); }
+
+.switch.lg { width: 52px; height: 30px; }
+.switch.lg .switch-thumb { width: 24px; height: 24px; top: 3px; left: 3px; }
+.switch.lg.on .switch-thumb { transform: translateX(22px); }
+
+/* 内嵌文字 */
+.switch-text {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.switch.on .switch-text.on { opacity: 1; left: 8px; }
+.switch:not(.on) .switch-text.off { opacity: 1; right: 8px; }
+
+/* 加载 */
+.switch-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--x-primary, #2563eb);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: x-btn-spin .6s linear infinite;
+}
+@keyframes x-btn-spin { to { transform: rotate(360deg); } }
+
+.switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+

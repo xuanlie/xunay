@@ -1,0 +1,49 @@
+// title: zustand 诊断
+import React from 'xunay/compat'
+import { create } from 'zustand'
+const h = React.createElement
+
+function out(msg) {
+  let el = document.getElementById('__diag')
+  if (!el) {
+    el = document.createElement('pre')
+    el.id = '__diag'
+    el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;padding:10px;font:12px monospace;max-height:60vh;overflow:auto;z-index:99999;white-space:pre-wrap;margin:0'
+    document.body.appendChild(el)
+  }
+  el.textContent += msg + '\n'
+  el.scrollTop = el.scrollHeight
+}
+
+// ★ 让 compat 的错误吐到这里
+window.__XUNAY_DEBUG_LOG = out
+
+out('[1] import OK')
+
+const useStore = create((set) => ({
+  bears: 0,
+  increase: () => set((s) => ({ bears: s.bears + 1 })),
+  decrease: () => set((s) => ({ bears: s.bears - 1 })),
+  reset: () => set({ bears: 0 }),
+}))
+out('[2] create() OK')
+
+function Counter() {
+  out('[3] Counter 进入')
+  const bears = useStore((s) => s.bears)
+  out('[4] useStore(selector) = ' + bears)
+  return h('div', null, 'bears = ' + bears)
+}
+out('[5] Counter 定义')
+
+function App() {
+  out('[6] App 进入')
+  return h('div', { style: 'padding:16px;background:#282c34;color:#fff;font-family:system-ui;min-height:100vh' },
+    h('h1', null, 'zustand 诊断'),
+    h(Counter)
+  )
+}
+
+out('[7] 开始 render')
+React.createRoot(document.getElementById('app')).render(h(App))
+out('[8] render 调用完成')

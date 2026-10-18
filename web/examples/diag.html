@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Diagnostic</title>
+<style>body{font:13px/1.6 ui-monospace,monospace;padding:20px;background:#0f172a;color:#e2e8f0}
+pre{white-space:pre-wrap;word-break:break-all}
+.ok{color:#4ade80}.err{color:#f87171}</style>
+</head><body>
+<h2>Kit UI Diagnostic</h2>
+<pre id="out"></pre>
+<script type="module">
+const out = document.getElementById('out')
+function log(...a){ out.textContent += a.join(' ') + '\n' }
+function ok(...a){ log('<span class="ok">✓</span>', ...a) }
+function er(...a){ log('<span class="err">✗</span>', ...a) }
+
+window.addEventListener('error', e => er('GLOBAL:', e.message, e.filename + ':' + e.lineno))
+window.addEventListener('unhandledrejection', e => er('REJECT:', String(e.reason)))
+
+log('URL:', location.href)
+log('---')
+
+async function test() {
+  // 1. 依赖文件
+  for (const f of ['element.js', 'core.js', 'runtime.js', 'kit-util.js']) {
+    try {
+      const r = await fetch('./' + f)
+      ok(f, r.status)
+    } catch (e) { er(f, e.message) }
+  }
+  log('---')
+
+  // 2. UI 目录
+  for (const f of ['index.js', 'input.js', 'switch.js', 'progress.js', 'alert.js']) {
+    try {
+      const r = await fetch('./kit/ui/' + f)
+      ok('kit/ui/' + f, r.status)
+    } catch (e) { er('kit/ui/' + f, e.message) }
+  }
+  log('---')
+
+  // 3. CSS
+  for (const f of ['input.css', 'switch.css', 'progress.css', 'alert.css']) {
+    try {
+      const r = await fetch('./kit/ui/' + f)
+      const t = await r.text()
+      ok('kit/ui/' + f, r.status, 'len=' + t.length)
+    } catch (e) { er('kit/ui/' + f, e.message) }
+  }
+  log('---')
+
+  // 4. 动态导入
+  try {
+    const m = await import('./kit/ui/index.js')
+    ok('import index.js:', Object.keys(m).join(', '))
+    log('  Input type:', typeof m.Input)
+    log('  Switch type:', typeof m.Switch)
+  } catch (e) { er('import index.js:', e.message); log(e.stack) }
+  log('---')
+
+  // 5. 单独导入
+  try {
+    const m = await import('./kit/ui/input.js')
+    ok('import input.js:', Object.keys(m).join(', '))
+  } catch (e) { er('import input.js:', e.message); log(e.stack) }
+  log('---')
+
+  log('done.')
+}
+test()
+</script>
+</body></html>

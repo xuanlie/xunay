@@ -1,0 +1,67 @@
+// title: myapp
+import 'xunay/kit/ui'
+import { div, mount } from 'xunay'
+import { route } from '@/router.xuy'
+import { Header } from '@/components/Header.xuy'
+import { Footer } from '@/components/Footer.xuy'
+import { Index } from '@/pages/index.xuy'
+import { About } from '@/pages/about.xuy'
+import { Demo } from '@/pages/demo.xuy'
+
+const st = document.createElement('style')
+st.textContent = `
+  body { background: var(--x-bg-soft); }
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+  .main { flex: 1; }
+  .page-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+  .hero {
+    padding: 64px 24px 48px;
+    text-align: center;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, var(--x-primary-soft), transparent 70%);
+  }
+  .hero-icon {
+    width: 96px; height: 96px; margin: 0 auto 24px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    box-shadow: 0 16px 40px rgba(99,102,241,.25);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-title {
+    font-size: 40px; font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub { color: var(--x-fg-dim); font-size: 16px; margin-bottom: 28px; }
+  .nf { text-align: center; padding: 100px 24px; }
+  .nf-code { font-size: 88px; font-weight: 800; line-height: 1; color: var(--x-line-2); }
+  .nf-msg { font-size: 18px; color: var(--x-fg-dim); margin-top: 16px; }
+  .nf-path { font-size: 13px; color: var(--x-fg-mute); margin-top: 8px; font-family: var(--x-mono); }
+`
+document.head.appendChild(st)
+
+function NotFound() {
+  return div({ class: 'nf' },
+    div({ class: 'nf-code' }, '404'),
+    div({ class: 'nf-msg' }, '页面不存在'),
+    div({ class: 'nf-path' }, () => route()),
+  )
+}
+
+function App() {
+  return div({ class: 'app' },
+    Header(),
+    div({ class: 'main' }, () => {
+      const r = route()
+      if (r === '/') return Index()
+      if (r === '/demo') return Demo()
+      if (r === '/about') return About()
+      return NotFound()
+    }),
+    Footer()
+  )
+}
+
+mount(() => App(), '#app')

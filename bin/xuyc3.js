@@ -88,6 +88,32 @@ async function main() {
     }
   }
 
+  // ===== React 兼容模式 =====
+  const compatMode = (() => {
+    if (process.env.XUNAY_COMPAT === '1' || process.env.XUNAY_COMPAT === 'true') return true
+    try {
+      const pkg = JSON.parse(fs.readFileSync(path.resolve(ROOT, 'package.json'), 'utf8'))
+      if (pkg.xunay && pkg.xunay.compat && pkg.xunay.compat.react) return true
+    } catch (_) {}
+    let dir = process.cwd()
+    for (let i = 0; i < 5; i++) {
+      const f = path.join(dir, 'xunay.config.json')
+      if (fs.existsSync(f)) {
+        try {
+          const cfg = JSON.parse(fs.readFileSync(f, 'utf8'))
+          if (cfg.compat && cfg.compat.react) return true
+        } catch (_) {}
+        break
+      }
+      const parent = path.dirname(dir)
+      if (parent === dir) break
+      dir = parent
+    }
+    return false
+  })()
+  const compatPath = path.resolve(ROOT, 'core/src/react-compat.js')
+  if (compatMode) console.log('  [xuyc3] React 兼容模式：react → xunay/compat')
+
   await build({
     entryPoints: [tmpEntry],
     bundle: true,
@@ -97,6 +123,15 @@ async function main() {
     target: 'es2020',
     logLevel: 'error',
     plugins: [xuyPlugin],
+    jsx: 'automatic',
+    jsxImportSource: compatMode ? 'react' : 'react',
+    ...(compatMode ? { alias: {
+      react: compatPath,
+      'react-dom': compatPath.replace('react-compat', 'react-dom-compat'),
+      'react-dom/client': compatPath.replace('react-compat', 'react-dom-compat'),
+      'react/jsx-runtime': compatPath,
+      'react/jsx-dev-runtime': compatPath,
+    } } : {}),
   })
   fs.unlinkSync(tmpEntry)
 
@@ -106,18 +141,72 @@ async function main() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${args.title}</title>
+<script>
+window.__XERR__ = function(msg, src, line, col, err) {
+  try {
+    document.title = '[ERR] ' + msg
+    var el = document.getElementById('__xerr__')
+    if (!el) {
+      el = document.createElement('pre')
+      el.id = '__xerr__'
+      el.style.cssText = 'position:fixed;inset:0;background:#1a1b26;color:#f55;padding:16px;font:12px monospace;white-space:pre-wrap;z-index:2147483647;overflow:auto;margin:0'
+      if (document.body) document.body.appendChild(el)
+      else document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(el) })
+    }
+    var txt = '=== 页面错误 ===\n' + msg + '\n  at ' + (src||'?') + ':' + line + ':' + col + '\n'
+    if (err && err.stack) txt += '\n' + err.stack
+    el.textContent = txt
+  } catch (_) {}
+}
+window.onerror = function(m, s, l, c, e) { window.__XERR__(m, s, l, c, e); return false }
+window.addEventListener('unhandledrejection', function(e) { window.__XERR__('Promise 拒绝: ' + (e.reason && e.reason.message || e.reason), '', 0, 0, e.reason) })
+</script>
+<link rel="stylesheet" href="./tw.css">
+<link rel="stylesheet" href="./ui.css">
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; margin: 0; padding: 24px; }
   button { padding: 6px 14px; margin: 0 4px; }
+  #__err { position: fixed; inset: 0; background: #1a1b26; color: #f55; padding: 16px;
+    font: 12px monospace; white-space: pre-wrap; overflow: auto; z-index: 99999; display: none; }
+  #__err .head { color: #ff7; font-size: 14px; margin-bottom: 8px; }
 </style>
 </head>
 <body>
 <div id="app"></div>
+<div id="__err"><div class="head">❌ 页面错误（点此关闭）</div><div id="__errbody"></div></div>
+<script>
+(function(){
+  var err = document.getElementById('__err');
+  var errbody = document.getElementById('__errbody');
+  var text = '';
+  function show(s) {
+    text += s + '\n';
+    errbody.textContent = text;
+    err.style.display = 'block';
+  }
+  err.addEventListener('click', function(){ err.style.display = 'none' });
+  window.onerror = function(msg, src, line, col, e) {
+    show('ERR: ' + msg + '\n  at ' + (src||'') + ':' + line + ':' + col +
+      (e && e.stack ? '\n' + e.stack.split('\n').slice(0,6).join('\n') : ''));
+  };
+  window.addEventListener('unhandledrejection', function(e) {
+    show('REJECT: ' + ((e.reason && e.reason.message) || e.reason));
+  });
+})();
+</script>
 <script src="./app.js"></script>
 </body>
 </html>
 `
-  fs.writeFileSync(path.join(args.out, 'index.html'), html)
+  // 自动拷贝 kit 样式
+try {
+  const cssSrc = path.join(ROOT, 'core/src')
+  for (const f of ['ui.css', 'tw.css']) {
+    const src = path.join(cssSrc, f)
+    if (fs.existsSync(src)) fs.copyFileSync(src, path.join(args.out, f))
+  }
+} catch (e) { console.warn('[xuyc3] CSS 拷贝失败:', e.message) }
+fs.writeFileSync(path.join(args.out, 'index.html'), html)
   console.log('✅ 构建完成 → ' + args.out + '/index.html')
 }
 

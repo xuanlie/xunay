@@ -1,0 +1,22 @@
+.x-badge {
+  box-shadow: 0 0 0 2px var(--x-bg, #fff), 0 1px 3px rgba(0,0,0,.12);
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+}
+.x-badge-pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: x-badge-pulse 1.8s cubic-bezier(.4,0,.6,1) infinite;
+  z-index: -1;
+}
+@keyframes x-badge-pulse {
+  0% { transform: scale(1); opacity: .8 }
+  70% { transform: scale(2); opacity: 0 }
+  100% { transform: scale(2); opacity: 0 }
+}
+
+[data-theme="dark"] .x-badge {
+  box-shadow: 0 0 0 2px var(--x-bg, #0a0e17), 0 1px 3px rgba(0,0,0,.5);
+}

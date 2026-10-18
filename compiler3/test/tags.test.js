@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { compile } from '../src/index.js'
 import { TAGS, VOID_TAGS } from '../src/tags.js'
 
-const allTags = [...TAGS]
+const allTags = [...TAGS].filter(tag => tag !== 'fragment')
 
 for (const tag of allTags) {
   test(`[${tag}] 单标签无子节点`, () => {

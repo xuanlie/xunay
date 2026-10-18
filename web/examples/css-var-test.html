@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>CSS 变量测试</title>
+<style>
+  body{padding:40px;font:20px sans-serif;background:#fff;color:#000}
+  .box{padding:16px;margin:12px 0;border-radius:8px;font-size:20px;font-weight:bold}
+  #a{border:4px solid red;background:#ffe}
+  #b{border:4px solid var(--notdefined, blue);background:var(--notdefined, #eef)}
+  #c{--mycolor: 20px; border:4px solid green; margin-top: var(--mycolor)}
+</style>
+</head><body>
+<h2>三选一</h2>
+<div class="box" id="a">A · 纯固定值（红边）</div>
+<div class="box" id="b">B · var() 带 fallback（蓝边）</div>
+<div class="box" id="c">C · 自定义变量（绿边）</div>
+</body></html>

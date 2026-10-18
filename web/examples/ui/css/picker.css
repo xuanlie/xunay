@@ -1,0 +1,419 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · picker · 日期时间选择器（精致版）
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.picker { position: relative; display: inline-block; width: 100%; max-width: 320px; }
+
+/* ─── 触发框 ─── */
+.picker-input {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; height: 40px; padding: 0 12px;
+  font: inherit; font-size: 14px;
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: 10px; cursor: pointer;
+  box-sizing: border-box; user-select: none;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  text-align: left;
+}
+.picker-input:hover { border-color: var(--x-line-strong, #888); }
+.picker-input.open {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28));
+  outline: none;
+}
+.picker-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--x-fg-mute, #999); }
+.picker-input.open .picker-icon { color: var(--x-primary, #2563eb); }
+.picker-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.picker-text.placeholder { color: var(--x-fg-subtle, #bbb); }
+.picker-clear {
+  width: 18px; height: 18px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--x-fg-mute, #999);
+  color: #fff; font-size: 11px; cursor: pointer;
+  opacity: 0; transition: opacity .15s, background .15s;
+}
+.picker-input:hover .picker-clear { opacity: .5; }
+.picker-input .picker-clear:hover { opacity: 1; background: var(--x-fg-dim, #666); }
+.picker-clear:empty { display: none; }
+
+/* ─── 面板 ─── */
+.picker-panel {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 900;
+  width: 328px;
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: 18px;
+  box-shadow:
+    0 20px 48px -16px rgba(0,0,0,.22),
+    0 8px 20px -8px rgba(0,0,0,.10);
+  display: none; overflow: hidden;
+  animation: x-picker-in .22s cubic-bezier(.34,1.56,.64,1);
+  transform-origin: top left;
+}
+.picker-panel.open { display: block; }
+@keyframes x-picker-in {
+  from { opacity: 0; transform: scale(.94) translateY(-8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── 顶部 Tab ─── */
+.picker-tabs {
+  display: flex; padding: 6px;
+  background: var(--x-bg-soft, #f5f5f5);
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+  gap: 4px;
+}
+.picker-tab {
+  flex: 1; padding: 9px 12px;
+  font: inherit; font-size: 13px; font-weight: 500;
+  color: var(--x-fg-dim, #666);
+  background: transparent; border: 0;
+  border-radius: 10px;
+  cursor: pointer; transition: all .18s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.picker-tab svg { width: 15px; height: 15px; }
+.picker-tab:hover { color: var(--x-fg, #1a1a1a); background: rgba(0,0,0,.04); }
+.picker-tab.active {
+  color: var(--x-primary, #2563eb);
+  background: var(--x-bg-elev, #fff);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+
+/* ─── 视图容器 ─── */
+.picker-view { display: none; padding: 16px; }
+.picker-view.active { display: block; }
+
+/* ─── 头部：年月切换 ─── */
+.picker-header {
+  display: flex; align-items: center; gap: 4px; margin-bottom: 14px;
+}
+.picker-nav {
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; background: transparent;
+  color: var(--x-fg-dim, #666);
+  border-radius: 10px; cursor: pointer;
+  transition: all .15s; flex-shrink: 0;
+}
+.picker-nav svg { width: 15px; height: 15px; }
+.picker-nav:hover {
+  background: var(--x-bg-hover, #f5f5f5);
+  color: var(--x-primary, #2563eb);
+}
+.picker-title {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 4px; font-size: 14px; font-weight: 600;
+  color: var(--x-fg, #1a1a1a);
+}
+.picker-title button {
+  padding: 5px 10px; border: 0; background: transparent;
+  font: inherit; font-weight: 600; font-size: 14px;
+  color: var(--x-fg, #1a1a1a);
+  border-radius: 8px; cursor: pointer;
+  transition: all .15s; font-variant-numeric: tabular-nums;
+}
+.picker-title button:hover {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+}
+.picker-title button.active {
+  background: var(--x-primary, #2563eb);
+  color: #fff;
+}
+.picker-title .sep { color: var(--x-fg-subtle, #bbb); font-weight: 400; }
+
+/* ─── 日期子视图 ─── */
+.picker-sub { display: none; }
+.picker-sub.active { display: block; }
+
+/* 星期头 */
+.picker-weekdays {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--x-line-subtle, #f0f0f0);
+}
+.picker-weekday {
+  text-align: center;
+  font-size: 11px; font-weight: 600;
+  color: var(--x-fg-mute, #999);
+  padding: 4px 0;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.picker-weekday.wk { color: var(--x-danger, #dc2626); opacity: .8; }
+
+/* 日历格 */
+.picker-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 2px; margin-top: 6px;
+}
+.picker-cell {
+  aspect-ratio: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; background: transparent;
+  color: var(--x-fg, #1a1a1a);
+  font: inherit; font-size: 13px; font-weight: 500;
+  border-radius: 10px; cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: all .12s ease;
+  padding: 0; min-height: 34px;
+  position: relative;
+  font-family: inherit;
+}
+.picker-cell:hover:not(:disabled):not(.selected) {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+  transform: scale(1.05);
+}
+.picker-cell.other { color: var(--x-fg-subtle, #ccc); font-weight: 400; }
+.picker-cell.other:hover {
+  background: var(--x-bg-hover, #f5f5f5);
+  color: var(--x-fg-dim, #666);
+  transform: none;
+}
+.picker-cell.wk { color: var(--x-danger, #dc2626); }
+.picker-cell.wk:hover { background: var(--x-danger-soft, rgba(220,38,38,.1)); }
+.picker-cell.today {
+  color: var(--x-primary, #2563eb);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1.5px var(--x-primary-soft, rgba(37,99,235,.4));
+}
+.picker-cell.today::before {
+  content: ""; position: absolute;
+  bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--x-primary, #2563eb);
+}
+.picker-cell.selected {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  font-weight: 600;
+  box-shadow:
+    0 4px 12px -2px rgba(37,99,235,.4),
+    0 2px 4px -2px rgba(37,99,235,.3);
+  transform: scale(1.05);
+}
+.picker-cell.selected::before { background: #fff; }
+.picker-cell.selected:hover {
+  background: linear-gradient(135deg, #1d4ed8, #4338ca);
+  transform: scale(1.08);
+}
+
+/* 年 / 月网格 */
+.picker-months, .picker-years {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.picker-month, .picker-year {
+  padding: 16px 8px; text-align: center;
+  border: 0; border-radius: 12px; cursor: pointer;
+  font: inherit; font-size: 14px; font-weight: 500;
+  background: transparent; color: var(--x-fg, #1a1a1a);
+  transition: all .15s;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+}
+.picker-month:hover, .picker-year:hover {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+  transform: scale(1.04);
+}
+.picker-month.selected, .picker-year.selected {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  box-shadow: 0 4px 12px -2px rgba(37,99,235,.4);
+}
+.picker-month.current, .picker-year.current {
+  color: var(--x-primary, #2563eb);
+  font-weight: 700;
+}
+.picker-month.current::after, .picker-year.current::after {
+  content: ""; position: absolute;
+  bottom: 6px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: currentColor;
+}
+.picker-year-range {
+  font-size: 12px; color: var(--x-fg-mute, #999);
+  text-align: center; margin-bottom: 12px;
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════ 时间视图 · 钟表 ═══════════════ */
+.clock-wrap {
+  display: flex; justify-content: center;
+  padding: 0 0 6px;
+}
+
+.clock-svg {
+  width: 240px; height: 240px;
+  user-select: none;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(37,99,235,.08));
+}
+
+.clock-svg .clock-bg {
+  fill: var(--x-bg-elev, #fff);
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+}
+.clock-svg .clock-tick {
+  stroke: var(--x-line-2, #ccc);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.clock-svg .clock-tick-major {
+  stroke: var(--x-line-strong, #888);
+  stroke-width: 2;
+}
+.clock-svg .clock-num {
+  fill: var(--x-fg, #1a1a1a);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--x-font, sans-serif);
+  text-anchor: middle;
+  dominant-baseline: central;
+  cursor: pointer;
+  transition: fill .15s;
+  user-select: none;
+  pointer-events: none;
+}
+.clock-svg .clock-num.inner { font-size: 11px; fill: var(--x-fg-dim, #666); }
+.clock-svg .clock-num.selected { fill: #fff; font-weight: 700; }
+.clock-svg .clock-num-bg {
+  fill: transparent;
+  cursor: pointer;
+  transition: fill .15s;
+}
+.clock-svg .clock-num-bg:hover { fill: var(--x-primary-soft, rgba(37,99,235,.1)); }
+.clock-svg .clock-num-bg.selected {
+  fill: url(#clock-grad);
+}
+.clock-svg .clock-hand {
+  stroke: var(--x-primary, #2563eb);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: x2 .25s cubic-bezier(.34,1.56,.64,1), y2 .25s cubic-bezier(.34,1.56,.64,1);
+}
+.clock-svg .clock-hand-dot {
+  fill: var(--x-primary, #2563eb);
+}
+.clock-svg .clock-center {
+  fill: var(--x-primary, #2563eb);
+}
+.clock-svg .clock-center-ring {
+  fill: var(--x-bg-elev, #fff);
+  stroke: var(--x-primary, #2563eb);
+  stroke-width: 2;
+}
+
+/* 时间指示器 */
+.clock-value {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--x-fg, #1a1a1a);
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0 4px;
+  letter-spacing: -.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.clock-value .sep { color: var(--x-fg-subtle, #bbb); margin: 0 2px; font-weight: 400; }
+.clock-value span {
+  padding: 4px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .15s;
+  min-width: 48px;
+}
+.clock-value span.active {
+  color: var(--x-primary, #2563eb);
+  background: var(--x-primary-soft, rgba(37,99,235,.12));
+}
+.clock-value span:hover { background: var(--x-bg-hover, #f5f5f5); }
+
+.clock-ampm {
+  display: flex; justify-content: center;
+  gap: 0; padding: 8px 0 4px;
+  margin: 0 auto;
+  width: fit-content;
+  background: var(--x-bg-soft, #f5f5f5);
+  border-radius: 10px;
+  padding: 3px;
+}
+.clock-ampm button {
+  padding: 6px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--x-fg-dim, #666);
+  font: inherit; font-size: 12px; font-weight: 600;
+  border-radius: 7px; cursor: pointer;
+  transition: all .15s;
+  letter-spacing: .04em;
+}
+.clock-ampm button:hover { color: var(--x-primary, #2563eb); }
+.clock-ampm button.active {
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-primary, #2563eb);
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+
+/* ═══════════════ 底部 ═══════════════ */
+.picker-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 12px 16px;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-soft, #f5f5f5);
+}
+.picker-link {
+  background: none; border: 0;
+  padding: 7px 12px;
+  color: var(--x-fg-dim, #666);
+  font: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; border-radius: 8px;
+  transition: all .15s;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.picker-link svg { width: 13px; height: 13px; }
+.picker-link:hover {
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-primary, #2563eb);
+}
+.picker-ok {
+  padding: 0 22px; height: 34px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  border: 0; border-radius: 10px;
+  font: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+  box-shadow: 0 2px 8px -2px rgba(37,99,235,.4);
+}
+.picker-ok:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 12px -2px rgba(37,99,235,.5);
+}
+.picker-ok:active { transform: translateY(1px); }
+
+/* ─── 暗色 ─── */
+[data-theme="dark"] .picker-panel,
+[data-theme="dracula"] .picker-panel,
+[data-theme="tokyo"] .picker-panel {
+  box-shadow: 0 20px 48px -16px rgba(0,0,0,.7), 0 8px 20px -8px rgba(0,0,0,.4);
+}
+
+/* ─── 移动端 ─── */
+@media (max-width: 480px) {
+  .picker-panel {
+    position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+    width: 100%; max-width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding-bottom: var(--x-safe-b, 0);
+  }
+  .clock-svg { width: 220px; height: 220px; }
+}

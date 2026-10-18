@@ -1,0 +1,92 @@
+// title: react-window 深挖
+import React from 'xunay/compat'
+import { FixedSizeList } from 'react-window'
+const h = React.createElement
+
+function out(msg) {
+  let el = document.getElementById('__diag')
+  if (!el) {
+    el = document.createElement('pre')
+    el.id = '__diag'
+    el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0f0;padding:8px;font:11px monospace;max-height:70vh;overflow:auto;z-index:99999;white-space:pre-wrap;margin:0'
+    document.body.appendChild(el)
+  }
+  el.textContent += msg + '\n'
+  el.scrollTop = el.scrollHeight
+}
+window.__XUNAY_DEBUG_LOG = out
+
+out('[1] import OK')
+
+// 用 wrap 追踪 FixedSizeList 内部
+const Original = FixedSizeList
+function ProbedList(props) {
+  out('[RW-1] ProbedList 进入, props keys=' + Object.keys(props).join(','))
+  out('[RW-2] props.children 类型=' + typeof props.children)
+  out('[RW-3] props.height=' + props.height + ' width=' + props.width + ' itemCount=' + props.itemCount)
+
+  // 试着真的调一次
+  try {
+    const vnode = h(Original, props)
+    out('[RW-4] 创建 vnode 成功, type=' + (typeof vnode.type))
+    return vnode
+  } catch (e) {
+    out('[RW-5] !!! h(Original) 抛错: ' + e.message)
+    throw e
+  }
+}
+
+// 但这里要真正拿到渲染后的 DOM 尺寸——所以直接渲染并诊断
+function Row({ index, style }) {
+  return h('div', { style: { ...style, padding: '8px 16px', borderBottom: '1px solid #eee' } }, '行 ' + (index + 1))
+}
+
+let capturedInst = null
+
+function App() {
+  out('[A-1] App 进入')
+  const containerRef = React.useRef(null)
+  const listRef = React.useRef(null)
+
+  React.useLayoutEffect(() => {
+    out('[A-2] layoutEffect 触发')
+    if (listRef.current) {
+      const inst = listRef.current
+      out('[A-3] listRef.current.constructor=' + (inst.constructor && inst.constructor.name))
+      out('[A-4] inst 属性: ' + Object.keys(inst).slice(0, 15).join(','))
+      out('[A-5] inst 方法: ' + Object.getOwnPropertyNames(Object.getPrototypeOf(inst)).slice(0, 15).join(','))
+    } else {
+      out('[A-3] listRef.current 是 null/undefined')
+    }
+    if (containerRef.current) {
+      out('[A-6] container 尺寸: w=' + containerRef.current.offsetWidth + ' h=' + containerRef.current.offsetHeight)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    out('[A-7] effect 触发, listRef.current=' + (listRef.current ? '有' : '无'))
+    if (listRef.current) {
+      out('[A-8] 尝试调用 scrollToItem: ' + typeof listRef.current.scrollToItem)
+    }
+  }, [])
+
+  return h('div', { style: 'padding:16px;background:#282c34;color:#fff;font-family:system-ui;min-height:100vh' },
+    h('h1', { style: { color: '#61afef' } }, 'react-window 深挖'),
+    h('div', { ref: containerRef, style: 'background:#fff;color:#000;width:100%;height:400px;overflow:hidden;position:relative' },
+      h(FixedSizeList, {
+        ref: listRef,
+        height: 400,
+        width: '100%',
+        itemCount: 1000,
+        itemSize: 40,
+      }, Row)
+    )
+  )
+}
+
+try {
+  React.createRoot(document.getElementById('app')).render(h(App))
+  out('[9] render 完成')
+} catch (e) {
+  out('!! 顶层: ' + (e.stack || e.message))
+}

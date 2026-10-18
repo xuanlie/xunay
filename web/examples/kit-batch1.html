@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 1 批 · 精修测试</title>
+<link rel="stylesheet" href="/xunay/Kit/ui/ui.css">
+<link rel="stylesheet" href="/xunay/Kit/ui/tw.css">
+<script type="importmap">
+{ "imports": {
+  "xunay/kit/ui": "/xunay/Kit/ui/index.js",
+  "xunay/kit/ui/": "/xunay/Kit/ui/",
+  "xunay/element": "/xunay/element.js",
+  "xunay/core": "/xunay/core.js",
+  "xunay/runtime": "/xunay/runtime.js",
+  "xunay/misc": "/xunay/misc.js",
+  "xunay/mobile": "/xunay/mobile.js",
+  "xunay/hl": "/xunay/hl.js",
+  "xunay/sanitize": "/xunay/sanitize.js",
+  "xunay/render": "/xunay/render.js",
+  "xunay/events": "/xunay/events.js",
+  "xunay": "/xunay/index.js"
+}}
+</script>
+<style>
+  body { padding: 20px; background: #f8fafc; color: #0f172a; font: 14px/1.5 -apple-system, "PingFang SC", sans-serif; margin: 0 }
+  h1 { font-size: 20px; margin: 0 0 6px }
+  .sub { color: #64748b; font-size: 13px; margin-bottom: 20px }
+  .box { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 14px }
+  .label { font-size: 11px; color: #64748b; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600 }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px }
+  .col { display: flex; flex-direction: column; gap: 12px; max-width: 400px }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap }
+  .toolbar button { padding: 6px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; cursor: pointer; font-size: 13px }
+</style>
+</head><body>
+<h1>第 1 批 · 精修测试</h1>
+<div class="sub">Btn / Card / Tag / Badge / Avatar / Input / Switch / Checkbox / Radio</div>
+
+<div class="toolbar">
+  <button onclick="document.documentElement.toggleAttribute('data-theme')">🌓 主题</button>
+  <button onclick="location.reload()">🔄 重载</button>
+</div>
+
+<div class="box"><div class="label">Btn · 尺寸</div><div class="row" id="b-size"></div></div>
+<div class="box"><div class="label">Btn · 类型 + 图标 + 徽标 + 快捷键</div><div class="row" id="b-type"></div></div>
+<div class="box"><div class="label">Tag · 7 tone × 3 variant</div><div class="row" id="tag1"></div><div class="row" id="tag2"></div><div class="row" id="tag3"></div><div class="row" id="tag4"></div></div>
+<div class="box"><div class="label">Badge · 计数 / 点 / 文本 / 脉冲</div><div class="row" id="badge"></div></div>
+<div class="box"><div class="label">Avatar · 6 尺寸 + 状态</div><div class="row" id="avt"></div></div>
+<div class="box"><div class="label">Card · 折叠 / 加载 / 骨架 / 色带</div><div class="row" id="card"></div></div>
+<div class="box"><div class="label">Input · 全部形态</div><div class="col" id="inp"></div></div>
+<div class="box"><div class="label">Switch · 5 尺寸 · 3 tone · 加载</div><div class="row" id="sw"></div></div>
+<div class="box"><div class="label">Checkbox · 基础 / 卡片 / 不确定</div><div class="row" id="cb"></div></div>
+<div class="box"><div class="label">Radio · 基础 / 卡片 / 按钮</div><div class="row" id="rd"></div></div>
+
+<script type="module">
+import * as UI from 'xunay/kit/ui'
+const $ = id => document.getElementById(id)
+
+function render(v, c) {
+  if (v == null || v === false || v === true) return
+  if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+  if (typeof v === 'function') return render(v(), c)
+  if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+  if (!v.type) return
+  const el = document.createElement(v.type)
+  const p = v.props || {}
+  for (const k in p) {
+    const val = p[k]
+    if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+    else if (k === 'ref' && typeof val === 'function') val(el)
+    else if (k === 'style') { const st = typeof val === 'function' ? val() : val; if (typeof st === 'string') el.setAttribute('style', st); else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk] }
+    else if (k === 'class' || k === 'className') { const cc = typeof val === 'function' ? val() : val; if (cc) el.className = cc }
+    else if (k.startsWith('aria-') || k.startsWith('data-')) { const vv = typeof val === 'function' ? val() : val; if (vv != null) el.setAttribute(k, vv) }
+    else if (k === 'disabled' || k === 'checked' || k === 'selected') { const vv = typeof val === 'function' ? val() : val; if (vv) el.setAttribute(k, '') }
+    else if (typeof val !== 'function' && val != null) el.setAttribute(k, val)
+  }
+  for (const ch of (v.children || [])) render(ch, el)
+  c.appendChild(el)
+}
+
+// Btn 尺寸
+for (const size of ['xs','sm','md','lg','xl'])
+  render(UI.Btn({ size }, size.toUpperCase()), $('b-size'))
+
+// Btn 类型
+const iconPlus = (() => { const s = document.createElementNS('http://www.w3.org/2000/svg','svg'); s.setAttribute('viewBox','0 0 24 24'); s.setAttribute('width','16'); s.setAttribute('height','16'); s.setAttribute('fill','none'); s.setAttribute('stroke','currentColor'); s.setAttribute('stroke-width','2'); const p = document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d','M12 5v14M5 12h14'); s.appendChild(p); return s })()
+render(UI.Btn({ type:'primary' }, '主要'), $('b-type'))
+render(UI.Btn(null, '默认'), $('b-type'))
+render(UI.Btn({ type:'dashed' }, '虚线'), $('b-type'))
+render(UI.Btn({ type:'danger' }, '危险'), $('b-type'))
+render(UI.Btn({ type:'text' }, '文本'), $('b-type'))
+render(UI.Btn({ type:'primary', icon: iconPlus }, '新建'), $('b-type'))
+render(UI.Btn({ type:'primary', iconRight: iconPlus }, '继续'), $('b-type'))
+render(UI.Btn({ badge: 5 }, '消息'), $('b-type'))
+render(UI.Btn({ shortcut: '⌘K' }, '搜索'), $('b-type'))
+render(UI.Btn({ loading: true, type:'primary' }, '加载中'), $('b-type'))
+render(UI.Btn({ disabled: true }, '禁用'), $('b-type'))
+
+// Tag
+const TONES = ['default','primary','success','warning','danger','info','purple']
+for (const t of TONES) render(UI.Tag({ type: t }, t), $('tag1'))
+for (const t of TONES) render(UI.Tag({ type: t, variant: 'solid' }, t), $('tag2'))
+for (const t of TONES) render(UI.Tag({ type: t, variant: 'outline' }, t), $('tag3'))
+render(UI.Tag({ type:'success', dot: true }, '在线'), $('tag4'))
+render(UI.Tag({ type:'primary', closable: true, onClose: () => alert('closed') }, '可关闭'), $('tag4'))
+render(UI.Tag({ type:'warning', checkable: true, onChange: v => console.log('selected:', v) }, '可选中'), $('tag4'))
+render(UI.Tag({ type:'purple', round: true }, '圆角'), $('tag4'))
+
+// Badge
+render(UI.Badge({ count: 5 }, UI.Avatar({ text: 'A' })), $('badge'))
+render(UI.Badge({ count: 128, max: 99 }, UI.Avatar({ text: 'B' })), $('badge'))
+render(UI.Badge({ dot: true }, UI.Avatar({ text: 'C' })), $('badge'))
+render(UI.Badge({ text: 'NEW', tone: 'success' }, UI.Avatar({ text: 'D' })), $('badge'))
+render(UI.Badge({ count: 3, pulse: true }, UI.Avatar({ text: 'E' })), $('badge'))
+render(UI.Badge({ count: 7, standalone: true }), $('badge'))
+
+// Avatar
+for (const s of ['xs','sm','md','lg','xl','2xl']) render(UI.Avatar({ size: s, text: '张三' }), $('avt'))
+render(UI.Avatar({ text: 'Alice', shape: 'square' }), $('avt'))
+render(UI.Avatar({ text: 'Bob', shape: 'rounded' }), $('avt'))
+render(UI.Avatar({ text: 'Carol', status: 'online' }), $('avt'))
+render(UI.Avatar({ text: 'Dave', status: 'busy' }), $('avt'))
+render(UI.Avatar({ loading: true }), $('avt'))
+
+// Card
+render(UI.Card({ title: '基础卡片', desc: '描述文字' }, '内容区域'), $('card'))
+render(UI.Card({ title: '带色带', desc: '左侧色带', stripe: 'left', variant: 'outlined' }, '内容'), $('card'))
+render(UI.Card({ title: '折叠卡片', desc: '点我折叠', collapsible: true, defaultOpen: false, variant: 'outlined' }, '隐藏内容'), $('card'))
+render(UI.Card({ title: '加载中', loading: true, variant: 'outlined' }, '内容模糊'), $('card'))
+render(UI.Card({ title: '骨架屏', skeleton: true, variant: 'outlined' }), $('card'))
+
+// Input
+render(UI.Input({ label: '用户名', placeholder: '请输入', hint: '4-20 字符' }), $('inp'))
+render(UI.Input({ label: '邮箱', placeholder: 'you@example.com', type: 'email', allowClear: true }), $('inp'))
+render(UI.Input({ label: '密码', placeholder: '••••', password: true, allowClear: true }), $('inp'))
+render(UI.Input({ label: '错误', value: 'abc', error: '格式不正确' }), $('inp'))
+render(UI.Input({ label: '字数', placeholder: '最多 20', maxLength: 20, showCount: true }), $('inp'))
+render(UI.Input({ placeholder: '禁用', disabled: true, value: '不可编辑' }), $('inp'))
+
+// Switch
+for (const s of ['xs','sm','md','lg','xl']) render(UI.Switch({ size: s, defaultChecked: true }), $('sw'))
+render(UI.Switch({ defaultChecked: true, tone: 'success', label: '成功' }), $('sw'))
+render(UI.Switch({ tone: 'danger', label: '危险' }), $('sw'))
+render(UI.Switch({ loading: true, label: '加载' }), $('sw'))
+render(UI.Switch({ onText: 'ON', offText: 'OFF' }), $('sw'))
+
+// Checkbox
+render(UI.Checkbox({ label: '基础' }), $('cb'))
+render(UI.Checkbox({ label: '已选', defaultChecked: true }), $('cb'))
+render(UI.Checkbox({ label: '禁用', disabled: true }), $('cb'))
+render(UI.Checkbox({ label: '不确定', indeterminate: true }), $('cb'))
+render(UI.Checkbox({ label: '卡片模式', desc: '带描述', card: true }), $('cb'))
+render(UI.Checkbox({ label: '成功色', tone: 'success', defaultChecked: true }), $('cb'))
+
+// Radio
+render(UI.Radio({ label: '选项 A', name: 'r1' }), $('rd'))
+render(UI.Radio({ label: '选项 B', name: 'r1', checked: true }), $('rd'))
+render(UI.Radio({ label: '禁用', name: 'r1', disabled: true }), $('rd'))
+render(UI.Radio({ label: '卡片', desc: '副标题', card: true, name: 'r2' }), $('rd'))
+render(UI.Radio({ label: '按钮 A', button: true, name: 'r3' }), $('rd'))
+render(UI.Radio({ label: '按钮 B', button: true, name: 'r3', checked: true }), $('rd'))
+
+document.title = 'OK · 第 1 批'
+</script>
+</body></html>

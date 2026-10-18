@@ -1,0 +1,14 @@
+// 限制与修复
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("Xuyg · 限制与修复记录"),
+    H2("限制"),
+    Ul(["不支持 JSX", "不支持 TypeScript 类型注解", "sdu 的 if 只支持一个条件", "sdu 的 @media 只支持 media query", "不支持自定义 sdu 模板声明（只能用内置 + sdu<N> 匿名）", "增量编译未实现（每次全量）", "图表需手写 ChartBox 包装（未内置到 sdu）"]),
+    H2("已修复的 bug"),
+    Ol(["dt 字段引用（orig: price + 100 → row.price + 100）", "隐式 return 保留缩进", "sdu 结尾 ) 消费", "sdu 数据源调用（typeof goods === function ? goods(n) : goods）", "sdu if / @media 逗号表达式", "多个 @xxx 合并 on 键", "vmodel 合并已有 on", "img 404 触发清屏（e.error 过滤）"]),
+    H2("实现位置"),
+    Table(["文件","作用"], [["bin/Xuyg.js","CLI 入口（只读 xuyc.js）"],["core/compiler4/index.js","编译器入口"],["core/compiler4/cpt.js","cpt / pag / dt 转换"],["core/compiler4/sdu.js","sdu 模板"],["core/compiler4/builtins.js","20 个内置模板 + CSS"],["core/compiler4/event.js","@click / onClick"],["core/compiler4/vmodel.js","vmodel 双向绑定"]]),
+  )
+}

@@ -1,0 +1,281 @@
+// title: XuNay UI · 组件画廊
+import React, { useState } from 'xunay/compat'
+const h = React.createElement
+
+if (!document.getElementById('xunay-ui')) {
+  const l = document.createElement('link')
+  l.id = 'xunay-ui'; l.rel = 'stylesheet'; l.href = './ui.css'
+  document.head.appendChild(l)
+}
+
+const THEMES  = ['light','dark','dracula','nord','solarized','tokyo','monokai']
+const ACCENTS = ['默认','green','red','orange','purple','cyan','pink']
+
+function Section({ title, children, note }) {
+  return h('section', { className: 'card mb-6' },
+    h('div', { className: 'card-header' },
+      h('h2', { style: { margin: 0, fontSize: 'var(--text-lg)' } }, title),
+      note && h('p', { className: 'card-desc', style: { marginTop: 4 } }, note)
+    ),
+    h('div', { className: 'stack' }, children)
+  )
+}
+
+function Row({ label, children }) {
+  return h('div', { className: 'row', style: { alignItems: 'center', gap: 12 } },
+    h('div', { style: { minWidth: 120, color: 'var(--color-fg-muted)', fontSize: 'var(--text-xs)' } }, label),
+    h('div', { className: 'row', style: { gap: 8, flexWrap: 'wrap', flex: 1 } }, children)
+  )
+}
+
+function App() {
+  const [theme, setTheme] = useState('light')
+  const [accent, setAccent] = useState('默认')
+  const [tab, setTab] = useState(0)
+  const [showModal, setShowModal] = useState(false)
+  const [checked, setChecked] = useState(true)
+
+  const applyT = v => {
+    setTheme(v)
+    v === 'light' ? document.documentElement.removeAttribute('data-theme')
+                  : document.documentElement.setAttribute('data-theme', v)
+  }
+  const applyA = v => {
+    setAccent(v)
+    v === '默认' ? document.documentElement.removeAttribute('data-accent')
+                 : document.documentElement.setAttribute('data-accent', v)
+  }
+
+  return h('div', null,
+    h('div', { className: 'card', style: { position: 'sticky', top: 0, zIndex: 10, margin: 16, borderRadius: 'var(--radius-xl)' } },
+      h('div', { className: 'row', style: { gap: 16, flexWrap: 'wrap', alignItems: 'center' } },
+        h('strong', null, 'XuNay UI 组件画廊'),
+        h('div', { className: 'row', style: { gap: 4, flexWrap: 'wrap' } },
+          ...THEMES.map(t => h('button', { key: t, className: theme === t ? 'btn btn-primary btn-sm' : 'btn btn-sm', onClick: () => applyT(t) }, t))
+        ),
+        h('div', { className: 'row', style: { gap: 4, flexWrap: 'wrap' } },
+          ...ACCENTS.map(a => h('button', { key: a, className: accent === a ? 'btn btn-primary btn-sm' : 'btn btn-sm', onClick: () => applyA(a) }, a))
+        )
+      )
+    ),
+
+    h('div', { className: 'container', style: { paddingBottom: 80 } },
+
+      h(Section, { title: '按钮', note: '变体 × 尺寸 × 状态' },
+        h(Row, { label: '变体' },
+          h('button', { className: 'btn-primary' }, 'Primary'),
+          h('button', { className: 'btn-danger' }, 'Danger'),
+          h('button', { className: 'btn-success' }, 'Success'),
+          h('button', { className: 'btn-outline' }, 'Outline'),
+          h('button', { className: 'btn-ghost' }, 'Ghost'),
+          h('button', { className: 'btn-link' }, 'Link'),
+          h('button', { className: 'btn-gradient' }, 'Gradient')
+        ),
+        h(Row, { label: '尺寸' },
+          h('button', { className: 'btn btn-xs' }, 'XS'),
+          h('button', { className: 'btn btn-sm' }, 'SM'),
+          h('button', { className: 'btn' }, 'MD'),
+          h('button', { className: 'btn btn-lg' }, 'LG'),
+          h('button', { className: 'btn btn-xl' }, 'XL')
+        ),
+        h(Row, { label: '状态' },
+          h('button', { className: 'btn' }, '默认'),
+          h('button', { className: 'btn', disabled: true }, '禁用'),
+          h('button', { className: 'btn loading' }, '加载中'),
+          h('button', { className: 'btn', 'aria-pressed': true }, '按下')
+        ),
+        h(Row, { label: '按钮组' },
+          h('div', { className: 'btn-group' },
+            h('button', { className: 'btn' }, '左'),
+            h('button', { className: 'btn' }, '中'),
+            h('button', { className: 'btn' }, '右')
+          )
+        )
+      ),
+
+      h(Section, { title: '表单' },
+        h('div', { className: 'grid grid-2' },
+          h('div', { className: 'field' },
+            h('label', { className: 'label' }, '普通 ', h('span', { className: 'required' }, '*')),
+            h('input', { className: 'input', placeholder: '请输入' }),
+            h('div', { className: 'hint' }, '提示文字')
+          ),
+          h('div', { className: 'field error' },
+            h('label', { className: 'label' }, '错误'),
+            h('input', { className: 'input', 'aria-invalid': true, defaultValue: '错误值' }),
+            h('div', { className: 'error-msg' }, '错误提示')
+          ),
+          h('div', { className: 'field' },
+            h('label', { className: 'label' }, '成功'),
+            h('input', { className: 'input success', defaultValue: 'OK' })
+          ),
+          h('div', { className: 'field' },
+            h('label', { className: 'label' }, '禁用'),
+            h('input', { className: 'input', defaultValue: '不可编辑', disabled: true })
+          ),
+          h('div', { className: 'field' },
+            h('label', { className: 'label' }, '下拉'),
+            h('select', { className: 'select' }, h('option', null, '选项一'), h('option', null, '选项二'))
+          ),
+          h('div', { className: 'field' },
+            h('label', { className: 'label' }, '文本域'),
+            h('textarea', { className: 'textarea', placeholder: '多行' })
+          )
+        ),
+        h(Row, { label: '控件' },
+          h('label', { className: 'checkbox' }, h('input', { type: 'checkbox', checked, onChange: e => setChecked(e.target.checked) }), ' 复选'),
+          h('label', { className: 'radio' }, h('input', { type: 'radio', name: 'r', defaultChecked: true }), ' 单选 A'),
+          h('label', { className: 'radio' }, h('input', { type: 'radio', name: 'r' }), ' 单选 B'),
+          h('button', { className: 'switch' + (checked ? ' on' : ''), role: 'switch', 'aria-checked': checked, onClick: () => setChecked(!checked) }, h('span', { className: 'switch-thumb' })),
+          h('input', { type: 'range', style: { width: 160 } })
+        )
+      ),
+
+      h(Section, { title: '徽章 / 提示条' },
+        h(Row, { label: 'Badge' },
+          h('span', { className: 'badge' }, '默认'),
+          h('span', { className: 'badge badge-primary' }, 'Primary'),
+          h('span', { className: 'badge badge-success' }, 'Success'),
+          h('span', { className: 'badge badge-warning' }, 'Warning'),
+          h('span', { className: 'badge badge-danger' }, 'Danger')
+        ),
+        h('div', { style: { display: 'grid', gap: 8 } },
+          h('div', { className: 'alert alert-info' }, '信息：提示'),
+          h('div', { className: 'alert alert-success' }, '成功：完成'),
+          h('div', { className: 'alert alert-warning' }, '警告：注意'),
+          h('div', { className: 'alert alert-danger' }, '错误：异常')
+        )
+      ),
+
+      h(Section, { title: '标签页' },
+        h('div', { className: 'tabs', role: 'tablist' },
+          ...['概览','详情','设置','权限'].map((t, i) =>
+            h('button', { key: t, className: 'tab' + (tab === i ? ' active' : ''), role: 'tab', 'aria-selected': tab === i, onClick: () => setTab(i) }, t)
+          )
+        ),
+        h('div', { style: { paddingTop: 16, color: 'var(--color-fg-muted)' } }, `当前：${['概览','详情','设置','权限'][tab]}`)
+      ),
+
+      h(Section, { title: '表格' },
+        h('div', { className: 'table-wrap' },
+          h('table', { className: 'table' },
+            h('thead', null, h('tr', null,
+              h('th', { 'aria-sort': 'ascending' }, '名称'),
+              h('th', null, '状态'), h('th', null, '数量'), h('th', null, '操作')
+            )),
+            h('tbody', null,
+              ...[['项目 A','badge-success','正常',128],['项目 B','badge-warning','警告',64],['项目 C','badge-danger','异常',0]].map(([n,c,s,v],i) =>
+                h('tr', { key: i, 'aria-selected': i === 1 },
+                  h('td', null, n),
+                  h('td', null, h('span', { className: 'badge ' + c }, s)),
+                  h('td', null, String(v)),
+                  h('td', null, h('button', { className: 'btn btn-sm btn-link' }, '编辑'))
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      h(Section, { title: '卡片' },
+        h('div', { className: 'grid grid-3' },
+          h('div', { className: 'card' },
+            h('div', { className: 'card-header' }, h('div', { className: 'card-title' }, '普通卡片')),
+            h('p', null, '带 header/footer'),
+            h('div', { className: 'card-footer' }, '底部')
+          ),
+          h('div', { className: 'card card-hover' },
+            h('div', { className: 'card-title' }, '悬停卡片'),
+            h('p', { className: 'card-desc' }, 'hover 有位移')
+          ),
+          h('div', { className: 'card card-flat' },
+            h('div', { className: 'card-title' }, '扁卡片'),
+            h('p', { className: 'card-desc' }, '无阴影')
+          )
+        )
+      ),
+
+      h(Section, { title: '头像 / 进度 / 骨架' },
+        h(Row, { label: '头像' },
+          h('span', { className: 'avatar avatar-sm' }, 'A'),
+          h('span', { className: 'avatar' }, 'B'),
+          h('span', { className: 'avatar avatar-lg' }, 'C')
+        ),
+        h(Row, { label: '进度' },
+          h('div', { style: { flex: 1 } },
+            h('div', { className: 'progress mb-2' }, h('div', { className: 'progress-bar', style: { width: '35%' } })),
+            h('div', { className: 'progress mb-2' }, h('div', { className: 'progress-bar', style: { width: '70%' } })),
+            h('div', { className: 'progress progress-sm' }, h('div', { className: 'progress-bar', style: { width: '100%' } }))
+          )
+        ),
+        h(Row, { label: '骨架' },
+          h('div', { style: { flex: 1 } },
+            h('div', { className: 'skeleton skeleton-title' }),
+            h('div', { className: 'skeleton skeleton-text' }),
+            h('div', { className: 'skeleton skeleton-text', style: { width: '60%' } })
+          )
+        )
+      ),
+
+      h(Section, { title: '浮层' },
+        h(Row, { label: '模态' },
+          h('button', { className: 'btn btn-primary', onClick: () => setShowModal(true) }, '打开模态')
+        ),
+        h(Row, { label: '下拉' },
+          h('div', { className: 'dropdown' },
+            h('button', { className: 'btn' }, '下拉 ▾'),
+            h('div', { className: 'dropdown-menu', style: { position: 'static', marginTop: 4 } },
+              h('div', { className: 'dropdown-item' }, '菜单项 1'),
+              h('div', { className: 'dropdown-item', 'aria-selected': true }, '选中项'),
+              h('div', { className: 'dropdown-divider' }),
+              h('div', { className: 'dropdown-item', 'aria-disabled': true }, '禁用项')
+            )
+          )
+        )
+      ),
+
+      h(Section, { title: '代码 / 渐变' },
+        h('pre', null, h('code', null, "function hello(name) {\n  return `Hello, ${name}!`\n}")),
+        h('div', { className: 'grid grid-4', style: { marginTop: 12 } },
+          h('div', { className: 'bg-gradient-blue', style: { height: 60, borderRadius: 8 } }),
+          h('div', { className: 'bg-gradient-green', style: { height: 60, borderRadius: 8 } }),
+          h('div', { className: 'bg-gradient-purple', style: { height: 60, borderRadius: 8 } }),
+          h('div', { className: 'bg-gradient-cyan', style: { height: 60, borderRadius: 8 } })
+        ),
+        h('div', { className: 'text-gradient', style: { fontSize: 32, fontWeight: 700, marginTop: 12 } }, '渐变文字')
+      ),
+
+      h(Section, { title: '文本 / 引用' },
+        h('p', null, '普通文本，含 ', h('strong', null, '加粗'), '、', h('em', null, '斜体'), '、', h('code', null, 'inline code'), ' 和 ', h('a', { href: '#' }, '链接'), '。'),
+        h('blockquote', null, '这是一段引用。'),
+        h('hr', null),
+        h('div', { className: 'row' },
+          h('span', { className: 'text-sm text-dim' }, '小字 · 次要'),
+          h('span', { className: 'divider-vertical' }),
+          h('span', { className: 'text-primary' }, '主色'),
+          h('span', { className: 'text-danger' }, '危险'),
+          h('span', { className: 'text-success' }, '成功')
+        )
+      )
+    ),
+
+    showModal && h('div', { className: 'modal-overlay', onClick: () => setShowModal(false) },
+      h('div', { className: 'modal', onClick: e => e.stopPropagation() },
+        h('div', { className: 'modal-header' },
+          h('div', { className: 'modal-title' }, '示例模态框'),
+          h('button', { className: 'modal-close', onClick: () => setShowModal(false) }, '×')
+        ),
+        h('div', { className: 'modal-body' },
+          h('p', null, '移动端会自动变成底部抽屉。'),
+          h('input', { className: 'input', placeholder: '试试输入' })
+        ),
+        h('div', { className: 'modal-footer' },
+          h('button', { className: 'btn', onClick: () => setShowModal(false) }, '取消'),
+          h('button', { className: 'btn btn-primary', onClick: () => setShowModal(false) }, '确定')
+        )
+      )
+    )
+  )
+}
+
+React.createRoot(document.getElementById('app')).render(h(App))

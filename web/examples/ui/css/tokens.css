@@ -1,0 +1,1205 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · tokens · 设计令牌 (Design Tokens)
+   ───────────────────────────────────────────────────────────────────────
+   唯一真源。所有颜色 / 尺寸 / 动效 / 层级 / 字体 / 混合模式都在这里。
+   禁止在组件文件里写死色值，必须引用这里的变量。
+
+   目录：
+     01 · 中性灰阶        (13 级 × 亮/暗)
+     02 · 主色 - 蓝       (11 级 × 亮/暗)
+     03 · 危险 - 红       (11 级 × 亮/暗)
+     04 · 成功 - 绿       (11 级 × 亮/暗)
+     05 · 警告 - 黄       (11 级 × 亮/暗)
+     06 · 信息 - 青       (11 级 × 亮/暗)
+     07 · 辅助 · 紫       (11 级 × 亮/暗)
+     08 · 辅助 · 粉       (11 级 × 亮/暗)
+     09 · 辅助 · 橙       (11 级 × 亮/暗)
+     10 · 辅助 · 靛       (11 级 × 亮/暗)
+     11 · 辅助 · 玫       (11 级 × 亮/暗)
+     12 · 辅助 · 柠       (11 级 × 亮/暗)
+     13 · 辅助 · 翠       (11 级 × 亮/暗)
+     14 · 辅助 · 天       (11 级 × 亮/暗)
+     15 · 语义背景
+     16 · 语义前景
+     17 · 语义边框
+     18 · 圆角
+     19 · 间距
+     20 · 字号
+     21 · 行高
+     22 · 字重
+     23 · 字距
+     24 · 阴影
+     25 · 动效时长
+     26 · 缓动函数
+     27 · 层级 z-index
+     28 · 字体栈
+     29 · 焦点环
+     30 · 过渡组合
+     31 · 触摸 / 安全区
+     32 · 透明度
+     33 · 模糊
+     34 · 混合模式
+     35 · 边框宽度
+     36 · 光标
+     37 · 断点参考（注释）
+     38 · 兼容旧变量
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+:root {
+
+/* ═══════════ 01 · 中性灰阶 (亮) ═══════════ */
+--x-gray-0:   oklch(1.000 0     0);
+--x-gray-50:  oklch(0.985 0.002 250);
+--x-gray-100: oklch(0.965 0.004 250);
+--x-gray-150: oklch(0.950 0.005 250);
+--x-gray-200: oklch(0.935 0.006 250);
+--x-gray-300: oklch(0.890 0.008 250);
+--x-gray-400: oklch(0.820 0.010 250);
+--x-gray-500: oklch(0.700 0.010 250);
+--x-gray-600: oklch(0.550 0.010 250);
+--x-gray-700: oklch(0.420 0.010 250);
+--x-gray-800: oklch(0.300 0.012 250);
+--x-gray-900: oklch(0.200 0.012 250);
+--x-gray-950: oklch(0.140 0.010 250);
+--x-gray-975: oklch(0.080 0.008 250);
+--x-white:    #ffffff;
+--x-black:    #000000;
+
+/* ═══════════ 02 · 主色 · 蓝 ═══════════ */
+--x-blue-50:  oklch(0.970 0.015 262);
+--x-blue-100: oklch(0.940 0.040 262);
+--x-blue-200: oklch(0.880 0.080 262);
+--x-blue-300: oklch(0.800 0.125 262);
+--x-blue-400: oklch(0.700 0.160 262);
+--x-blue-500: oklch(0.580 0.180 262);
+--x-blue-600: oklch(0.520 0.190 262);
+--x-blue-700: oklch(0.450 0.190 262);
+--x-blue-800: oklch(0.380 0.170 262);
+--x-blue-900: oklch(0.300 0.140 262);
+--x-blue-950: oklch(0.220 0.100 262);
+
+/* ═══════════ 03 · 危险 · 红 ═══════════ */
+--x-red-50:  oklch(0.970 0.020 25);
+--x-red-100: oklch(0.940 0.050 25);
+--x-red-200: oklch(0.880 0.100 25);
+--x-red-300: oklch(0.800 0.150 25);
+--x-red-400: oklch(0.700 0.195 25);
+--x-red-500: oklch(0.600 0.210 25);
+--x-red-600: oklch(0.540 0.220 25);
+--x-red-700: oklch(0.470 0.220 25);
+--x-red-800: oklch(0.400 0.200 25);
+--x-red-900: oklch(0.320 0.170 25);
+--x-red-950: oklch(0.240 0.130 25);
+
+/* ═══════════ 04 · 成功 · 绿 ═══════════ */
+--x-green-50:  oklch(0.970 0.030 152);
+--x-green-100: oklch(0.930 0.070 152);
+--x-green-200: oklch(0.870 0.110 152);
+--x-green-300: oklch(0.780 0.145 152);
+--x-green-400: oklch(0.700 0.160 152);
+--x-green-500: oklch(0.620 0.160 152);
+--x-green-600: oklch(0.560 0.160 152);
+--x-green-700: oklch(0.490 0.150 152);
+--x-green-800: oklch(0.410 0.130 152);
+--x-green-900: oklch(0.330 0.110 152);
+--x-green-950: oklch(0.250 0.080 152);
+
+/* ═══════════ 05 · 警告 · 黄 ═══════════ */
+--x-yellow-50:  oklch(0.980 0.030 85);
+--x-yellow-100: oklch(0.950 0.080 85);
+--x-yellow-200: oklch(0.900 0.120 82);
+--x-yellow-300: oklch(0.840 0.150 78);
+--x-yellow-400: oklch(0.780 0.160 76);
+--x-yellow-500: oklch(0.750 0.150 75);
+--x-yellow-600: oklch(0.680 0.155 75);
+--x-yellow-700: oklch(0.580 0.150 72);
+--x-yellow-800: oklch(0.480 0.125 70);
+--x-yellow-900: oklch(0.380 0.100 68);
+--x-yellow-950: oklch(0.280 0.070 65);
+
+/* ═══════════ 06 · 信息 · 青 ═══════════ */
+--x-cyan-50:  oklch(0.970 0.020 235);
+--x-cyan-100: oklch(0.930 0.050 235);
+--x-cyan-200: oklch(0.870 0.090 235);
+--x-cyan-300: oklch(0.790 0.125 235);
+--x-cyan-400: oklch(0.700 0.145 235);
+--x-cyan-500: oklch(0.640 0.150 235);
+--x-cyan-600: oklch(0.580 0.150 235);
+--x-cyan-700: oklch(0.500 0.140 235);
+--x-cyan-800: oklch(0.420 0.120 235);
+--x-cyan-900: oklch(0.340 0.100 235);
+--x-cyan-950: oklch(0.250 0.075 235);
+
+/* ═══════════ 07 · 辅助 · 紫 ═══════════ */
+--x-purple-50:  oklch(0.970 0.020 300);
+--x-purple-100: oklch(0.940 0.050 300);
+--x-purple-200: oklch(0.880 0.100 300);
+--x-purple-300: oklch(0.800 0.150 300);
+--x-purple-400: oklch(0.700 0.195 300);
+--x-purple-500: oklch(0.580 0.220 300);
+--x-purple-600: oklch(0.520 0.230 300);
+--x-purple-700: oklch(0.450 0.220 300);
+--x-purple-800: oklch(0.380 0.190 300);
+--x-purple-900: oklch(0.300 0.160 300);
+--x-purple-950: oklch(0.220 0.120 300);
+
+/* ═══════════ 08 · 辅助 · 粉 ═══════════ */
+--x-pink-50:  oklch(0.970 0.020 0);
+--x-pink-100: oklch(0.940 0.050 0);
+--x-pink-200: oklch(0.880 0.100 0);
+--x-pink-300: oklch(0.800 0.150 0);
+--x-pink-400: oklch(0.730 0.190 0);
+--x-pink-500: oklch(0.660 0.210 0);
+--x-pink-600: oklch(0.590 0.220 0);
+--x-pink-700: oklch(0.510 0.210 0);
+--x-pink-800: oklch(0.430 0.180 0);
+--x-pink-900: oklch(0.340 0.150 0);
+--x-pink-950: oklch(0.250 0.110 0);
+
+/* ═══════════ 09 · 辅助 · 橙 ═══════════ */
+--x-orange-50:  oklch(0.975 0.020 55);
+--x-orange-100: oklch(0.945 0.055 55);
+--x-orange-200: oklch(0.890 0.100 55);
+--x-orange-300: oklch(0.820 0.145 55);
+--x-orange-400: oklch(0.750 0.175 55);
+--x-orange-500: oklch(0.700 0.190 55);
+--x-orange-600: oklch(0.640 0.195 52);
+--x-orange-700: oklch(0.560 0.190 50);
+--x-orange-800: oklch(0.470 0.170 48);
+--x-orange-900: oklch(0.380 0.140 46);
+--x-orange-950: oklch(0.280 0.100 45);
+
+/* ═══════════ 10 · 辅助 · 靛 ═══════════ */
+--x-indigo-50:  oklch(0.970 0.020 285);
+--x-indigo-100: oklch(0.940 0.045 285);
+--x-indigo-200: oklch(0.880 0.085 285);
+--x-indigo-300: oklch(0.790 0.130 285);
+--x-indigo-400: oklch(0.700 0.165 285);
+--x-indigo-500: oklch(0.570 0.190 285);
+--x-indigo-600: oklch(0.500 0.195 285);
+--x-indigo-700: oklch(0.430 0.190 285);
+--x-indigo-800: oklch(0.360 0.170 285);
+--x-indigo-900: oklch(0.290 0.140 285);
+--x-indigo-950: oklch(0.210 0.100 285);
+
+/* ═══════════ 11 · 辅助 · 玫 ═══════════ */
+--x-rose-50:  oklch(0.970 0.020 15);
+--x-rose-100: oklch(0.940 0.050 15);
+--x-rose-200: oklch(0.880 0.095 15);
+--x-rose-300: oklch(0.800 0.145 15);
+--x-rose-400: oklch(0.720 0.190 15);
+--x-rose-500: oklch(0.650 0.215 15);
+--x-rose-600: oklch(0.580 0.220 15);
+--x-rose-700: oklch(0.500 0.210 15);
+--x-rose-800: oklch(0.420 0.185 15);
+--x-rose-900: oklch(0.340 0.155 15);
+--x-rose-950: oklch(0.250 0.115 15);
+
+/* ═══════════ 12 · 辅助 · 柠 ═══════════ */
+--x-lime-50:  oklch(0.975 0.030 125);
+--x-lime-100: oklch(0.945 0.070 125);
+--x-lime-200: oklch(0.890 0.120 125);
+--x-lime-300: oklch(0.820 0.160 125);
+--x-lime-400: oklch(0.750 0.180 125);
+--x-lime-500: oklch(0.680 0.180 125);
+--x-lime-600: oklch(0.610 0.175 125);
+--x-lime-700: oklch(0.530 0.165 125);
+--x-lime-800: oklch(0.440 0.140 125);
+--x-lime-900: oklch(0.360 0.115 125);
+--x-lime-950: oklch(0.270 0.085 125);
+
+/* ═══════════ 13 · 辅助 · 翠 ═══════════ */
+--x-emerald-50:  oklch(0.970 0.030 165);
+--x-emerald-100: oklch(0.935 0.070 165);
+--x-emerald-200: oklch(0.880 0.115 165);
+--x-emerald-300: oklch(0.800 0.150 165);
+--x-emerald-400: oklch(0.720 0.170 165);
+--x-emerald-500: oklch(0.650 0.170 165);
+--x-emerald-600: oklch(0.580 0.165 165);
+--x-emerald-700: oklch(0.500 0.155 165);
+--x-emerald-800: oklch(0.420 0.135 165);
+--x-emerald-900: oklch(0.340 0.110 165);
+--x-emerald-950: oklch(0.250 0.080 165);
+
+/* ═══════════ 14 · 辅助 · 天 ═══════════ */
+--x-sky-50:  oklch(0.970 0.020 220);
+--x-sky-100: oklch(0.930 0.050 220);
+--x-sky-200: oklch(0.870 0.095 220);
+--x-sky-300: oklch(0.790 0.135 220);
+--x-sky-400: oklch(0.710 0.155 220);
+--x-sky-500: oklch(0.650 0.160 220);
+--x-sky-600: oklch(0.590 0.160 220);
+--x-sky-700: oklch(0.510 0.150 220);
+--x-sky-800: oklch(0.430 0.130 220);
+--x-sky-900: oklch(0.350 0.105 220);
+--x-sky-950: oklch(0.260 0.075 220);
+
+/* ═══════════ 15 · 语义背景 ═══════════ */
+--x-bg:            var(--x-gray-0);
+--x-bg-canvas:     var(--x-gray-50);
+--x-bg-subtle:     var(--x-gray-50);
+--x-bg-soft:       var(--x-gray-100);
+--x-bg-muted:      var(--x-gray-200);
+--x-bg-elev:       var(--x-gray-0);
+--x-bg-hover:      var(--x-gray-100);
+--x-bg-active:     var(--x-gray-200);
+--x-bg-selected:   var(--x-blue-50);
+--x-bg-inv:        var(--x-gray-900);
+--x-bg-overlay:    oklch(0 0 0 / 0.45);
+--x-bg-glass:      oklch(1 0 0 / 0.72);
+--x-bg-glass-dark: oklch(0.15 0.01 250 / 0.72);
+
+/* ═══════════ 16 · 语义前景 ═══════════ */
+--x-fg:            var(--x-gray-900);
+--x-fg-strong:     var(--x-gray-950);
+--x-fg-emphasis:   var(--x-gray-975);
+--x-fg-dim:        var(--x-gray-600);
+--x-fg-mute:       var(--x-gray-500);
+--x-fg-subtle:     var(--x-gray-400);
+--x-fg-disabled:   var(--x-gray-400);
+--x-fg-inv:        var(--x-gray-0);
+--x-fg-inv-dim:    oklch(0.85 0.005 250);
+--x-fg-on-primary: var(--x-white);
+--x-fg-on-danger:  var(--x-white);
+--x-fg-on-success: var(--x-white);
+--x-fg-on-warning: oklch(0.35 0.10 75);
+
+/* ═══════════ 17 · 语义边框 ═══════════ */
+--x-line-faint:  var(--x-gray-50);
+--x-line-subtle: var(--x-gray-100);
+--x-line:        var(--x-gray-200);
+--x-line-soft:   var(--x-gray-300);
+--x-line-2:      var(--x-gray-400);
+--x-line-strong: var(--x-gray-600);
+--x-line-focus:  var(--x-blue-500);
+--x-line-inv:    oklch(1 0 0 / 0.15);
+
+/* ═══════════ 18 · 圆角 ═══════════ */
+--x-r-none: 0;
+--x-r-2xs:  2px;
+--x-r-xs:   4px;
+--x-r-sm:   6px;
+--x-r:      8px;
+--x-r-md:   10px;
+--x-r-lg:   14px;
+--x-r-xl:   18px;
+--x-r-2xl:  24px;
+--x-r-3xl:  32px;
+--x-r-4xl:  48px;
+--x-r-full: 9999px;
+
+/* ═══════════ 19 · 间距 ═══════════ */
+--x-sp-0:   0;
+--x-sp-px:  1px;
+--x-sp-0h:  2px;
+--x-sp-1:   4px;
+--x-sp-1h:  6px;
+--x-sp-2:   8px;
+--x-sp-2h:  10px;
+--x-sp-3:   12px;
+--x-sp-3h:  14px;
+--x-sp-4:   16px;
+--x-sp-5:   20px;
+--x-sp-6:   24px;
+--x-sp-7:   28px;
+--x-sp-8:   32px;
+--x-sp-9:   36px;
+--x-sp-10:  40px;
+--x-sp-12:  48px;
+--x-sp-14:  56px;
+--x-sp-16:  64px;
+--x-sp-20:  80px;
+--x-sp-24:  96px;
+--x-sp-32:  128px;
+
+/* ═══════════ 20 · 字号 ═══════════ */
+--x-fs-3xs: 9px;
+--x-fs-2xs: 10px;
+--x-fs-xs:  11px;
+--x-fs-sm:  12.5px;
+--x-fs:     14px;
+--x-fs-md:  15px;
+--x-fs-lg:  17px;
+--x-fs-xl:  20px;
+--x-fs-2xl: 24px;
+--x-fs-3xl: 30px;
+--x-fs-4xl: 36px;
+--x-fs-5xl: 48px;
+--x-fs-6xl: 60px;
+--x-fs-7xl: 72px;
+
+/* ═══════════ 21 · 行高 ═══════════ */
+--x-lh-none:   1;
+--x-lh-tight:  1.2;
+--x-lh-snug:   1.35;
+--x-lh-normal: 1.5;
+--x-lh:        1.55;
+--x-lh-relax:  1.7;
+--x-lh-loose:  1.9;
+
+/* ═══════════ 22 · 字重 ═══════════ */
+--x-fw-hairline: 100;
+--x-fw-thin:     200;
+--x-fw-light:    300;
+--x-fw-r:        400;
+--x-fw-m:        500;
+--x-fw-sb:       600;
+--x-fw-b:        700;
+--x-fw-eb:       800;
+--x-fw-black:    900;
+
+/* ═══════════ 23 · 字距 ═══════════ */
+--x-ls-tightest: -0.05em;
+--x-ls-tighter:  -0.04em;
+--x-ls-tight:    -0.02em;
+--x-ls-snug:     -0.01em;
+--x-ls-normal:   0;
+--x-ls-wide:     0.02em;
+--x-ls-wider:    0.05em;
+--x-ls-widest:   0.1em;
+--x-ls-caps:     0.08em;
+
+/* ═══════════ 24 · 阴影 ═══════════ */
+--x-sh-none: none;
+--x-sh-hair: 0 0 0 1px oklch(0 0 0 / 0.05);
+--x-sh-xs:   0 1px 2px oklch(0 0 0 / 0.04);
+--x-sh-sm:   0 1px 3px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.04);
+--x-sh:      0 2px 6px oklch(0 0 0 / 0.06), 0 1px 2px oklch(0 0 0 / 0.04);
+--x-sh-md:   0 4px 12px oklch(0 0 0 / 0.08), 0 2px 4px oklch(0 0 0 / 0.04);
+--x-sh-lg:   0 8px 24px oklch(0 0 0 / 0.10), 0 4px 8px oklch(0 0 0 / 0.04);
+--x-sh-xl:   0 16px 40px oklch(0 0 0 / 0.12), 0 8px 16px oklch(0 0 0 / 0.06);
+--x-sh-2xl:  0 24px 56px oklch(0 0 0 / 0.16), 0 12px 24px oklch(0 0 0 / 0.08);
+--x-sh-3xl:  0 32px 72px oklch(0 0 0 / 0.20), 0 16px 32px oklch(0 0 0 / 0.10);
+--x-sh-inner: inset 0 1px 2px oklch(0 0 0 / 0.06);
+--x-sh-inner-lg: inset 0 2px 6px oklch(0 0 0 / 0.08);
+--x-sh-up:   0 -4px 12px oklch(0 0 0 / 0.08);
+--x-sh-primary: 0 8px 24px oklch(0.58 0.18 262 / 0.25);
+--x-sh-danger:  0 8px 24px oklch(0.60 0.21 25 / 0.25);
+--x-sh-success: 0 8px 24px oklch(0.62 0.16 152 / 0.25);
+--x-sh-glow:    0 0 24px oklch(0.58 0.18 262 / 0.4);
+
+/* ═══════════ 25 · 动效时长 ═══════════ */
+--x-dur-0:       0ms;
+--x-dur-instant: 60ms;
+--x-dur-1:       100ms;
+--x-dur-2:       180ms;
+--x-dur-3:       240ms;
+--x-dur-4:       320ms;
+--x-dur-5:       480ms;
+--x-dur-6:       640ms;
+--x-dur-7:       800ms;
+--x-dur-8:       1200ms;
+
+/* ═══════════ 26 · 缓动函数 ═══════════ */
+--x-ease:          cubic-bezier(0.4, 0, 0.2, 1);
+--x-ease-in:       cubic-bezier(0.4, 0, 1, 1);
+--x-ease-out:      cubic-bezier(0, 0, 0.2, 1);
+--x-ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+--x-ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+--x-ease-bounce:   cubic-bezier(0.68, -0.55, 0.27, 1.55);
+--x-ease-smooth:   cubic-bezier(0.25, 0.1, 0.25, 1);
+--x-ease-sharp:    cubic-bezier(0.4, 0, 0.6, 1);
+--x-ease-emphasis: cubic-bezier(0.2, 0, 0, 1);
+--x-ease-decel:    cubic-bezier(0, 0, 0.2, 1);
+--x-ease-accel:    cubic-bezier(0.4, 0, 1, 1);
+--x-ease-linear:   linear;
+
+/* ═══════════ 27 · 层级 ═══════════ */
+--x-z-hide:     -1;
+--x-z-base:     0;
+--x-z-raised:   10;
+--x-z-docked:   20;
+--x-z-sticky:   100;
+--x-z-banner:   300;
+--x-z-dropdown: 500;
+--x-z-overlay:  900;
+--x-z-modal:    1000;
+--x-z-popover:  1100;
+--x-z-drawer:   1200;
+--x-z-toast:    1500;
+--x-z-tooltip:  1700;
+--x-z-max:      9999;
+
+/* ═══════════ 28 · 字体栈 ═══════════ */
+--x-font-sans:
+  -apple-system, BlinkMacSystemFont, "Segoe UI Variable",
+  "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+  "Microsoft YaHei UI", "Microsoft YaHei",
+  "Noto Sans CJK SC", "Source Han Sans SC",
+  system-ui, sans-serif;
+
+--x-font-serif:
+  "Songti SC", "STSong", "SimSun",
+  "Noto Serif CJK SC", "Source Han Serif SC",
+  Georgia, Cambria, "Times New Roman", Times, serif;
+
+--x-font-mono:
+  ui-monospace, "SF Mono", "JetBrains Mono",
+  "Fira Code", "Cascadia Code", "Roboto Mono",
+  Menlo, Consolas, "Liberation Mono", monospace;
+
+--x-font-rounded:
+  ui-rounded, "SF Pro Rounded", "Varela Round",
+  "Quicksand", "Comfortaa", system-ui, sans-serif;
+
+--x-font:      var(--x-font-sans);
+--x-mono:      var(--x-font-mono);
+
+/* ═══════════ 29 · 焦点环 ═══════════ */
+--x-focus-width: 2px;
+--x-focus-offset: 2px;
+--x-focus-ring:         0 0 0 3px oklch(0.58 0.18 262 / 0.28);
+--x-focus-ring-danger:  0 0 0 3px oklch(0.60 0.21 25 / 0.25);
+--x-focus-ring-success: 0 0 0 3px oklch(0.62 0.16 152 / 0.25);
+--x-focus-ring-warning: 0 0 0 3px oklch(0.75 0.15 75 / 0.30);
+--x-focus-ring-info:    0 0 0 3px oklch(0.64 0.15 235 / 0.25);
+--x-focus-ring-inner:   inset 0 0 0 2px oklch(0.58 0.18 262 / 0.4);
+
+/* ═══════════ 30 · 过渡组合 ═══════════ */
+--x-t-color:     color var(--x-dur-2) var(--x-ease);
+--x-t-bg:        background-color var(--x-dur-2) var(--x-ease);
+--x-t-border:    border-color var(--x-dur-2) var(--x-ease);
+--x-t-shadow:    box-shadow var(--x-dur-2) var(--x-ease);
+--x-t-transform: transform var(--x-dur-2) var(--x-ease);
+--x-t-opacity:   opacity var(--x-dur-2) var(--x-ease);
+--x-t-all:       all var(--x-dur-2) var(--x-ease);
+--x-t-fast:      all var(--x-dur-1) var(--x-ease);
+--x-t-slow:      all var(--x-dur-4) var(--x-ease);
+--x-t-spring:    all var(--x-dur-3) var(--x-ease-spring);
+--x-t-focus:     box-shadow var(--x-dur-2) var(--x-ease), border-color var(--x-dur-2) var(--x-ease);
+
+/* ═══════════ 31 · 触摸 / 安全区 ═══════════ */
+--x-touch-min:  44px;
+--x-touch-com:  48px;
+--x-safe-t:     env(safe-area-inset-top, 0px);
+--x-safe-b:     env(safe-area-inset-bottom, 0px);
+--x-safe-l:     env(safe-area-inset-left, 0px);
+--x-safe-r:     env(safe-area-inset-right, 0px);
+
+/* ═══════════ 32 · 透明度 ═══════════ */
+--x-op-0:   0;
+--x-op-5:   0.05;
+--x-op-10:  0.10;
+--x-op-20:  0.20;
+--x-op-30:  0.30;
+--x-op-40:  0.40;
+--x-op-50:  0.50;
+--x-op-60:  0.60;
+--x-op-70:  0.70;
+--x-op-80:  0.80;
+--x-op-90:  0.90;
+--x-op-95:  0.95;
+--x-op-100: 1;
+
+/* ═══════════ 33 · 模糊 ═══════════ */
+--x-blur-none: 0;
+--x-blur-xs:   2px;
+--x-blur-sm:   4px;
+--x-blur:      8px;
+--x-blur-md:   12px;
+--x-blur-lg:   16px;
+--x-blur-xl:   24px;
+--x-blur-2xl:  40px;
+--x-blur-3xl:  64px;
+
+/* ═══════════ 34 · 混合模式 ═══════════ */
+--x-blend-normal:    normal;
+--x-blend-multiply:  multiply;
+--x-blend-screen:    screen;
+--x-blend-overlay:   overlay;
+--x-blend-darken:    darken;
+--x-blend-lighten:   lighten;
+--x-blend-color-dodge: color-dodge;
+--x-blend-color-burn:  color-burn;
+--x-blend-hard-light:  hard-light;
+--x-blend-soft-light:  soft-light;
+--x-blend-difference:  difference;
+--x-blend-exclusion:   exclusion;
+--x-blend-hue:         hue;
+--x-blend-saturation:  saturation;
+--x-blend-color:       color;
+--x-blend-luminosity:  luminosity;
+
+/* ═══════════ 35 · 边框宽度 ═══════════ */
+--x-bw-0: 0;
+--x-bw-hair: 1px;
+--x-bw-1: 1px;
+--x-bw-2: 2px;
+--x-bw-3: 3px;
+--x-bw-4: 4px;
+--x-bw-5: 5px;
+--x-bw-8: 8px;
+
+/* ═══════════ 36 · 光标 ═══════════ */
+--x-cursor-auto:     auto;
+--x-cursor-default:  default;
+--x-cursor-pointer:  pointer;
+--x-cursor-wait:     wait;
+--x-cursor-text:     text;
+--x-cursor-move:     move;
+--x-cursor-help:     help;
+--x-cursor-not-allowed: not-allowed;
+--x-cursor-grab:     grab;
+--x-cursor-grabbing: grabbing;
+--x-cursor-crosshair: crosshair;
+--x-cursor-zoom-in:  zoom-in;
+--x-cursor-zoom-out: zoom-out;
+
+/* ═══════════ 37 · 断点参考（仅供阅读，CSS 无法存变量） ═══════════
+   --x-bp-xs:  320px   超小手机
+   --x-bp-sm:  480px   手机横屏
+   --x-bp-md:  640px   小平板
+   --x-bp-lg:  768px   平板竖
+   --x-bp-xl:  1024px  平板横 / 小笔记本
+   --x-bp-2xl: 1280px  桌面
+   --x-bp-3xl: 1536px  大桌面
+   --x-bp-4xl: 1920px  超宽
+   ═════════════════════════════════════════════════════════════════════ */
+
+} /* /:root */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   暗色主题
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+
+--x-gray-0:   oklch(0.115 0.006 250);
+--x-gray-50:  oklch(0.135 0.008 250);
+--x-gray-100: oklch(0.165 0.010 250);
+--x-gray-150: oklch(0.185 0.010 250);
+--x-gray-200: oklch(0.205 0.012 250);
+--x-gray-300: oklch(0.255 0.012 250);
+--x-gray-400: oklch(0.325 0.012 250);
+--x-gray-500: oklch(0.425 0.012 250);
+--x-gray-600: oklch(0.545 0.010 250);
+--x-gray-700: oklch(0.680 0.010 250);
+--x-gray-800: oklch(0.800 0.008 250);
+--x-gray-900: oklch(0.900 0.006 250);
+--x-gray-950: oklch(0.955 0.004 250);
+--x-gray-975: oklch(0.985 0.002 250);
+--x-white:    oklch(1.000 0     0);
+--x-black:    oklch(0.080 0.008 250);
+
+--x-blue-50:  oklch(0.220 0.030 262);
+--x-blue-100: oklch(0.280 0.055 262);
+--x-blue-200: oklch(0.360 0.090 262);
+--x-blue-300: oklch(0.460 0.130 262);
+--x-blue-400: oklch(0.580 0.155 262);
+--x-blue-500: oklch(0.720 0.150 262);
+--x-blue-600: oklch(0.780 0.140 262);
+--x-blue-700: oklch(0.830 0.120 262);
+--x-blue-800: oklch(0.870 0.100 262);
+--x-blue-900: oklch(0.920 0.070 262);
+--x-blue-950: oklch(0.960 0.040 262);
+
+--x-red-50:  oklch(0.220 0.035 25);
+--x-red-100: oklch(0.290 0.070 25);
+--x-red-200: oklch(0.370 0.115 25);
+--x-red-300: oklch(0.480 0.170 25);
+--x-red-400: oklch(0.600 0.200 25);
+--x-red-500: oklch(0.700 0.180 25);
+--x-red-600: oklch(0.760 0.160 25);
+--x-red-700: oklch(0.810 0.135 25);
+--x-red-800: oklch(0.860 0.105 25);
+--x-red-900: oklch(0.910 0.075 25);
+--x-red-950: oklch(0.950 0.045 25);
+
+--x-green-50:  oklch(0.220 0.025 152);
+--x-green-100: oklch(0.280 0.050 152);
+--x-green-200: oklch(0.350 0.085 152);
+--x-green-300: oklch(0.450 0.125 152);
+--x-green-400: oklch(0.580 0.150 152);
+--x-green-500: oklch(0.720 0.140 152);
+--x-green-600: oklch(0.780 0.125 152);
+--x-green-700: oklch(0.830 0.105 152);
+--x-green-800: oklch(0.870 0.085 152);
+--x-green-900: oklch(0.920 0.060 152);
+--x-green-950: oklch(0.960 0.035 152);
+
+--x-yellow-50:  oklch(0.240 0.030 80);
+--x-yellow-100: oklch(0.300 0.055 80);
+--x-yellow-200: oklch(0.380 0.090 78);
+--x-yellow-300: oklch(0.480 0.125 76);
+--x-yellow-400: oklch(0.620 0.150 75);
+--x-yellow-500: oklch(0.780 0.140 75);
+--x-yellow-600: oklch(0.830 0.125 75);
+--x-yellow-700: oklch(0.870 0.105 75);
+--x-yellow-800: oklch(0.900 0.080 75);
+--x-yellow-900: oklch(0.930 0.060 75);
+--x-yellow-950: oklch(0.965 0.035 75);
+
+--x-cyan-50:  oklch(0.220 0.025 235);
+--x-cyan-100: oklch(0.280 0.050 235);
+--x-cyan-200: oklch(0.350 0.085 235);
+--x-cyan-300: oklch(0.460 0.120 235);
+--x-cyan-400: oklch(0.580 0.140 235);
+--x-cyan-500: oklch(0.720 0.130 235);
+--x-cyan-600: oklch(0.780 0.115 235);
+--x-cyan-700: oklch(0.830 0.095 235);
+--x-cyan-800: oklch(0.870 0.075 235);
+--x-cyan-900: oklch(0.920 0.055 235);
+--x-cyan-950: oklch(0.960 0.030 235);
+
+--x-purple-50:  oklch(0.230 0.035 300);
+--x-purple-100: oklch(0.290 0.070 300);
+--x-purple-200: oklch(0.360 0.115 300);
+--x-purple-300: oklch(0.470 0.165 300);
+--x-purple-400: oklch(0.580 0.195 300);
+--x-purple-500: oklch(0.740 0.175 300);
+--x-purple-600: oklch(0.800 0.155 300);
+--x-purple-700: oklch(0.850 0.130 300);
+--x-purple-800: oklch(0.890 0.100 300);
+--x-purple-900: oklch(0.935 0.070 300);
+--x-purple-950: oklch(0.970 0.040 300);
+
+--x-pink-50:  oklch(0.230 0.030 0);
+--x-pink-100: oklch(0.290 0.060 0);
+--x-pink-200: oklch(0.360 0.100 0);
+--x-pink-300: oklch(0.470 0.150 0);
+--x-pink-400: oklch(0.580 0.190 0);
+--x-pink-500: oklch(0.720 0.175 0);
+--x-pink-600: oklch(0.780 0.155 0);
+--x-pink-700: oklch(0.830 0.130 0);
+--x-pink-800: oklch(0.870 0.100 0);
+--x-pink-900: oklch(0.920 0.070 0);
+--x-pink-950: oklch(0.960 0.040 0);
+
+--x-orange-50:  oklch(0.240 0.030 55);
+--x-orange-100: oklch(0.300 0.060 55);
+--x-orange-200: oklch(0.380 0.095 55);
+--x-orange-300: oklch(0.490 0.140 55);
+--x-orange-400: oklch(0.620 0.175 55);
+--x-orange-500: oklch(0.770 0.155 55);
+--x-orange-600: oklch(0.820 0.140 55);
+--x-orange-700: oklch(0.860 0.115 55);
+--x-orange-800: oklch(0.895 0.090 55);
+--x-orange-900: oklch(0.935 0.065 55);
+--x-orange-950: oklch(0.970 0.035 55);
+
+--x-indigo-50:  oklch(0.220 0.030 285);
+--x-indigo-100: oklch(0.280 0.060 285);
+--x-indigo-200: oklch(0.350 0.100 285);
+--x-indigo-300: oklch(0.460 0.145 285);
+--x-indigo-400: oklch(0.570 0.175 285);
+--x-indigo-500: oklch(0.720 0.155 285);
+--x-indigo-600: oklch(0.780 0.135 285);
+--x-indigo-700: oklch(0.830 0.115 285);
+--x-indigo-800: oklch(0.870 0.090 285);
+--x-indigo-900: oklch(0.920 0.065 285);
+--x-indigo-950: oklch(0.960 0.035 285);
+
+--x-rose-50:  oklch(0.230 0.030 15);
+--x-rose-100: oklch(0.290 0.060 15);
+--x-rose-200: oklch(0.360 0.100 15);
+--x-rose-300: oklch(0.470 0.150 15);
+--x-rose-400: oklch(0.580 0.190 15);
+--x-rose-500: oklch(0.720 0.180 15);
+--x-rose-600: oklch(0.780 0.160 15);
+--x-rose-700: oklch(0.830 0.135 15);
+--x-rose-800: oklch(0.870 0.105 15);
+--x-rose-900: oklch(0.920 0.075 15);
+--x-rose-950: oklch(0.960 0.040 15);
+
+--x-lime-50:  oklch(0.220 0.035 125);
+--x-lime-100: oklch(0.280 0.070 125);
+--x-lime-200: oklch(0.350 0.110 125);
+--x-lime-300: oklch(0.450 0.155 125);
+--x-lime-400: oklch(0.580 0.180 125);
+--x-lime-500: oklch(0.740 0.165 125);
+--x-lime-600: oklch(0.800 0.145 125);
+--x-lime-700: oklch(0.850 0.120 125);
+--x-lime-800: oklch(0.890 0.095 125);
+--x-lime-900: oklch(0.930 0.070 125);
+--x-lime-950: oklch(0.965 0.040 125);
+
+--x-emerald-50:  oklch(0.220 0.025 165);
+--x-emerald-100: oklch(0.280 0.055 165);
+--x-emerald-200: oklch(0.350 0.090 165);
+--x-emerald-300: oklch(0.460 0.130 165);
+--x-emerald-400: oklch(0.580 0.155 165);
+--x-emerald-500: oklch(0.730 0.145 165);
+--x-emerald-600: oklch(0.790 0.130 165);
+--x-emerald-700: oklch(0.840 0.110 165);
+--x-emerald-800: oklch(0.880 0.085 165);
+--x-emerald-900: oklch(0.925 0.060 165);
+--x-emerald-950: oklch(0.965 0.035 165);
+
+--x-sky-50:  oklch(0.220 0.025 220);
+--x-sky-100: oklch(0.280 0.050 220);
+--x-sky-200: oklch(0.350 0.085 220);
+--x-sky-300: oklch(0.460 0.125 220);
+--x-sky-400: oklch(0.580 0.145 220);
+--x-sky-500: oklch(0.730 0.135 220);
+--x-sky-600: oklch(0.790 0.120 220);
+--x-sky-700: oklch(0.840 0.100 220);
+--x-sky-800: oklch(0.880 0.080 220);
+--x-sky-900: oklch(0.925 0.055 220);
+--x-sky-950: oklch(0.960 0.030 220);
+
+--x-bg:            oklch(0.135 0.008 250);
+--x-bg-canvas:     oklch(0.115 0.006 250);
+--x-bg-subtle:     oklch(0.165 0.010 250);
+--x-bg-soft:       oklch(0.205 0.012 250);
+--x-bg-muted:      oklch(0.255 0.012 250);
+--x-bg-elev:       oklch(0.185 0.010 250);
+--x-bg-hover:      oklch(0.240 0.012 250);
+--x-bg-active:     oklch(0.285 0.014 250);
+--x-bg-selected:   oklch(0.280 0.055 262);
+--x-bg-inv:        oklch(0.945 0.004 250);
+--x-bg-overlay:    oklch(0 0 0 / 0.65);
+--x-bg-glass:      oklch(0.185 0.010 250 / 0.72);
+
+--x-fg:            oklch(0.945 0.004 250);
+--x-fg-strong:     oklch(0.985 0.002 250);
+--x-fg-emphasis:   oklch(1.000 0     0);
+--x-fg-dim:        oklch(0.720 0.010 250);
+--x-fg-mute:       oklch(0.545 0.010 250);
+--x-fg-subtle:     oklch(0.425 0.012 250);
+--x-fg-disabled:   oklch(0.380 0.010 250);
+--x-fg-inv:        oklch(0.135 0.008 250);
+--x-fg-inv-dim:    oklch(0.280 0.010 250);
+
+--x-line-faint:  oklch(0.185 0.008 250);
+--x-line-subtle: oklch(0.225 0.010 250);
+--x-line:        oklch(0.280 0.012 250);
+--x-line-soft:   oklch(0.335 0.012 250);
+--x-line-2:      oklch(0.405 0.014 250);
+--x-line-strong: oklch(0.520 0.014 250);
+--x-line-focus:  var(--x-blue-500);
+--x-line-inv:    oklch(0 0 0 / 0.5);
+
+--x-sh-none: none;
+--x-sh-hair: 0 0 0 1px oklch(1 0 0 / 0.06);
+--x-sh-xs:   0 1px 2px oklch(0 0 0 / 0.30);
+--x-sh-sm:   0 1px 3px oklch(0 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.25);
+--x-sh:      0 2px 6px oklch(0 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.25);
+--x-sh-md:   0 4px 12px oklch(0 0 0 / 0.40), 0 2px 4px oklch(0 0 0 / 0.25);
+--x-sh-lg:   0 8px 24px oklch(0 0 0 / 0.45), 0 4px 8px oklch(0 0 0 / 0.25);
+--x-sh-xl:   0 16px 40px oklch(0 0 0 / 0.55), 0 8px 16px oklch(0 0 0 / 0.30);
+--x-sh-2xl:  0 24px 56px oklch(0 0 0 / 0.65), 0 12px 24px oklch(0 0 0 / 0.35);
+--x-sh-3xl:  0 32px 72px oklch(0 0 0 / 0.75), 0 16px 32px oklch(0 0 0 / 0.40);
+--x-sh-inner: inset 0 1px 2px oklch(0 0 0 / 0.35);
+--x-sh-inner-lg: inset 0 2px 6px oklch(0 0 0 / 0.40);
+--x-sh-up:   0 -4px 12px oklch(0 0 0 / 0.40);
+--x-sh-primary: 0 8px 24px oklch(0.72 0.15 262 / 0.30);
+--x-sh-danger:  0 8px 24px oklch(0.70 0.18 25 / 0.30);
+--x-sh-success: 0 8px 24px oklch(0.72 0.14 152 / 0.30);
+--x-sh-glow:    0 0 32px oklch(0.72 0.15 262 / 0.5);
+
+--x-focus-ring:         0 0 0 3px oklch(0.72 0.15 262 / 0.35);
+--x-focus-ring-danger:  0 0 0 3px oklch(0.70 0.18 25 / 0.35);
+--x-focus-ring-success: 0 0 0 3px oklch(0.72 0.14 152 / 0.35);
+--x-focus-ring-warning: 0 0 0 3px oklch(0.78 0.14 75 / 0.40);
+--x-focus-ring-info:    0 0 0 3px oklch(0.72 0.13 235 / 0.35);
+
+} /* /[data-theme="dark"] */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   高对比度偏好
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (prefers-contrast: more) {
+  :root {
+    --x-fg-dim:    var(--x-fg);
+    --x-fg-mute:   var(--x-fg-dim);
+    --x-fg-subtle: var(--x-fg-dim);
+    --x-line:      var(--x-line-strong);
+    --x-line-2:    var(--x-line-strong);
+    --x-line-soft: var(--x-line-strong);
+    --x-sh-xs: none;
+    --x-sh-sm: none;
+    --x-sh:    none;
+    --x-sh-md: none;
+    --x-sh-lg: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   兼容旧变量名（v1 → v2 迁移用）
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --x-text:           var(--x-fg);
+  --x-text-dim:       var(--x-fg-dim);
+  --x-text-mute:      var(--x-fg-mute);
+  --x-text-inverse:   var(--x-fg-inv);
+  --x-text-strong:    var(--x-fg-strong);
+
+  --x-border:         var(--x-line);
+  --x-border-strong:  var(--x-line-2);
+  --x-border-subtle:  var(--x-line-subtle);
+
+  --x-radius:         var(--x-r);
+  --x-radius-sm:      var(--x-r-sm);
+  --x-radius-lg:      var(--x-r-lg);
+  --x-radius-full:    var(--x-r-full);
+
+  --x-gap:            var(--x-sp-4);
+  --x-gap-sm:         var(--x-sp-2);
+  --x-gap-xs:         var(--x-sp-1);
+  --x-gap-lg:         var(--x-sp-6);
+  --x-gap-xl:         var(--x-sp-8);
+
+  --x-shadow:         var(--x-sh-sm);
+  --x-shadow-md:      var(--x-sh-md);
+  --x-shadow-lg:      var(--x-sh-lg);
+
+  --x-primary-soft:   oklch(0.58 0.18 262 / 0.10);
+  --x-danger-soft:    oklch(0.60 0.21 25 / 0.10);
+  --x-success-soft:   oklch(0.62 0.16 152 / 0.10);
+  --x-warning-soft:   oklch(0.75 0.15 75 / 0.12);
+  --x-info-soft:      oklch(0.64 0.15 235 / 0.10);
+
+  --x-primary:        var(--x-blue-500);
+  --x-primary-hov:    var(--x-blue-600);
+  --x-primary-act:    var(--x-blue-700);
+  --x-danger:         var(--x-red-500);
+  --x-danger-hov:     var(--x-red-600);
+  --x-success:        var(--x-green-500);
+  --x-success-hov:    var(--x-green-600);
+  --x-warning:        var(--x-yellow-500);
+  --x-warning-hov:    var(--x-yellow-600);
+  --x-info:           var(--x-cyan-500);
+  --x-info-hov:       var(--x-cyan-600);
+  --x-warning-fg:     oklch(0.35 0.10 75);
+  --x-danger-fg:      var(--x-red-500);
+  --x-success-fg:     var(--x-green-500);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   追加 · 主题预设（6 套）
+   用法：<html data-theme="dracula"> / "nord" / "tokyo" / "solarized" / "monokai" / "catppuccin"
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── Dracula ─── */
+[data-theme="dracula"] {
+  --x-bg:            oklch(0.220 0.018 280);
+  --x-bg-canvas:     oklch(0.185 0.015 280);
+  --x-bg-subtle:     oklch(0.240 0.020 280);
+  --x-bg-soft:       oklch(0.260 0.022 280);
+  --x-bg-muted:      oklch(0.300 0.024 280);
+  --x-bg-elev:       oklch(0.260 0.022 280);
+  --x-bg-hover:      oklch(0.320 0.026 280);
+  --x-bg-active:     oklch(0.365 0.028 280);
+  --x-fg:            oklch(0.960 0.010 280);
+  --x-fg-strong:     oklch(0.985 0.005 280);
+  --x-fg-dim:        oklch(0.720 0.020 280);
+  --x-fg-mute:       oklch(0.545 0.020 280);
+  --x-fg-inv:        oklch(0.220 0.018 280);
+  --x-line:          oklch(0.320 0.026 280);
+  --x-line-2:        oklch(0.400 0.028 280);
+  --x-line-strong:   oklch(0.520 0.028 280);
+  --x-primary:       oklch(0.750 0.150 310);
+  --x-primary-hov:   oklch(0.800 0.140 310);
+  --x-primary-act:   oklch(0.850 0.130 310);
+  --x-primary-soft:  oklch(0.750 0.150 310 / 0.16);
+  --x-primary-ring:  oklch(0.750 0.150 310 / 0.35);
+  --x-success:       oklch(0.870 0.200 145);
+  --x-warning:       oklch(0.940 0.150 95);
+  --x-danger:        oklch(0.720 0.220 20);
+  --x-info:          oklch(0.780 0.150 195);
+}
+
+/* ─── Nord ─── */
+[data-theme="nord"] {
+  --x-bg:            oklch(0.300 0.020 240);
+  --x-bg-canvas:     oklch(0.280 0.020 240);
+  --x-bg-subtle:     oklch(0.330 0.020 240);
+  --x-bg-soft:       oklch(0.360 0.020 240);
+  --x-bg-muted:      oklch(0.400 0.020 240);
+  --x-bg-elev:       oklch(0.360 0.020 240);
+  --x-bg-hover:      oklch(0.420 0.020 240);
+  --x-bg-active:     oklch(0.460 0.020 240);
+  --x-fg:            oklch(0.940 0.010 240);
+  --x-fg-strong:     oklch(0.985 0.005 240);
+  --x-fg-dim:        oklch(0.850 0.015 240);
+  --x-fg-mute:       oklch(0.650 0.015 240);
+  --x-fg-inv:        oklch(0.300 0.020 240);
+  --x-line:          oklch(0.420 0.020 240);
+  --x-line-2:        oklch(0.480 0.020 240);
+  --x-line-strong:   oklch(0.580 0.020 240);
+  --x-primary:       oklch(0.780 0.060 200);
+  --x-primary-hov:   oklch(0.820 0.060 200);
+  --x-primary-soft:  oklch(0.780 0.060 200 / 0.20);
+  --x-success:       oklch(0.780 0.100 145);
+  --x-warning:       oklch(0.850 0.120 90);
+  --x-danger:        oklch(0.680 0.140 25);
+  --x-info:          oklch(0.740 0.080 230);
+}
+
+/* ─── Tokyo Night ─── */
+[data-theme="tokyo"] {
+  --x-bg:            oklch(0.180 0.020 260);
+  --x-bg-canvas:     oklch(0.150 0.020 260);
+  --x-bg-subtle:     oklch(0.220 0.025 260);
+  --x-bg-soft:       oklch(0.240 0.025 260);
+  --x-bg-muted:      oklch(0.280 0.025 260);
+  --x-bg-elev:       oklch(0.240 0.025 260);
+  --x-bg-hover:      oklch(0.300 0.025 260);
+  --x-bg-active:     oklch(0.340 0.025 260);
+  --x-fg:            oklch(0.820 0.050 260);
+  --x-fg-strong:     oklch(0.920 0.030 260);
+  --x-fg-dim:        oklch(0.720 0.050 260);
+  --x-fg-mute:       oklch(0.520 0.050 260);
+  --x-fg-inv:        oklch(0.180 0.020 260);
+  --x-line:          oklch(0.300 0.025 260);
+  --x-line-2:        oklch(0.380 0.025 260);
+  --x-line-strong:   oklch(0.500 0.025 260);
+  --x-primary:       oklch(0.720 0.150 260);
+  --x-primary-hov:   oklch(0.780 0.140 260);
+  --x-primary-soft:  oklch(0.720 0.150 260 / 0.18);
+  --x-success:       oklch(0.820 0.140 140);
+  --x-warning:       oklch(0.800 0.140 80);
+  --x-danger:        oklch(0.720 0.200 20);
+  --x-info:          oklch(0.760 0.120 220);
+}
+
+/* ─── Solarized Light ─── */
+[data-theme="solarized"] {
+  --x-bg:            oklch(0.960 0.030 90);
+  --x-bg-canvas:     oklch(0.940 0.030 85);
+  --x-bg-subtle:     oklch(0.920 0.030 85);
+  --x-bg-soft:       oklch(0.900 0.030 85);
+  --x-bg-muted:      oklch(0.880 0.030 85);
+  --x-bg-elev:       oklch(0.980 0.015 90);
+  --x-bg-hover:      oklch(0.900 0.030 85);
+  --x-bg-active:     oklch(0.870 0.030 85);
+  --x-fg:            oklch(0.420 0.030 200);
+  --x-fg-strong:     oklch(0.320 0.030 200);
+  --x-fg-dim:        oklch(0.520 0.030 200);
+  --x-fg-mute:       oklch(0.620 0.020 200);
+  --x-fg-inv:        oklch(0.980 0.015 90);
+  --x-line:          oklch(0.860 0.030 85);
+  --x-line-2:        oklch(0.780 0.030 85);
+  --x-line-strong:   oklch(0.640 0.030 200);
+  --x-primary:       oklch(0.580 0.150 240);
+  --x-primary-hov:   oklch(0.520 0.160 240);
+  --x-primary-soft:  oklch(0.580 0.150 240 / 0.12);
+  --x-success:       oklch(0.620 0.160 100);
+  --x-warning:       oklch(0.720 0.150 85);
+  --x-danger:        oklch(0.600 0.210 25);
+  --x-info:          oklch(0.580 0.150 240);
+}
+
+/* ─── Monokai ─── */
+[data-theme="monokai"] {
+  --x-bg:            oklch(0.220 0.010 100);
+  --x-bg-canvas:     oklch(0.180 0.010 100);
+  --x-bg-subtle:     oklch(0.250 0.012 100);
+  --x-bg-soft:       oklch(0.280 0.012 100);
+  --x-bg-muted:      oklch(0.320 0.012 100);
+  --x-bg-elev:       oklch(0.280 0.012 100);
+  --x-bg-hover:      oklch(0.340 0.012 100);
+  --x-bg-active:     oklch(0.380 0.012 100);
+  --x-fg:            oklch(0.950 0.010 100);
+  --x-fg-strong:     oklch(0.985 0.005 100);
+  --x-fg-dim:        oklch(0.750 0.020 100);
+  --x-fg-mute:       oklch(0.580 0.020 100);
+  --x-fg-inv:        oklch(0.220 0.010 100);
+  --x-line:          oklch(0.340 0.012 100);
+  --x-line-2:        oklch(0.420 0.012 100);
+  --x-line-strong:   oklch(0.540 0.012 100);
+  --x-primary:       oklch(0.850 0.180 130);
+  --x-primary-hov:   oklch(0.890 0.165 130);
+  --x-primary-soft:  oklch(0.850 0.180 130 / 0.16);
+  --x-success:       oklch(0.850 0.180 130);
+  --x-warning:       oklch(0.880 0.150 95);
+  --x-danger:        oklch(0.680 0.230 350);
+  --x-info:          oklch(0.750 0.150 200);
+}
+
+/* ─── Catppuccin (Mocha) ─── */
+[data-theme="catppuccin"] {
+  --x-bg:            oklch(0.230 0.030 285);
+  --x-bg-canvas:     oklch(0.200 0.030 285);
+  --x-bg-subtle:     oklch(0.260 0.032 285);
+  --x-bg-soft:       oklch(0.290 0.034 285);
+  --x-bg-muted:      oklch(0.330 0.034 285);
+  --x-bg-elev:       oklch(0.290 0.034 285);
+  --x-bg-hover:      oklch(0.350 0.036 285);
+  --x-bg-active:     oklch(0.400 0.038 285);
+  --x-fg:            oklch(0.900 0.020 285);
+  --x-fg-strong:     oklch(0.960 0.010 285);
+  --x-fg-dim:        oklch(0.760 0.030 285);
+  --x-fg-mute:       oklch(0.580 0.030 285);
+  --x-fg-inv:        oklch(0.230 0.030 285);
+  --x-line:          oklch(0.350 0.036 285);
+  --x-line-2:        oklch(0.420 0.038 285);
+  --x-line-strong:   oklch(0.550 0.038 285);
+  --x-primary:       oklch(0.780 0.130 265);
+  --x-primary-hov:   oklch(0.830 0.120 265);
+  --x-primary-soft:  oklch(0.780 0.130 265 / 0.18);
+  --x-success:       oklch(0.850 0.120 145);
+  --x-warning:       oklch(0.880 0.130 85);
+  --x-danger:        oklch(0.720 0.180 15);
+  --x-info:          oklch(0.820 0.100 200);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   追加 · 渐变色板（12 种预设）
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --x-grad-primary: linear-gradient(135deg,
+    var(--x-blue-500) 0%, var(--x-indigo-500) 100%);
+  --x-grad-danger: linear-gradient(135deg,
+    var(--x-rose-500) 0%, var(--x-red-600) 100%);
+  --x-grad-success: linear-gradient(135deg,
+    var(--x-emerald-500) 0%, var(--x-green-600) 100%);
+  --x-grad-warning: linear-gradient(135deg,
+    var(--x-yellow-400) 0%, var(--x-orange-500) 100%);
+  --x-grad-info: linear-gradient(135deg,
+    var(--x-sky-400) 0%, var(--x-cyan-500) 100%);
+  --x-grad-sunset: linear-gradient(135deg,
+    var(--x-pink-400) 0%, var(--x-yellow-400) 100%);
+  --x-grad-ocean: linear-gradient(135deg,
+    var(--x-blue-900) 0%, var(--x-cyan-400) 100%);
+  --x-grad-forest: linear-gradient(135deg,
+    var(--x-emerald-700) 0%, var(--x-lime-400) 100%);
+  --x-grad-aurora: linear-gradient(135deg,
+    var(--x-green-400) 0%, var(--x-cyan-500) 50%, var(--x-purple-500) 100%);
+  --x-grad-candy: linear-gradient(135deg,
+    var(--x-pink-300) 0%, var(--x-purple-400) 100%);
+  --x-grad-fire: linear-gradient(135deg,
+    var(--x-red-500) 0%, var(--x-orange-500) 50%, var(--x-yellow-400) 100%);
+  --x-grad-rainbow: linear-gradient(90deg,
+    #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  --x-grad-mesh:
+    radial-gradient(at 27% 37%, oklch(0.58 0.18 262) 0px, transparent 50%),
+    radial-gradient(at 97% 21%, oklch(0.66 0.21 0)   0px, transparent 50%),
+    radial-gradient(at 52% 99%, oklch(0.75 0.15 75)  0px, transparent 50%),
+    radial-gradient(at 10% 29%, oklch(0.58 0.22 300) 0px, transparent 50%),
+    radial-gradient(at 97% 96%, oklch(0.64 0.15 235) 0px, transparent 50%);
+
+  --x-grad-from: var(--x-blue-500);
+  --x-grad-to:   var(--x-purple-500);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   追加 · 语义状态别名（组件常用组合）
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* 每套状态色 = 主色 + hover + soft + ring + fg 五件套 */
+  --x-primary-subtle:  var(--x-blue-50);
+  --x-primary-border:  var(--x-blue-200);
+  --x-primary-fg:      var(--x-blue-700);
+
+  --x-danger-subtle:   var(--x-red-50);
+  --x-danger-border:   var(--x-red-200);
+  --x-danger-fg-strong: var(--x-red-700);
+
+  --x-success-subtle:  var(--x-green-50);
+  --x-success-border:  var(--x-green-200);
+  --x-success-fg-strong: var(--x-green-700);
+
+  --x-warning-subtle:  var(--x-yellow-50);
+  --x-warning-border:  var(--x-yellow-200);
+
+  --x-info-subtle:     var(--x-cyan-50);
+  --x-info-border:     var(--x-cyan-200);
+  --x-info-fg-strong:  var(--x-cyan-700);
+}
+
+[data-theme="dark"] {
+  --x-primary-subtle:  var(--x-blue-100);
+  --x-primary-border:  var(--x-blue-300);
+  --x-primary-fg:      var(--x-blue-700);
+  --x-danger-subtle:   var(--x-red-100);
+  --x-danger-border:   var(--x-red-300);
+  --x-danger-fg-strong: var(--x-red-700);
+  --x-success-subtle:  var(--x-green-100);
+  --x-success-border:  var(--x-green-300);
+  --x-success-fg-strong: var(--x-green-700);
+  --x-warning-subtle:  var(--x-yellow-100);
+  --x-warning-border:  var(--x-yellow-300);
+  --x-info-subtle:     var(--x-cyan-100);
+  --x-info-border:     var(--x-cyan-300);
+  --x-info-fg-strong:  var(--x-cyan-700);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   追加 · 尺寸预设（常见组件高度）
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --x-h-xs: 24px;
+  --x-h-sm: 30px;
+  --x-h-md: 36px;
+  --x-h:    40px;
+  --x-h-lg: 46px;
+  --x-h-xl: 54px;
+  --x-h-2xl: 64px;
+
+  --x-w-xs: 48px;
+  --x-w-sm: 64px;
+  --x-w-md: 96px;
+  --x-w-lg: 128px;
+  --x-w-xl: 192px;
+  --x-w-2xl: 256px;
+  --x-w-3xl: 384px;
+
+  --x-avatar-xs: 20px;
+  --x-avatar-sm: 28px;
+  --x-avatar:    36px;
+  --x-avatar-lg: 48px;
+  --x-avatar-xl: 64px;
+  --x-avatar-2xl: 80px;
+
+  --x-badge-h:   20px;
+  --x-badge-dot: 8px;
+  --x-btn-h:     38px;
+  --x-input-h:   38px;
+  --x-sidebar-w: 240px;
+  --x-header-h:  56px;
+  --x-container-max: 1100px;
+  --x-prose-max:     72ch;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   追加 · 组件专用令牌（tokens 级别，供 base/form/display 引用）
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --x-btn-radius:       var(--x-r);
+  --x-btn-font:         var(--x-fs);
+  --x-btn-fw:           var(--x-fw-m);
+  --x-btn-px:           16px;
+  --x-btn-gap:          6px;
+
+  --x-input-radius:     var(--x-r);
+  --x-input-font:       var(--x-fs);
+  --x-input-px:         12px;
+  --x-input-py:         8px;
+  --x-input-bg:         var(--x-bg-elev);
+  --x-input-border:     var(--x-line-2);
+
+  --x-card-radius:      var(--x-r-lg);
+  --x-card-pad:         var(--x-sp-5);
+  --x-card-gap:         var(--x-sp-4);
+
+  --x-tag-h:            24px;
+  --x-tag-px:           8px;
+  --x-tag-radius:       var(--x-r-sm);
+  --x-tag-font:         var(--x-fs-sm);
+
+  --x-modal-radius:     var(--x-r-lg);
+  --x-modal-shadow:     var(--x-sh-4);
+  --x-modal-max-w:      480px;
+
+  --x-dropdown-radius:  var(--x-r-md);
+  --x-dropdown-shadow:  var(--x-sh-md);
+  --x-dropdown-py:      4px;
+
+  --x-tabs-h:           40px;
+  --x-tabs-px:          16px;
+  --x-table-th-bg:      var(--x-bg-soft);
+  --x-table-pad:        10px 12px;
+  --x-table-line:       var(--x-line);
+
+  --x-progress-h:       8px;
+  --x-progress-radius:  var(--x-r-full);
+  --x-avatar-radius:    var(--x-r-full);
+}

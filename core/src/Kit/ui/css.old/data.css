@@ -1,0 +1,28 @@
+/* XuNay UI · data.css */
+
+/* === 列表 === */
+.list { list-style: none; padding: 0; margin: 0; }
+
+.list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--x-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.list-item:last-child { border-bottom: none; }
+
+.list-item-title { font-weight: 500; }
+
+.list-item-desc { font-size: 13px; color: var(--x-text-dim); margin-top: 2px; }
+
+.list-hover .list-item { padding: 12px 16px; border-radius: var(--x-radius); border-bottom: none; cursor: pointer; transition: background .1s; }
+
+.list-hover .list-item:hover { background: var(--x-bg-soft); }
+
+.list-group { border: 1px solid var(--x-border); border-radius: var(--x-radius); overflow: hidden; }
+
+.list-group .list-item { padding: 12px 16px; border-bottom: 1px solid var(--x-border); }
+
+.list-group .list-item:last-child { border-bottom: none; }

@@ -1,0 +1,30 @@
+// title: react-icons 跑在 XuNay
+import { mount } from 'xunay'
+import React from 'xunay/compat'
+import { FaBeer, FaHeart, FaStar, FaGithub, FaRocket } from 'react-icons/fa'
+import { IoIosPerson, IoIosHome, IoIosSettings } from 'react-icons/io'
+
+const h = React.createElement
+
+function App() {
+  const [count, setCount] = React.useState(0)
+  return h('div', { style: { padding: '24px', background: '#282c34', color: '#abb2bf', fontFamily: 'monospace' } },
+    h('h1', { style: { color: '#61afef' } }, 'react-icons 跑在 XuNay 上'),
+    h('div', { style: { fontSize: '32px', display: 'flex', gap: '16px', color: '#e5c07b', margin: '16px 0' } },
+      h(FaBeer),
+      h(FaHeart, { color: '#e06c75' }),
+      h(FaStar, { color: '#e5c07b' }),
+      h(FaGithub),
+      h(FaRocket, { color: '#61afef' })
+    ),
+    h('div', { style: { fontSize: '32px', display: 'flex', gap: '16px', margin: '16px 0' } },
+      h(IoIosPerson),
+      h(IoIosHome),
+      h(IoIosSettings)
+    ),
+    h('div', null, 'count: ' + count),
+    h('button', { onClick: () => setCount(count + 1), style: 'padding:6px 14px;margin-top:8px' }, '+1')
+  )
+}
+
+React.createRoot(document.getElementById('app')).render(h(App))

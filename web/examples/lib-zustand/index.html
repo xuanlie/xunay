@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>zustand 诊断</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; margin: 0; padding: 24px; }
+  button { padding: 6px 14px; margin: 0 4px; }
+  #__err { position: fixed; inset: 0; background: #1a1b26; color: #f55; padding: 16px;
+    font: 12px monospace; white-space: pre-wrap; overflow: auto; z-index: 99999; display: none; }
+  #__err .head { color: #ff7; font-size: 14px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="__err"><div class="head">❌ 页面错误（点此关闭）</div><div id="__errbody"></div></div>
+<script>
+(function(){
+  var err = document.getElementById('__err');
+  var errbody = document.getElementById('__errbody');
+  var text = '';
+  function show(s) {
+    text += s + '\n';
+    errbody.textContent = text;
+    err.style.display = 'block';
+  }
+  err.addEventListener('click', function(){ err.style.display = 'none' });
+  window.onerror = function(msg, src, line, col, e) {
+    show('ERR: ' + msg + '\n  at ' + (src||'') + ':' + line + ':' + col +
+      (e && e.stack ? '\n' + e.stack.split('\n').slice(0,6).join('\n') : ''));
+  };
+  window.addEventListener('unhandledrejection', function(e) {
+    show('REJECT: ' + ((e.reason && e.reason.message) || e.reason));
+  });
+})();
+</script>
+<script src="./app.js"></script>
+</body>
+</html>

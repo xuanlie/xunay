@@ -1,0 +1,331 @@
+// title: XuNay Code Editor
+import { signal, computed, onMount, onCleanup, mount, ref, frag } from 'xunay'
+import { highlight, languages } from '../../../core/src/hl.js'
+
+// ============================================================
+// 1. 状态层
+// ============================================================
+const INIT = `// XuNay Code Editor
+// Ctrl+Z 撤销 · Ctrl+Y 重做 · Tab 缩进 · Shift+Tab 反缩进
+// Ctrl+/ 注释 · 括号自动配对 · 回车自动缩进
+
+import { signal, mount } from 'xunay'
+
+const n = signal(0)
+
+mount(() => div({ class: 'counter' },
+  button({ on: { click: () => n(v => v - 1) } }, '-'),
+  span(null, () => String(n())),
+  button({ on: { click: () => n(v => v + 1) } }, '+')
+), '#app')
+`
+
+const text = signal(INIT)
+const lang = signal('xuy')
+const cursor = signal({ line: 0, col: 0 })
+const dirty = signal(false)
+
+const past = signal([INIT])
+const future = signal([])
+const MAX_HISTORY = 300
+
+// ============================================================
+// 2. Transaction 层
+// ============================================================
+function commit() {
+  const t = text()
+  const p = past()
+  if (p.length && p[p.length - 1] === t) return
+  past([...p, t].slice(-MAX_HISTORY))
+  future([])
+  dirty(true)
+}
+
+function replaceText(next) {
+  text(next)
+  scheduleRender()
+}
+
+function undo() {
+  const p = past()
+  if (p.length < 2) return
+  future([text(), ...future()])
+  past(p.slice(0, -1))
+  replaceText(p[p.length - 2])
+}
+
+function redo() {
+  const f = future()
+  if (!f.length) return
+  past([...past(), text()])
+  future(f.slice(1))
+  replaceText(f[0])
+}
+
+// ============================================================
+// 3. 派生
+// ============================================================
+const html = computed(() => highlight(text(), lang()) || '\u200b')
+const lineCount = computed(() => text().split('\n').length)
+const lineNumbers = computed(() => {
+  const n = lineCount()
+  const out = new Array(n)
+  for (let i = 0; i < n; i++) out[i] = i + 1
+  return out.join('\n')
+})
+const langList = computed(() => languages)
+
+// ============================================================
+// 4. View 层
+// ============================================================
+let bodyEl = null
+let lnEl = null
+let pendingRender = false
+
+function scheduleRender() {
+  if (pendingRender) return
+  pendingRender = true
+  requestAnimationFrame(() => {
+    pendingRender = false
+    doRender()
+  })
+}
+
+function doRender() {
+  if (!bodyEl) return
+  const sel = saveSel()
+  bodyEl.innerHTML = html()
+  restoreSel(sel)
+}
+
+function saveSel() {
+  if (!bodyEl) return null
+  const s = window.getSelection()
+  if (!s.rangeCount || !bodyEl.contains(s.anchorNode)) return null
+  const r = s.getRangeAt(0)
+  const pre = document.createRange()
+  pre.selectNodeContents(bodyEl)
+  pre.setEnd(r.startContainer, r.startOffset)
+  const start = pre.toString().length
+  pre.setEnd(r.endContainer, r.endOffset)
+  const end = pre.toString().length
+  return { start, end }
+}
+
+function restoreSel(sel) {
+  if (!sel || !bodyEl) return
+  const r = document.createRange()
+  let pos = 0, started = false
+  const walk = n => {
+    if (pos > (sel.end + 100)) return
+    if (n.nodeType === 3) {
+      const len = n.nodeValue.length
+      if (!started && pos + len >= sel.start) {
+        r.setStart(n, Math.max(0, sel.start - pos)); started = true
+      }
+      if (started && pos + len >= sel.end) {
+        r.setEnd(n, Math.max(0, sel.end - pos))
+        pos = Infinity; return
+      }
+      pos += len
+    } else {
+      for (const c of n.childNodes) if (pos < Infinity) walk(c)
+    }
+  }
+  walk(bodyEl)
+  if (started) {
+    const s = window.getSelection()
+    s.removeAllRanges()
+    s.addRange(r)
+  }
+}
+
+function cursorBefore() {
+  if (!bodyEl) return ''
+  const s = window.getSelection()
+  if (!s.rangeCount) return ''
+  const r = s.getRangeAt(0)
+  const pre = document.createRange()
+  pre.selectNodeContents(bodyEl)
+  pre.setEnd(r.startContainer, r.startOffset)
+  return pre.toString()
+}
+
+function updateCursor() {
+  const before = cursorBefore()
+  const lines = before.split('\n')
+  cursor({ line: lines.length - 1, col: lines[lines.length - 1].length })
+}
+
+function moveBack(n) {
+  const s = window.getSelection()
+  if (!s.rangeCount) return
+  const r = s.getRangeAt(0)
+  const off = r.startOffset - n
+  r.setStart(r.startContainer, off)
+  r.setEnd(r.startContainer, off)
+  s.removeAllRanges(); s.addRange(r)
+}
+
+function syncScroll(e) {
+  if (lnEl) lnEl.style.transform = 'translateY(-' + e.target.scrollTop + 'px)'
+}
+
+// ============================================================
+// 5. Keymap
+// ============================================================
+function onKeyDown(e) {
+  const mod = e.ctrlKey || e.metaKey
+
+  if (mod && !e.shiftKey && e.key === 'z') { e.preventDefault(); undo(); return }
+  if (mod && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) { e.preventDefault(); redo(); return }
+
+  if (e.key === 'Tab') {
+    e.preventDefault()
+    if (e.shiftKey) {
+      const before = cursorBefore()
+      const lines = text().split('\n')
+      const idx = before.split('\n').length - 1
+      lines[idx] = lines[idx].replace(/^ {1,2}/, '')
+      replaceText(lines.join('\n'))
+    } else {
+      document.execCommand('insertText', false, '  ')
+    }
+    commit(); return
+  }
+
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    const before = cursorBefore()
+    const lastLine = before.split('\n').pop()
+    const indent = (lastLine.match(/^\s*/) || [''])[0]
+    const extra = /[{\[(]\s*$/.test(lastLine) ? '  ' : ''
+    document.execCommand('insertText', false, '\n' + indent + extra)
+    commit(); return
+  }
+
+  if (mod && e.key === '/') {
+    e.preventDefault()
+    const before = cursorBefore()
+    const lines = text().split('\n')
+    const idx = before.split('\n').length - 1
+    const line = lines[idx]
+    lines[idx] = line.trim().startsWith('//')
+      ? line.replace(/^(\s*)\/\/\s?/, '$1')
+      : line.replace(/^(\s*)/, '$1// ')
+    replaceText(lines.join('\n'))
+    commit(); return
+  }
+
+  const PAIR = { '(': ')', '[': ']', '{': '}' }
+  if (PAIR[e.key]) {
+    e.preventDefault()
+    document.execCommand('insertText', false, e.key + PAIR[e.key])
+    moveBack(1); commit(); return
+  }
+  if (["'", '"', '`'].includes(e.key)) {
+    e.preventDefault()
+    document.execCommand('insertText', false, e.key + e.key)
+    moveBack(1); commit(); return
+  }
+
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    setTimeout(commit, 0)
+  }
+}
+
+// ============================================================
+// 6. 样式注入
+// ============================================================
+if (typeof document !== 'undefined' && !document.getElementById('xe-style')) {
+  const s = document.createElement('style')
+  s.id = 'xe-style'
+  s.textContent = `
+.xe{display:flex;flex-direction:column;height:100vh;background:#1a1b26;color:#a9b1d6;
+  font-family:"JetBrains Mono","Fira Code",ui-monospace,Menlo,monospace;font-size:13px;line-height:1.6}
+.xe-bar{display:flex;align-items:center;gap:12px;padding:8px 14px;background:#16161e;
+  border-bottom:1px solid #292e42;flex-wrap:wrap}
+.xe-title{font-weight:600;color:#7aa2f7;font-size:13px}
+.xe-langs{display:flex;gap:3px;flex-wrap:wrap}
+.xe-lang{padding:2px 8px;font-size:11px;background:transparent;border:1px solid #292e42;
+  border-radius:4px;color:#565f89;cursor:pointer;font-family:inherit}
+.xe-lang:hover{border-color:#3b4261;color:#a9b1d6}
+.xe-lang.on{background:#7aa2f7;color:#1a1b26;border-color:#7aa2f7}
+.xe-status{margin-left:auto;font-size:12px;color:#565f89;white-space:nowrap}
+.xe-main{display:flex;flex:1;overflow:hidden;position:relative}
+.xe-ln-wrap{background:#16161e;border-right:1px solid #292e42;overflow:hidden;min-width:52px;
+  padding:12px 0;position:relative}
+.xe-ln{padding:0 12px 0 8px;text-align:right;color:#3b4261;white-space:pre;user-select:none;
+  will-change:transform}
+.xe-body{flex:1;padding:12px 16px;outline:none;white-space:pre;overflow:auto;tab-size:2;
+  color:#a9b1d6;font-family:inherit;font-size:inherit;line-height:inherit;caret-color:#c0caf5}
+.h-k{color:#bb9af7}.h-s{color:#9ece6a}.h-c{color:#565f89;font-style:italic}
+.h-n{color:#ff9e64}.h-f{color:#7aa2f7}.h-t{color:#e0af68}.h-m{color:#7dcfff}
+.h-o{color:#89ddff}.h-b{color:#ff9e64}.h-d{color:#7dcfff}.h-p{color:#7aa2f7}
+`
+  document.head.appendChild(s)
+}
+
+// ============================================================
+// 7. 挂载
+// ============================================================
+onMount(() => {
+  bodyEl = document.querySelector('.xe-body')
+  lnEl = document.querySelector('.xe-ln')
+  if (!bodyEl) return
+  doRender()
+
+  let hlTimer = 0
+  const onInput = () => {
+    const t = bodyEl.textContent
+    if (t !== text()) {
+      text(t); updateCursor(); commit()
+      clearTimeout(hlTimer)
+      hlTimer = setTimeout(() => scheduleRender(), 300)
+    }
+  }
+  const onSel = () => updateCursor()
+  bodyEl.addEventListener('input', onInput)
+  bodyEl.addEventListener('scroll', syncScroll, { passive: true })
+  document.addEventListener('selectionchange', onSel)
+
+  onCleanup(() => {
+    bodyEl.removeEventListener('input', onInput)
+    bodyEl.removeEventListener('scroll', syncScroll)
+    document.removeEventListener('selectionchange', onSel)
+    clearTimeout(hlTimer)
+  })
+})
+
+mount(() => div({ class: 'xe' },
+  div({ class: 'xe-bar' },
+    span({ class: 'xe-title' }, 'XuNay Code Editor'),
+    div({ class: 'xe-langs' },
+      ...languages.map(l =>
+        button({
+          class: () => 'xe-lang' + (lang() === l ? ' on' : ''),
+          on: { click: () => { lang(l); scheduleRender() } }
+        }, l)
+      )
+    ),
+    span({ class: 'xe-status' },
+      () => '行 ' + (cursor().line + 1) + ':' + (cursor().col + 1) +
+            '  ·  ' + lineCount() + ' 行  ·  ' + lang() +
+            (dirty() ? '  ·  已修改' : '')
+    )
+  ),
+  div({ class: 'xe-main' },
+    div({ class: 'xe-ln-wrap' },
+      div({ class: 'xe-ln' }, () => lineNumbers())
+    ),
+    div({
+      class: 'xe-body',
+      contenteditable: 'true',
+      spellcheck: 'false',
+      autocomplete: 'off',
+      autocorrect: 'off',
+      autocapitalize: 'off',
+      on: { keydown: onKeyDown }
+    })
+  )
+), '#app')

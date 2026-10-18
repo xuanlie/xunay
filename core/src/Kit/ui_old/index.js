@@ -1,0 +1,11 @@
+// @xunay/kit/ui —— UI 组件入口
+export { Btn } from './btn.js'
+export { Card } from './card.js'
+export { Tag } from './tag.js'
+export { Badge } from './badge.js'
+export { Avatar, AvatarGroup } from './avatar.js'
+export { Spinner } from './spinner.js'
+export { Input } from './input.js'
+export { Switch } from './switch.js'
+export { Progress } from './progress.js'
+export { Alert } from './alert.js'

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>纯 CSS 测试</title>
+<link rel="stylesheet" href="./ui.css">
+<style>body{padding:32px;font-family:sans-serif}section{margin-bottom:24px}h3{margin:0 0 12px;font-size:16px}</style>
+</head>
+<body>
+<h1>纯 CSS 测试（不经过 JS）</h1>
+
+<section>
+  <h3>按钮</h3>
+  <button class="btn">默认</button>
+  <button class="btn btn-primary">主色</button>
+  <button class="btn btn-success">成功</button>
+  <button class="btn btn-danger">危险</button>
+  <button class="btn btn-ghost">幽灵</button>
+  <button class="btn btn-dashed">虚线</button>
+  <button class="btn btn-primary btn-lg">大按钮</button>
+  <button class="btn btn-primary btn-sm">小按钮</button>
+</section>
+
+<section>
+  <h3>卡片</h3>
+  <div style="display:flex;gap:16px">
+    <div class="card" style="flex:1">
+      <div class="card-title">卡片标题</div>
+      <div class="card-desc">描述文字</div>
+    </div>
+    <div class="card card-hover" style="flex:1">
+      <div class="card-title">悬停卡片</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h3>Tag / Badge</h3>
+  <span class="tag">默认</span>
+  <span class="tag tag-primary">主色</span>
+  <span class="tag tag-success">成功</span>
+  <span class="tag tag-warning">警告</span>
+  <span class="tag tag-danger">危险</span>
+  <span class="tag tag-primary tag-solid">实心</span>
+  <span class="tag tag-primary tag-outline">描边</span>
+  <br><br>
+  <span class="badge">5</span>
+  <span class="badge badge-primary">8</span>
+  <span class="badge badge-success badge-pulse">•</span>
+</section>
+
+<section>
+  <h3>暗色切换</h3>
+  <button class="btn" onclick="document.documentElement.toggleAttribute('data-theme');this.textContent=document.documentElement.hasAttribute('data-theme')?'变亮色':'变暗色'">变暗色</button>
+</section>
+</body>
+</html>

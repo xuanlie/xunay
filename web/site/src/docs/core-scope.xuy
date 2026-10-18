@@ -1,5 +1,5 @@
 // Scope
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -30,6 +30,6 @@ export function Doc() {
     H2("调试 scope"),
     P("devtools 的 Scopes 面板能看到活跃 scope 的树结构和 effect 数量。"),
     H2("完整示例：可复用的定时器"),
-    Code("import { signal, effect, div, span, mount } from 'xunay'\n\nfunction Timer() {\n  const n = signal(0)\n\n  // effect 自动加入当前 scope\n  effect(() => {\n    const id = setInterval(() => n(v => v + 1), 1000)\n    return () => clearInterval(id)\n  })\n\n  return div(null, '秒数: ', () => n())\n}\n\n// 卸载 Timer 时，setInterval 自动清理——因为 effect 属于 Timer 的 scope", "xuy"),
+    Code("import { signal, effect, mount } from 'xunay'\n\nfunction Timer() {\n  const n = signal(0)\n\n  // effect 自动加入当前 scope\n  effect(() => {\n    const id = setInterval(() => n(v => v + 1), 1000)\n    onCleanup(() => clearInterval(id))\n  })\n\n  return div(null, '秒数: ', () => n())\n}\n\n// 卸载 Timer 时，setInterval 自动清理——因为 effect 属于 Timer 的 scope", "xuy"),
   )
 }

@@ -1,0 +1,116 @@
+// title: 样式测试
+import { mount, signal } from 'xunay'
+
+// 主题状态
+const isDark = signal(false)
+const toggleTheme = () => {
+  isDark(!isDark())
+  document.documentElement.setAttribute('data-theme', isDark() ? 'dark' : '')
+}
+
+// 悬浮主题切换按钮
+const themeBtn = button({
+  style: 'position:fixed;top:16px;right:16px;z-index:9999;padding:8px 16px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,.2);font-weight:600',
+  on: { click: toggleTheme }
+}, () => isDark() ? '☀ 切浅色' : '☾ 切深色')
+
+mount(() => div({ style: 'padding:24px;max-width:800px;margin:0 auto' },
+  themeBtn,
+
+  h1(null, '用法 A：裸标签自动有样式'),
+  p(null, '不用加任何 class，写 <button> <input> <table> 就有样式。'),
+
+  div({ class: 'gap-4 flex flex-wrap items-center', style: 'margin:16px 0' },
+    button(null, '按钮'),
+    button({ disabled: true }, '禁用'),
+    input({ placeholder: '输入框', style: 'width:200px' }),
+    input({ type: 'checkbox' }),
+    label(null, ' 复选框'),
+    select(null, option(null, '选项 A'), option(null, '选项 B'))
+  ),
+
+  table(null,
+    thead(null, tr(null, th(null, '姓名'), th(null, '年龄'), th(null, '城市'))),
+    tbody(null,
+      tr(null, td(null, '张三'), td(null, '28'), td(null, '北京')),
+      tr(null, td(null, '李四'), td(null, '34'), td(null, '上海')),
+      tr(null, td(null, '王五'), td(null, '22'), td(null, '广州'))
+    )
+  ),
+
+  hr(null),
+
+  h1(null, '用法 B：加 class 精确控制'),
+
+  h3(null, '按钮变体'),
+  div({ class: 'gap-2 flex flex-wrap', style: 'margin:12px 0' },
+    button({ class: 'primary' }, '主色'),
+    button({ class: 'danger' }, '危险'),
+    button({ class: 'success' }, '成功'),
+    button({ class: 'ghost' }, '幽灵'),
+    button({ class: 'dashed' }, '虚线'),
+    button({ class: 'primary sm' }, '小'),
+    button({ class: 'primary lg' }, '大'),
+    button({ class: 'primary block', style: 'margin-top:12px' }, '整行按钮')
+  ),
+
+  h3(null, '输入框变体'),
+  div({ style: 'display:grid;gap:8px;margin:12px 0' },
+    input({ placeholder: '默认输入框' }),
+    input({ class: 'error', placeholder: '错误状态' }),
+    input({ class: 'sm', placeholder: '小号' }),
+    input({ class: 'lg', placeholder: '大号' })
+  ),
+
+  h3(null, '表格变体'),
+  div({ style: 'margin:12px 0' },
+    table({ class: 'striped bordered' },
+      thead(null, tr(null, th(null, 'ID'), th(null, '产品'), th(null, '价格'))),
+      tbody(null,
+        tr(null, td(null, '1'), td(null, '键盘'), td(null, '¥299')),
+        tr(null, td(null, '2'), td(null, '鼠标'), td(null, '¥99')),
+        tr(null, td(null, '3'), td(null, '耳机'), td(null, '¥599')),
+        tr(null, td(null, '4'), td(null, '显示器'), td(null, '¥1299'))
+      )
+    )
+  ),
+
+  h3(null, '徽章 / 提示 / 卡片'),
+  div({ class: 'gap-2 flex flex-wrap', style: 'margin:12px 0' },
+    span({ class: 'badge' }, '默认'),
+    span({ class: 'badge primary' }, '主色'),
+    span({ class: 'badge success' }, '成功'),
+    span({ class: 'badge danger' }, '危险'),
+    span({ class: 'badge warning' }, '警告')
+  ),
+
+  div({ class: 'alert info' }, '这是一条信息提示'),
+  div({ class: 'alert success' }, '操作成功'),
+  div({ class: 'alert warning' }, '注意'),
+  div({ class: 'alert danger' }, '出错了'),
+
+  div({ class: 'card hover', style: 'margin:16px 0' },
+    div({ class: 'card-header' },
+      div({ class: 'card-title' }, '卡片标题'),
+      div({ class: 'card-desc' }, '这是描述文字')
+    ),
+    p(null, '卡片内容'),
+    div({ class: 'card-footer' },
+      button({ class: 'primary sm' }, '确定'),
+      button({ class: 'sm', style: 'margin-left:8px' }, '取消')
+    )
+  ),
+
+  h3(null, '布局类'),
+  div({ class: 'grid-3', style: 'margin:12px 0' },
+    div({ class: 'card' }, '格子 1'),
+    div({ class: 'card' }, '格子 2'),
+    div({ class: 'card' }, '格子 3')
+  ),
+
+  h3(null, '链接 / 代码'),
+  p(null, '这是一个 ', a({ href: '#' }, '链接'), '。'),
+  p(null, '行内代码 ', code(null, 'const x = 1'), '。'),
+
+  pre(null, 'function hello() {\n  console.log("world")\n}')
+), '#app')

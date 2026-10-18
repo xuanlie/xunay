@@ -1,0 +1,42 @@
+// title: Modal 诊断 2
+import React from 'xunay/compat'
+import { Button, Modal } from 'antd'
+
+const h = React.createElement
+
+function App() {
+  const [open, setOpen] = React.useState(false)
+  const [cnt, setCnt] = React.useState(0)
+
+  // 每次渲染时读 body 里 portal 数量
+  const portalCount = document.querySelectorAll('.ant-modal-root, .ant-modal-wrap, .ant-modal-mask').length
+  const bodyCount = document.body.children.length
+
+  return h('div', { style: 'padding:16px;background:#282c34;color:#fff;font:14px monospace;min-height:100vh' },
+    h('h1', { style: { color: '#61afef' } }, 'Modal 诊断'),
+    h('div', { style: { color: '#e5c07b', padding: '8px', background: '#111', marginBottom: '12px' } },
+      h('div', null, 'open 状态: ' + open),
+      h('div', null, '点击计数: ' + cnt),
+      h('div', null, 'body 子节点数: ' + bodyCount),
+      h('div', null, '页面上的 Modal DOM: ' + portalCount),
+    ),
+
+    h(Button, {
+      type: 'primary',
+      onClick: () => { setCnt(cnt + 1); setOpen(!open) },
+      style: { marginRight: '8px' }
+    }, () => '切 open（当前 ' + open + '）'),
+
+    h(Button, { onClick: () => setCnt(cnt + 1) }, '只加计数'),
+
+    h(Modal, {
+      title: 'Test',
+      open: open,
+      onCancel: () => { setCnt(cnt + 100); setOpen(false) },
+      onOk: () => { setCnt(cnt + 1000); setOpen(false) },
+      getContainer: false,  // ← 关键：不挂 body，挂当前位置
+    }, '内容')
+  )
+}
+
+React.createRoot(document.getElementById('app')).render(h(App))

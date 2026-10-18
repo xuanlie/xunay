@@ -1,5 +1,5 @@
 // signal
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -17,7 +17,7 @@ export function Doc() {
     Code("import { signal, effect } from 'xunay'\n\nconst a = signal(1)\nconst b = signal(2)\n\neffect(() => {\n  // 这个 effect 只订阅了 a，没订阅 b\n  console.log('a =', a())\n  // b 没被读，所以 b 变化不会触发这里\n})\n\na(10)   // 触发，打印 a = 10\nb(20)   // 不触发", "xuy"),
     H2("在 JSX 风格里怎么用"),
     P("xunay 没有 JSX，但用法几乎一样——所有动态值都用函数包起来。signal 的读操作必须放在函数里，才会建立订阅关系。"),
-    Code("import { div, span, button, signal } from 'xunay'\n\nconst n = signal(0)\n\ndiv(null,\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\n  // 用 () => n() 才能订阅\n  span(null, () => 'n = ' + n()),\n  button({ on: { click: () => n(v => v + 1) } }, '+')\n)", "xuy"),
+    Code("import { signal } from 'xunay'\n\nconst n = signal(0)\n\ndiv(null,\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\n  // 用 () => n() 才能订阅\n  span(null, () => 'n = ' + n()),\n  button({ on: { click: () => n(v => v + 1) } }, '+')\n)", "xuy"),
     Warn("不要写成 span(null, n()) —— 那样会立即取值，只显示 0，后续变化不会更新。永远用 () => n()。"),
     H2("常用模式"),
     H3("计数器"),
@@ -48,7 +48,7 @@ export function Doc() {
     H2("与 React / Vue 对比"),
     Table(["操作","XuNay","React","Vue 3"], [["创建","signal(0)","useState(0)","ref(0)"],["读","n()","n","n.value"],["写","n(1)","setN(1)","n.value = 1"],["函数式","n(v => v+1)","setN(v => v+1)","n.value++"],["写时比较","自动","自动","自动"],["依赖收集","运行时","手动数组","编译期"]]),
     H2("完整示例：一个小购物车"),
-    Code("import { signal, computed, div, h1, button, span, ul, li, list, mount } from 'xunay'\n\nconst items = signal([\n  { id: 1, name: '键盘', price: 299, qty: 1 },\n  { id: 2, name: '鼠标', price: 99, qty: 2 }\n])\n\nconst total = computed(() =>\n  items().reduce((sum, i) => sum + i.price * i.qty, 0)\n)\n\nconst setQty = (id, qty) => {\n  items(list => list.map(i => i.id === id ? { ...i, qty } : i))\n}\n\nconst remove = id => {\n  items(list => list.filter(i => i.id !== id))\n}\n\nmount(() => div(null,\n  h1(null, '购物车'),\n  ul(null,\n    list(items, i => i.id, i => li(null,\n      span(null, i.name + ' · ¥' + i.price + ' × '),\n      button({ on: { click: () => setQty(i.id, i.qty - 1) } }, '-'),\n      span(null, ' ' + i.qty + ' '),\n      button({ on: { click: () => setQty(i.id, i.qty + 1) } }, '+'),\n      button({ on: { click: () => remove(i.id) } }, '删除')\n    ))\n  ),\n  div(null, '总计: ¥', () => total())\n), '#app')", "xuy"),
+    Code("import { signal, computed, list, mount } from 'xunay'\n\nconst items = signal([\n  { id: 1, name: '键盘', price: 299, qty: 1 },\n  { id: 2, name: '鼠标', price: 99, qty: 2 }\n])\n\nconst total = computed(() =>\n  items().reduce((sum, i) => sum + i.price * i.qty, 0)\n)\n\nconst setQty = (id, qty) => {\n  items(list => list.map(i => i.id === id ? { ...i, qty } : i))\n}\n\nconst remove = id => {\n  items(list => list.filter(i => i.id !== id))\n}\n\nmount(() => div(null,\n  h1(null, '购物车'),\n  ul(null,\n    list(items, i => i.id, i => li(null,\n      span(null, i.name + ' · ¥' + i.price + ' × '),\n      button({ on: { click: () => setQty(i.id, i.qty - 1) } }, '-'),\n      span(null, ' ' + i.qty + ' '),\n      button({ on: { click: () => setQty(i.id, i.qty + 1) } }, '+'),\n      button({ on: { click: () => remove(i.id) } }, '删除')\n    ))\n  ),\n  div(null, '总计: ¥', () => total())\n), '#app')", "xuy"),
     H2("下一步"),
     P("读 computed 了解如何派生新值，或直接看 effect 理解订阅机制。"),
   )

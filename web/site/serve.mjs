@@ -8,6 +8,9 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.join(__dirname, 'dist')
+const EXAMPLES = path.join(__dirname, '..', 'examples')
+const CORE_SRC = path.join(__dirname, '..', '..', 'core', 'src')
+const XUYG_TEST = path.join(__dirname, '..', '..', 'myapp', 'dist-test')
 const PORT = Number(process.argv[2]) || 8080
 
 const MIME = {
@@ -70,18 +73,33 @@ function sendCompressed(req, res, buf, mime, cacheControl) {
 
 const server = http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0])
+  let fileRoot = ROOT
+  // /examples/* → web/examples/（源目录，绕过 dist）
+  if (urlPath === '/examples' || urlPath.startsWith('/examples/')) {
+    fileRoot = EXAMPLES
+    urlPath = urlPath.slice('/examples'.length) || '/'
+  }
+  // /xunay/* → core/src/*（让浏览器直接 import xunay/kit/ui 等）
+  else if (urlPath === '/xunay' || urlPath.startsWith('/xunay/')) {
+    fileRoot = CORE_SRC
+    urlPath = urlPath.slice('/xunay'.length) || '/'
+  }
+  // /xuyg-test/* → myapp/dist-test/（Xuyg 编译产物）
+  else if (urlPath === '/xuyg-test' || urlPath.startsWith('/xuyg-test/')) {
+    fileRoot = XUYG_TEST
+    urlPath = urlPath.slice('/xuyg-test'.length) || '/'
+  }
   if (urlPath === '/') urlPath = '/index.html'
-  // 子目录：/playground/ → /playground/index.html
-  else if (urlPath.endsWith('/')) urlPath = urlPath + 'index.html'
+  else if (urlPath.endsWith('/')) urlPath = urlPath + '/index.html'
   else {
-    const direct = path.join(ROOT, urlPath)
+    const direct = path.join(fileRoot, urlPath)
     if (fs.existsSync(direct) && fs.statSync(direct).isDirectory()) {
       urlPath = urlPath + '/index.html'
     }
   }
-  const filePath = path.join(ROOT, urlPath)
+  const filePath = path.join(fileRoot, urlPath)
 
-  if (!filePath.startsWith(ROOT)) { res.writeHead(403); return res.end('Forbidden') }
+  if (!filePath.startsWith(fileRoot)) { res.writeHead(403); return res.end('Forbidden') }
 
   fs.stat(filePath, (err, st) => {
     if (err || !st.isFile()) {
@@ -93,7 +111,8 @@ const server = http.createServer((req, res) => {
         const idx = path.join(ROOT, 'index.html')
         if (fs.existsSync(idx)) {
           let html = fs.readFileSync(idx, 'utf8')
-          html = injectVersion(html, st.mtimeMs.toString(36))
+          const idxSt = fs.statSync(idx)
+          html = injectVersion(html, idxSt.mtimeMs.toString(36))
           const buf = Buffer.from(html, 'utf8')
           return sendCompressed(req, res, buf, MIME['.html'], 'no-store')
         }

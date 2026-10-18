@@ -1,5 +1,5 @@
-// 设计哲学
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+// 设计哲学（当前）
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -28,5 +28,19 @@ export function Doc() {
     Ul("需要庞大生态（Ant Design 那种）","需要 SSR + 复杂数据层","团队已经熟悉 React / Vue","需要面试时\"用了什么\""),
     H2("什么时候用"),
     Ul("个人项目 / 小工具","内部后台 / 仪表盘","想学\"响应式的本质\"","想要最小核心"),
+    H2("为什么是\"信号\"不是\"状态\""),
+    P("\"状态\"是值，\"信号\"是\"会通知的值\"。区别在于：状态需要框架去比较（diff），信号自己知道什么时候变、谁在听。"),
+    Code("// 状态：框架需要遍历对比\nconst state = { n: 0 }\n// ...\n// <div>n = {state.n}</div>   → diff 对比\n\n// 信号：值自己通知\neffect(() => {\n  textNode.textContent = 'n = ' + n()\n})\n// n 变 → 直接调用这个 effect", "xuy"),
+    H2("为什么\"组件只执行一次\""),
+    P("React 的模型是\"状态变 → 重跑组件 → 重建 vnode → diff → 更新 DOM\"。这条链上有两次遍历（重建 + diff）都可以省掉。"),
+    Code("// React：3 次遍历\n// 1. 组件函数重跑\n// 2. 生成 vnode 树\n// 3. diff 新旧树\n\n// XuNay：0 次遍历\n// 状态变 → effect 直接改 DOM", "xuy"),
+    H2("为什么核心这么小"),
+    P("核心只做一件事：把\"数据变\"映射到\"DOM 变\"。UI 组件、动画、表单、SSR 都是可选的，不塞进核心。"),
+    Table(["模块","gzip"], [["核心","7.06 KB"],["kit（UI 组件）","29.58 KB"],["devtools","15.89 KB"],["anim","15.06 KB"]]),
+    P("核心 7.06 KB——比 Preact 略大，比 Solid 小。"),
+    H2("为什么和别家都不一样"),
+    Table(["框架","核心思想","代价"], [["React","组件重渲染 + VDOM","概念多、性能一般"],["Vue","编译 + 响应式","需要编译、生态绑定"],["Solid","编译期响应式","必须编译、调试难"],["Svelte","编译 + 无运行时","编译复杂、限制多"],["XuNay","纯运行时响应式","无生态、无编译优化"]]),
+    H2("一句话总结"),
+    Quote("React 是 2013 年的回答，Vue 是 2014 年的回答，Svelte 是 2016 年的回答。xunay 是现在的回答——用最直接的方式，解决 90% 的前端问题。"),
   )
 }

@@ -1,5 +1,5 @@
 // ctx(default)
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -10,7 +10,7 @@ export function Doc() {
     H2("返回值"),
     Table(["方法","作用"], [["C.get()","读最近一次 provide 的值"],["C.provide(value, fn)","在 fn 执行期间提供值"]]),
     H2("示例"),
-    Code("import { ctx, div } from 'xunay'\n\nconst ThemeCtx = ctx('light')\n\n// 祖先\nThemeCtx.provide('dark', () => Card())\n\n// 后代\nfunction Card() {\n  const theme = ThemeCtx.get()\n  return div(null, 'theme: ' + theme)\n}", "xuy"),
+    Code("import { ctx } from 'xunay'\n\nconst ThemeCtx = ctx('light')\n\n// 祖先\nThemeCtx.provide('dark', () => Card())\n\n// 后代\nfunction Card() {\n  const theme = ThemeCtx.get()\n  return div(null, 'theme: ' + theme)\n}", "xuy"),
     H2("特性"),
     Ul("同步栈——provide 期间的 get 才有效","可嵌套——内层覆盖外层","默认值——没人 provide 时返回"),
     H2("嵌套"),

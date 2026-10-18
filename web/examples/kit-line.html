@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LineChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui;
+    padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px;
+    transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#3b82f6; transform:translateY(-1px); }
+  button:active { transform:translateY(0); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:18px; transition:background .2s,border-color .2s; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>LineChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-mode">📈 模式</button>
+  <button id="btn-rand">🎲 随机数据</button>
+  <button id="btn-add">➕ 加系列</button>
+  <button id="btn-null">⚊ 插 null</button>
+  <button id="btn-replay">▶ 重播动画</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">基础多系列</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">单系列 · 阶梯 · 参考线</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">大数据 · null 断线 · 标注</div>
+    <div id="c3"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import LineChart from './kit/charts/line.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+const mkData = (n, base) => MONTHS.slice(0, n).map(m => ({ label: m, y: rand(base, base + 80) }))
+
+let series1 = [
+  { name: '收入', data: mkData(12, 120) },
+  { name: '支出', data: mkData(12, 80) },
+  { name: '利润', data: mkData(12, 40) },
+]
+
+let modes = ['smooth', 'line', 'step']
+let modeIdx = 0
+
+const c1 = new LineChart('#c1', {
+  title: '月度趋势',
+  subtitle: '鼠标悬停查看详情 · 点击图例切换系列',
+  series: series1,
+  height: 340,
+  theme: 'light',
+  mode: 'smooth',
+  area: true,
+  onHover: (p) => p && log('hover', p.series.name, p.datum.label, p.datum.y),
+})
+
+const c2 = new LineChart('#c2', {
+  title: '系统负载',
+  series: [{ name: 'CPU', data: mkData(10, 30), mode: 'step', area: false }],
+  height: 280,
+  theme: 'light',
+  pointRadius: 5,
+  referenceLines: [
+    { y: 90, label: '告警线 90', color: '#ef4444' },
+    { y: 60, label: '基线 60', color: '#f59e0b', dash: '3 4' },
+  ],
+})
+
+let c3Data = []
+let c3 = null
+function buildC3() {
+  const raw = Array.from({ length: 40 }, (_, i) => ({
+    label: 'T' + i,
+    y: Math.sin(i * 0.3) * 40 + 60 + rand(-10, 10),
+  }))
+  raw[12].y = null; raw[13].y = null; raw[14].y = null
+  raw[25].y = null
+  c3Data = [{ name: '指标', data: raw }]
+  if (c3) c3.destroy()
+  c3 = new LineChart('#c3', {
+    title: '时序数据',
+    subtitle: 'null 值自动断开 · 标注点显示',
+    series: c3Data,
+    height: 300,
+    theme: 'light',
+    pointRadius: 3,
+    pointRadiusHover: 6,
+    annotations: [
+      { x: 8, y: 95, text: '峰值', color: '#ef4444' },
+      { x: 30, y: 40, text: '低谷', color: '#22c55e' },
+    ],
+  })
+}
+buildC3()
+
+// 工具栏
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  c1.setOptions({ theme: t })
+  c2.setOptions({ theme: t })
+  if (c3) c3.setOptions({ theme: t })
+  log('主题 →', t)
+}
+
+document.getElementById('btn-mode').onclick = () => {
+  modeIdx = (modeIdx + 1) % modes.length
+  const m = modes[modeIdx]
+  c1.setOptions({ mode: m })
+  log('模式 →', m)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  c1.setData(series1.map(s => ({ ...s, data: mkData(12, rand(30, 100)) })))
+  c2.setData([{ name: 'CPU', data: mkData(10, rand(20, 50)), mode: 'step', area: false }])
+  buildC3()
+  log('数据已刷新')
+}
+
+document.getElementById('btn-add').onclick = () => {
+  const idx = c1._series.length
+  c1.setData([...c1._series.map(s => ({ ...s })), {
+    name: '新系列 ' + (idx + 1),
+    data: mkData(12, rand(20, 80)),
+  }])
+  log('已添加系列', c1._series.length)
+}
+
+document.getElementById('btn-null').onclick = () => {
+  const s = c3Data[0]
+  const i = Math.floor(Math.random() * s.data.length)
+  s.data = s.data.map((d, j) => j === i ? { ...d, y: null } : d)
+  c3.setData(c3Data)
+  log('插入 null @', i)
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  c1.replay(); c2.replay(); if (c3) c3.replay()
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

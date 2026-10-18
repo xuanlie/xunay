@@ -56,9 +56,37 @@ function renderShow(v) {
   return h
 }
 
+const SVG_NS = 'http://www.w3.org/2000/svg'
+const SVG_TAGS = new Set([
+  'svg','g','rect','circle','ellipse','line','path','polygon','polyline',
+  'text','tspan','textPath','defs','use','symbol','clipPath','mask',
+  'linearGradient','radialGradient','stop','pattern','marker','filter',
+  'foreignObject','image','switch','view',
+  'feGaussianBlur','feColorMatrix','feOffset','feComposite','feBlend',
+  'feMorphology','feTurbulence','feDisplacementMap',
+])
+// SVG 里保留驼峰的属性名
+const SVG_KEEP_CAMEL = new Set([
+  'viewBox','preserveAspectRatio','gradientUnits','gradientTransform',
+  'patternUnits','patternContentUnits','patternTransform',
+  'clipPathUnits','maskUnits','maskContentUnits','primitiveUnits',
+  'markerWidth','markerHeight','markerUnits','markerStart','markerEnd','markerMid',
+  'refX','refY','baseFrequency','numOctaves','kernelMatrix',
+  'stdDeviation','tableValues','targetX','targetY','spreadMethod',
+])
+function toSvgAttr(name) {
+  if (SVG_KEEP_CAMEL.has(name)) return name
+  if (name === 'className') return 'class'
+  if (name === 'htmlFor') return 'for'
+  return name.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+}
+
 function el(v) {
   const { type, props, children } = v
-  const dom = document.createElement(type)
+  const isSvg = SVG_TAGS.has(type)
+  const dom = isSvg
+    ? document.createElementNS(SVG_NS, type)
+    : document.createElement(type)
   const bind = []
   let scope = null
   const gs = () => scope || (scope = createScope(runtime.currentScope))
@@ -70,7 +98,7 @@ function el(v) {
     else if (k === 'class' && pv && typeof pv === 'object') { gs(); bind.push([2, pv]) }
     else if (k === 'style' && typeof pv === 'function') { gs(); bind.push([3, pv]) }
     else if (typeof pv === 'function') { gs(); bind.push([1, k, pv]) }
-    else set(dom, k, pv)
+    else set(dom, k, pv, isSvg)
   }
 
   let ci = 0
@@ -124,12 +152,37 @@ function el(v) {
   return dom
 }
 
-function set(d, k, v) {
-  if (v == null || v === false) { d.removeAttribute(k === 'className' ? 'class' : k); return }
+function set(d, k, v, isSvg) {
+  if (v == null || v === false) {
+    const key = isSvg ? toSvgAttr(k) : (k === 'className' ? 'class' : k)
+    d.removeAttribute(key)
+    return
+  }
   if (k === 'html') { d.innerHTML = sanitize(v); return }
+  if (k === 'style' && typeof v === 'object') { Object.assign(d.style, v); return }
+  if (isSvg) {
+    // SVG 里 fill / stroke / color 走 style —— 因为 SVG 属性不认 CSS 变量
+    if (k === 'fill' || k === 'stroke' || k === 'color') {
+      d.style.setProperty(k, String(v))
+      return
+    }
+    if (k === 'fillOpacity' || k === 'fill-opacity') { d.style.setProperty('fill-opacity', String(v)); return }
+    if (k === 'strokeWidth' || k === 'stroke-width') { d.style.setProperty('stroke-width', String(v)); return }
+    if (k === 'strokeDasharray' || k === 'stroke-dasharray') { d.style.setProperty('stroke-dasharray', String(v)); return }
+    if (k === 'strokeDashoffset' || k === 'stroke-dashoffset') { d.style.setProperty('stroke-dashoffset', String(v)); return }
+    if (k === 'strokeLinecap' || k === 'stroke-linecap') { d.style.setProperty('stroke-linecap', String(v)); return }
+    if (k === 'strokeLinejoin' || k === 'stroke-linejoin') { d.style.setProperty('stroke-linejoin', String(v)); return }
+    if (k === 'class' || k === 'className') { d.setAttribute('class', v); return }
+    if (k === 'textContent' || k === 'innerText') { d.textContent = v; return }
+    d.setAttribute(toSvgAttr(k), String(v))
+    return
+  }
+  // HTML 分支：value 相同不重设，防光标跳/视觉叠加
+  if (k === 'value' && 'value' in d && d.value === v) return
+  if (k === 'checked' && 'checked' in d && d.checked === v) return
+  // HTML 分支（原逻辑）
   if (k === 'class' || k === 'className') d.className = v
   else if (k === 'value') d.value = v
-  else if (k === 'style' && typeof v === 'object') Object.assign(d.style, v)
   else if (k === 'checked' || k === 'disabled' || k === 'selected') d[k] = !!v
   else d.setAttribute(k, v)
 }

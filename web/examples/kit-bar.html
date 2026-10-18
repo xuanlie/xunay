@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BarChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui;
+    padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px;
+    transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#3b82f6; transform:translateY(-1px); }
+  button:active { transform:translateY(0); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>BarChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-layout">📊 布局</button>
+  <button id="btn-dir">🔁 方向</button>
+  <button id="btn-value">🔢 值标签</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-add">➕ 加系列</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">多系列 · 分组柱</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">堆叠 · 值标签</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">水平 · 负值 · 参考线</div>
+    <div id="c3"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import BarChart from './kit/charts/bar.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月']
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+const mkData = (n, base) => MONTHS.slice(0, n).map(m => ({ label: m, value: rand(base, base + 80) }))
+
+let series1 = [
+  { name: '产品 A', data: mkData(8, 120) },
+  { name: '产品 B', data: mkData(8, 80) },
+  { name: '产品 C', data: mkData(8, 60) },
+]
+let series2 = [
+  { name: '移动端', data: mkData(8, 40) },
+  { name: '桌面端', data: mkData(8, 60) },
+  { name: '平板', data: mkData(8, 30) },
+]
+let series3 = [
+  { name: '盈亏', data: MONTHS.slice(0, 8).map(m => ({ label: m, value: rand(-90, 90) })) },
+]
+
+const c1 = new BarChart('#c1', {
+  title: '季度销量',
+  subtitle: '分组布局 · 单柱高亮',
+  series: series1,
+  height: 340,
+  layout: 'grouped',
+  highlight: 'single',
+  onHover: p => p && log('hover', p.series.name, p.datum.label, p.datum.value),
+  onBarClick: (d, i) => log('click', d.label, d.value),
+})
+
+const c2 = new BarChart('#c2', {
+  title: '渠道构成',
+  series: series2,
+  height: 300,
+  layout: 'stacked',
+  showValue: true,
+  radius: 4,
+  highlight: 'column',
+})
+
+let c3 = new BarChart('#c3', {
+  title: '月度盈亏',
+  series: series3,
+  height: 280,
+  direction: 'horizontal',
+  referenceLines: [
+    { value: 0, color: '#94a3b8' },
+    { value: 60, label: '目标 60', color: '#22c55e', dash: '4 4' },
+    { value: -60, label: '预警 -60', color: '#ef4444', dash: '4 4' },
+  ],
+})
+
+let dark = false
+let layouts = ['grouped', 'stacked', 'normal']
+let layoutIdx = 0
+let dirs = ['vertical', 'horizontal']
+let dirIdx = 0
+let showValue = false
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  c1.setOptions({ theme: t })
+  c2.setOptions({ theme: t })
+  c3.setOptions({ theme: t })
+  log('主题 →', t)
+}
+
+document.getElementById('btn-layout').onclick = () => {
+  layoutIdx = (layoutIdx + 1) % layouts.length
+  const l = layouts[layoutIdx]
+  c1.setOptions({ layout: l })
+  c2.setOptions({ layout: l })
+  log('布局 →', l)
+}
+
+document.getElementById('btn-dir').onclick = () => {
+  dirIdx = (dirIdx + 1) % dirs.length
+  const d = dirs[dirIdx]
+  c1.setOptions({ direction: d })
+  c3.setOptions({ direction: d })
+  log('方向 →', d)
+}
+
+document.getElementById('btn-value').onclick = () => {
+  showValue = !showValue
+  c1.setOptions({ showValue })
+  c3.setOptions({ showValue })
+  log('值标签 →', showValue)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  c1.setData({ series: series1.map(s => ({ ...s, data: mkData(8, rand(40, 100)) })) })
+  c2.setData({ series: series2.map(s => ({ ...s, data: mkData(8, rand(20, 70)) })) })
+  c3.setData({ series: series3.map(s => ({ ...s, data: MONTHS.slice(0, 8).map(m => ({ label: m, value: rand(-90, 90) })) })) })
+  log('已刷新')
+}
+
+document.getElementById('btn-add').onclick = () => {
+  const idx = c1._series.length
+  c1.setData({
+    series: [...c1._series.map(s => ({ ...s })), {
+      name: '系列 ' + (idx + 1),
+      data: mkData(8, rand(30, 80)),
+    }],
+  })
+  log('系列数', c1._series.length)
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  c1.replay(); c2.replay(); c3.replay()
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+// title: 上半部分
+import { mount } from 'xunay'
+import {
+  Btn, Row, Col, Text, Card, Divider, Space, Tag, Badge,
+  Input, Textarea, Select, Checkbox, Radio, Switch, NumberInput,
+  DatePicker, TimePicker, SearchInput, PasswordStrength, Rate,
+  ColorPicker, Slider, Mentions, Transfer, Cascader,
+  Alert, Modal, Spinner, Empty, Progress, Avatar, Result,
+  Skeleton, Count, Stat, Descriptions, ItemCard, QRCode,
+  Typography, Comment, Watermark, Ribbon, Code, Keyboard, Highlight, Ellipsis,
+  Tabs, Breadcrumb, Pagination, Steps, Accordion,
+  Table, List, Timeline, Tree, Menu,
+} from 'xunay/kit'
+
+mount(() => div({ style: 'padding:24px;background:#111;color:#0f0;font:14px monospace' },
+  div(null, '=== 上半：基础 / 表单 / 展示 / 导航 / 树 ==='),
+  div(null, '1. Btn:'), Btn(null, 'x'),
+  div(null, '2. Input:'), Input({ placeholder: 'x' }),
+  div(null, '3. Switch:'), Switch({ label: 'x' }),
+  div(null, '4. Alert:'), Alert({ title: 'A' }, 'a'),
+  div(null, '5. Progress:'), Progress({ value: 50 }),
+  div(null, '6. Tabs:'), Tabs({ items: [{ key: 'a', title: 'A' }] }),
+  div(null, '7. Tree:'), Tree({ data: [{ key: 'a', label: 'a' }] }),
+  div(null, '8. Table:'), Table({ columns: [{ title: 'a', key: 'a' }], data: [] }),
+  div(null, '9. Timeline:'), Timeline({ items: [] }),
+  div(null, '10. Rate:'), Rate({ value: 3 }),
+  div(null, '=== 上半通过 ===')
+), '#app')

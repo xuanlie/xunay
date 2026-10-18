@@ -1,0 +1,32 @@
+// title: react-query
+import React from 'xunay/compat'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+const h = React.createElement
+
+const qc = new QueryClient()
+
+function Todos() {
+  const { isLoading, error, data, isFetching } = useQuery({
+    queryKey: ['todos'],
+    queryFn: () => fetch('https://jsonplaceholder.typicode.com/todos?_limit=5')
+      .then(r => r.json()),
+  })
+
+  if (isLoading) return h('div', null, '加载中...')
+  if (error) return h('div', { style: { color: '#e06c75' } }, '错误: ' + error.message)
+  return h('div', null,
+    h('div', { style: { color: '#98c379', marginBottom: '8px' } },
+      '数据 (5 条)' + (isFetching ? ' · 刷新中' : '')),
+    h('ul', null, data.map(t => h('li', { key: t.id }, '#' + t.id + ' — ' + t.title)))
+  )
+}
+
+function App() {
+  return h(QueryClientProvider, { client: qc },
+    h('div', { style: 'padding:24px;background:#282c34;color:#abb2bf;font-family:system-ui;min-height:100vh' },
+      h('h1', { style: { color: '#61afef' } }, 'react-query'),
+      h(Todos)
+    )
+  )
+}
+React.createRoot(document.getElementById('app')).render(h(App))

@@ -1,0 +1,81 @@
+// 主内容：按路由懒加载对应文档（带缓存）
+import { div, signal, effect, onCleanup } from '/tmp/xuyg-test/xunay.js'
+import { route } from '../router.js'
+import { docMap } from '../docs-index.js'
+import { Home } from '../pages/Home.js'
+
+// 模块级缓存：所有加载过的文档永远保存
+const docCache = new Map()
+
+export function Content() {
+  const curDoc = signal(null)
+  const loading = signal(false)
+  const err = signal(null)
+
+  effect(() => {
+    const r = route()
+    if (r === '/' || r === '') {
+      curDoc(() => Home)
+      loading(false)
+      err(null)
+      return
+    }
+    const key = r.slice(1)
+    const loader = docMap[key]
+    if (!loader) { curDoc(null); err('no-loader: ' + key); loading(false); return }
+
+    // 命中缓存：同步切换，零延迟
+    if (docCache.has(key)) {
+      curDoc(docCache.get(key))
+      loading(false)
+      err(null)
+      return
+    }
+
+    let cancelled = false
+    onCleanup(() => { cancelled = true })
+    loading(true); err(null); curDoc(null)
+
+    loader().then(Doc => {
+      if (cancelled) return
+      if (typeof Doc !== 'function') {
+        err('bad-doc: ' + key + ' got=' + typeof Doc)
+        loading(false)
+        return
+      }
+      // 缓存：包一层避免 xunay 把 Doc 当 updater 调用
+      const wrapped = () => Doc
+      docCache.set(key, wrapped)
+      curDoc(wrapped)
+      loading(false)
+    }).catch(e => {
+      if (cancelled) return
+      err('load-fail: ' + key + ' | ' + (e && (e.message || e.name) || String(e)))
+      loading(false)
+    })
+  })
+
+  return (() => {
+  const _div0 = document.createElement("div")
+  _div0.className = 'content'
+  const _t1 = document.createElement('span')
+  _t1.style.display = 'contents'
+  __rt__.bindText(_t1, () => {
+      const r = route()
+      if (loading()) return div({ class: 'doc-loading' }, '加载中...')
+      if (err()) return div({ class: 'not-found' },
+        div({ class: 'nf-code' }, 'ERR'),
+        div({ class: 'nf-text' }, err()),
+        div({ class: 'nf-hint' }, 'route: ' + r)
+      )
+      const f = curDoc()
+      if (!f) return div({ class: 'not-found' },
+        div({ class: 'nf-code' }, '404'),
+        div({ class: 'nf-text' }, '找不到页面：' + r)
+      )
+      return f()
+    })
+  _div0.appendChild(_t1)
+  return _div0
+})()
+}

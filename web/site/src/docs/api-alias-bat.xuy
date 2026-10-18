@@ -1,5 +1,5 @@
 // bat 别名
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -10,6 +10,6 @@ export function Doc() {
     H2("说明"),
     P("batch 的短别名。"),
     H2("示例"),
-    Code("import { s, bat, div } from 'xunay'\n\nconst a = s(0), b = s(0)\n\nbat(() => { a(1); b(2) })", "xuy"),
+    Code("import { s, bat } from 'xunay'\n\nconst a = s(0), b = s(0)\n\nbat(() => { a(1); b(2) })", "xuy"),
   )
 }

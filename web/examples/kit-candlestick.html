@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CandlestickChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>CandlestickChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-vol">📊 成交量</button>
+  <button id="btn-ma">📈 MA 均线</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">股票 K 线 · 60 日</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">加密货币 · 无 MA</div>
+    <div id="c2"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import CandlestickChart from './kit/charts/candlestick.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+// 生成假 K 线数据
+function mkOHLC(n, start, volatility) {
+  const out = []
+  let price = start
+  const d = new Date()
+  for (let i = 0; i < n; i++) {
+    const change = (Math.random() - 0.48) * volatility
+    const open = price
+    const close = Math.max(1, open + change)
+    const high = Math.max(open, close) + Math.random() * volatility * 0.4
+    const low = Math.min(open, close) - Math.random() * volatility * 0.4
+    price = close
+    const dt = new Date(d)
+    dt.setDate(dt.getDate() - (n - i - 1))
+    out.push({
+      label: `${dt.getMonth() + 1}/${dt.getDate()}`,
+      open: +open.toFixed(2),
+      high: +high.toFixed(2),
+      low: +low.toFixed(2),
+      close: +close.toFixed(2),
+      volume: Math.round(1000 + Math.random() * 9000),
+    })
+  }
+  return out
+}
+
+let data1 = mkOHLC(60, 100, 3)
+let data2 = mkOHLC(40, 35000, 1200)
+
+const c1 = new CandlestickChart('#c1', {
+  title: 'XX 股票',
+  subtitle: '60 日 K 线 · MA5 / MA10 / MA20',
+  data: data1,
+  height: 460,
+  showVolume: true,
+  showMA: true,
+  onHover: p => p && log('hover', p.datum.label, p.datum.close),
+  onClick: (d, i) => log('click', d.label, 'O:' + d.open, 'C:' + d.close),
+})
+
+const c2 = new CandlestickChart('#c2', {
+  title: 'BTC/USDT',
+  data: data2,
+  height: 420,
+  showVolume: false,
+  showMA: false,
+  showLegend: false,
+  yFormat: v => '$' + v.toLocaleString(),
+})
+
+let dark = false
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-vol').onclick = () => {
+  const v = !c1.opts.showVolume
+  c1.setOptions({ showVolume: v })
+  log('成交量 →', v)
+}
+
+document.getElementById('btn-ma').onclick = () => {
+  const v = !c1.opts.showMA
+  c1.setOptions({ showMA: v })
+  log('MA 均线 →', v)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  data1 = mkOHLC(60, 100 + Math.random() * 20, 3)
+  data2 = mkOHLC(40, 30000 + Math.random() * 8000, 1200)
+  c1.setData(data1)
+  c2.setData(data2)
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

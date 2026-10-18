@@ -1,5 +1,5 @@
 // 别名
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -24,7 +24,7 @@ export function Doc() {
     H2("为什么只有这些别名"),
     P("xunay 的别名只覆盖\"高频 + 短\"的 API。标签工厂（div、span）已经很短，不需要别名；生僻 API（trans、lazy）用全名更好读。"),
     H2("完整示例"),
-    Code("// 用别名写一个计数器\nimport { s, c, f, m, div, button, span } from 'xunay'\n\nconst n = s(0)\nconst double = c(() => n() * 2)\n\nf(() => console.log('n 变了:', n()))\n\nm(() => div(null,\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\n  span(null, () => n()),\n  button({ on: { click: () => n(v => v + 1) } }, '+'),\n  span(null, () => '双倍: ' + double())\n), '#app')", "xuy"),
+    Code("// 用别名写一个计数器\nimport { s, c, f, m } from 'xunay'\n\nconst n = s(0)\nconst double = c(() => n() * 2)\n\nf(() => console.log('n 变了:', n()))\n\nm(() => div(null,\n  button({ on: { click: () => n(v => v - 1) } }, '-'),\n  span(null, () => n()),\n  button({ on: { click: () => n(v => v + 1) } }, '+'),\n  span(null, () => '双倍: ' + double())\n), '#app')", "xuy"),
     H2("和原名的对照表"),
     Table(["写法","等价"], [["s(0)","signal(0)"],["c(fn)","computed(fn)"],["f(fn)","effect(fn)"],["bat(fn)","batch(fn)"],["m(comp, target)","mount(comp, target)"],["app(comp, target)","mount(comp, target)"],["l(arr, key, fn)","list(arr, key, fn)"],["each(arr, key, fn)","list(arr, key, fn)"]]),
   )

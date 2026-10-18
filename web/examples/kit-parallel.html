@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>ParallelChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>ParallelChart · 平行坐标</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-mode">〰 模式</button>
+<button id="btn-clear">🧹 清刷选</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">球员数据 · 6 维 · 拖拽轴刷选</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">车型对比 · 5 维</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import ParallelChart from './kit/charts/parallel.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const mkPlayer=()=>{
+  const names=['Alice','Bob','Carol','Dave','Eve','Frank','Grace','Henry','Ivy','Jack','Kate','Leo','Mia','Noah','Olivia','Paul','Quinn','Rose','Sam','Tina']
+  return names.map(name=>({
+    name,
+    得分: rand(40, 95),
+    助攻: rand(20, 90),
+    篮板: rand(15, 85),
+    命中率: rand(30, 80),
+    抢断: rand(10, 75),
+    失误: rand(5, 60),
+  }))
+}
+const mkCar=()=>{
+  const models=['特斯拉 Model 3','比亚迪 汉','蔚来 ET5','小鹏 P7','理想 L7','极氪 001','问界 M5','智己 L7','埃安 S','深蓝 SL03']
+  return models.map(m=>({
+    name: m,
+    续航: rand(400, 750),
+    马力: rand(200, 550),
+    加速: +(rand(30, 60)/10).toFixed(1),
+    价格: rand(20, 50),
+    快充: rand(25, 60),
+  }))
+}
+let p1=mkPlayer(), p2=mkCar()
+const c1 = new ParallelChart('#c1',{
+  title:'球员能力画像',
+  subtitle:'拖拽轴上区域可刷选 · 每条线是一名球员',
+  data:p1,
+  categoryKey:'name',
+  dimensions:[
+    { key:'得分', label:'得分' },
+    { key:'助攻', label:'助攻' },
+    { key:'篮板', label:'篮板' },
+    { key:'命中率', label:'命中率(%)' },
+    { key:'抢断', label:'抢断' },
+    { key:'失误', label:'失误', invert:true },
+  ],
+  height:400,
+  brushable:true,
+  onHover: r => r && log('hover', r.name, r.得分),
+  onLineClick: (r) => log('click', r.name),
+})
+const c2 = new ParallelChart('#c2',{
+  title:'新能源车型对比',
+  data:p2,
+  categoryKey:'name',
+  dimensions:[
+    { key:'续航', label:'续航(km)' },
+    { key:'马力', label:'马力' },
+    { key:'加速', label:'0-100(s)', invert:true },
+    { key:'价格', label:'价格(万)', invert:true },
+    { key:'快充', label:'快充(min)', invert:true },
+  ],
+  height:360,
+  brushable:true,
+  mode:'line',
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let modes=['smooth','line'], mi=0
+document.getElementById('btn-mode').onclick=()=>{mi=(mi+1)%modes.length;c1.setOptions({mode:modes[mi]});log('模式 →',modes[mi])}
+document.getElementById('btn-clear').onclick=()=>{c1.clearBrush();c2.clearBrush();log('已清刷选')}
+document.getElementById('btn-rand').onclick=()=>{p1=mkPlayer();p2=mkCar();c1.setData(p1);c2.setData(p2);log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

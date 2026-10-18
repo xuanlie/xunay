@@ -1,0 +1,17 @@
+@keyframes x-card-shimmer {
+  0% { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
+}
+@keyframes x-card-spin { to { transform: rotate(360deg) } }
+
+.x-card {
+  font-family: inherit;
+}
+.x-card[data-stripe="top"] { padding-top: calc(var(--x-card-pad, 16px) + 3px) }
+.x-card[data-stripe="left"] { padding-left: calc(var(--x-card-pad, 16px) + 4px) }
+
+.x-card-tone-success { --x-card-stripe: #10b981 }
+.x-card-tone-warning { --x-card-stripe: #f59e0b }
+.x-card-tone-danger  { --x-card-stripe: #ef4444 }
+.x-card-tone-info    { --x-card-stripe: #06b6d4 }
+.x-card-tone-brand   { --x-card-stripe: var(--x-primary, #3b82f6) }

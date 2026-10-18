@@ -1,5 +1,5 @@
 // 属性
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -47,6 +47,6 @@ export function Doc() {
     H3("陷阱 3：html 属性"),
     Code("div({ html: '<b>你好</b>' })                  // ✓ 白名单过滤\ndiv({ html: userInput })                   // ⚠ 白名单外标签被剥离\ndiv({ html: () => escapeHtml(userInput) })  // ✓ 想显示纯文本用这个", "xuy"),
     H2("完整示例：可搜索输入框"),
-    Code("import { div, input, ul, li, span, signal, list, show, mount } from 'xunay'\n\nfunction Search() {\n  const q = signal('')\n  const focus = signal(false)\n  const items = ['苹果', '香蕉', '橙子', '葡萄']\n  const results = () => items.filter(i => i.includes(q()))\n\n  return div({ class: () => 'search ' + (focus() ? 'focus' : '') },\n    input({\n      class: 'search-input',\n      placeholder: '搜索…',\n      value: () => q(),\n      on: {\n        input: e => q(e.target.value),\n        focus: () => focus(true),\n        blur: () => setTimeout(() => focus(false), 200),\n        keydown: e => { if (e.key === 'Escape') q('') }\n      }\n    }),\n    show(() => focus() && q(), () =>\n      ul({ class: 'results' },\n        list(results(), i => i, i => li(null, i))\n      )\n    )\n  )\n}\n\nmount(() => Search(), '#app')", "xuy"),
+    Code("import { signal, list, show, mount } from 'xunay'\n\nfunction Search() {\n  const q = signal('')\n  const focus = signal(false)\n  const items = ['苹果', '香蕉', '橙子', '葡萄']\n  const results = () => items.filter(i => i.includes(q()))\n\n  return div({ class: () => 'search ' + (focus() ? 'focus' : '') },\n    input({\n      class: 'search-input',\n      placeholder: '搜索…',\n      value: () => q(),\n      on: {\n        input: e => q(e.target.value),\n        focus: () => focus(true),\n        blur: () => setTimeout(() => focus(false), 200),\n        keydown: e => { if (e.key === 'Escape') q('') }\n      }\n    }),\n    show(() => focus() && q(), () =>\n      ul({ class: 'results' },\n        list(results(), i => i, i => li(null, i))\n      )\n    )\n  )\n}\n\nmount(() => Search(), '#app')", "xuy"),
   )
 }

@@ -1,0 +1,17 @@
+@keyframes x-spinner-spin { to { transform: rotate(360deg) } }
+@keyframes x-spinner-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: .4 }
+  40% { transform: scale(1); opacity: 1 }
+}
+@keyframes x-spinner-pulse {
+  0% { transform: scale(0.6); opacity: .7 }
+  100% { transform: scale(1.6); opacity: 0 }
+}
+@keyframes x-spinner-bar {
+  0%, 100% { transform: scaleY(0.4) }
+  50% { transform: scaleY(1) }
+}
+@keyframes x-spinner-fade {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}

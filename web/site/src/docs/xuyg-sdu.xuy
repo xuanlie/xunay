@@ -1,0 +1,17 @@
+// sdu 模板
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("sdu · 模板调用"),
+    P("sdu 有两种用法：调用内置模板（一行一个），或者用 <N> 循环生成自定义结构。"),
+    H2("用法 1：内置模板"),
+    Code("sdu NavBar({ brand: 'ShopX', search: '搜索商品' })\nsdu GoodsList({ items: goods(12) })\nsdu Empty()", "js"),
+    H2("用法 2：自定义循环"),
+    Code("const LIST = goods(12)\n\npag Home() {\n  div(null,\n    sdu<12> GoodsCard($LIST)({\n      img: @img\n      h3: @name\n      p: '¥' + @price\n      span: { text: '加入购物车', c: 'btn', '@click.stop': g => addCart(g) }\n    })\n  )\n}", "js"),
+    H2("格式说明"),
+    Code("sdu<数量> 模板名($数据源)({\n  子元素: 表达式或属性对象\n})", "txt"),
+    Table(["部分","说明"], [["<N>","生成 N 个，不写默认 1"],["$数据源","循环数组，如 $LIST 或 goods(12)"],["@字段","取当前项字段，如 @img / @name"],["@全局","无数据源时查全局 signal / computed / 函数"]]),
+    Tip("查找规则：有 $数据源时先查字段，找不到再查全局。"),
+  )
+}

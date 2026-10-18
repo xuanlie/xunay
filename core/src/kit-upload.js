@@ -30,7 +30,11 @@ export function DragUpload(props) {
     }
   },
     input({ type: 'file', accept, multiple, style: { display: 'none' }, on: { change: e => handle(e.target.files) } }),
-    div({ style: { fontSize: '40px', marginBottom: '10px' } }, '📁'),
+    div({ style: { marginBottom: '10px', display: 'flex', justifyContent: 'center', color: 'var(--x-text-mute)' } },
+      createElement('svg', { width: 48, height: 48, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        createElement('path', { d: 'M3 7h18v13H3z' }),
+        createElement('path', { d: 'M3 7l2-4h14l2 4' })
+      )),
     div({ style: { color: 'var(--x-text-dim)' } }, text)
   )
 }
@@ -62,7 +66,12 @@ export function ImageUpload(props) {
       }),
       show(() => url(), () => img( { src: url(), style: { maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' } })),
       show(() => !url(), () => div(null,
-        div({ style: { fontSize: '32px', marginBottom: '6px' } }, '🖼️'),
+        div({ style: { marginBottom: '6px', display: 'flex', justifyContent: 'center', color: 'var(--x-text-mute)' } },
+          createElement('svg', { width: 40, height: 40, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+            createElement('rect', { x: 3, y: 3, width: 18, height: 18, rx: 2 }),
+            createElement('circle', { cx: 9, cy: 9, r: 2 }),
+            createElement('path', { d: 'M21 15l-5-5L5 21' })
+          )),
         div({ style: { color: 'var(--x-text-dim)' } }, '点击选择图片')
       ))
     ),

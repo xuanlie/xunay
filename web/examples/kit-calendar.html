@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>CalendarHeatmap</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>CalendarHeatmap · 日历热力图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">GitHub 提交记录 · 近 1 年</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">每日步数 · 自定义配色</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import CalendarHeatmap from './kit/charts/calendar.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+function dayKey(d){
+  const dt=d instanceof Date?d:new Date(d)
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+}
+function addDays(d,n){const dt=new Date(d);dt.setDate(dt.getDate()+n);dt.setHours(0,0,0,0);return dt}
+// 生成近一年的假数据
+const mkCommits = () => {
+  const out = []
+  const today = new Date(); today.setHours(0,0,0,0)
+  for (let i = 0; i < 365; i++) {
+    const d = addDays(today, -i)
+    const dow = d.getDay()
+    // 周末少一些
+    const base = dow === 0 || dow === 6 ? 0.3 : 1
+    const v = Math.random() < 0.15 ? 0 : Math.round(Math.pow(Math.random(), 2) * 20 * base)
+    out.push({ date: dayKey(d), value: v })
+  }
+  return out
+}
+const mkSteps = () => {
+  const out = []
+  const today = new Date(); today.setHours(0,0,0,0)
+  for (let i = 0; i < 365; i++) {
+    const d = addDays(today, -i)
+    const dow = d.getDay()
+    const base = dow === 0 || dow === 6 ? 12000 : 6000
+    const v = Math.round(base + (Math.random() - 0.5) * 8000)
+    out.push({ date: dayKey(d), value: Math.max(0, v) })
+  }
+  return out
+}
+let data1 = mkCommits()
+let data2 = mkSteps()
+const c1 = new CalendarHeatmap('#c1',{
+  title:'GitHub 提交',
+  subtitle:'整年贡献记录 · 悬停查看',
+  data: data1,
+  cellSize: 12,
+  colorRamp: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+  colorRampDark: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+  onHover: (d,v) => d && log('hover', dayKey(d), v),
+  onCellClick: (d,v) => log('click', dayKey(d), v),
+})
+const c2 = new CalendarHeatmap('#c2',{
+  title:'每日步数',
+  data: data2,
+  cellSize: 11,
+  colorRamp: ['#fef3c7', '#fcd34d', '#f59e0b', '#d97706', '#7c2d12'],
+  colorRampDark: ['#7c2d12', '#d97706', '#f59e0b', '#fcd34d', '#fef3c7'],
+  tooltipFormat: (d,v) => `${dayKey(d)} · ${v.toLocaleString()} 步`,
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-rand').onclick=()=>{data1=mkCommits();data2=mkSteps();c1.setData(data1);c2.setData(data2);log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

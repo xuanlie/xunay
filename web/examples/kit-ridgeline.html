@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>RidgelineChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>RidgelineChart · 山脊图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-color">🎨 配色</button>
+<button id="btn-overlap">🌊 重叠度</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">月度温度分布</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">各国人均收入（对数）</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import RidgelineChart from './kit/charts/ridgeline.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+function randn(mean, sd) {
+  let u = 0, v = 0
+  while (u === 0) u = Math.random()
+  while (v === 0) v = Math.random()
+  return mean + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+}
+function mkTemps() {
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+  return months.map((m, i) => {
+    const mean = 5 + 15 * Math.sin((i - 3) / 12 * Math.PI * 2)
+    return { label: m, values: Array.from({length: 60}, () => mean + randn(0, 4)) }
+  })
+}
+function mkIncome() {
+  return [
+    { label: '美国', values: Array.from({length: 100}, () => Math.log(60000 + randn(0, 20000))) },
+    { label: '英国', values: Array.from({length: 100}, () => Math.log(42000 + randn(0, 12000))) },
+    { label: '德国', values: Array.from({length: 100}, () => Math.log(48000 + randn(0, 14000))) },
+    { label: '日本', values: Array.from({length: 100}, () => Math.log(38000 + randn(0, 10000))) },
+    { label: '中国', values: Array.from({length: 100}, () => Math.log(15000 + randn(0, 8000))) },
+    { label: '印度', values: Array.from({length: 100}, () => Math.log(5000 + randn(0, 3000))) },
+  ]
+}
+const c1 = new RidgelineChart('#c1',{
+  title:'月度温度',
+  subtitle:'KDE 核密度 · 12 层',
+  groups: mkTemps(),
+  height:520,
+  overlap:0.6,
+  xFormat: v => v.toFixed(0) + '°C',
+  onHover: p => p && log('hover', p.group.label, '均温', p.stats.mean.toFixed(1)),
+  onRidgeClick: (g,i) => log('click', g.label),
+})
+const c2 = new RidgelineChart('#c2',{
+  title:'人均收入分布',
+  subtitle:'对数刻度 · 渐变色',
+  groups: mkIncome(),
+  height:440,
+  colorMode:'ramp',
+  ramp:['#fef3c7','#f59e0b','#7c2d12'],
+  overlap:0.55,
+  xFormat: v => '$' + Math.round(Math.exp(v)).toLocaleString(),
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let modes=['palette','ramp','single'], mi=0
+document.getElementById('btn-color').onclick=()=>{mi=(mi+1)%modes.length;const m=modes[mi];c1.setOptions({colorMode:m, ramp:['#dbeafe','#60a5fa','#1e3a8a']});log('配色 →',m)}
+let overlaps=[0.6,0.3,0.8], oi=0
+document.getElementById('btn-overlap').onclick=()=>{oi=(oi+1)%overlaps.length;const o=overlaps[oi];c1.setOptions({overlap:o});log('重叠 →',o)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData({groups:mkTemps()});c2.setData({groups:mkIncome()});log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

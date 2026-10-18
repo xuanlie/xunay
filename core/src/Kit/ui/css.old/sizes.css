@@ -1,0 +1,229 @@
+/* XuNay UI · sizes.css */
+
+/* === 工具类 === */
+.w-full { width: 100%; }
+
+.h-full { height: 100%; }
+
+.h-screen { height: 100vh; }
+
+.m-auto { margin: auto; }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.mt-0 { margin-top: 0 }
+
+.mt-1 { margin-top: 4px }
+
+.mt-2 { margin-top: 8px }
+
+.mt-3 { margin-top: 12px }
+
+.mt-4 { margin-top: 16px }
+
+.mt-6 { margin-top: 24px }
+
+.mb-0 { margin-bottom: 0 }
+
+.mb-1 { margin-bottom: 4px }
+
+.mb-2 { margin-bottom: 8px }
+
+.mb-3 { margin-bottom: 12px }
+
+.mb-4 { margin-bottom: 16px }
+
+.mb-6 { margin-bottom: 24px }
+
+.p-0 { padding: 0 }
+
+.p-1 { padding: 4px }
+
+.p-2 { padding: 8px }
+
+.p-3 { padding: 12px }
+
+.p-4 { padding: 16px }
+
+.p-6 { padding: 24px }
+
+.inline-flex { display: inline-flex }
+
+.block { display: block }
+
+.inline-block { display: inline-block }
+
+.hidden { display: none }
+
+.items-center { align-items: center }
+
+.items-start { align-items: flex-start }
+
+.items-end { align-items: flex-end }
+
+.justify-center { justify-content: center }
+
+.justify-between { justify-content: space-between }
+
+.justify-end { justify-content: flex-end }
+
+.gap-1 { gap: 4px }
+
+.gap-2 { gap: 8px }
+
+.gap-3 { gap: 12px }
+
+.gap-4 { gap: 16px }
+
+.gap-6 { gap: 24px }
+
+.text-xs { font-size: 11px }
+
+.text-sm { font-size: 13px }
+
+.text-base { font-size: 15px }
+
+.text-lg { font-size: 18px }
+
+.text-xl { font-size: 22px }
+
+.text-2xl { font-size: 28px }
+
+.font-normal { font-weight: 400 }
+
+.font-medium { font-weight: 500 }
+
+.font-bold { font-weight: 700 }
+
+.text-left { text-align: left }
+
+.text-center { text-align: center }
+
+.text-right { text-align: right }
+
+.text-dim { color: var(--x-text-dim) }
+
+.text-mute { color: var(--x-text-mute) }
+
+.text-primary { color: var(--x-primary) }
+
+.text-danger { color: var(--x-danger) }
+
+.text-success { color: var(--x-success) }
+
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+
+.break { word-break: break-word }
+
+.uppercase { text-transform: uppercase }
+
+.underline { text-decoration: underline }
+
+.rounded { border-radius: var(--x-radius) }
+
+.rounded-sm { border-radius: 4px }
+
+.rounded-lg { border-radius: var(--x-radius-lg) }
+
+.rounded-full { border-radius: 999px }
+
+.shadow { box-shadow: var(--x-shadow) }
+
+.shadow-md { box-shadow: var(--x-shadow-md) }
+
+.shadow-lg { box-shadow: var(--x-shadow-lg) }
+
+.shadow-none { box-shadow: none }
+
+.border { border: 1px solid var(--x-border) }
+
+.border-0 { border: 0 }
+
+.border-t { border-top: 1px solid var(--x-border) }
+
+.border-b { border-bottom: 1px solid var(--x-border) }
+
+.overflow-hidden { overflow: hidden }
+
+.overflow-auto { overflow: auto }
+
+.relative { position: relative }
+
+.absolute { position: absolute }
+
+.fixed { position: fixed }
+
+.sticky { position: sticky }
+
+.cursor-pointer { cursor: pointer }
+
+.pointer-none { pointer-events: none }
+
+.opacity-50 { opacity: .5 }
+
+.opacity-100 { opacity: 1 }
+
+.transition { transition: all .15s }
+
+.hide-mobile { display: initial }
+
+.hide-desktop { display: none }
+
+.full-height { height: 100vh; height: 100dvh; }
+
+/* 横滑容器 */
+.x-swipe {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.x-swipe::-webkit-scrollbar { display: none; }
+
+.x-swipe > * {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.items-center { align-items: center; }
+
+.items-start { align-items: flex-start; }
+
+.items-end { align-items: flex-end; }
+
+.justify-center { justify-content: center; }
+
+.justify-between { justify-content: space-between; }
+
+.justify-end { justify-content: flex-end; }
+
+.gap-1 { gap: 4px; }
+
+.gap-2 { gap: 8px; }
+
+.gap-3 { gap: 12px; }
+
+.gap-4 { gap: 16px; }
+
+.gap-6 { gap: 24px; }
+
+/* ---------- 状态文字 ---------- */
+.text-dim { color: var(--x-text-dim); }
+
+.text-mute { color: var(--x-text-mute); }
+
+.text-primary { color: var(--x-primary); }
+
+.text-danger { color: var(--x-danger); }
+
+.text-success { color: var(--x-success); }
+
+.text-center { text-align: center; }
+
+.text-sm { font-size: 13px; }
+
+.text-lg { font-size: 18px; }
+
+.font-bold { font-weight: 600; }

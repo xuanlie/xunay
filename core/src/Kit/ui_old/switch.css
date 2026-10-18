@@ -1,0 +1,5 @@
+@keyframes x-switch-spin { to { transform: rotate(360deg) } }
+.x-switch:focus-visible {
+  box-shadow: 0 0 0 3px var(--x-switch-ring, rgba(59,130,246,.3));
+  outline: none;
+}

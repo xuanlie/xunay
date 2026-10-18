@@ -1,0 +1,20 @@
+// RPC 客户端（需要后端时取消注释）
+// 后端启动后，把 baseURL 指向它。
+//
+// import { rpc, initToken, setBase } from 'xunay'
+//
+// setBase('http://localhost:12342')
+//
+// export async function connect() {
+//   await initToken()
+// }
+//
+// export async function listTodos() {
+//   return rpc.getTodos({})
+// }
+//
+// export async function addTodo(title) {
+//   return rpc.addTodo({ title })
+// }
+
+export {}

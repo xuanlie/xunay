@@ -1,6 +1,6 @@
 // XuNay compiler v3 — 标签白名单
 export const TAGS = new Set([
-  'div', 'span', 'p', 'a', 'button', 'input', 'form', 'label',
+  'fragment', 'div', 'span', 'p', 'a', 'button', 'input', 'form', 'label',
   'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
   'pre', 'code', 'blockquote',
   'header', 'footer', 'nav', 'main', 'section', 'article',

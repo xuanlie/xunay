@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>VoronoiChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>VoronoiChart · 泰森多边形</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-mode">🎨 配色</button>
+<button id="btn-labels">🏷 标签</button>
+<button id="btn-values">🔢 数值</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">中国城市 Voronoi 划分</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">随机点 · 按值配色</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import VoronoiChart from './kit/charts/voronoi.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>a+Math.random()*(b-a)
+const CITIES = [
+  ['北京', 116.4, 39.9, 2189],
+  ['上海', 121.5, 31.2, 2487],
+  ['广州', 113.3, 23.1, 1868],
+  ['深圳', 114.1, 22.5, 1756],
+  ['成都', 104.1, 30.7, 2094],
+  ['武汉', 114.3, 30.6, 1365],
+  ['西安', 108.9, 34.3, 1295],
+  ['杭州', 120.2, 30.3, 1220],
+  ['南京', 118.8, 32.1, 942],
+  ['重庆', 106.5, 29.6, 3205],
+  ['长沙', 112.9, 28.2, 1042],
+  ['郑州', 113.6, 34.7, 1274],
+  ['青岛', 120.4, 36.1, 1025],
+  ['沈阳', 123.4, 41.8, 912],
+  ['哈尔滨', 126.6, 45.8, 988],
+  ['乌鲁木齐', 87.6, 43.8, 405],
+  ['拉萨', 91.1, 29.7, 86],
+  ['昆明', 102.7, 25.0, 846],
+  ['厦门', 118.1, 24.5, 528],
+  ['海口', 110.3, 20.0, 293],
+]
+function mkCities() {
+  return CITIES.map(([name, lon, lat, pop]) => ({
+    x: lon,
+    y: lat,
+    value: pop,
+    label: name,
+  }))
+}
+function mkRandom(n) {
+  return Array.from({length: n}, (_, i) => ({
+    x: rand(0, 100),
+    y: rand(0, 100),
+    value: rand(10, 100),
+    label: 'P' + (i + 1),
+  }))
+}
+const c1 = new VoronoiChart('#c1',{
+  title:'城市势力范围',
+  subtitle:'每个多边形内离该城市最近',
+  data: mkCities(),
+  height:480,
+  padding:30,
+  showLabels:true,
+  showValues:false,
+  labelMinArea:1200,
+  valueFormat: v => v + '万',
+  onHover: p => p && log('hover', p.label, p.value),
+  onCellClick: (p, i) => log('click', p.label),
+})
+const c2 = new VoronoiChart('#c2',{
+  title:'随机点 · 100 个',
+  data: mkRandom(100),
+  height:480,
+  showLabels:false,
+  showValues:true,
+  labelMinArea:800,
+  fillMode:'value',
+  colorRamp:['#fef3c7','#fcd34d','#f59e0b','#d97706','#7c2d12'],
+  colorRampDark:['#7c2d12','#d97706','#f59e0b','#fcd34d','#fef3c7'],
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let modes=['value','uniform'], mi=0
+document.getElementById('btn-mode').onclick=()=>{mi=(mi+1)%modes.length;const m=modes[mi];c1.setOptions({fillMode:m});log('配色 →',m)}
+document.getElementById('btn-labels').onclick=()=>{const v=!c1.opts.showLabels;c1.setOptions({showLabels:v});log('标签 →',v)}
+document.getElementById('btn-values').onclick=()=>{const v=!c1.opts.showValues;c1.setOptions({showValues:v});log('数值 →',v)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(mkCities());c2.setData(mkRandom(100));log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

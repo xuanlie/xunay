@@ -181,6 +181,14 @@ const XUNAY_MAP = {
 
 function resolveXunaySub(sub) {
   if (!sub) return xunayPath
+  // xunay/kit/ui → 指向真实源码（core/src/Kit/ui/）
+  if (sub === '/kit/ui' || sub.startsWith('/kit/ui/')) {
+    const sub2 = sub.slice('/kit/ui'.length)
+    if (!sub2) return path.join(ROOT, 'src/Kit/ui/index.js')
+    const rel = sub2.startsWith('/') ? sub2.slice(1) : sub2
+    const full = path.join(ROOT, 'src/Kit/ui', rel)
+    return full.endsWith('.js') ? full : full + '.js'
+  }
   for (const [k, v] of Object.entries(XUNAY_MAP)) {
     if (sub === k || sub.startsWith(k + '/')) return path.join(outDir, v + '.js')
   }
@@ -374,6 +382,128 @@ for (const name of builtinCss) {
     console.warn('[xuyc] 内置 CSS 不存在:', name)
   }
 }
+
+// ─── 按需检测 xunay/kit/ui 使用，注入对应 CSS 模块 ───
+;(function autoKitUI() {
+  try {
+    const scanDir = path.dirname(entryPath)
+    let used = false
+    const imported = new Set()
+
+    function scan(f) {
+      if (!fs.existsSync(f)) return
+      const st = fs.statSync(f)
+      if (st.isDirectory()) {
+        for (const x of fs.readdirSync(f)) {
+          if (x === 'node_modules' || x === 'dist' || x.startsWith('.')) continue
+          scan(path.join(f, x))
+        }
+      } else if (/\.(xuy|js|mjs)$/.test(f)) {
+        const c = fs.readFileSync(f, 'utf8')
+        if (/import\s+['"]xunay\/kit\/ui['"]/.test(c)) used = true
+        const re = /import\s*\{([^}]+)\}\s*from\s*['"]xunay\/kit\/ui['"]/g
+        let m
+        while ((m = re.exec(c))) {
+          used = true
+          m[1].split(',').forEach(x => {
+            const name = x.trim().split(/\s+as\s+/)[0].trim()
+            if (name) imported.add(name)
+          })
+        }
+      }
+    }
+    scan(scanDir)
+    if (!used) return
+
+    const JS_DIR = path.join(ROOT, 'src/Kit/ui')
+    const JS_2_MOD = {
+      'base.js':     ['base'],
+      'form.js':     ['form'],
+      'form2.js':    ['form'],
+      'display.js':  ['display'],
+      'display2.js': ['display'],
+      'nav.js':      ['nav'],
+      'nav2.js':     ['nav'],
+      'data.js':     ['data'],
+      'data2.js':    ['data'],
+      'overlay.js':  ['overlay'],
+      'layout.js':   ['layout'],
+      'editor.js':   ['editor'],
+      'editor2.js':  ['editor'],
+      'virtual.js':  ['data'],
+    }
+    const SPECIAL = {
+      DatePicker:    ['picker'],
+      TimePicker:    ['picker'],
+      ColorPicker:   ['color-picker'],
+      Code:          ['code'],
+      CodeEditor:    ['code', 'editor'],
+      JSONViewer:    ['code'],
+      DiffViewer:    ['code'],
+      Terminal:      ['code'],
+      CommandPalette:['code'],
+      ContextMenu:   ['overlay'],
+      Comment:       ['comment'],
+      Markdown:      ['code'],
+      RichText:      ['editor'],
+    }
+    const CMAP = {}
+    for (const [js, mods] of Object.entries(JS_2_MOD)) {
+      const f = path.join(JS_DIR, js)
+      if (!fs.existsSync(f)) continue
+      const src = fs.readFileSync(f, 'utf8')
+      const re = /^export\s+(?:async\s+)?(?:function|const|class|let|var)\s+([A-Z][A-Za-z0-9_]*)/gm
+      let m
+      while ((m = re.exec(src))) CMAP[m[1]] = mods.slice()
+    }
+    for (const [k, v] of Object.entries(SPECIAL)) {
+      if (!CMAP[k]) CMAP[k] = []
+      for (const mod of v) if (!CMAP[k].includes(mod)) CMAP[k].push(mod)
+    }
+
+    const CORE = ['tokens','reset','typography','sizes','layout','themes','a11y','mobile']
+    const needed = new Set(CORE)
+
+    if (imported.size === 0) {
+      ['base','form','picker','color-picker','code','comment','display','nav',
+       'data','overlay','editor','charts','animation'].forEach(m => needed.add(m))
+    } else {
+      for (const name of imported) {
+        const mods = CMAP[name]
+        if (mods) mods.forEach(m => needed.add(m))
+      }
+      needed.add('base')
+    }
+
+    const ORDER = ['tokens','reset','typography','sizes','layout',
+                   'base','form','picker','color-picker','code',
+                   'comment','display','nav','data','overlay',
+                   'themes','editor','charts','animation','a11y','mobile']
+    const kitCssDir = path.join(ROOT, 'src/Kit/ui/css')
+    if (!fs.existsSync(kitCssDir)) { console.warn('[xuyc] Kit/ui/css 不存在'); return }
+
+    let merged = '/* XuNay Kit/UI · 按需注入 · modules: ' + [...needed].sort().join(',') + ' */\n'
+    for (const name of ORDER) {
+      if (!needed.has(name)) continue
+      const f = path.join(kitCssDir, name + '.css')
+      if (fs.existsSync(f)) {
+        merged += '\n/* ===== ' + name + '.css ===== */\n' + fs.readFileSync(f, 'utf8') + '\n'
+      }
+    }
+    try {
+      const r = esbuild.transformSync(merged, { loader: 'css', minify: true })
+      fs.writeFileSync(path.join(outDir, 'kit-ui.css'), '@layer xunay {\n' + r.code + '\n}\n')
+    } catch (e) {
+      fs.writeFileSync(path.join(outDir, 'kit-ui.css'), '@layer xunay {\n' + merged + '\n}\n')
+    }
+    cssLinks.push('./kit-ui.css')
+    const mods = [...needed].filter(x => !CORE.includes(x))
+    console.log('[xuyc] Kit/UI: ' + (mods.length ? mods.join(', ') : 'core') +
+                ' → kit-ui.css (' + fs.statSync(path.join(outDir, 'kit-ui.css')).size + ' bytes)')
+  } catch (e) {
+    console.warn('[xuyc] autoKitUI 失败:', e.message)
+  }
+})()
 
 // 复制 docs
 const docsDir = path.join(entryDir, 'docs')

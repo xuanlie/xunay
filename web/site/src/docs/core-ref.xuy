@@ -1,12 +1,12 @@
 // ref
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("ref"),
     P("ref 是一个闭包变量，专门用来保存 DOM 引用。读它返回真实 DOM，写它更新引用。"),
     H2("基础用法"),
-    Code("import { ref, input, onMount } from 'xunay'\n\nconst inputRef = ref()\n\ninput({\n  ref: el => inputRef(el),\n  placeholder: '输入'\n})\n\nonMount(() => inputRef().focus())", "xuy"),
+    Code("import { ref, onMount } from 'xunay'\n\nconst inputRef = ref()\n\ninput({\n  ref: el => inputRef(el),\n  placeholder: '输入'\n})\n\nonMount(() => inputRef().focus())", "xuy"),
     H2("为什么用函数包装"),
     P("ref 返回一个函数：\n· 调用 r() 读\n· 调用 r(dom) 写\n\n这样避免暴露内部变量，也能保证每次读到的都是最新值。"),
     Code("const r = ref()\nr()          // 读（null）\nr(el)        // 写\nr()          // 读（el）", "xuy"),
@@ -26,7 +26,7 @@ export function Doc() {
     Code("let el = null\\ndiv({ ref: e => { el = e; console.log('创建') } })\\n// 打印: 创建\\nonMount(() => console.log('挂载', el))\\n// 打印: 挂载", "xuy"),
     H2("ref 在列表里"),
     P("list 每一项可以有自己的 ref。用 map 存："),
-    Code("import { list, li, ref } from 'xunay'\n\nconst itemRefs = new Map()\n\nlist(todos, t => t.id, t =>\n  li({\n    ref: el => {\n      if (el) itemRefs.set(t.id, el)\n      else itemRefs.delete(t.id)\n    }\n  }, t.title)\n)", "xuy"),
+    Code("import { list, ref } from 'xunay'\n\nconst itemRefs = new Map()\n\nlist(todos, t => t.id, t =>\n  li({\n    ref: el => {\n      if (el) itemRefs.set(t.id, el)\n      else itemRefs.delete(t.id)\n    }\n  }, t.title)\n)", "xuy"),
     H2("ref 在组件间传递"),
     P("父组件想访问子组件的 DOM——有两种模式："),
     Code("// 模式 A：子组件内部处理，父组件不关心\nfunction FancyInput(props) {\n  const el = ref()\n  onMount(() => el().focus())\n  return input({ ref: e => el(e), ...props })\n}\n\n// 模式 B：父组件显式传入 ref 回调\nfunction FancyInput({ inputRef, ...props }) {\n  return input({ ref: inputRef, ...props })\n}\n// 用：FancyInput({ inputRef: el => myRef(el) })", "xuy"),
@@ -38,6 +38,6 @@ export function Doc() {
     H3("陷阱 3：把 ref 当 signal 传给模板"),
     Code("div({ class: () => r() ? 'ready' : '' })\n// ✗ 首次求值后就不再更新", "xuy"),
     H2("完整示例：自定义滚动条"),
-    Code("import { div, ref, signal, onMount, onUnmount, mount } from 'xunay'\n\nfunction CustomScroll() {\n  const scroller = ref()\n  const content = ref()\n  const thumbH = signal(50)\n  const thumbTop = signal(0)\n\n  const update = () => {\n    const s = scroller(), c = content()\n    if (!s || !c) return\n    const ratio = s.clientHeight / c.scrollHeight\n    thumbH(Math.max(30, s.clientHeight * ratio))\n    const maxTop = s.clientHeight - thumbH()\n    thumbTop((s.scrollTop / (c.scrollHeight - s.clientHeight)) * maxTop)\n  }\n\n  onMount(() => {\n    const s = scroller()\n    s.addEventListener('scroll', update)\n    window.addEventListener('resize', update)\n    update()\n    onUnmount(() => {\n      s.removeEventListener('scroll', update)\n      window.removeEventListener('resize', update)\n    })\n  })\n\n  return div({\n    ref: e => scroller(e),\n    class: 'scroll-wrap',\n    style: { position: 'relative', height: '300px', overflow: 'auto' }\n  },\n    div({ ref: e => content(e) },\n      ...Array.from({ length: 50 }, (_, i) => div(null, '行 ' + i))\n    ),\n    div({\n      class: 'scroll-thumb',\n      style: () => ({\n        height: thumbH() + 'px',\n        transform: 'translateY(' + thumbTop() + 'px)'\n      })\n    })\n  )\n}\n\nmount(() => CustomScroll(), '#app')", "xuy"),
+    Code("import { ref, signal, onMount, onUnmount, mount } from 'xunay'\n\nfunction CustomScroll() {\n  const scroller = ref()\n  const content = ref()\n  const thumbH = signal(50)\n  const thumbTop = signal(0)\n\n  const update = () => {\n    const s = scroller(), c = content()\n    if (!s || !c) return\n    const ratio = s.clientHeight / c.scrollHeight\n    thumbH(Math.max(30, s.clientHeight * ratio))\n    const maxTop = s.clientHeight - thumbH()\n    thumbTop((s.scrollTop / (c.scrollHeight - s.clientHeight)) * maxTop)\n  }\n\n  onMount(() => {\n    const s = scroller()\n    s.addEventListener('scroll', update)\n    window.addEventListener('resize', update)\n    update()\n  })\n\n  onUnmount(() => {\n    const s = scroller()\n    if (s) s.removeEventListener('scroll', update)\n    window.removeEventListener('resize', update)\n  })\n\n  return div({\n    ref: e => scroller(e),\n    class: 'scroll-wrap',\n    style: { position: 'relative', height: '300px', overflow: 'auto' }\n  },\n    div({ ref: e => content(e) },\n      ...Array.from({ length: 50 }, (_, i) => div(null, '行 ' + i))\n    ),\n    div({\n      class: 'scroll-thumb',\n      style: () => ({\n        height: thumbH() + 'px',\n        transform: 'translateY(' + thumbTop() + 'px)'\n      })\n    })\n  )\n}\n\nmount(() => CustomScroll(), '#app')", "xuy"),
   )
 }

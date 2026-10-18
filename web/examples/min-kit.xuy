@@ -1,0 +1,18 @@
+// title: MIN KIT
+import { mount } from 'xunay'
+import { Btn, Switch, BarChart, Card, Row, IconCheck } from 'xunay/kit'
+
+mount(() => div({ style: 'padding:24px;background:#111;color:#0f0;font:14px monospace' },
+  div(null, '=== MIN KIT ==='),
+  div(null, '1: Btn'),
+  Btn(null, 'click'),
+  div(null, '2: Switch'),
+  Switch({ label: '开关' }),
+  div(null, '3: BarChart'),
+  BarChart({ data: [1, 2, 3, 4], labels: ['a', 'b', 'c', 'd'], height: 180 }),
+  div(null, '4: Card + Row'),
+  Card({ title: 'Card' }, Row({ gap: 2 }, Btn(null, 'a'), Btn(null, 'b'))),
+  div(null, '5: IconCheck'),
+  IconCheck({ size: 24 }),
+  div(null, '=== 全部通过 ===')
+), '#app')

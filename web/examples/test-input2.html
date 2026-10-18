@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><body style="padding:40px;background:#f8fafc;font-family:sans-serif">
+<h2>红框测试</h2>
+<div id="root" style="border:3px solid red;padding:20px;min-height:80px">
+  <div style="color:red">← 这里应该有 JS 渲染的输入框</div>
+</div>
+<script type="module">
+import { Input } from './kit/ui/input.js'
+
+function render(v, c) {
+  if (v == null || v === false || v === true) return
+  if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+  if (typeof v === 'function') return render(v(), c)
+  if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+  if (!v.type) return
+  const el = document.createElement(v.type)
+  const p = v.props || {}
+  for (const k in p) {
+    const val = p[k]
+    if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+    else if (k === 'ref' && typeof val === 'function') val(el)
+    else if (k === 'style') { const st = typeof val === 'function' ? val() : val; if (typeof st === 'string') el.setAttribute('style', st) }
+    else if (k === 'class' || k === 'className') { const cc = typeof val === 'function' ? val() : val; if (cc) el.className = cc }
+    else if (typeof val !== 'function' && val != null) { if (val === true) el.setAttribute(k, ''); else el.setAttribute(k, val) }
+  }
+  for (const ch of (v.children || [])) render(ch, el)
+  c.appendChild(el)
+}
+
+const root = document.getElementById('root')
+root.innerHTML = ''
+
+const vnode = Input({ label: '用户名', placeholder: '请输入', hint: '4-20 个字符' })
+console.log('Input type:', typeof Input)
+console.log('vnode:', vnode)
+console.log('vnode.type:', vnode && vnode.type)
+
+try {
+  render(vnode, root)
+  console.log('渲染后 root.innerHTML:', root.innerHTML.slice(0, 500))
+  document.title = 'DONE - ' + root.children.length
+} catch (e) {
+  console.error(e)
+  document.title = 'ERR: ' + e.message
+}
+</script>
+</body></html>

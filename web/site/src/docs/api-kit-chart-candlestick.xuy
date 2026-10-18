@@ -1,0 +1,18 @@
+// kit: K 线图
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: K 线图"),
+    P("影线 + MA 均线（分类：时间）"),
+    H2("引入"),
+    Code("import Kit from 'xunay/kit/charts/candlestick'", "js"),
+    H2("实时预览"),
+    ChartDemo("candlestick", {"height": 280, "showVolume": false, "showMA": true, "showLegend": false, "padding": {"top": 10, "right": 50, "bottom": 30, "left": 10}, "data": [{"label": "D1", "open": 100, "close": 105, "high": 108, "low": 98}, {"label": "D2", "open": 105, "close": 102, "high": 110, "low": 100}, {"label": "D3", "open": 102, "close": 108, "high": 112, "low": 101}, {"label": "D4", "open": 108, "close": 106, "high": 115, "low": 104}, {"label": "D5", "open": 106, "close": 112, "high": 115, "low": 105}, {"label": "D6", "open": 112, "close": 118, "high": 120, "low": 110}, {"label": "D7", "open": 118, "close": 115, "high": 122, "low": 113}, {"label": "D8", "open": 115, "close": 120, "high": 123, "low": 113}]}),
+    H2("示例"),
+    Code("const chart = new Kit('#app', { title: 'K 线图' })\nchart.setData([...])\nchart.setOptions({ theme: 'dark' })\nchart.replay()\nchart.destroy()", "js"),
+    H2("通用方法"),
+    Table(["方法","说明"], [["setData(data)","替换数据"],["setOptions(opts)","更新配置"],["render({animate})","手动重绘"],["replay()","重播动画"],["destroy()","销毁"]]),
+    Tip("完整清单见「Kit 组件 → Kit 总览」。"),
+  )
+}

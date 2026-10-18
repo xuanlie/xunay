@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit UI 测试</title>
+<link rel="stylesheet" href="/xunay/Kit/ui/ui.css">
+<link rel="stylesheet" href="/xunay/Kit/ui/tw.css">
+<script type="importmap">
+{
+  "imports": {
+    "xunay/kit/ui": "/xunay/Kit/ui/index.js",
+    "xunay/kit/ui/": "/xunay/Kit/ui/",
+    "xunay/kit/ui/base": "/xunay/Kit/ui/base.js",
+    "xunay/kit/ui/display": "/xunay/Kit/ui/display.js",
+    "xunay/kit/ui/form": "/xunay/Kit/ui/form.js",
+    "xunay/kit/ui/nav": "/xunay/Kit/ui/nav.js",
+    "xunay/kit/ui/data": "/xunay/Kit/ui/data.js",
+    "xunay/kit/ui/overlay": "/xunay/Kit/ui/overlay.js",
+    "xunay/kit/ui/layout": "/xunay/Kit/ui/layout.js",
+    "xunay/kit/ui/util": "/xunay/Kit/ui/util.js",
+    "xunay/element": "/xunay/element.js",
+    "xunay/core": "/xunay/core.js",
+    "xunay/runtime": "/xunay/runtime.js",
+    "xunay/misc": "/xunay/misc.js",
+    "xunay/mobile": "/xunay/mobile.js",
+    "xunay/hl": "/xunay/hl.js",
+    "xunay/sanitize": "/xunay/sanitize.js",
+    "xunay/render": "/xunay/render.js",
+    "xunay/events": "/xunay/events.js",
+    "xunay": "/xunay/index.js"
+  }
+}
+</script>
+<style>
+  body { padding: 24px; background: #f8fafc; color: #0f172a; font: 14px/1.5 -apple-system, "PingFang SC", sans-serif }
+  h1 { font-size: 22px; margin: 0 0 4px }
+  .sub { color: #64748b; font-size: 13px; margin-bottom: 20px }
+  .box { padding: 16px; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; margin-bottom: 14px }
+  .label { font-size: 11px; color: #64748b; margin-bottom: 12px; letter-spacing: .06em; text-transform: uppercase }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
+  #err { color: #ef4444; background: #fee; padding: 12px; border-radius: 8px; font: 12px monospace; margin-top: 20px; white-space: pre-wrap; display: none }
+</style>
+</head>
+<body>
+<h1>Kit UI · 105 组件</h1>
+<div class="sub">从 xunay/kit/ui 直接 import</div>
+
+<div class="box">
+  <div class="label">Btn / Tag / Badge</div>
+  <div class="row" id="r1"></div>
+</div>
+<div class="box">
+  <div class="label">Card</div>
+  <div class="row" id="r2"></div>
+</div>
+<div class="box">
+  <div class="label">Form</div>
+  <div class="row" id="r3"></div>
+</div>
+<div class="box">
+  <div class="label">Display</div>
+  <div class="row" id="r4"></div>
+</div>
+
+<pre id="err"></pre>
+
+<script type="module">
+const errEl = document.getElementById('err')
+function showErr(m, stack) {
+  errEl.style.display = 'block'
+  errEl.textContent += m + '\n' + (stack || '') + '\n\n'
+}
+window.onerror = (m, f, l) => showErr(m + ' @ ' + f + ':' + l)
+window.onunhandledrejection = e => showErr('REJECT: ' + e.reason)
+
+try {
+  const UI = await import('xunay/kit/ui')
+  console.log('组件数:', Object.keys(UI).length)
+
+  // mini renderer for xunay vnode
+  function render(v, c) {
+    if (v == null || v === false || v === true) return
+    if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+    if (typeof v === 'function') return render(v(), c)
+    if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+    if (!v.type) return
+    const el = document.createElement(v.type)
+    const p = v.props || {}
+    for (const k in p) {
+      const val = p[k]
+      if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+      else if (k === 'ref' && typeof val === 'function') val(el)
+      else if (k === 'style') { const st = typeof val === 'function' ? val() : val; if (typeof st === 'string') el.setAttribute('style', st); else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk] }
+      else if (k === 'class' || k === 'className') { const cc = typeof val === 'function' ? val() : val; if (cc) el.className = cc }
+      else if (k.startsWith('aria-') || k.startsWith('data-')) { const vv = typeof val === 'function' ? val() : val; if (vv != null) el.setAttribute(k, vv) }
+      else if (k === 'disabled' || k === 'checked' || k === 'selected') { const vv = typeof val === 'function' ? val() : val; if (vv) el.setAttribute(k, '') }
+      else if (typeof val !== 'function' && val != null) el.setAttribute(k, val)
+    }
+    for (const ch of (v.children || [])) render(ch, el)
+    c.appendChild(el)
+  }
+
+  const R = id => document.getElementById(id)
+  render(UI.Btn({ type: 'primary' }, '主要'), R('r1'))
+  render(UI.Btn(null, '默认'), R('r1'))
+  render(UI.Btn({ type: 'dashed' }, '虚线'), R('r1'))
+  render(UI.Btn({ type: 'danger' }, '危险'), R('r1'))
+  render(UI.Btn({ disabled: true }, '禁用'), R('r1'))
+  render(UI.Tag(null, '标签'), R('r1'))
+  render(UI.Tag({ type: 'success' }, '成功'), R('r1'))
+  render(UI.Badge(null, '徽章'), R('r1'))
+
+  render(UI.Card({ title: '卡片 A', desc: '描述' }, '内容'), R('r2'))
+  render(UI.Card({ title: '卡片 B', desc: '描述', hover: true }, '内容'), R('r2'))
+
+  render(UI.Input({ label: '用户名', placeholder: '请输入' }), R('r3'))
+  render(UI.Switch({ checked: true, label: '开启' }), R('r3'))
+  render(UI.Checkbox(null, '复选'), R('r3'))
+  render(UI.Radio(null, '单选'), R('r3'))
+
+  render(UI.Alert({ type: 'success', title: '成功', description: '已完成' }), R('r4'))
+  render(UI.Spinner(), R('r4'))
+  render(UI.Avatar({ text: 'AB' }), R('r4'))
+  render(UI.Progress({ value: 60 }), R('r4'))
+
+  document.title = 'OK · ' + Object.keys(UI).length + ' 组件'
+} catch (e) {
+  showErr('import/渲染失败: ' + e.message, e.stack)
+  document.title = 'ERROR'
+}
+</script>
+</body>
+</html>

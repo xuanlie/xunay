@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>WaterfallChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>WaterfallChart · 瀑布图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">财务分析 · 季度利润</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">用户增长 · 渠道增减</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import WaterfallChart from './kit/charts/waterfall.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const mkFinance=()=>[
+  { label:'Q1 期初', value: 400, type:'total' },
+  { label:'营收', value: rand(150, 250), type:'increase' },
+  { label:'成本', value: -rand(80, 130), type:'decrease' },
+  { label:'营销', value: -rand(40, 80), type:'decrease' },
+  { label:'研发', value: -rand(30, 60), type:'decrease' },
+  { label:'Q2 期末', value: 0, type:'total' },
+]
+const mkUser=()=>[
+  { label:'期初', value: 5000, type:'total' },
+  { label:'自然增长', value: rand(800, 1500), type:'increase' },
+  { label:'推荐', value: rand(400, 900), type:'increase' },
+  { label:'广告', value: rand(200, 600), type:'increase' },
+  { label:'流失', value: -rand(300, 700), type:'decrease' },
+  { label:'期终', value: 0, type:'total' },
+]
+// 修复 total 值：需要运行时算
+function fixTotal(data){
+  let acc=0
+  data.forEach(d=>{
+    if(d.type==='total'&&d.label.includes('期末')) d.value=acc
+    else if(d.type!=='total') acc+=d.value
+    else acc=d.value
+  })
+  return data
+}
+let f1=fixTotal(mkFinance()), f2=fixTotal(mkUser())
+const c1=new WaterfallChart('#c1',{title:'利润变化',data:f1,height:340,yFormat:v=>v+'K',onHover:b=>b&&log('hover',b.label,b.value),onBarClick:b=>log('click',b.label,b.value)})
+const c2=new WaterfallChart('#c2',{title:'用户增长',data:f2,height:340,increaseColor:'#06b6d4',decreaseColor:'#f59e0b',totalColor:'#8b5cf6',showValue:true})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-rand').onclick=()=>{f1=fixTotal(mkFinance());f2=fixTotal(mkUser());c1.setData(f1);c2.setData(f2);log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

@@ -1,0 +1,18 @@
+// kit: 箱线图
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
+
+export function Doc() {
+  return D(
+    H1("kit: 箱线图"),
+    P("5 数概括 + IQR 异常值（分类：分布）"),
+    H2("引入"),
+    Code("import Kit from 'xunay/kit/charts/boxplot'", "js"),
+    H2("实时预览"),
+    ChartDemo("boxplot", {"height": 280, "groups": [{"label": "A班", "values": [62, 70, 75, 78, 82, 85, 88, 90, 92, 95]}, {"label": "B班", "values": [55, 62, 68, 72, 78, 82, 85, 88, 90, 94]}, {"label": "C班", "values": [70, 75, 80, 85, 88, 90, 92, 95, 98, 99]}]}),
+    H2("示例"),
+    Code("const chart = new Kit('#app', { title: '箱线图' })\nchart.setData([...])\nchart.setOptions({ theme: 'dark' })\nchart.replay()\nchart.destroy()", "js"),
+    H2("通用方法"),
+    Table(["方法","说明"], [["setData(data)","替换数据"],["setOptions(opts)","更新配置"],["render({animate})","手动重绘"],["replay()","重播动画"],["destroy()","销毁"]]),
+    Tip("完整清单见「Kit 组件 → Kit 总览」。"),
+  )
+}

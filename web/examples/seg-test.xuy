@@ -1,0 +1,96 @@
+// title: 分段测试
+import { mount } from 'xunay'
+import {
+  Btn, Row, Col, Text, Card, Divider, Space, Tag, Badge,
+  Input, Textarea, Select, Checkbox, Radio, Switch, NumberInput,
+  DatePicker, TimePicker, SearchInput, PasswordStrength, Rate,
+  ColorPicker, Slider, Mentions, Transfer, Cascader,
+  Alert, Modal, Spinner, Empty, Progress, Avatar, Result,
+  Skeleton, Count, Stat, Descriptions, ItemCard, QRCode,
+  Typography, Comment, Watermark, Ribbon, Code, Keyboard, Highlight, Ellipsis,
+  Tabs, Breadcrumb, Pagination, Steps, Accordion,
+  Menu, Anchor, BackTop, Collapse,
+  Table, List, Timeline, Tree, TreeSelect, Calendar, SplitPane,
+  Carousel, Image, VirtualTable, Kanban, Gantt,
+  Layout, Grid, Flex, Affix,
+  BarChart, LineChart, PieChart, Sparkline, RingProgress,
+  DonutChart, AreaChart, RadarChart, GaugeChart, ScatterChart,
+  WaterfallChart, FunnelChart, CandlestickChart, Treemap, Heatmap,
+  IconCheck, IconClose, IconSearch, IconUser, IconHome, IconSettings,
+  IconHeart, IconStar, IconBell, IconDownload, IconUpload, IconLock,
+  IconEye, IconInfo, IconWarn, IconRefresh, IconPlay, IconTrash, IconEdit,
+  IconChevronRight, IconChevronDown, IconPlus, IconMinus,
+} from 'xunay/kit'
+
+const log = []
+function test(name, fn) {
+  try {
+    const r = fn()
+    log.push({ name, ok: true })
+    return r
+  } catch (e) {
+    log.push({ name, ok: false, err: e.message || String(e) })
+    return null
+  }
+}
+
+// 每个组件独立 try/catch
+test('Btn', () => Btn(null, 'x'))
+test('Tag', () => Tag(null, 'x'))
+test('Badge', () => Badge(null, 'x'))
+test('Avatar', () => Avatar({ text: 'X' }))
+test('Spinner', () => Spinner())
+test('Count', () => Count({ value: 5 }))
+test('Alert', () => Alert({ title: 'x' }, 'body'))
+test('Progress', () => Progress({ value: 50 }))
+test('Input', () => Input({ placeholder: 'x' }))
+test('Select', () => Select({ options: [] }))
+test('Checkbox', () => Checkbox({ label: 'x' }))
+test('Radio', () => Radio({ label: 'x' }))
+test('Switch', () => Switch({ label: 'x' }))
+test('NumberInput', () => NumberInput({}))
+test('DatePicker', () => DatePicker({}))
+test('SearchInput', () => SearchInput({}))
+test('Rate', () => Rate({ value: 3 }))
+test('ColorPicker', () => ColorPicker({}))
+test('Slider', () => Slider({}))
+test('Tabs', () => Tabs({ items: [{ key: 'a', title: 'A' }] }))
+test('Breadcrumb', () => Breadcrumb({ items: [{ label: 'x' }] }))
+test('Pagination', () => Pagination({ page: 1, total: 100 }))
+test('Steps', () => Steps({ steps: [{ label: 'x' }] }))
+test('Accordion', () => Accordion({ items: [{ title: 'x', content: 'y' }] }))
+test('Menu', () => Menu({ items: [{ key: '1', label: 'a' }] }))
+test('Tree', () => Tree({ data: [{ key: 'a', label: 'a' }] }))
+test('Table', () => Table({ columns: [{ title: 'a', key: 'a' }], data: [] }))
+test('List', () => List({ items: [], render: () => null }))
+test('Timeline', () => Timeline({ items: [] }))
+test('BarChart', () => BarChart({ data: [1, 2, 3] }))
+test('LineChart', () => LineChart({ data: [1, 2, 3] }))
+test('PieChart', () => PieChart({ data: [{ value: 1, label: 'a' }] }))
+test('RingProgress', () => RingProgress({ value: 50 }))
+test('DonutChart', () => DonutChart({ data: [{ value: 1, label: 'a' }] }))
+test('AreaChart', () => AreaChart({ data: [1, 2, 3] }))
+test('RadarChart', () => RadarChart({ data: [{ label: 'a', value: 1 }] }))
+test('GaugeChart', () => GaugeChart({ value: 50 }))
+test('ScatterChart', () => ScatterChart({ data: [{ x: 1, y: 2 }] }))
+test('Heatmap', () => Heatmap({ data: [[1, 2, 3]] }))
+test('WaterfallChart', () => WaterfallChart({ data: [1, 2, 3] }))
+test('FunnelChart', () => FunnelChart({ data: [{ label: 'a', value: 1 }] }))
+test('Treemap', () => Treemap({ data: [{ label: 'a', value: 1 }] }))
+test('CandlestickChart', () => CandlestickChart({ data: [{ open: 1, high: 2, low: 0, close: 1.5 }] }))
+test('IconCheck', () => IconCheck({}))
+test('IconUser', () => IconUser({}))
+test('IconArrowRight', () => IconArrowRight({}))
+test('IconHeart', () => IconHeart({}))
+test('IconSun', () => IconSun({}))
+test('IconPlay', () => IconPlay({}))
+test('IconFile', () => IconFile({}))
+test('IconMap', () => IconMap({}))
+
+mount(() => div({ style: 'padding:16px;background:#111;color:#0f0;font:12px monospace;white-space:pre-wrap' },
+  div(null, '=== 组件测试 ==='),
+  ...log.map(l =>
+    div({ style: l.ok ? 'color:#0f0' : 'color:#f55' },
+      (l.ok ? '✓ ' : '✗ ') + l.name + (l.ok ? '' : ' — ' + l.err))
+  )
+), '#app')

@@ -1,5 +1,5 @@
 // onUnmount(fn)
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -8,7 +8,7 @@ export function Doc() {
     H2("签名"),
     Code("onUnmount(fn)", "js"),
     H2("示例"),
-    Code("import { onMount, onUnmount, div } from 'xunay'\n\nfunction Timer() {\n  onMount(() => {\n    const id = setInterval(tick, 1000)\n    onUnmount(() => clearInterval(id))\n  })\n  return div(null, '定时器')\n}", "xuy"),
+    Code("import { onMount, onUnmount } from 'xunay'\n\nfunction Timer() {\n  onMount(() => {\n    const id = setInterval(tick, 1000)\n    onUnmount(() => clearInterval(id))\n  })\n  return div(null, '定时器')\n}", "xuy"),
     H2("执行时机"),
     Table(["触发","时机"], [["show 切换假","卸载时"],["list 删除项","卸载时"],["父组件卸载","递归卸载时"],["unmount() 调用","卸载根组件时"]]),
     H2("执行顺序"),

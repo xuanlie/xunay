@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MIN KIT</title>
+<script>
+window.__XERR__ = function(msg, src, line, col, err) {
+  try {
+    document.title = '[ERR] ' + msg
+    var el = document.getElementById('__xerr__')
+    if (!el) {
+      el = document.createElement('pre')
+      el.id = '__xerr__'
+      el.style.cssText = 'position:fixed;inset:0;background:#1a1b26;color:#f55;padding:16px;font:12px monospace;white-space:pre-wrap;z-index:2147483647;overflow:auto;margin:0'
+      if (document.body) document.body.appendChild(el)
+      else document.addEventListener('DOMContentLoaded', function(){ document.body.appendChild(el) })
+    }
+    var txt = '=== 页面错误 ===
+' + msg + '
+  at ' + (src||'?') + ':' + line + ':' + col + '
+'
+    if (err && err.stack) txt += '
+' + err.stack
+    el.textContent = txt
+  } catch (_) {}
+}
+window.onerror = function(m, s, l, c, e) { window.__XERR__(m, s, l, c, e); return false }
+window.addEventListener('unhandledrejection', function(e) { window.__XERR__('Promise 拒绝: ' + (e.reason && e.reason.message || e.reason), '', 0, 0, e.reason) })
+</script>
+<link rel="stylesheet" href="./tw.css">
+<link rel="stylesheet" href="./ui.css">
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; margin: 0; padding: 24px; }
+  button { padding: 6px 14px; margin: 0 4px; }
+  #__err { position: fixed; inset: 0; background: #1a1b26; color: #f55; padding: 16px;
+    font: 12px monospace; white-space: pre-wrap; overflow: auto; z-index: 99999; display: none; }
+  #__err .head { color: #ff7; font-size: 14px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="__err"><div class="head">❌ 页面错误（点此关闭）</div><div id="__errbody"></div></div>
+<script>
+(function(){
+  var err = document.getElementById('__err');
+  var errbody = document.getElementById('__errbody');
+  var text = '';
+  function show(s) {
+    text += s + '
+';
+    errbody.textContent = text;
+    err.style.display = 'block';
+  }
+  err.addEventListener('click', function(){ err.style.display = 'none' });
+  window.onerror = function(msg, src, line, col, e) {
+    show('ERR: ' + msg + '
+  at ' + (src||'') + ':' + line + ':' + col +
+      (e && e.stack ? '
+' + e.stack.split('
+').slice(0,6).join('
+') : ''));
+  };
+  window.addEventListener('unhandledrejection', function(e) {
+    show('REJECT: ' + ((e.reason && e.reason.message) || e.reason));
+  });
+})();
+</script>
+<script src="./app.js"></script>
+</body>
+</html>

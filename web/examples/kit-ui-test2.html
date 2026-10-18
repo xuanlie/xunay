@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit UI 测试 2</title>
+<style>
+  :root { --x-bg:#f8fafc; --x-card:#fff; --x-text:#0f172a; --x-muted:#64748b; --x-border:#e2e8f0; --x-primary:#3b82f6; --x-bg-soft:#f1f5f9; }
+  [data-theme="dark"] { --x-bg:#0a0e17; --x-card:#0f172a; --x-text:#e2e8f0; --x-muted:#94a3b8; --x-border:#1e293b; --x-primary:#60a5fa; --x-bg-soft:#1e293b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--x-bg); color:var(--x-text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif; padding:32px; transition:background .2s,color .2s; max-width:900px; margin:0 auto; }
+  h1 { font-size:22px; margin-bottom:6px; }
+  h2 { font-size:12px; color:var(--x-muted); font-weight:500; margin:32px 0 12px; letter-spacing:.08em; text-transform:uppercase; }
+  .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:10px; }
+  .col { display:flex; flex-direction:column; gap:12px; max-width:420px; }
+  .toolbar { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .toolbar button { padding:6px 14px; border:1px solid var(--x-border); border-radius:8px; background:var(--x-card); color:var(--x-text); cursor:pointer; font-size:13px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--x-card); border:1px solid var(--x-border); border-radius:10px; padding:10px 14px; font:12px ui-monospace,monospace; color:var(--x-muted); max-width:340px; max-height:200px; overflow:auto; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+</style>
+</head>
+<body>
+  <h1>Kit UI · 新 4 组件</h1>
+  <div style="color:var(--x-muted);font-size:13px">Input · Switch · Progress · Alert</div>
+
+  <div class="toolbar">
+    <button id="btn-theme">🌓 主题</button>
+    <button id="btn-clear">清日志</button>
+  </div>
+
+  <h2>Input</h2>
+  <div class="col" id="r-input"></div>
+  <div class="col" id="r-input2"></div>
+
+  <h2>Switch</h2>
+  <div class="row" id="r-switch"></div>
+  <div class="row" id="r-switch2"></div>
+
+  <h2>Progress · Line</h2>
+  <div class="col" id="r-prog1"></div>
+
+  <h2>Progress · Circle</h2>
+  <div class="row" id="r-prog2"></div>
+
+  <h2>Progress · Segments</h2>
+  <div class="col" id="r-prog3"></div>
+
+  <h2>Alert</h2>
+  <div class="col" id="r-alert"></div>
+  <div id="r-alert2"></div>
+
+  <div id="log">交互…</div>
+
+<script type="module">
+for (const f of ['input','switch','progress','alert','btn']) {
+  const l = document.createElement('link')
+  l.rel = 'stylesheet'
+  l.href = './kit/ui/' + f + '.css'
+  document.head.appendChild(l)
+}
+
+import { Input, Switch, Progress, Alert, Btn } from './kit/ui/index.js'
+
+const logEl = document.getElementById('log')
+function say(...a) {
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 4000) logEl.textContent = logEl.textContent.slice(0, 4000)
+}
+
+// mini renderer
+function render(vnode, container) {
+  if (vnode == null || vnode === false || vnode === true) return
+  if (Array.isArray(vnode)) { for (const v of vnode) render(v, container); return }
+  if (typeof vnode === 'function') return render(vnode(), container)
+  if (typeof vnode !== 'object') { container.appendChild(document.createTextNode(String(vnode))); return }
+  if (!vnode.type) return
+  const el = document.createElement(vnode.type)
+  const p = vnode.props || {}
+  for (const k in p) {
+    if (k === 'on' && p.on) for (const ev in p.on) if (typeof p.on[ev] === 'function') el.addEventListener(ev, p.on[ev])
+    else if (k === 'ref' && typeof p[k] === 'function') p[k](el)
+    else if (k === 'style') {
+      const st = typeof p.style === 'function' ? p.style() : p.style
+      if (typeof st === 'string') el.style.cssText = st
+      else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk]
+    }
+    else if (k === 'class' || k === 'className') {
+      const c = typeof p[k] === 'function' ? p[k]() : p[k]; if (c) el.className = c
+    }
+    else if (k.startsWith('aria-') || k.startsWith('data-')) {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]; if (v != null) el.setAttribute(k, v)
+    }
+    else if (k === 'disabled' || k === 'checked' || k === 'selected') {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]; if (v) el.setAttribute(k, '')
+    }
+    else if (k === 'tabindex' || k === 'role' || k === 'title' || k === 'type' || k === 'placeholder' || k === 'value' || k === 'max' || k === 'min') {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]; if (v != null) el.setAttribute(k, v)
+    }
+    else if (typeof p[k] !== 'function') el.setAttribute(k, p[k])
+  }
+  const ch = vnode.children || []
+  for (const c of ch) render(c, el)
+  container.appendChild(el)
+}
+
+const R = id => document.getElementById(id)
+
+// ============ Input ============
+render(Input({ label: '用户名', placeholder: '请输入', hint: '4-20 个字符' }), R('r-input'))
+render(Input({ label: '邮箱', placeholder: 'you@example.com', type: 'email', allowClear: true }), R('r-input'))
+render(Input({ label: '密码', placeholder: '••••••', password: true, allowClear: true }), R('r-input'))
+render(Input({ label: '带错误', defaultValue: 'abc', error: '格式不正确' }), R('r-input2'))
+render(Input({ label: '字数限制', placeholder: '最多 20 字', maxLength: 20, showCount: true }), R('r-input2'))
+render(Input({ placeholder: 'disabled', disabled: true, defaultValue: '不可编辑' }), R('r-input2'))
+
+// ============ Switch ============
+render(Switch({ checked: true, label: '开启通知' }), R('r-switch'))
+render(Switch({ label: '自动保存' }), R('r-switch'))
+render(Switch({ checked: true, label: '深色模式', tone: 'success' }), R('r-switch'))
+render(Switch({ label: '危险操作', tone: 'danger' }), R('r-switch'))
+render(Switch({ loading: true, label: '加载中…' }), R('r-switch'))
+
+render(Switch({ size:'xs', checked: true }), R('r-switch2'))
+render(Switch({ size:'sm', checked: true }), R('r-switch2'))
+render(Switch({ size:'md', checked: true }), R('r-switch2'))
+render(Switch({ size:'lg', checked: true }), R('r-switch2'))
+render(Switch({ size:'xl', checked: true }), R('r-switch2'))
+
+// ============ Progress ============
+render(Progress({ value: 65, showText: true }), R('r-prog1'))
+render(Progress({ value: 30, tone: 'success' }), R('r-prog1'))
+render(Progress({ value: 45, tone: 'warning' }), R('r-prog1'))
+render(Progress({ value: 85, tone: 'gradient', striped: true, animated: true }), R('r-prog1'))
+
+render(Progress({ variant:'circle', value: 72, showText: true }), R('r-prog2'))
+render(Progress({ variant:'circle', value: 45, tone:'success', size: 'sm' }), R('r-prog2'))
+render(Progress({ variant:'circle', value: 90, tone:'gradient', size: 'lg' }), R('r-prog2'))
+
+render(Progress({ variant:'segments', segments: [
+  { value: 45, color: '#10b981', label: '成功' },
+  { value: 25, color: '#ef4444', label: '失败' },
+  { value: 30, color: '#f59e0b', label: '进行' },
+], size: 'lg' }), R('r-prog3'))
+
+// ============ Alert ============
+render(Alert({ tone: 'info', title: '提示', description: '这是一条信息提示' }), R('r-alert'))
+render(Alert({ tone: 'success', title: '成功', description: '操作已完成', closable: true, onClose: () => say('alert closed') }), R('r-alert'))
+render(Alert({ tone: 'warning', title: '警告', description: '磁盘空间不足' }), R('r-alert'))
+render(Alert({ tone: 'danger', title: '错误', description: '提交失败，请重试' }), R('r-alert'))
+render(Alert({ tone: 'primary', title: '温馨提示', description: '有新版本可用', action: Btn({ size:'sm', type:'primary' }, '更新') }), R('r-alert'))
+
+// Banner 通栏（全屏宽）
+render(Alert({ tone: 'warning', banner: true, title: '⚠ 系统维护', description: '10 月 20 日 02:00-04:00 停机升级', closable: true, showIcon: false }), R('r-alert2'))
+
+// ============ 主题 ============
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  say('主题', dark ? 'dark' : 'light')
+}
+document.getElementById('btn-clear').onclick = () => { logEl.textContent = '已清空' }
+
+say('加载完成')
+</script>
+</body>
+</html>

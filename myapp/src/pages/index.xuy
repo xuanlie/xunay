@@ -1,0 +1,106 @@
+import { div, a } from 'xunay'
+import { Btn, Card, Tag, Row } from 'xunay/kit/ui'
+import { go } from '@/router.xuy'
+
+const FEATURES = [
+  { icon: '⚡', title: '极速构建', desc: '编译期展开 DOM 操作，运行时零开销，首屏更快一步' },
+  { icon: '📦', title: '极小体积', desc: '核心仅 7KB，比主流框架小 50 倍，加载快、跑得稳' },
+  { icon: '🎯', title: '细粒度响应式', desc: 'signal 直挂 DOM 节点，更新精确到点，无虚拟 DOM 开销' },
+  { icon: '🧩', title: '函数即组件', desc: '组合自由，无 class、无 hooks 心智负担，类型天然友好' },
+  { icon: '🛣️', title: '内置路由', desc: 'hash 路由开箱即用，支持参数、嵌套与懒加载' },
+  { icon: '🎨', title: 'UI Kit', desc: 'Button / Card / Tag 一整套现成组件，开箱即美' }
+]
+
+const STATS = [
+  { num: '7KB',  label: '核心体积' },
+  { num: '0',    label: '运行时依赖' },
+  { num: '<16ms', label: '首次渲染' },
+  { num: '100%', label: 'TypeScript' }
+]
+
+const CODE = `import { div, signal } from 'xunay'
+
+const n = signal(0)
+
+export function Counter() {
+  return div(
+    { on: { click: () => n.set(n() + 1) } },
+    () => '计数：' + n()
+  )
+}`
+
+export function Index() {
+  return div(null,
+    // ═══ Hero ═══
+    div({ class: 'hero' },
+      div({ class: 'hero-icon' },
+        a({ href: '#/', style: 'color:#fff;font-size:40px;font-weight:900;text-decoration:none;line-height:1' }, 'X')
+      ),
+      div({ class: 'hero-title' }, 'myapp'),
+      div({ class: 'hero-sub' }, '用 XuNay 构建的下一代前端应用 —— 极速、极简、极致'),
+      Row({ gap: 3, justify: 'center', wrap: true },
+        Btn({ type: 'primary', size: 'lg', onClick: () => go('/demo') }, '立即体验'),
+        a({ class: 'btn btn-lg', href: 'http://107.172.190.220:12342/', target: '_blank' }, '查看文档')
+      ),
+      div({ style: 'margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap' },
+        Tag({ type: 'primary', variant: 'outline' }, 'v1.0.0'),
+        Tag({ type: 'success', variant: 'outline' }, 'MIT License'),
+        Tag({ type: 'info',    variant: 'outline' }, 'TypeScript')
+      )
+    ),
+
+    // ═══ 数据条 ═══
+    div({ class: 'page-wrap', style: 'padding-top:0' },
+      div({ style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:20px 24px;background:var(--x-bg-elev);border:1px solid var(--x-line);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.05);margin-top:-16px' },
+        ...STATS.map(s =>
+          div({ style: 'text-align:center;padding:8px 0' },
+            div({ style: 'font-size:26px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#6366f1,#06b6d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent' }, s.num),
+            div({ style: 'font-size:12px;color:var(--x-fg-mute);margin-top:4px' }, s.label)
+          )
+        )
+      )
+    ),
+
+    // ═══ 功能 ═══
+    div({ class: 'page-wrap' },
+      div({ style: 'text-align:center;margin-bottom:36px' },
+        div({ style: 'font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px' }, '为什么选择 XuNay'),
+        div({ style: 'color:var(--x-fg-dim);font-size:15px' }, '为性能与开发体验而生的前端框架')
+      ),
+      div({ class: 'grid-3' },
+        ...FEATURES.map(f =>
+          Card({ hover: true },
+            div({ style: 'width:44px;height:44px;border-radius:12px;background:var(--x-primary-soft);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px' }, f.icon),
+            div({ style: 'font-size:15px;font-weight:700;margin-bottom:6px' }, f.title),
+            div({ style: 'font-size:13px;color:var(--x-fg-dim);line-height:1.6' }, f.desc)
+          )
+        )
+      )
+    ),
+
+    // ═══ 代码演示 ═══
+    div({ class: 'page-wrap' },
+      div({ style: 'text-align:center;margin-bottom:28px' },
+        div({ style: 'font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px' }, '简单到不可思议'),
+        div({ style: 'color:var(--x-fg-dim);font-size:15px' }, '几行代码，写一个响应式组件')
+      ),
+      div({ style: 'background:#0f172a;border-radius:16px;padding:22px 26px;overflow:auto;box-shadow:0 16px 40px rgba(15,23,42,.18)' },
+        div({ style: 'display:flex;gap:6px;margin-bottom:16px' },
+          div({ style: 'width:11px;height:11px;border-radius:50%;background:#ff5f57' }),
+          div({ style: 'width:11px;height:11px;border-radius:50%;background:#febc2e' }),
+          div({ style: 'width:11px;height:11px;border-radius:50%;background:#28c840' })
+        ),
+        div({ style: 'color:#e2e8f0;font-family:var(--x-mono);font-size:13px;line-height:1.75;white-space:pre' }, CODE)
+      )
+    ),
+
+    // ═══ CTA ═══
+    div({ class: 'page-wrap' },
+      div({ style: 'text-align:center;padding:56px 24px;background:radial-gradient(ellipse 60% 80% at 50% 50%,var(--x-primary-soft),transparent 70%);border-radius:24px' },
+        div({ style: 'font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px' }, '准备好开始了吗'),
+        div({ style: 'color:var(--x-fg-dim);font-size:15px;margin-bottom:24px' }, '几分钟上手，构建你的第一个 XuNay 应用'),
+        Btn({ type: 'primary', size: 'lg', onClick: () => go('/demo') }, '立即体验')
+      )
+    )
+  )
+}

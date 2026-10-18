@@ -1,5 +1,5 @@
 // Devtool
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -28,6 +28,6 @@ export function Doc() {
     P("每个 effect 对象上有 runs、totalMs、lastMs 字段："),
     Code("rt.hooks.onEffectCreate = (e) => {\n  setTimeout(() => {\n    console.log('effect 跑了 ' + e.runs + ' 次，累计 ' + e.totalMs + 'ms')\n  }, 5000)\n}", "xuy"),
     H2("完整示例：自定义性能面板"),
-    Code("import { div, span, signal, onMount, onUnmount, mount } from 'xunay'\n\nfunction PerfPanel() {\n  const effectRuns = signal(0)\n  const slowEffects = signal(0)\n  const signals = signal(0)\n\n  onMount(() => {\n    const rt = window.__XUNAY_RUNTIME__\n    if (!rt || !rt.hooks) return\n    rt.hooks.onSignalCreate = () => signals(signals() + 1)\n    rt.hooks.onEffectRun = (e, ms) => {\n      effectRuns(effectRuns() + 1)\n      if (ms > 5) slowEffects(slowEffects() + 1)\n    }\n  })\n\n  return div({ class: 'perf' },\n    div(null, 'Signals: ', () => signals()),\n    div(null, 'Effect 重跑: ', () => effectRuns()),\n    div(null, '慢 effect: ', () => slowEffects())\n  )\n}\n\nmount(() => PerfPanel(), '#app')", "xuy"),
+    Code("import { signal, onMount, onUnmount, mount } from 'xunay'\n\nfunction PerfPanel() {\n  const effectRuns = signal(0)\n  const slowEffects = signal(0)\n  const signals = signal(0)\n\n  onMount(() => {\n    const rt = window.__XUNAY_RUNTIME__\n    if (!rt || !rt.hooks) return\n    rt.hooks.onSignalCreate = () => signals(signals() + 1)\n    rt.hooks.onEffectRun = (e, ms) => {\n      effectRuns(effectRuns() + 1)\n      if (ms > 5) slowEffects(slowEffects() + 1)\n    }\n  })\n\n  return div({ class: 'perf' },\n    div(null, 'Signals: ', () => signals()),\n    div(null, 'Effect 重跑: ', () => effectRuns()),\n    div(null, '慢 effect: ', () => slowEffects())\n  )\n}\n\nmount(() => PerfPanel(), '#app')", "xuy"),
   )
 }

@@ -1,0 +1,49 @@
+// title: TanStack Table
+import React from 'xunay/compat'
+import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table'
+const h = React.createElement
+
+const data = [
+  { name: '张三', age: 28, city: '北京' },
+  { name: '李四', age: 34, city: '上海' },
+  { name: '王五', age: 22, city: '广州' },
+]
+const columns = [
+  { accessorKey: 'name', header: '姓名' },
+  { accessorKey: 'age', header: '年龄' },
+  { accessorKey: 'city', header: '城市' },
+]
+
+function Table() {
+  const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() })
+  return h('table', { style: { borderCollapse: 'collapse', width: '100%', background: '#fff', color: '#000' } },
+    h('thead', null,
+      table.getHeaderGroups().map(hg =>
+        h('tr', { key: hg.id },
+          hg.headers.map(header =>
+            h('th', { key: header.id, style: { border: '1px solid #ccc', padding: '8px', textAlign: 'left' } },
+              flexRender(header.column.columnDef.header, header.getContext()))
+          )
+        )
+      )
+    ),
+    h('tbody', null,
+      table.getRowModel().rows.map(row =>
+        h('tr', { key: row.id },
+          row.getVisibleCells().map(cell =>
+            h('td', { key: cell.id, style: { border: '1px solid #ccc', padding: '8px' } },
+              flexRender(cell.column.columnDef.cell, cell.getContext()))
+          )
+        )
+      )
+    )
+  )
+}
+
+function App() {
+  return h('div', { style: 'padding:24px;background:#282c34;color:#abb2bf;font-family:system-ui;min-height:100vh' },
+    h('h1', { style: { color: '#61afef' } }, 'TanStack Table'),
+    h(Table)
+  )
+}
+React.createRoot(document.getElementById('app')).render(h(App))

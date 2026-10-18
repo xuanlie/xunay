@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HeatmapChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>HeatmapChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-values">🔢 值标签</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-rows">📏 行列数</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">GitHub 风格 · 7 天 × 24 小时</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">带数值 · 5×5</div>
+    <div id="c2"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">绿阶 · 3×12</div>
+    <div id="c3"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import HeatmapChart from './kit/charts/heatmap.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => a + Math.random() * (b - a)
+const DAYS = ['周一','周二','周三','周四','周五','周六','周日']
+
+const mk7x24 = () => DAYS.map((_, ri) =>
+  Array.from({ length: 24 }, (_, ci) => {
+    const base = Math.sin((ci - 6) / 24 * Math.PI * 2) * 30 + 50
+    const weekend = ri >= 5 ? 0.4 : 1
+    return Math.max(0, Math.round((base + rand(-15, 15)) * weekend))
+  }))
+
+const mk5x5 = () => Array.from({ length: 5 }, (_, r) =>
+  Array.from({ length: 5 }, (_, c) => Math.round(rand(10, 100))))
+
+const mk3x12 = () => Array.from({ length: 3 }, () =>
+  Array.from({ length: 12 }, () => Math.round(rand(5, 80))))
+
+const c1 = new HeatmapChart('#c1', {
+  title: '活跃度分布',
+  subtitle: '十字准线 · 悬停高亮行列',
+  rowLabels: DAYS,
+  colLabels: Array.from({ length: 24 }, (_, i) => i + '时'),
+  data: mk7x24(),
+  colLabelRotate: -45,
+  cellGap: 3,
+  cellRadius: 3,
+  crosshair: true,
+  onHover: p => p && log('hover', p.row, p.col, p.value),
+  onCellClick: c => log('click', c.row, c.col, c.value),
+})
+
+const c2 = new HeatmapChart('#c2', {
+  title: '能力矩阵',
+  rowLabels: ['A','B','C','D','E'],
+  colLabels: ['X','Y','Z','W','V'],
+  data: mk5x5(),
+  showValues: true,
+  valueDigits: 0,
+  cellGap: 4,
+  height: 380,
+  colorRamp: ['#fef3c7','#fcd34d','#f59e0b','#dc2626','#7f1d1d'],
+  colorRampDark: ['#7f1d1d','#dc2626','#f59e0b','#fcd34d','#fef3c7'],
+})
+
+const c3 = new HeatmapChart('#c3', {
+  title: '月度指标',
+  rowLabels: ['Q1','Q2','Q3'],
+  colLabels: Array.from({ length: 12 }, (_, i) => (i + 1) + '月'),
+  data: mk3x12(),
+  colorRamp: ['#f0fdf4','#86efac','#22c55e','#15803d','#052e16'],
+  colorRampDark: ['#052e16','#15803d','#22c55e','#86efac','#f0fdf4'],
+  cellGap: 2,
+  cellRadius: 4,
+  height: 240,
+})
+
+let dark = false
+let showValues = false
+let sizes = [null, [7,24], [10,20], [4,8]]
+let sizeIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2, c3].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-values').onclick = () => {
+  showValues = !showValues
+  c2.setOptions({ showValues })
+  log('值标签 →', showValues)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  c1.setData(mk7x24(), { rowLabels: DAYS, colLabels: Array.from({length:24},(_,i)=>i+'时') })
+  c2.setData(mk5x5(), { rowLabels: ['A','B','C','D','E'], colLabels: ['X','Y','Z','W','V'] })
+  c3.setData(mk3x12(), { rowLabels: ['Q1','Q2','Q3'], colLabels: Array.from({length:12},(_,i)=>(i+1)+'月') })
+  log('已刷新')
+}
+
+document.getElementById('btn-rows').onclick = () => {
+  sizeIdx = (sizeIdx + 1) % sizes.length
+  const [r, cc] = sizes[sizeIdx] || [7, 24]
+  const rl = Array.from({ length: r }, (_, i) => 'R' + (i + 1))
+  const cl = Array.from({ length: cc }, (_, i) => 'C' + (i + 1))
+  const m = Array.from({ length: r }, () =>
+    Array.from({ length: cc }, () => Math.round(rand(5, 90))))
+  c1.setData(m, { rowLabels: rl, colLabels: cl })
+  log('尺寸 →', r + '×' + cc)
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2, c3].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

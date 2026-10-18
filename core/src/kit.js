@@ -1,5 +1,6 @@
 import { px, cx } from './kit-util.js'
-import { div, span, button, input, h1, h2, h3, p, label as _label } from './element.js'
+import { div, span, button, input, h1, h2, h3, h4, h5, h6, p, a, code as _code, pre as _pre, label as _label } from './element.js'
+const require_tags = { h4, h5, h6, a, code: _code, pre: _pre }
 import { createElement } from './element.js'
 import { show } from './misc.js'
 import { signal } from './core.js'
@@ -27,7 +28,8 @@ export function Col(props, ...children) {
 export function Text(props, ...children) {
   const { size, dim, bold, center, tag = 'p' } = px(props)
   const cls = cx(size && 'text-' + size, dim && 'text-dim', bold && 'font-' + (bold === true ? 'bold' : bold), center && 'text-center')
-  const Tag = { p, span, h1, h2, h3 }[tag] || p
+  const { h4, h5, h6, a, code: _code, pre: _pre } = require_tags
+  const Tag = { p, span, h1, h2, h3, h4, h5, h6, a, code: _code, pre: _pre }[tag] || p
   return Tag({ class: cls }, ...children)
 }
 
@@ -53,9 +55,15 @@ export function Divider(props) {
   )
 }
 
-export function Space(props) {
-  const { size = 16 } = px(props)
-  return div({ style: { height: size + 'px' } })
+export function Space(props, ...children) {
+  const { size = 16, direction = 'horizontal' } = px(props)
+  const real = children.length ? children : [props.children].filter(Boolean)
+  if (!real.length) return div({ style: { height: size + 'px' } })
+  const gap = typeof size === 'number' ? size : parseInt(size) || 16
+  const sty = direction === 'vertical'
+    ? { display: 'flex', flexDirection: 'column', gap: gap + 'px' }
+    : { display: 'inline-flex', alignItems: 'center', gap: gap + 'px' }
+  return div({ style: sty }, ...real)
 }
 
 export function Tag(props, ...children) {

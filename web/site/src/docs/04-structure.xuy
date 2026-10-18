@@ -1,5 +1,5 @@
 // 项目结构
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -15,7 +15,7 @@ export function Doc() {
     H2("xunay.config.json（可选）"),
     Code("{\n  \"title\": \"我的应用\",\n  \"minify\": true,\n  \"devtools\": false,\n  \"css\": [\"tw\", \"ui\"],\n  \"alias\": { \"@\": \"./src\" },\n  \"pwa\": { \"name\": \"我的应用\", \"themeColor\": \"#1f6feb\" }\n}", "json"),
     H2("组件子路径（按需加载）"),
-    Code("import { Btn, Row, Col } from 'xunay/kit/base'      // ~2 KB\nimport { Input, Select } from 'xunay/kit/form'\nimport { LineChart } from 'xunay/kit/charts'\nimport { Btn, Input, Table } from 'xunay/kit'         // 全量 ~29 KB", "js"),
+    Code("import { Btn, Row, Col } from 'xunay/kit/ui'      // ~2 KB\nimport { Input, Select } from 'xunay/kit/ui'\nimport { LineChart } from 'xunay/kit/charts'\nimport { Btn, Input, Table } from 'xunay/kit/ui'         // 全量 ~29 KB", "js"),
     Tip("大项目只 import 用到的子路径，体积从 29KB 降到 2-5KB。"),
   )
 }

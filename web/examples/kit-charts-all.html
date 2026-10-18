@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit · 36 种图表总览</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; --accent:#3b82f6; }
+  [data-theme=dark] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui;
+    padding:20px; transition:background .2s,color .2s; }
+  header { margin-bottom:14px; }
+  h1 { font-size:22px; margin-bottom:4px; }
+  .sub { color:var(--muted); font-size:13px; }
+  .toolbar { position:sticky; top:0; z-index:30; display:flex; gap:8px; flex-wrap:wrap;
+    padding:10px 0; margin-bottom:14px;
+    background:color-mix(in srgb,var(--bg) 92%,transparent);
+    backdrop-filter:blur(8px); }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px;
+    transition:all .15s; }
+  button:hover { border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+  button.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:14px; }
+  .grid.compact { grid-template-columns:1fr; }
+  .card { background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:14px; transition:box-shadow .2s; overflow:hidden; }
+  .card:hover { box-shadow:0 4px 20px rgba(0,0,0,.06); }
+  .card-head { display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; }
+  .card-title { font-size:14px; font-weight:600; }
+  .card-num { font-size:10.5px; color:var(--muted); font-family:ui-monospace,monospace; }
+  .card-tag { font-size:10px; padding:2px 6px; border-radius:4px;
+    background:color-mix(in srgb,var(--accent) 15%,transparent); color:var(--accent);
+    font-weight:600; margin-left:6px; }
+  .card-body { min-height:200px; }
+  @media(max-width:640px){ .grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kit · 36 种图表总览</h1>
+  <div class="sub">全部零依赖 · 原生 SVG · 悬停交互 · 动画 · 深色浅色 · 响应式</div>
+</header>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 切换主题</button>
+  <button id="btn-replay">▶ 全部重播</button>
+  <button id="btn-compact">📱 单列模式</button>
+  <button id="btn-filter-all" class="active" data-filter="all">全部 36</button>
+  <button data-filter="basic">基础 6</button>
+  <button data-filter="dist">分布 6</button>
+  <button data-filter="hier">层级 6</button>
+  <button data-filter="flow">流向 6</button>
+  <button data-filter="time">时间 6</button>
+  <button data-filter="adv">进阶 6</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script type="module">
+// 一次性导入全部 36 个
+import LineChart from './kit/charts/line.js'
+import BarChart from './kit/charts/bar.js'
+import AreaChart from './kit/charts/area.js'
+import PieChart from './kit/charts/pie.js'
+import ScatterChart from './kit/charts/scatter.js'
+import RadarChart from './kit/charts/radar.js'
+import FunnelChart from './kit/charts/funnel.js'
+import GaugeChart from './kit/charts/gauge.js'
+import HeatmapChart from './kit/charts/heatmap.js'
+import TreemapChart from './kit/charts/treemap.js'
+import SankeyChart from './kit/charts/sankey.js'
+import NetworkChart from './kit/charts/network.js'
+import TreeChart from './kit/charts/tree.js'
+import BoxplotChart from './kit/charts/boxplot.js'
+import CandlestickChart from './kit/charts/candlestick.js'
+import WordcloudChart from './kit/charts/wordcloud.js'
+import WaterfallChart from './kit/charts/waterfall.js'
+import GanttChart from './kit/charts/gantt.js'
+import SunburstChart from './kit/charts/sunburst.js'
+import ChordChart from './kit/charts/chord.js'
+import ParallelChart from './kit/charts/parallel.js'
+import BulletChart from './kit/charts/bullet.js'
+import WaffleChart from './kit/charts/waffle.js'
+import CalendarHeatmap from './kit/charts/calendar.js'
+import ViolinChart from './kit/charts/violin.js'
+import RidgelineChart from './kit/charts/ridgeline.js'
+import StreamChart from './kit/charts/stream.js'
+import BumpChart from './kit/charts/bump.js'
+import LollipopChart from './kit/charts/lollipop.js'
+import DumbbellChart from './kit/charts/dumbbell.js'
+import SlopeChart from './kit/charts/slope.js'
+import HexbinChart from './kit/charts/hexbin.js'
+import CirclePackingChart from './kit/charts/circlepack.js'
+import MarimekkoChart from './kit/charts/marimekko.js'
+import IcicleChart from './kit/charts/icicle.js'
+import VoronoiChart from './kit/charts/voronoi.js'
+
+// ============ 数据工具 ============
+const rnd = (a, b) => Math.round(a + Math.random() * (b - a))
+function randn(m, s) {
+  let u = 0, v = 0
+  while (u === 0) u = Math.random()
+  while (v === 0) v = Math.random()
+  return m + s * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)
+}
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月']
+const MONTHS12 = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+const mkSeries = (name, base, spread, n = 8) => ({
+  name,
+  data: MONTHS.slice(0, n).map(m => ({ label: m, value: rnd(base, base + spread), y: rnd(base, base + spread) })),
+})
+const mkPie = (labels) => labels.map(l => ({ label: l, value: rnd(50, 400) }))
+
+// ============ 图表实例管理 ============
+const charts = []
+const grid = document.getElementById('grid')
+
+const GROUPS = { basic: 0, dist: 0, hier: 0, flow: 0, time: 0, adv: 0 }
+
+function addCard(num, title, tag, group, build) {
+  const card = document.createElement('div')
+  card.className = 'card'
+  card.dataset.group = group
+  card.innerHTML = `<div class="card-head">
+    <div><span class="card-title">${title}</span><span class="card-tag">${tag}</span></div>
+    <span class="card-num">#${String(num).padStart(2, '0')}</span>
+  </div>`
+  const body = document.createElement('div')
+  body.className = 'card-body'
+  card.appendChild(body)
+  grid.appendChild(card)
+  try {
+    const c = build(body)
+    if (c) charts.push(c)
+  } catch (e) {
+    body.innerHTML = `<div style="color:#ef4444;font-size:12px;padding:20px;text-align:center">⚠ ${e.message}</div>`
+    console.error(title, e)
+  }
+}
+
+const chartOpts = () => ({ height: 240, legend: false, animation: { duration: 600, easing: 'easeOutCubic' } })
+
+// ============ 1-6 基础 ============
+addCard(1, '折线图', 'LineChart', 'basic', (host) => new LineChart(host, {
+  ...chartOpts(),
+  series: [mkSeries('收入', 100, 80), mkSeries('支出', 60, 60)],
+  mode: 'smooth',
+}))
+
+addCard(2, '柱状图', 'BarChart', 'basic', (host) => new BarChart(host, {
+  ...chartOpts(),
+  series: [mkSeries('产品 A', 80, 100, 6), mkSeries('产品 B', 60, 80, 6)],
+  layout: 'grouped',
+}))
+
+addCard(3, '面积图', 'AreaChart', 'basic', (host) => new AreaChart(host, {
+  ...chartOpts(),
+  series: [mkSeries('移动端', 100, 120), mkSeries('桌面端', 80, 90)],
+  layout: 'stacked',
+}))
+
+addCard(4, '饼图', 'PieChart', 'basic', (host) => new PieChart(host, {
+  ...chartOpts(),
+  data: mkPie(['直接访问','搜索引擎','邮件','联盟','视频']),
+  shape: 'donut',
+}))
+
+addCard(5, '散点图', 'ScatterChart', 'basic', (host) => new ScatterChart(host, {
+  ...chartOpts(),
+  data: Array.from({length: 80}, () => ({ x: randn(50, 15), y: randn(50, 15) })),
+  showRegression: true,
+  showR2: false,
+}))
+
+addCard(6, '雷达图', 'RadarChart', 'basic', (host) => new RadarChart(host, {
+  ...chartOpts(),
+  indicators: ['性能','易用','功能','生态','文档','稳定'],
+  max: 100,
+  series: [
+    { name: 'A', data: [90, 70, 85, 60, 75, 88], color: '#3b82f6' },
+    { name: 'B', data: [70, 88, 65, 80, 60, 72], color: '#ec4899' },
+  ],
+}))
+
+// ============ 7-12 分布 ============
+addCard(7, '箱线图', 'BoxplotChart', 'dist', (host) => {
+  const mkG = (m, s) => Array.from({length: 40}, () => randn(m, s))
+  return new BoxplotChart(host, {
+    ...chartOpts(),
+    groups: [
+      { label: 'A班', values: mkG(78, 10) },
+      { label: 'B班', values: mkG(72, 15) },
+      { label: 'C班', values: mkG(85, 8) },
+    ],
+    yFormat: v => v.toFixed(0),
+  })
+})
+
+addCard(8, '小提琴图', 'ViolinChart', 'dist', (host) => new ViolinChart(host, {
+  ...chartOpts(),
+  groups: [
+    { label: 'A', values: Array.from({length: 50}, () => randn(75, 8)) },
+    { label: 'B', values: Array.from({length: 50}, () => randn(70, 12)) },
+    { label: 'C', values: Array.from({length: 50}, () => randn(82, 6)) },
+  ],
+  showMean: true,
+}))
+
+addCard(9, '山脊图', 'RidgelineChart', 'dist', (host) => new RidgelineChart(host, {
+  ...chartOpts(),
+  height: 280,
+  groups: MONTHS.slice(0, 6).map((m, i) => ({
+    label: m,
+    values: Array.from({length: 40}, () => randn(50 + i * 3, 8)),
+  })),
+  overlap: 0.6,
+}))
+
+addCard(10, '直方热力', 'HexbinChart', 'dist', (host) => new HexbinChart(host, {
+  ...chartOpts(),
+  data: Array.from({length: 1200}, () => ({
+    x: randn(50, 20),
+    y: randn(50, 20),
+  })),
+  bins: 14,
+  legend: false,
+}))
+
+addCard(11, '日历热力', 'CalendarHeatmap', 'dist', (host) => {
+  const data = []
+  const today = new Date()
+  for (let i = 0; i < 180; i++) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const k = d.toISOString().slice(0, 10)
+    data.push({ date: k, value: Math.random() < 0.3 ? 0 : rnd(1, 20) })
+  }
+  return new CalendarHeatmap(host, {
+    ...chartOpts(),
+    data,
+    cellSize: 10,
+    showLegend: false,
+  })
+})
+
+addCard(12, '词云', 'WordcloudChart', 'dist', (host) => new WordcloudChart(host, {
+  ...chartOpts(),
+  data: 'React Vue Svelte Angular Solid Qwik Astro Next Nuxt Remix Vite Webpack Rollup esbuild'.split(' ')
+    .map((t, i) => ({ text: t, value: 100 - i * 5 })),
+  minFontSize: 10,
+  maxFontSize: 30,
+  rotateRatio: 0,
+}))
+
+// ============ 13-18 层级 ============
+addCard(13, '矩形树图', 'TreemapChart', 'hier', (host) => new TreemapChart(host, {
+  ...chartOpts(),
+  data: [
+    { label: '技术', value: 300, children: [
+      { label: '前端', value: 150 }, { label: '后端', value: 100 }, { label: '算法', value: 50 },
+    ]},
+    { label: '产品', value: 250, children: [
+      { label: '设计', value: 120 }, { label: '需求', value: 80 }, { label: '测试', value: 50 },
+    ]},
+    { label: '运营', value: 180 },
+    { label: '行政', value: 100 },
+  ],
+  depth: 1,
+}))
+
+addCard(14, '旭日图', 'SunburstChart', 'hier', (host) => new SunburstChart(host, {
+  ...chartOpts(),
+  data: {
+    children: [
+      { label: '系统', children: [
+        { label: 'Windows', value: 40 },
+        { label: 'macOS', value: 25 },
+        { label: 'Linux', value: 15 },
+      ]},
+      { label: '移动', children: [
+        { label: 'Android', value: 45 },
+        { label: 'iOS', value: 35 },
+      ]},
+    ],
+  },
+  innerRadius: 0.28,
+  showCenterLabel: false,
+}))
+
+addCard(15, '圆堆积', 'CirclePackingChart', 'hier', (host) => new CirclePackingChart(host, {
+  ...chartOpts(),
+  height: 260,
+  data: {
+    children: [
+      { label: '中文', value: 1200, children: [
+        { label: '普通话', value: 900 }, { label: '粤语', value: 300 },
+      ]},
+      { label: '英语', value: 1000 },
+      { label: '西语', value: 550 },
+      { label: '印地语', value: 600 },
+      { label: '阿语', value: 400 },
+      { label: '法语', value: 300 },
+    ],
+  },
+  maxDepth: 2,
+  minLabelR: 14,
+}))
+
+addCard(16, '树形图', 'TreeChart', 'hier', (host) => new TreeChart(host, {
+  ...chartOpts(),
+  height: 280,
+  data: {
+    name: 'root',
+    children: [
+      { name: 'A', children: [{ name: 'A1' }, { name: 'A2' }] },
+      { name: 'B', children: [{ name: 'B1' }, { name: 'B2' }, { name: 'B3' }] },
+      { name: 'C' },
+    ],
+  },
+  orientation: 'horizontal',
+  nodeRadius: 5,
+  expandAll: true,
+}))
+
+addCard(17, '冰柱图', 'IcicleChart', 'hier', (host) => new IcicleChart(host, {
+  ...chartOpts(),
+  height: 260,
+  data: {
+    children: [
+      { label: 'src', children: [
+        { label: 'components', children: [
+          { label: 'Button', value: 12 }, { label: 'Input', value: 8 }, { label: 'Modal', value: 15 },
+        ]},
+        { label: 'pages', children: [
+          { label: 'Home', value: 18 }, { label: 'About', value: 8 },
+        ]},
+      ]},
+      { label: 'public', children: [
+        { label: 'images', value: 60 }, { label: 'fonts', value: 18 },
+      ]},
+    ],
+  },
+  maxDepth: 3,
+}))
+
+addCard(18, '马赛克图', 'MarimekkoChart', 'hier', (host) => {
+  const BR = ['A','B','C','D','E']
+  const mk = (label) => ({ label, values: BR.reduce((a, b) => { a[b] = rnd(50, 300); return a }, {}) })
+  return new MarimekkoChart(host, {
+    ...chartOpts(),
+    height: 280,
+    data: { columns: ['手机','电脑','平板','电视'].map(mk), categories: BR },
+    normalize: true,
+    labelMode: 'percent',
+    legend: false,
+  })
+})
+
+// ============ 19-24 流向 ============
+addCard(19, '桑基图', 'SankeyChart', 'flow', (host) => new SankeyChart(host, {
+  ...chartOpts(),
+  height: 280,
+  nodes: [
+    { id: 'src', name: '来源' },
+    { id: 'web', name: 'Web' },
+    { id: 'app', name: 'App' },
+    { id: 'paid', name: '付费' },
+    { id: 'free', name: '免费' },
+  ],
+  links: [
+    { source: 'src', target: 'web', value: 600 },
+    { source: 'src', target: 'app', value: 400 },
+    { source: 'web', target: 'paid', value: 200 },
+    { source: 'web', target: 'free', value: 400 },
+    { source: 'app', target: 'paid', value: 280 },
+    { source: 'app', target: 'free', value: 120 },
+  ],
+}))
+
+addCard(20, '和弦图', 'ChordChart', 'flow', (host) => {
+  const labels = ['A','B','C','D','E']
+  const matrix = labels.map((_, i) => labels.map((_, j) => i === j ? 0 : (Math.random() > 0.4 ? rnd(5, 40) : 0)))
+  return new ChordChart(host, {
+    ...chartOpts(),
+    height: 280,
+    labels, matrix,
+    innerRadius: 0.68,
+    showLabels: false,
+    padding: 30,
+  })
+})
+
+addCard(21, '平行坐标', 'ParallelChart', 'flow', (host) => new ParallelChart(host, {
+  ...chartOpts(),
+  height: 260,
+  data: Array.from({length: 15}, (_, i) => ({
+    name: 'P' + (i + 1),
+    速度: rnd(20, 100),
+    力量: rnd(20, 100),
+    敏捷: rnd(20, 100),
+    智力: rnd(20, 100),
+    耐力: rnd(20, 100),
+  })),
+  categoryKey: 'name',
+  dimensions: [
+    { key: '速度', label: '速度' },
+    { key: '力量', label: '力量' },
+    { key: '敏捷', label: '敏捷' },
+    { key: '智力', label: '智力' },
+    { key: '耐力', label: '耐力' },
+  ],
+  brushable: false,
+  padding: { top: 30, right: 30, bottom: 30, left: 30 },
+}))
+
+addCard(22, '泰森多边形', 'VoronoiChart', 'flow', (host) => new VoronoiChart(host, {
+  ...chartOpts(),
+  height: 260,
+  padding: 10,
+  data: Array.from({length: 20}, (_, i) => ({
+    x: rnd(0, 100),
+    y: rnd(0, 100),
+    value: rnd(10, 100),
+    label: 'P' + (i + 1),
+  })),
+  showLabels: false,
+  showValues: false,
+  legend: false,
+}))
+
+addCard(23, '关系图', 'NetworkChart', 'flow', (host) => {
+  const NAMES = ['A','B','C','D','E','F','G','H']
+  const nodes = NAMES.map(n => ({ id: n, name: n, value: rnd(20, 100) }))
+  const links = []
+  for (let i = 0; i < 15; i++) {
+    const a = NAMES[rnd(0, 7)], b = NAMES[rnd(0, 7)]
+    if (a !== b && !links.find(l => l.source === a && l.target === b)) {
+      links.push({ source: a, target: b, value: rnd(1, 5) })
+    }
+  }
+  return new NetworkChart(host, { ...chartOpts(), height: 260, nodes, links, layout: 'force' })
+})
+
+addCard(24, '凹凸图', 'BumpChart', 'flow', (host) => new BumpChart(host, {
+  ...chartOpts(),
+  height: 260,
+  series: ['A','B','C','D'].map((name, i) => ({
+    name,
+    data: MONTHS.slice(0, 6).map((m, j) => ({ label: m, value: rnd(50, 200) })),
+  })),
+  labels: MONTHS.slice(0, 6),
+  padding: { top: 30, right: 70, bottom: 30, left: 50 },
+}))
+
+// ============ 25-30 时间 ============
+addCard(25, 'K线图', 'CandlestickChart', 'time', (host) => {
+  let price = 100
+  const data = []
+  for (let i = 0; i < 25; i++) {
+    const open = price
+    const close = open + (Math.random() - 0.48) * 4
+    const high = Math.max(open, close) + Math.random() * 2
+    const low = Math.min(open, close) - Math.random() * 2
+    price = close
+    data.push({ label: 'D' + (i + 1), open, close, high, low })
+  }
+  return new CandlestickChart(host, {
+    ...chartOpts(),
+    height: 260,
+    data,
+    showVolume: false,
+    showMA: true,
+    showLegend: false,
+    padding: { top: 10, right: 50, bottom: 30, left: 10 },
+  })
+})
+
+addCard(26, '甘特图', 'GanttChart', 'time', (host) => {
+  const today = new Date()
+  const d = (n) => { const x = new Date(today); x.setDate(x.getDate() + n); return x }
+  return new GanttChart(host, {
+    ...chartOpts(),
+    height: undefined,
+    tasks: [
+      { id: 'a', name: '需求', start: d(-5), end: d(0), progress: 1.0 },
+      { id: 'b', name: '设计', start: d(0), end: d(6), progress: 0.6, deps: ['a'] },
+      { id: 'c', name: '开发', start: d(6), end: d(18), progress: 0.3, deps: ['b'] },
+      { id: 'd', name: '测试', start: d(15), end: d(24), progress: 0.1, deps: ['c'] },
+    ],
+    rowHeight: 30,
+    labelWidth: 70,
+    padding: { top: 36, right: 20, bottom: 20, left: 0 },
+    showProgress: true,
+    showDependencies: true,
+    showToday: true,
+  })
+})
+
+addCard(27, '瀑布图', 'WaterfallChart', 'time', (host) => {
+  const data = [
+    { label: '期初', value: 400, type: 'total' },
+    { label: '营收', value: 200, type: 'increase' },
+    { label: '成本', value: -120, type: 'decrease' },
+    { label: '营销', value: -60, type: 'decrease' },
+    { label: '研发', value: -40, type: 'decrease' },
+  ]
+  let acc = 400
+  for (let i = 1; i < data.length; i++) acc += data[i].value
+  data.push({ label: '期末', value: acc, type: 'total' })
+  return new WaterfallChart(host, {
+    ...chartOpts(),
+    height: 260,
+    data,
+    showValue: true,
+    showConnector: true,
+  })
+})
+
+addCard(28, '斜率图', 'SlopeChart', 'time', (host) => new SlopeChart(host, {
+  ...chartOpts(),
+  height: 280,
+  leftLabel: '2023',
+  rightLabel: '2024',
+  data: ['A','B','C','D','E'].map(name => ({
+    label: name,
+    a: rnd(40, 100),
+    b: rnd(40, 100),
+  })),
+  showDelta: true,
+  padding: { top: 30, right: 100, bottom: 20, left: 100 },
+}))
+
+addCard(29, '哑铃图', 'DumbbellChart', 'time', (host) => new DumbbellChart(host, {
+  ...chartOpts(),
+  height: undefined,
+  rowHeight: 30,
+  padding: { top: 16, right: 70, bottom: 20, left: 70 },
+  data: ['A','B','C','D'].map(name => ({
+    label: name,
+    a: rnd(30, 60),
+    b: rnd(60, 100),
+  })),
+  showDelta: true,
+}))
+
+addCard(30, '棒棒糖图', 'LollipopChart', 'time', (host) => new LollipopChart(host, {
+  ...chartOpts(),
+  height: undefined,
+  rowHeight: 26,
+  padding: { top: 16, right: 60, bottom: 24, left: 90 },
+  data: ['北京','上海','广州','深圳','杭州'].map(name => ({
+    label: name,
+    value: rnd(50, 400),
+  })),
+}))
+
+// ============ 31-36 进阶 ============
+addCard(31, '华夫图', 'WaffleChart', 'adv', (host) => new WaffleChart(host, {
+  ...chartOpts(),
+  cols: 10, rows: 10,
+  data: mkPie(['Chrome','Safari','Edge','Firefox']),
+  showLegend: false,
+  padding: 8,
+}))
+
+addCard(32, '子弹图', 'BulletChart', 'adv', (host) => new BulletChart(host, {
+  ...chartOpts(),
+  height: undefined,
+  rowHeight: 42,
+  padding: { top: 16, right: 70, bottom: 16, left: 80 },
+  data: [
+    { label: 'Q1', value: 85, target: 80, max: 100, unit: '' },
+    { label: 'Q2', value: 92, target: 85, max: 120, unit: '' },
+    { label: 'Q3', value: 78, target: 90, max: 120, unit: '' },
+  ],
+  valueFormat: v => String(Math.round(v)),
+}))
+
+addCard(33, '流图', 'StreamChart', 'adv', (host) => new StreamChart(host, {
+  ...chartOpts(),
+  height: 260,
+  series: ['A','B','C','D','E'].map((name, i) => ({
+    name,
+    data: MONTHS.map((m, j) => ({
+      label: m,
+      value: Math.round(40 + Math.sin((j + i) * 0.7) * 20 + Math.random() * 40 + 10),
+    })),
+  })),
+  labels: MONTHS,
+  baseline: 'wiggle',
+  legend: false,
+}))
+
+addCard(34, '漏斗图', 'FunnelChart', 'adv', (host) => new FunnelChart(host, {
+  ...chartOpts(),
+  height: 260,
+  data: [
+    { label: '访问', value: 1000 },
+    { label: '注册', value: 640 },
+    { label: '激活', value: 420 },
+    { label: '付费', value: 180 },
+    { label: '复购', value: 75 },
+  ],
+  showPercent: false,
+}))
+
+addCard(35, '仪表盘', 'GaugeChart', 'adv', (host) => new GaugeChart(host, {
+  ...chartOpts(),
+  height: 240,
+  value: 72, min: 0, max: 100, unit: '%', valueLabel: 'CPU',
+  sweepAngle: 270, startAngle: 135,
+  thresholds: [
+    { to: 60, color: '#10b981' },
+    { to: 80, color: '#f59e0b' },
+    { to: 100, color: '#ef4444' },
+  ],
+}))
+
+addCard(36, '热力图', 'HeatmapChart', 'adv', (host) => {
+  const DAYS = ['一','二','三','四','五','六','日']
+  return new HeatmapChart(host, {
+    ...chartOpts(),
+    height: 260,
+    rowLabels: DAYS,
+    colLabels: Array.from({length: 12}, (_, i) => i + ''),
+    data: DAYS.map(() => Array.from({length: 12}, () => rnd(10, 100))),
+    cellGap: 3,
+    legend: false,
+    showValues: false,
+  })
+})
+
+// ============ 交互 ============
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  charts.forEach(c => c.setOptions && c.setOptions({ theme: t }))
+}
+document.getElementById('btn-replay').onclick = () => {
+  charts.forEach(c => c.replay && c.replay())
+}
+let compact = false
+document.getElementById('btn-compact').onclick = (e) => {
+  compact = !compact
+  grid.classList.toggle('compact', compact)
+  e.target.classList.toggle('active', compact)
+}
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    const f = btn.dataset.filter
+    document.querySelectorAll('.card').forEach(card => {
+      card.style.display = (f === 'all' || card.dataset.group === f) ? '' : 'none'
+    })
+  }
+})
+
+window.addEventListener('error', e => console.error('[gallery]', e.message))
+</script>
+</body>
+</html>

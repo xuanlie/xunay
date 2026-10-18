@@ -27,7 +27,7 @@ export function Tooltip(props, ...children) {
     show(visible, () => span({
       style: {
         position: 'absolute', zIndex: 1000, whiteSpace: 'nowrap',
-        background: '#101828', color: '#fff', padding: '6px 10px',
+        background: '#101828', color: 'var(--x-text-inverse)', padding: '6px 10px',
         borderRadius: '6px', fontSize: '12px',
         left: '50%', transform: 'translateX(-50%)',
         top: position === 'bottom' ? 'calc(100% + 6px)' : 'auto',
@@ -50,7 +50,7 @@ export function Popover(props, ...children) {
     ...children,
     show(visible, () => div({
       style: {
-        position: 'absolute', zIndex: 1000, background: '#fff',
+        position: 'absolute', zIndex: 1000, background: 'var(--x-text-inverse)',
         border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px',
         boxShadow: '0 8px 24px rgba(0,0,0,.1)', minWidth: '200px',
         left: '50%', transform: 'translateX(-50%)',
@@ -79,7 +79,7 @@ export function Dropdown(props, ...children) {
     show(visible, () => div({
       style: {
         position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 1000,
-        background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px',
+        background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb', borderRadius: '8px',
         boxShadow: '0 8px 24px rgba(0,0,0,.1)', minWidth: '140px', padding: '4px'
       }
     },
@@ -87,7 +87,7 @@ export function Dropdown(props, ...children) {
         style: { padding: '8px 12px', fontSize: '14px', cursor: 'pointer', borderRadius: '6px' },
         on: {
           click: () => { onSelect && onSelect(it); visible(false) },
-          mouseenter: e => e.currentTarget.style.background = '#f3f4f6',
+          mouseenter: e => e.currentTarget.style.background = 'var(--x-bg-hover)',
           mouseleave: e => e.currentTarget.style.background = 'transparent'
         }
       }, it.label || it))
@@ -122,7 +122,7 @@ export function Drawer(props, ...children) {
   },
     div({
       style: {
-        background: '#fff', width: position === 'top' || position === 'bottom' ? '100%' : width,
+        background: 'var(--x-text-inverse)', width: position === 'top' || position === 'bottom' ? '100%' : width,
         height: position === 'top' || position === 'bottom' ? width : '100%',
         display: 'flex', flexDirection: 'column'
       },
@@ -131,7 +131,7 @@ export function Drawer(props, ...children) {
       div({ style: { padding: '16px 20px', borderBottom: '1px solid #e5e7eb',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
         div({ style: { fontWeight: '600', fontSize: '15px' } }, title || ''),
-        button({ style: { border: 0, background: 'transparent', cursor: 'pointer', fontSize: '20px', color: '#6b7280' },
+        button({ style: { border: 0, background: 'transparent', cursor: 'pointer', fontSize: '20px', color: 'var(--x-text-dim)' },
           on: { click: onClose } }, '×')
       ),
       div({ style: { flex: 1, overflow: 'auto', padding: '20px' } }, ...children)
@@ -147,7 +147,7 @@ export function Popconfirm(props, ...children) {
     show(visible, () => div({
       style: {
         position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 1000,
-        background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px',
+        background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb', borderRadius: '8px',
         padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,.1)', minWidth: '200px'
       }
     },
@@ -160,18 +160,22 @@ export function Popconfirm(props, ...children) {
   )
 }
 
-const msgContainer = typeof document !== 'undefined' ? (() => {
-  const el = document.createElement('div')
-  el.id = '__xunay-msg'
-  el.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;pointer-events:none'
-  document.body && document.body.appendChild(el)
-  return el
-})() : null
+let msgContainer = null
+function ensureMsgContainer() {
+  if (msgContainer && msgContainer.isConnected) return msgContainer
+  if (typeof document === 'undefined' || !document.body) return null
+  msgContainer = document.createElement('div')
+  msgContainer.id = '__xunay-msg'
+  msgContainer.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;pointer-events:none'
+  document.body.appendChild(msgContainer)
+  return msgContainer
+}
 
 function pushMessage(text, type, duration = 2000) {
+  const msgContainer = ensureMsgContainer()
   if (!msgContainer) return
   const el = document.createElement('div')
-  const colors = { info: '#1f6feb', success: '#10b981', warning: '#f59e0b', error: '#ef4444' }
+  const colors = { info: 'var(--x-primary)', success: 'var(--x-success)', warning: 'var(--x-warning)', error: 'var(--x-danger)' }
   el.style.cssText = `background:#fff;padding:10px 16px;border-radius:8px;margin-bottom:8px;
     box-shadow:0 4px 12px rgba(0,0,0,.15);font-size:14px;color:${colors[type] || colors.info};
     border-left:3px solid ${colors[type] || colors.info};animation:slideIn .2s`
@@ -187,17 +191,21 @@ export const Message = {
   error: (t, d) => pushMessage(t, 'error', d),
 }
 
-const notiContainer = typeof document !== 'undefined' ? (() => {
-  const el = document.createElement('div')
-  el.id = '__xunay-noti'
-  el.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;width:340px'
-  document.body && document.body.appendChild(el)
-  return el
-})() : null
+let notiContainer = null
+function ensureNotiContainer() {
+  if (notiContainer && notiContainer.isConnected) return notiContainer
+  if (typeof document === 'undefined' || !document.body) return null
+  notiContainer = document.createElement('div')
+  notiContainer.id = '__xunay-noti'
+  notiContainer.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;width:340px'
+  document.body.appendChild(notiContainer)
+  return notiContainer
+}
 
 function pushNotification({ title, desc, type = 'info', duration = 4000 }) {
+  const notiContainer = ensureNotiContainer()
   if (!notiContainer) return
-  const colors = { info: '#1f6feb', success: '#10b981', warning: '#f59e0b', error: '#ef4444' }
+  const colors = { info: 'var(--x-primary)', success: 'var(--x-success)', warning: 'var(--x-warning)', error: 'var(--x-danger)' }
   const el = document.createElement('div')
   el.style.cssText = `background:#fff;padding:14px 16px;border-radius:8px;margin-bottom:10px;
     box-shadow:0 8px 24px rgba(0,0,0,.15);border-left:3px solid ${colors[type]};animation:slideIn .2s`
@@ -232,11 +240,11 @@ export function Tour(props) {
       background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center'
     }
   },
-    div({ style: { background: '#fff', borderRadius: '10px', padding: '20px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,.2)' } },
+    div({ style: { background: 'var(--x-text-inverse)', borderRadius: '10px', padding: '20px', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,.2)' } },
       div({ style: { fontWeight: '600', fontSize: '16px', marginBottom: '8px' } }, () => step().title || ''),
-      div({ style: { fontSize: '14px', color: '#6b7280', marginBottom: '16px' } }, () => step().desc || ''),
+      div({ style: { fontSize: '14px', color: 'var(--x-text-dim)', marginBottom: '16px' } }, () => step().desc || ''),
       Row({ gap: 1, justify: 'between', align: 'center' },
-        span({ style: { fontSize: '13px', color: '#9ca3af' } }, () => (cur() + 1) + ' / ' + steps.length),
+        span({ style: { fontSize: '13px', color: 'var(--x-text-mute)' } }, () => (cur() + 1) + ' / ' + steps.length),
         Row({ gap: 1 },
           Btn({ size: 'sm', onClick: () => { const n = cur() - 1; if (n < 0) return; onChange ? onChange(n) : idx(n) } }, '上一步'),
           Btn({ size: 'sm', type: 'primary', onClick: () => {

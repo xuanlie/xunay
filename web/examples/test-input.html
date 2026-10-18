@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8"><title>Input only</title>
+<style>
+  :root{--x-bg:#f8fafc;--x-card:#fff;--x-text:#0f172a;--x-muted:#64748b;--x-border:#e2e8f0;--x-primary:#3b82f6;--x-bg-soft:#f1f5f9}
+  body{background:var(--x-bg);color:var(--x-text);font:14px/1.5 -apple-system,system-ui,sans-serif;padding:40px;max-width:500px;margin:0 auto}
+  h1{font-size:20px;margin-bottom:20px}
+  .box{border:2px dashed #f87171;padding:20px;margin:20px 0}
+</style></head><body>
+<h1>Input 测试</h1>
+<div class="box" id="root"></div>
+
+<script type="module">
+import { Input } from './kit/ui/input.js'
+
+// 用最朴素的方式渲染
+function render(v, c) {
+  if (v == null || v === false || v === true) return
+  if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+  if (typeof v === 'function') return render(v(), c)
+  if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+  if (!v.type) return
+  const el = document.createElement(v.type)
+  const p = v.props || {}
+  for (const k in p) {
+    const val = p[k]
+    if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+    else if (k === 'ref' && typeof val === 'function') val(el)
+    else if (k === 'style') {
+      const st = typeof val === 'function' ? val() : val
+      if (typeof st === 'string') el.style.cssText = st
+    }
+    else if (k === 'class' || k === 'className') {
+      const cc = typeof val === 'function' ? val() : val
+      if (cc) el.className = cc
+    }
+    else if (typeof val !== 'function' && val != null) {
+      if (val === true) el.setAttribute(k, '')
+      else el.setAttribute(k, val)
+    }
+  }
+  for (const ch of (v.children || [])) render(ch, el)
+  c.appendChild(el)
+}
+
+const vnode = Input({ label: '用户名', placeholder: '请输入', hint: '4-20 个字符' })
+console.log('vnode:', vnode)
+render(vnode, document.getElementById('root'))
+</script>
+</body></html>

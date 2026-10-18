@@ -1,5 +1,5 @@
 // xuyc 命令
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -16,7 +16,7 @@ export function Doc() {
     H2("优先级"),
     Table(["位置","优先级"], [["文件头 // @runtime 或 // @compiled","最高"],["命令行 --mode","中"],["package.json.xunay.compileMode","低"],["内置默认 compiled","最低"]]),
     H2("和旧 xuyc 的区别"),
-    Table(["维度","xuyc (compiler2)","xuyc3 (compiler3)"], [["解析","字符串扫描","acorn AST"],["模式开关","XUYC_NO_COMPILE=1","--mode / package.json"],["value 响应式","错","对"],["测试","54","1391"]]),
+    Table(["维度","xuyc (compiler2)","xuyc3 (compiler3)"], [["解析","字符串扫描","acorn AST"],["模式开关","XUYC_NO_COMPILE=1","--mode / package.json"],["value 响应式","错","对"],["测试","—","1391"]]),
     H2("site 构建"),
     P("文档站有自己的构建脚本："),
     Code("cd site && bash build.sh", "bash"),

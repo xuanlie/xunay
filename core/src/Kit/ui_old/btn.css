@@ -1,0 +1,49 @@
+/* @xunay/kit/ui/btn 样式（全局注入） */
+.x-btn {
+  border: 1px solid var(--x-btn-bd, var(--x-border, #e2e8f0));
+  background: var(--x-btn-bg, var(--x-card, #fff));
+  color: var(--x-btn-fg, var(--x-text, #0f172a));
+  font-family: inherit;
+}
+.x-btn:hover:not(:disabled) {
+  border-color: var(--x-btn-hover-bd, var(--x-primary, #3b82f6));
+  color: var(--x-btn-hover-fg, var(--x-primary, #3b82f6));
+}
+.x-btn-primary {
+  background: var(--x-btn-bg, var(--x-primary, #3b82f6));
+  color: var(--x-btn-fg, #fff);
+  border-color: transparent;
+}
+.x-btn-primary:hover:not(:disabled) {
+  color: #fff;
+  filter: brightness(1.08);
+}
+.x-btn-dashed {
+  border-style: dashed;
+}
+.x-btn-text {
+  border-color: transparent;
+  background: transparent;
+}
+.x-btn-link {
+  border-color: transparent;
+  background: transparent;
+  color: var(--x-primary, #3b82f6);
+  text-decoration: none;
+}
+.x-btn-link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.x-btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border-color: transparent;
+}
+.x-btn:disabled { cursor: not-allowed; }
+
+@keyframes x-btn-spin { to { transform: rotate(360deg) } }
+@keyframes x-btn-ripple {
+  0% { transform: scale(0); opacity: .35 }
+  60% { opacity: .12 }
+  100% { transform: scale(1); opacity: 0 }
+}

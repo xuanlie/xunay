@@ -1,5 +1,5 @@
 import { px, cx } from './kit-util.js'
-import {div, span, button, input, h1, h2, h3, p, label as _label, img} from './element.js'
+import {div, span, button, input, h1, h2, h3, p, label as _label, img, canvas} from './element.js'
 import { createElement } from './element.js'
 import { show } from './misc.js'
 import { signal, effect, onCleanup } from './core.js'
@@ -26,13 +26,13 @@ export function Modal(props, ...children) {
       if (unlock) { unlock(); unlock = null }
     }
   })
-  // ESC 关闭
+  // ESC 关闭（每次 isOpen 变，旧 effect 会 dispose 再注册）
   effect(() => {
     if (!isOpen()) return
     const h = e => { if (e.key === 'Escape') onClose && onClose() }
     document.addEventListener('keydown', h)
     onCleanup(() => document.removeEventListener('keydown', h))
-  })
+  }, [() => isOpen()])
   return div({
     class: 'modal-overlay' + (mobile === 'sheet' ? ' modal-sheet' : ''),
     style: () => isOpen() ? { display: 'flex' } : { display: 'none' },
@@ -62,9 +62,14 @@ export function Spinner(props) {
 }
 
 export function Empty(props) {
-  const { text = '暂无数据', icon = '📭' } = px(props)
+  const { text = '暂无数据', icon } = px(props)
   return div({ style: { textAlign: 'center', padding: '60px 20px', color: 'var(--x-text-mute)' } },
-    div({ style: { fontSize: '48px', marginBottom: '12px' } }, icon),
+    div({ style: { marginBottom: '12px', display: 'flex', justifyContent: 'center', opacity: .4, color: 'var(--x-text-mute)' } },
+      icon || createElement('svg', { width: 64, height: 64, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        createElement('path', { d: 'M3 7h18v13H3z' }),
+        createElement('path', { d: 'M3 7l2-4h14l2 4' }),
+        createElement('path', { d: 'M3 7l9 6 9-6' })
+      )),
     div({ style: { fontSize: '14px' } }, text)
   )
 }
@@ -92,10 +97,10 @@ export function Avatar(props) {
 
 export function Result(props) {
   const { status = 'info', title, subTitle, extra } = px(props)
-  const icons = { success: '✓', error: '✗', warning: '!', info: 'i' }
+  const icons = { success: '✓', error: '✕', warning: '!', info: 'i' }
   const colors = { success: 'var(--x-success)', error: 'var(--x-danger)', warning: 'var(--x-warning)', info: 'var(--x-primary)' }
   return div({ style: { textAlign: 'center', padding: '40px 20px' } },
-    div({ style: { width: '64px', height: '64px', borderRadius: '50%', background: colors[status], color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', marginBottom: '16px' } }, icons[status]),
+    div({ style: { width: '64px', height: '64px', borderRadius: '50%', background: colors[status], color: 'var(--x-text-inverse)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', marginBottom: '16px' } }, icons[status]),
     div({ style: { fontSize: '20px', fontWeight: '600', marginBottom: '8px' } }, title || ''),
     subTitle ? div({ style: { color: 'var(--x-text-dim)', marginBottom: '20px' } }, subTitle) : null,
     extra || null
@@ -178,16 +183,37 @@ export function ItemCard(props) {
 
 // ===== 描述列表 =====
 
+// QRCode 不再依赖外部 API —— 用 canvas 绘制简易矩阵
+// 注意：这是"占位矩阵"，不是真正可扫描的 QR 码。
+// 生产环境请用 xunay/kit/qrcode 子路径（配合 qrcode 库）
 export function QRCode(props) {
   const { text, size = 200 } = px(props)
-  const buildUrl = (t) => 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(t)
-  const isFn = typeof text === 'function'
-  return img( {
-    src: isFn ? () => buildUrl(text()) : buildUrl(text),
-    width: size,
-    height: size,
-    style: { borderRadius: '8px' }
-  })
+  const canvasRef = el => {
+    if (!el) return
+    const ctx = el.getContext('2d')
+    const dpr = window.devicePixelRatio || 1
+    el.width = size * dpr
+    el.height = size * dpr
+    el.style.width = size + 'px'
+    el.style.height = size + 'px'
+    ctx.scale(dpr, dpr)
+    ctx.fillStyle = '#fff'
+    ctx.fillRect(0, 0, size, size)
+    // 用 text 做简易 hash 生成伪随机矩阵
+    const s = String(typeof text === 'function' ? text() : text || '')
+    let h = 0
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0
+    const grid = 21
+    const cell = size / grid
+    ctx.fillStyle = '#000'
+    for (let y = 0; y < grid; y++) {
+      for (let x = 0; x < grid; x++) {
+        h = (h * 1103515245 + 12345) | 0
+        if ((h >>> 16) & 1) ctx.fillRect(x * cell, y * cell, cell, cell)
+      }
+    }
+  }
+  return canvas({ ref: canvasRef, style: { display: 'block', borderRadius: '8px' } })
 }
 
 // ===== 星级评分 =====

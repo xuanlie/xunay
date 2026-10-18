@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>LollipopChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>LollipopChart · 棒棒糖图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-dir">🔁 方向</button>
+<button id="btn-sort">↕ 排序</button>
+<button id="btn-color">🎨 配色</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">各城市销售额 · 水平</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">月度盈亏 · 按正负配色</div><div id="c2"></div></div>
+<div class="card"><div class="card-label">同比对比 · 显示差值</div><div id="c3"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import LollipopChart from './kit/charts/lollipop.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const CITIES = ['北京','上海','广州','深圳','杭州','成都','武汉','西安','南京','重庆','苏州','天津']
+function mkCities() {
+  return CITIES.map(name => ({ label: name, value: rand(80, 480) }))
+}
+const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+function mkProfit() {
+  return MONTHS.map(m => ({ label: m, value: rand(-80, 120) }))
+}
+const CHANNELS = ['线上','门店','分销','代理','直播','社群','其他']
+function mkCompare() {
+  return CHANNELS.map(name => ({
+    label: name,
+    value: rand(100, 500),
+    compare: rand(80, 450),
+  }))
+}
+const c1 = new LollipopChart('#c1',{
+  title:'城市销售额',
+  data: mkCities(),
+  sort:'desc',
+  height:undefined,
+  rowHeight:36,
+  valueFormat: v => '¥' + v + '万',
+  onHover: d => d && log('hover', d.label, d.value),
+  onDotClick: (d,i) => log('click', d.label, d.value),
+})
+const c2 = new LollipopChart('#c2',{
+  title:'月度盈亏',
+  data: mkProfit(),
+  height:undefined,
+  rowHeight:32,
+  colorMode:'byValue',
+  positiveColor:'#10b981',
+  negativeColor:'#ef4444',
+  valueFormat: v => (v >= 0 ? '+' : '') + v + '万',
+})
+const c3 = new LollipopChart('#c3',{
+  title:'渠道同比对比',
+  subtitle:'空心圈 = 去年，实心点 = 今年，浅色区 = 差值',
+  data: mkCompare(),
+  height:undefined,
+  rowHeight:36,
+  valueFormat: v => v + '',
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2,c3].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-dir').onclick=()=>{const d=c1.opts.direction==='horizontal'?'vertical':'horizontal';c1.setOptions({direction:d});log('方向 →',d)}
+let sorts=['none','asc','desc'], si=2
+document.getElementById('btn-sort').onclick=()=>{si=(si+1)%sorts.length;const s=sorts[si];c1.setOptions({sort:s});c1.setData(mkCities());log('排序 →',s)}
+let modes=['byValue','single','byGroup'], ci=0
+document.getElementById('btn-color').onclick=()=>{ci=(ci+1)%modes.length;const m=modes[ci];c1.setOptions({colorMode:m});log('配色 →',m)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(mkCities());c2.setData(mkProfit());c3.setData(mkCompare());log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2,c3].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

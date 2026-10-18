@@ -30,7 +30,7 @@ test('kit-form 组件响应式回归', async () => {
     { name: 'Textarea',    Comp: Textarea,    prop: 'value',   tag: 'textarea', init: 'X',            next: 'Y' },
     { name: 'Checkbox',    Comp: Checkbox,    prop: 'checked', tag: 'input',    init: false,          next: true },
     { name: 'Radio',       Comp: Radio,       prop: 'checked', tag: 'input',    init: false,          next: true },
-    { name: 'Switch',      Comp: Switch,      prop: 'checked', tag: 'input',    init: false,          next: true },
+    { name: 'Switch',      Comp: Switch,      prop: 'checked', tag: '[role="switch"]', init: false, next: true },
     { name: 'DatePicker',  Comp: DatePicker,  prop: 'value',   tag: 'input',    init: '2024-01-01',   next: '2024-12-31' },
     { name: 'TimePicker',  Comp: TimePicker,  prop: 'value',   tag: 'input',    init: '10:00',        next: '20:30' },
     { name: 'SearchInput', Comp: SearchInput, prop: 'value',   tag: 'input',    init: 'foo',          next: 'bar' },
@@ -57,7 +57,7 @@ test('kit-form 组件响应式回归', async () => {
     s(c.next)
     await waitMs()
 
-    const actual = c.prop === 'value' ? el.value : el.checked
+    const actual = c.name === 'Switch' ? el.getAttribute('aria-checked') === 'true' : (c.prop === 'value' ? el.value : el.checked)
     assert.equal(actual, c.next, `${c.name}: signal 改变后 DOM 未更新`)
   }
 })

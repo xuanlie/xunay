@@ -71,12 +71,25 @@ export function Radio(props) {
 
 export function Switch(props) {
   const { label, checked, onChange, disabled } = px(props)
+  const isChecked = () => typeof checked === 'function' ? !!checked() : !!checked
+  const toggle = () => {
+    if (disabled) return
+    onChange && onChange(!isChecked())
+  }
   return Row({ gap: 2, align: 'center' },
-    _label({ class: 'switch' },
-      input({ type: 'checkbox', checked: typeof checked === 'function' ? () => !!checked() : !!checked, disabled: !!disabled, on: { change: e => onChange && onChange(e.target.checked) } }),
-      span({ class: 'switch-slider' })
+    div({
+      class: 'switch' + (isChecked() ? ' on' : '') + (disabled ? ' disabled' : ''),
+      role: 'switch',
+      'aria-checked': () => isChecked() ? 'true' : 'false',
+      tabindex: '0',
+      on: {
+        click: toggle,
+        keydown: e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle() } }
+      }
+    },
+      div({ class: 'switch-thumb' })
     ),
-    label ? span(null, label) : null
+    label ? span({ class: 'switch-label', on: { click: toggle } }, label) : null
   )
 }
 
@@ -84,7 +97,12 @@ export function NumberInput(props) {
   const { label, hint, error, value, onChange, min, max, step = 1, disabled } = px(props)
   const val = typeof value === 'function' ? value() : value
   const clamp = v => { if (min !== undefined && v < min) v = min; if (max !== undefined && v > max) v = max; return v }
-  const set = v => onChange && onChange(clamp(Number(v) || 0))
+  const set = v => {
+    if (v === '' || v == null) { onChange && onChange(''); return }
+    const n = Number(v)
+    if (isNaN(n)) return
+    onChange && onChange(clamp(n))
+  }
   return div({ class: 'field' },
     label ? _label({ class: 'label' }, label) : null,
     Row({ gap: 1, align: 'center' },
@@ -120,7 +138,11 @@ export function SearchInput(props) {
   const { placeholder = '搜索...', value, onChange, onSearch } = px(props)
   const val = typeof value === 'function' ? value() : value
   return div({ style: { position: 'relative' } },
-    span({ style: { position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--x-text-mute)', pointerEvents: 'none' } }, '🔍'),
+    span({ style: { position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--x-text-mute)', pointerEvents: 'none', display: 'flex' } },
+      createElement('svg', { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+        createElement('circle', { cx: 11, cy: 11, r: 7 }),
+        createElement('path', { d: 'M21 21l-4.35-4.35' })
+      )),
     input({ class: 'input', style: { paddingLeft: '36px' }, placeholder, value: typeof value === 'function' ? value : (value || ''), on: { input: e => onChange && onChange(e.target.value), keydown: e => { if (e.key === 'Enter' && onSearch) onSearch(val) } } })
   )
 }
@@ -161,7 +183,7 @@ export function Rate(props) {
         style: () => ({
           fontSize: size + 'px',
           cursor: 'pointer',
-          color: idx <= (hover() || val()) ? '#f59e0b' : 'var(--x-border-strong)',
+          color: idx <= (hover() || val()) ? 'var(--x-warning)' : 'var(--x-border-strong)',
           transition: 'color .1s',
           lineHeight: '1'
         }),

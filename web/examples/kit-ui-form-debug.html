@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkbox / Radio / Switch 诊断</title>
+<link rel="stylesheet" href="/xunay/Kit/ui/ui.css">
+<link rel="stylesheet" href="/xunay/Kit/ui/tw.css">
+<script type="importmap">
+{ "imports": {
+  "xunay/kit/ui": "/xunay/Kit/ui/index.js",
+  "xunay/kit/ui/": "/xunay/Kit/ui/",
+  "xunay/element": "/xunay/element.js",
+  "xunay/core": "/xunay/core.js",
+  "xunay/runtime": "/xunay/runtime.js",
+  "xunay/misc": "/xunay/misc.js",
+  "xunay/mobile": "/xunay/mobile.js",
+  "xunay/hl": "/xunay/hl.js",
+  "xunay/sanitize": "/xunay/sanitize.js",
+  "xunay/render": "/xunay/render.js",
+  "xunay/events": "/xunay/events.js",
+  "xunay": "/xunay/index.js"
+}}
+</script>
+<style>
+  body { padding: 20px; background: #f8fafc; color: #0f172a; font: 13px/1.5 monospace }
+  h1 { font-size: 18px; font-family: sans-serif }
+  .demo { padding: 14px; border: 1px dashed #cbd5e1; border-radius: 8px; background: #fff; margin: 10px 0 }
+  .demo-label { font-size: 11px; color: #64748b; margin-bottom: 10px; text-transform: uppercase }
+  pre { background: #0f172a; color: #a5f3fc; padding: 12px; border-radius: 6px; overflow: auto; font-size: 11px; white-space: pre-wrap; max-height: 300px }
+  .css-block { color: #94a3b8 }
+</style>
+</head><body>
+<h1>Checkbox / Radio / Switch 诊断</h1>
+
+<div class="demo">
+  <div class="demo-label">Checkbox</div>
+  <div id="cb"></div>
+</div>
+
+<div class="demo">
+  <div class="demo-label">Radio</div>
+  <div id="rd"></div>
+</div>
+
+<div class="demo">
+  <div class="demo-label">Switch</div>
+  <div id="sw"></div>
+</div>
+
+<pre id="out"></pre>
+
+<script type="module">
+const out = document.getElementById('out')
+function log(...a) { out.textContent += a.join(' ') + '\n' }
+
+function render(v, c) {
+  if (v == null || v === false || v === true) return
+  if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+  if (typeof v === 'function') return render(v(), c)
+  if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+  if (!v.type) return
+  const el = document.createElement(v.type)
+  const p = v.props || {}
+  for (const k in p) {
+    const val = p[k]
+    if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+    else if (k === 'ref' && typeof val === 'function') val(el)
+    else if (k === 'style') {
+      const st = typeof val === 'function' ? val() : val
+      if (typeof st === 'string') el.setAttribute('style', st)
+      else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk]
+    }
+    else if (k === 'class' || k === 'className') { const cc = typeof val === 'function' ? val() : val; if (cc) el.className = cc }
+    else if (k.startsWith('aria-') || k.startsWith('data-')) { const vv = typeof val === 'function' ? val() : val; if (vv != null) el.setAttribute(k, vv) }
+    else if (k === 'disabled' || k === 'checked' || k === 'selected') { const vv = typeof val === 'function' ? val() : val; if (vv) el.setAttribute(k, '') }
+    else if (typeof val !== 'function' && val != null) el.setAttribute(k, val)
+  }
+  for (const ch of (v.children || [])) render(ch, el)
+  c.appendChild(el)
+}
+
+const UI = await import('xunay/kit/ui')
+
+// ============ Checkbox ============
+render(UI.Checkbox({ label: '同意条款' }), document.getElementById('cb'))
+const cbRoot = document.querySelector('#cb .checkbox')
+log('【Checkbox】DOM:')
+log(cbRoot ? cbRoot.outerHTML : '  (未渲染)')
+if (cbRoot) {
+  const inp = cbRoot.querySelector('input')
+  if (inp) {
+    const cs = getComputedStyle(inp)
+    log('  input computed:')
+    log(`    width: ${cs.width}  height: ${cs.height}`)
+    log(`    accent-color: ${cs.accentColor}`)
+    log(`    appearance: ${cs.appearance || cs.webkitAppearance}`)
+  }
+}
+
+// ============ Radio ============
+render(UI.Radio({ label: '选项 A' }), document.getElementById('rd'))
+const rdRoot = document.querySelector('#rd .radio')
+log('\n【Radio】DOM:')
+log(rdRoot ? rdRoot.outerHTML : '  (未渲染)')
+if (rdRoot) {
+  const inp = rdRoot.querySelector('input')
+  if (inp) {
+    const cs = getComputedStyle(inp)
+    log(`  width: ${cs.width}  height: ${cs.height}`)
+    log(`  accent-color: ${cs.accentColor}`)
+  }
+}
+
+// ============ Switch ============
+render(UI.Switch({ label: '开启' }), document.getElementById('sw'))
+const swRoot = document.querySelector('#sw .switch')
+log('\n【Switch】DOM:')
+log(swRoot ? swRoot.outerHTML : '  (未渲染)')
+if (swRoot) {
+  const cs = getComputedStyle(swRoot)
+  log('  .switch computed:')
+  log(`    display: ${cs.display}`)
+  log(`    width: ${cs.width}  height: ${cs.height}`)
+  log(`    background: ${cs.backgroundColor}`)
+  log(`    border-radius: ${cs.borderRadius}`)
+  log(`    position: ${cs.position}`)
+  log(`    padding: ${cs.padding}`)
+  const thumb = swRoot.querySelector('.switch-thumb')
+  if (thumb) {
+    const ts = getComputedStyle(thumb)
+    log('  .switch-thumb computed:')
+    log(`    width: ${ts.width}  height: ${ts.height}`)
+    log(`    background: ${ts.backgroundColor}`)
+    log(`    border-radius: ${ts.borderRadius}`)
+    log(`    transform: ${ts.transform}`)
+  } else {
+    log('  ⚠ 没有 .switch-thumb 元素')
+  }
+}
+
+// ============ CSS 变量 ============
+log('\n【CSS 变量】')
+const rs = getComputedStyle(document.documentElement)
+for (const v of ['--x-primary', '--x-primary-soft', '--x-text-inverse', '--x-border']) {
+  log(`  ${v}: ${rs.getPropertyValue(v).trim() || '(空)'}`)
+}
+
+document.title = 'OK'
+</script>
+</body></html>

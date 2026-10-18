@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SankeyChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>SankeyChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-curve">〰 曲线</button>
+  <button id="btn-opacity">👁 透明度</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">用户旅程 · 5 级流转</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">能源流向</div>
+    <div id="c2"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import SankeyChart from './kit/charts/sankey.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+
+const journeyData = {
+  nodes: [
+    { id: 'visit', name: '访问' },
+    { id: 'search', name: '搜索' },
+    { id: 'social', name: '社交' },
+    { id: 'ads', name: '广告' },
+    { id: 'browse', name: '浏览' },
+    { id: 'cart', name: '加购' },
+    { id: 'wish', name: '收藏' },
+    { id: 'checkout', name: '结账' },
+    { id: 'paid', name: '付款' },
+    { id: 'abandon', name: '放弃' },
+    { id: 'revisit', name: '复购' },
+  ],
+  links: [
+    { source: 'search', target: 'visit', value: 480 },
+    { source: 'social', target: 'visit', value: 260 },
+    { source: 'ads', target: 'visit', value: 180 },
+    { source: 'visit', target: 'browse', value: 700 },
+    { source: 'visit', target: 'cart', value: 220 },
+    { source: 'browse', target: 'cart', value: 380 },
+    { source: 'browse', target: 'wish', value: 160 },
+    { source: 'browse', target: 'abandon', value: 160 },
+    { source: 'cart', target: 'checkout', value: 320 },
+    { source: 'cart', target: 'abandon', value: 180 },
+    { source: 'cart', target: 'wish', value: 100 },
+    { source: 'wish', target: 'checkout', value: 140 },
+    { source: 'wish', target: 'abandon', value: 120 },
+    { source: 'checkout', target: 'paid', value: 380 },
+    { source: 'checkout', target: 'abandon', value: 80 },
+    { source: 'paid', target: 'revisit', value: 180 },
+  ],
+}
+
+const energyData = {
+  nodes: [
+    { id: 'coal', name: '煤炭' },
+    { id: 'gas', name: '天然气' },
+    { id: 'hydro', name: '水电' },
+    { id: 'solar', name: '光伏' },
+    { id: 'wind', name: '风电' },
+    { id: 'power', name: '发电' },
+    { id: 'industry', name: '工业' },
+    { id: 'residential', name: '居民' },
+    { id: 'transport', name: '交通' },
+    { id: 'loss', name: '损耗' },
+  ],
+  links: [
+    { source: 'coal', target: 'power', value: 850 },
+    { source: 'gas', target: 'power', value: 420 },
+    { source: 'hydro', target: 'power', value: 260 },
+    { source: 'solar', target: 'power', value: 180 },
+    { source: 'wind', target: 'power', value: 220 },
+    { source: 'power', target: 'industry', value: 900 },
+    { source: 'power', target: 'residential', value: 450 },
+    { source: 'power', target: 'transport', value: 320 },
+    { source: 'power', target: 'loss', value: 260 },
+  ],
+}
+
+const c1 = new SankeyChart('#c1', {
+  title: '用户旅程',
+  subtitle: '悬停节点/链路高亮相关流',
+  ...journeyData,
+  height: 520,
+  linkOpacity: 0.35,
+  onHover: p => p && log('hover', p.type === 'node' ? p.node.name : `${p.source.name} → ${p.target.name}`, p.value),
+  onNodeClick: (n) => log('node', n.name, n._value),
+  onLinkClick: (l) => log('link', l.source, '→', l.target, l.value),
+})
+
+const c2 = new SankeyChart('#c2', {
+  title: '能源流向',
+  ...energyData,
+  height: 440,
+  linkOpacity: 0.28,
+  linkCurve: 0.4,
+})
+
+let dark = false
+let curves = [0.5, 0.2, 0.8]
+let curveIdx = 0
+let opacities = [0.32, 0.15, 0.55]
+let opacityIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-curve').onclick = () => {
+  curveIdx = (curveIdx + 1) % curves.length
+  const k = curves[curveIdx]
+  c1.setOptions({ linkCurve: k })
+  log('曲线 →', k)
+}
+
+document.getElementById('btn-opacity').onclick = () => {
+  opacityIdx = (opacityIdx + 1) % opacities.length
+  const o = opacities[opacityIdx]
+  c1.setOptions({ linkOpacity: o })
+  log('不透明度 →', o)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  const newLinks = journeyData.links.map(l => ({ ...l, value: rand(40, 500) }))
+  c1.setData({ nodes: journeyData.nodes, links: newLinks })
+  const newEnergy = energyData.links.map(l => ({ ...l, value: rand(80, 900) }))
+  c2.setData({ nodes: energyData.nodes, links: newEnergy })
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

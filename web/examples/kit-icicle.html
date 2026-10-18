@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>IcicleChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>IcicleChart · 冰柱图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-dir">🔁 方向</button>
+<button id="btn-depth">📏 层级</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">项目文件结构 · 垂直</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">公司组织架构 · 水平</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import IcicleChart from './kit/charts/icicle.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const fsData = {
+  children: [
+    { label: 'src', children: [
+      { label: 'components', children: [
+        { label: 'Button.tsx', value: 12 },
+        { label: 'Input.tsx', value: 8 },
+        { label: 'Modal.tsx', value: 15 },
+        { label: 'Table.tsx', value: 25 },
+      ]},
+      { label: 'pages', children: [
+        { label: 'Home.tsx', value: 18 },
+        { label: 'About.tsx', value: 8 },
+        { label: 'Blog.tsx', value: 22 },
+      ]},
+      { label: 'hooks', children: [
+        { label: 'useAuth.ts', value: 6 },
+        { label: 'useFetch.ts', value: 5 },
+      ]},
+    ]},
+    { label: 'node_modules', children: [
+      { label: 'react', value: 45 },
+      { label: 'lodash', value: 30 },
+      { label: 'axios', value: 12 },
+      { label: 'moment', value: 55 },
+    ]},
+    { label: 'public', children: [
+      { label: 'images', value: 60 },
+      { label: 'fonts', value: 18 },
+      { label: 'videos', value: 85 },
+    ]},
+    { label: 'docs', value: 22 },
+    { label: 'README.md', value: 5 },
+  ]
+}
+const orgData = {
+  children: [
+    { label: 'CEO', children: [
+      { label: 'CTO', children: [
+        { label: '前端', children: [{ label: 'React 组', value: 15 }, { label: 'Vue 组', value: 10 }] },
+        { label: '后端', children: [{ label: 'Java 组', value: 20 }, { label: 'Go 组', value: 12 }] },
+        { label: '算法', value: 8 },
+      ]},
+      { label: 'CFO', children: [
+        { label: '会计', value: 6 },
+        { label: '审计', value: 4 },
+      ]},
+      { label: 'COO', children: [
+        { label: '运营', value: 12 },
+        { label: '市场', value: 15 },
+        { label: '客服', value: 8 },
+      ]},
+    ]},
+  ]
+}
+const c1 = new IcicleChart('#c1',{
+  title:'项目文件结构',
+  subtitle:'层级矩形 · 悬停查看',
+  data: fsData,
+  height: 400,
+  direction:'vertical',
+  maxDepth: 3,
+  onHover: n => n && log('hover', n.label, n.value),
+  onItemClick: (n, l) => log('click', n.label, 'depth='+l),
+})
+const c2 = new IcicleChart('#c2',{
+  title:'公司组织架构',
+  data: orgData,
+  height: 400,
+  direction:'horizontal',
+  maxDepth: 4,
+  shadeMode:'byParent',
+  colors:['#6366f1','#8b5cf6','#ec4899','#f97316','#10b981','#06b6d4'],
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+document.getElementById('btn-dir').onclick=()=>{const d=c1.opts.direction==='vertical'?'horizontal':'vertical';c1.setOptions({direction:d});log('方向 →',d)}
+let depths=[3,2,4,null], di=0
+document.getElementById('btn-depth').onclick=()=>{di=(di+1)%depths.length;const d=depths[di];c1.setOptions({maxDepth:d});log('层级 →',d)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(fsData);c2.setData(orgData);log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

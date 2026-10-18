@@ -1,0 +1,11 @@
+@keyframes x-avatar-shimmer {
+  0% { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
+}
+.x-avatar-slot:hover {
+  transform: translateY(-3px) scale(1.05);
+  z-index: 99 !important;
+}
+[data-theme="dark"] .x-avatar-group > .x-avatar-slot:last-child {
+  box-shadow: 0 0 0 2px var(--x-bg,#0a0e17);
+}

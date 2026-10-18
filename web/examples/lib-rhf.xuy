@@ -1,0 +1,29 @@
+// title: react-hook-form
+import React from 'xunay/compat'
+import { useForm } from 'react-hook-form'
+const h = React.createElement
+
+function Form() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    defaultValues: { name: '', email: '' },
+  })
+  const onSubmit = (data) => alert('提交: ' + JSON.stringify(data))
+  const inp = { width: '100%', padding: '8px 12px', margin: '4px 0 8px', background: '#21252b', border: '1px solid #3b4048', color: '#abb2bf', borderRadius: '4px', boxSizing: 'border-box', fontFamily: 'inherit' }
+  return h('form', { onSubmit: handleSubmit(onSubmit), style: { maxWidth: '400px' } },
+    h('div', { style: { color: '#98c379' } }, '名字'),
+    h('input', { ...register('name', { required: '名字必填' }), style: inp }),
+    errors.name ? h('div', { style: { color: '#e06c75', fontSize: '12px' } }, errors.name.message) : null,
+    h('div', { style: { color: '#98c379' } }, '邮箱'),
+    h('input', { ...register('email', { required: '邮箱必填' }), style: inp }),
+    errors.email ? h('div', { style: { color: '#e06c75', fontSize: '12px' } }, errors.email.message) : null,
+    h('button', { type: 'submit', style: 'padding:8px 20px;background:#61afef;color:#fff;border:0;border-radius:4px;cursor:pointer;font-family:inherit' }, '提交')
+  )
+}
+
+function App() {
+  return h('div', { style: 'padding:24px;background:#282c34;color:#abb2bf;font-family:system-ui;min-height:100vh' },
+    h('h1', { style: { color: '#61afef' } }, 'react-hook-form'),
+    h(Form)
+  )
+}
+React.createRoot(document.getElementById('app')).render(h(App))

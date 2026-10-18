@@ -1,0 +1,278 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · code · 代码块 / 行内代码 / 语法高亮
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── 行内代码 ─── */
+code, .code-inline {
+  display: inline-block;
+  padding: 0.15em 0.5em;
+  font-family: var(--x-font-mono, ui-monospace, monospace);
+  font-size: 0.88em;
+  font-weight: 500;
+  color: #e11d48;
+  background: #fef2f2;
+  border: 1px solid #fecdd3;
+  border-radius: 5px;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+[data-theme="dark"] code,
+[data-theme="dracula"] code,
+[data-theme="tokyo"] code,
+[data-theme="catppuccin"] code,
+[data-theme="one-dark"] code,
+[data-theme="monokai"] code {
+  color: #fca5a5;
+  background: rgba(239,68,68,.1);
+  border-color: rgba(239,68,68,.2);
+}
+
+/* ─── 代码块容器 ─── */
+.code-block {
+  position: relative;
+  display: block;
+  border-radius: 12px;
+  background: #fafbfc;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.code-block-dots {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.code-block-dots span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.code-block-dots span:nth-child(1) { background: #ff5f56; }
+.code-block-dots span:nth-child(2) { background: #ffbd2e; }
+.code-block-dots span:nth-child(3) { background: #27c93f; }
+
+.code-block-title {
+  flex: 1;
+  font-family: var(--x-font-mono, monospace);
+  font-weight: 500;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-block-lang {
+  padding: 2px 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: var(--x-font-mono, monospace);
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.code-block-copy {
+  padding: 4px 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: inherit;
+}
+.code-block-copy:hover {
+  background: #f9fafb;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+.code-block-copy.copied {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+/* ─── 代码内容 ─── */
+.code-pre {
+  margin: 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-family: var(--x-font-mono, ui-monospace, monospace);
+  font-size: 13px;
+  line-height: 1.7;
+  color: #1f2937;
+  background: #fafbfc;
+  tab-size: 2;
+  -webkit-overflow-scrolling: touch;
+}
+
+.code-pre::-webkit-scrollbar { height: 8px; }
+.code-pre::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+.code-pre::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.code-pre code {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: inherit;
+  white-space: pre;
+  display: block;
+  line-height: inherit;
+}
+
+/* ─── 语法高亮 · 浅色 ─── */
+.tok-keyword    { color: #c026d3; font-weight: 600; }
+.tok-string     { color: #16a34a; }
+.tok-number     { color: #ea580c; }
+.tok-comment    { color: #9ca3af; font-style: italic; }
+.tok-function   { color: #0891b2; }
+.tok-class      { color: #d97706; }
+.tok-operator   { color: #db2777; }
+.tok-punctuation{ color: #6b7280; }
+.tok-variable   { color: #1f2937; }
+.tok-constant   { color: #7c3aed; font-weight: 500; }
+.tok-boolean    { color: #2563eb; font-weight: 600; }
+.tok-tag        { color: #dc2626; }
+.tok-attr       { color: #d97706; }
+.tok-property   { color: #1f2937; }
+.tok-regex      { color: #7c3aed; }
+.tok-builtin    { color: #0ea5e9; }
+
+/* ─── 行号 ─── */
+.code-lines {
+  padding-left: 3.4em;
+  position: relative;
+}
+.code-lines .line {
+  display: block;
+  counter-increment: codeline;
+  position: relative;
+}
+.code-lines .line::before {
+  content: counter(codeline);
+  position: absolute;
+  left: -2.4em;
+  width: 2em;
+  text-align: right;
+  color: #9ca3af;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.code-lines { counter-reset: codeline; }
+
+/* ─── 高亮行 ─── */
+.code-pre .line.highlight {
+  display: block;
+  margin: 0 -18px;
+  padding: 0 18px;
+  background: rgba(37,99,235,.08);
+  border-left: 3px solid #2563eb;
+}
+.code-pre .line.added {
+  background: rgba(22,163,74,.1);
+  margin: 0 -18px;
+  padding: 0 18px;
+}
+.code-pre .line.removed {
+  background: rgba(220,38,38,.1);
+  margin: 0 -18px;
+  padding: 0 18px;
+  text-decoration: line-through;
+  opacity: .7;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   深色代码块
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.code-block.dark {
+  background: #1e293b;
+  border-color: #334155;
+}
+.code-block.dark .code-block-header {
+  background: #0f172a;
+  border-bottom-color: #1e293b;
+  color: #94a3b8;
+}
+.code-block.dark .code-block-title { color: #cbd5e1; }
+.code-block.dark .code-block-lang {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+.code-block.dark .code-block-copy {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+.code-block.dark .code-block-copy:hover {
+  background: #334155;
+  color: #60a5fa;
+  border-color: #3b82f6;
+}
+
+.code-block.dark .code-pre {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+/* 深色语法高亮 */
+.code-block.dark .tok-keyword    { color: #f472b6; }
+.code-block.dark .tok-string     { color: #86efac; }
+.code-block.dark .tok-number     { color: #fdba74; }
+.code-block.dark .tok-comment    { color: #64748b; font-style: italic; }
+.code-block.dark .tok-function   { color: #67e8f9; }
+.code-block.dark .tok-class      { color: #fbbf24; }
+.code-block.dark .tok-operator   { color: #f9a8d4; }
+.code-block.dark .tok-punctuation{ color: #94a3b8; }
+.code-block.dark .tok-variable   { color: #e2e8f0; }
+.code-block.dark .tok-constant   { color: #c4b5fd; }
+.code-block.dark .tok-boolean    { color: #93c5fd; }
+.code-block.dark .tok-tag        { color: #fca5a5; }
+.code-block.dark .tok-attr       { color: #fdba74; }
+.code-block.dark .tok-builtin    { color: #7dd3fc; }
+.code-block.dark .code-lines .line::before { color: #475569; }
+
+/* ─── 简单代码块（无头部） ─── */
+pre.code-simple {
+  margin: 12px 0;
+  padding: 16px 18px;
+  background: #fafbfc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: var(--x-font-mono, monospace);
+  font-size: 13px;
+  line-height: 1.7;
+  color: #1f2937;
+}
+pre.code-simple.dark {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}

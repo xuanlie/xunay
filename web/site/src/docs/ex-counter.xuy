@@ -1,12 +1,12 @@
 // 计数器
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("计数器"),
     P("最简单的 xunay 应用——20 行代码。"),
     H2("代码"),
-    Code("// app.xuy\n// title: 计数器\nimport { div, h1, button, span, signal, computed, mount } from 'xunay'\n\nconst n = signal(0)\nconst double = computed(() => n() * 2)\n\nmount(() => div({ class: 'app' },\n  h1(null, '计数器'),\n  div({ class: 'row' },\n    button({ on: { click: () => n(v => v - 1) } }, '-'),\n    span({ class: 'num' }, () => String(n())),\n    button({ on: { click: () => n(v => v + 1) } }, '+')\n  ),\n  p(null, () => '双倍: ' + double()),\n  button({ on: { click: () => n(0) } }, '重置')\n), '#app')", "xuy"),
+    Code("// app.xuy\n// title: 计数器\nimport { signal, computed, mount } from 'xunay'\n\nconst n = signal(0)\nconst double = computed(() => n() * 2)\n\nmount(() => div({ class: 'app' },\n  h1(null, '计数器'),\n  div({ class: 'row' },\n    button({ on: { click: () => n(v => v - 1) } }, '-'),\n    span({ class: 'num' }, () => String(n())),\n    button({ on: { click: () => n(v => v + 1) } }, '+')\n  ),\n  p(null, () => '双倍: ' + double()),\n  button({ on: { click: () => n(0) } }, '重置')\n), '#app')", "xuy"),
     H2("关键点"),
     Ul("signal(0) 创建状态","() => n() 建立响应式","n(v => v + 1) 函数式更新"),
     H2("扩展"),

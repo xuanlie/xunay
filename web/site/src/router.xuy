@@ -26,6 +26,7 @@ export function go(p) {
 
 const TABLE = [
   { url: "/home", load: () => import("./pages/Home.xuy"), params: [] },
+  { url: "/kittest", load: () => import("./pages/KitTest.xuy"), params: [] },
 ]
 
 const _pageCache = new Map()

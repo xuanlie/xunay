@@ -1,5 +1,5 @@
 // 子节点
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -44,6 +44,6 @@ export function Doc() {
     H2("性能"),
     Table(["子节点","每次父更新成本"], [["静态文本","0"],["静态 vnode","0"],["动态文本函数","1 次 textContent 赋值"],["动态 vnode 函数","整块 DOM 重建"],["list","keyed diff，只动变化项"]]),
     H2("完整示例：多层评论树"),
-    Code("import { div, span, p, button, signal, list, show, mount } from 'xunay'\n\nconst comments = signal([\n  { id: 1, user: '小明', text: '真不错', replies: [\n    { id: 11, user: '小红', text: '同意' }\n  ]}\n])\n\nfunction Comment({ c }) {\n  return div({ class: 'comment' },\n    div({ class: 'head' }, span(null, c.user)),\n    p(null, c.text),\n    show(() => c.replies && c.replies.length, () =>\n      div({ class: 'replies' },\n        list(c.replies, r => r.id, r => Comment({ c: r }))\n      )\n    )\n  )\n}\n\nmount(() => div(null,\n  list(comments, c => c.id, c => Comment({ c }))\n), '#app')", "xuy"),
+    Code("import { signal, list, show, mount } from 'xunay'\n\nconst comments = signal([\n  { id: 1, user: '小明', text: '真不错', replies: [\n    { id: 11, user: '小红', text: '同意' }\n  ]}\n])\n\nfunction Comment({ c }) {\n  return div({ class: 'comment' },\n    div({ class: 'head' }, span(null, c.user)),\n    p(null, c.text),\n    show(() => c.replies && c.replies.length, () =>\n      div({ class: 'replies' },\n        list(c.replies, r => r.id, r => Comment({ c: r }))\n      )\n    )\n  )\n}\n\nmount(() => div(null,\n  list(comments, c => c.id, c => Comment({ c }))\n), '#app')", "xuy"),
   )
 }

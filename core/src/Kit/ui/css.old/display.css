@@ -1,0 +1,164 @@
+/* XuNay UI · display.css */
+
+/* === 提示 / Alert === */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--x-radius);
+  border-left: 4px solid;
+  font-size: 14px;
+  margin: 16px 0;
+}
+
+.alert-info { background: var(--x-primary-soft); border-color: var(--x-primary); color: var(--x-primary); }
+
+.alert-success { background: #dcfce7; border-color: var(--x-success); color: #166534; }
+
+.alert-warning { background: #fef3c7; border-color: var(--x-warning); color: #92400e; }
+
+.alert-danger { background: #fee2e2; border-color: var(--x-danger); color: #991b1b; }
+
+.alert-title { font-weight: 600; margin-bottom: 4px; }
+
+/* === 头像 === */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--x-primary);
+  color: var(--x-text-inverse);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar-sm { width: 28px; height: 28px; font-size: 12px; }
+
+.avatar-lg { width: 48px; height: 48px; font-size: 18px; }
+
+/* === 模态 === */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: x-fade .15s ease;
+}
+
+.modal {
+  background: var(--x-bg-elev);
+  border-radius: var(--x-radius-lg);
+  box-shadow: var(--x-shadow-lg);
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  animation: x-scale .15s ease;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--x-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title { font-size: 18px; font-weight: 600; margin: 0; }
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--x-text-mute);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.modal-close:hover { background: var(--x-bg-soft); color: var(--x-text); }
+
+.modal-body { padding: 20px; }
+
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--x-border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* === 进度条 === */
+.progress {
+  width: 100%;
+  height: 8px;
+  background: var(--x-bg-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--x-primary);
+  border-radius: 999px;
+  transition: width .3s ease;
+}
+
+.progress-sm { height: 4px; }
+
+.progress-lg { height: 12px; }
+
+/* === 骨架屏 === */
+.skeleton {
+  background: linear-gradient(90deg, var(--x-bg-soft) 0%, var(--x-bg-elev) 50%, var(--x-bg-soft) 100%);
+  background-size: 200% 100%;
+  animation: x-skeleton 1.5s infinite;
+  border-radius: var(--x-radius);
+  height: 16px;
+}
+
+.skeleton-text { height: 14px; margin-bottom: 8px; }
+
+.skeleton-title { height: 24px; width: 40%; margin-bottom: 16px; }
+
+.skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+
+.skeleton-card { height: 120px; }
+
+/* ---------- 提示条 ---------- */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--x-radius);
+  border-left: 4px solid var(--x-primary);
+  background: var(--x-primary-soft);
+  color: var(--x-text);
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.alert.info { border-color: var(--x-primary); background: var(--x-primary-soft); }
+
+.alert.success { border-color: var(--x-success); background: rgba(22,163,74,.08); }
+
+.alert.warning { border-color: var(--x-warning); background: rgba(217,119,6,.08); }
+
+.alert.danger { border-color: var(--x-danger); background: rgba(220,38,38,.08); }
+
+.alert-title { font-weight: 600; margin-bottom: 4px; }
+
+/* 渐变进度条 */
+.progress-gradient .progress-bar {
+  background: linear-gradient(90deg, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6));
+}

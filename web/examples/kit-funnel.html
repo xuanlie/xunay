@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FunnelChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>FunnelChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-dir">🔁 方向</button>
+  <button id="btn-label">🏷 标签</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">垂直漏斗 · 完整标签</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">水平漏斗 · 简洁</div>
+    <div id="c2"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import FunnelChart from './kit/charts/funnel.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+const baseData = [
+  { label: '访问', value: 1000 },
+  { label: '注册', value: 640 },
+  { label: '激活', value: 420 },
+  { label: '付费', value: 180 },
+  { label: '复购', value: 75 },
+]
+
+const c1 = new FunnelChart('#c1', {
+  title: '转化漏斗',
+  subtitle: '鼠标悬停查看转化率',
+  data: baseData,
+  height: 380,
+  showLabel: true,
+  showValue: true,
+  showPercent: true,
+  labelPosition: 'inside',
+  onHover: p => p && log('hover', p.data.label, p.percent != null ? p.percent + '%' : ''),
+  onSliceClick: (d, i) => log('click', d.label, d.value),
+})
+
+const c2 = new FunnelChart('#c2', {
+  title: '渠道对比',
+  direction: 'horizontal',
+  data: [
+    { label: '曝光', value: 5000 },
+    { label: '点击', value: 2800 },
+    { label: '加购', value: 1200 },
+    { label: '下单', value: 520 },
+  ],
+  height: 380,
+  showLabel: true,
+  showValue: true,
+  showPercent: false,
+  labelPosition: 'inside',
+})
+
+let dark = false
+const dirs = ['vertical', 'horizontal']
+let dirIdx = 0
+const labelPos = ['inside', 'outside']
+let labelIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-dir').onclick = () => {
+  dirIdx = (dirIdx + 1) % dirs.length
+  const d = dirs[dirIdx]
+  c1.setOptions({ direction: d })
+  log('方向 →', d)
+}
+
+document.getElementById('btn-label').onclick = () => {
+  labelIdx = (labelIdx + 1) % labelPos.length
+  const p = labelPos[labelIdx]
+  c2.setOptions({ labelPosition: p })
+  log('标签位置 →', p)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  let v = 1000
+  const d1 = baseData.map((d) => {
+    v = Math.max(20, Math.round(v * (0.4 + Math.random() * 0.5)))
+    return { label: d.label, value: v }
+  })
+  let v2 = 5000
+  const d2 = [
+    { label: '曝光', value: v2 },
+    { label: '点击', value: v2 = Math.round(v2 * (0.4 + Math.random() * 0.5)) },
+    { label: '加购', value: v2 = Math.round(v2 * (0.3 + Math.random() * 0.5)) },
+    { label: '下单', value: v2 = Math.round(v2 * (0.3 + Math.random() * 0.5)) },
+  ]
+  c1.setData(d1)
+  c2.setData(d2)
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

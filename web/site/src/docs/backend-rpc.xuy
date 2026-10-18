@@ -1,10 +1,10 @@
 // RPC 协议
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("RPC 协议"),
-    P("统一请求格式——四套后端共用。"),
+    P("统一请求格式——五套后端共用。"),
     H2("请求"),
     Code("POST /rpc/addTodo HTTP/1.1\nContent-Type: application/json\nAuthorization: Bearer <token>\n\n{\n  \"title\": \"新任务\"\n}", "txt"),
     H2("响应"),

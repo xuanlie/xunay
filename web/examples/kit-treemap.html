@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TreemapChart 精修版</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --text:#0f172a; --border:#e2e8f0; --muted:#64748b; }
+  [data-theme="dark"] { --bg:#0a0e17; --card:#0f172a; --text:#e2e8f0; --border:#1e293b; --muted:#94a3b8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:14px/1.5 system-ui; padding:24px; transition:background .2s,color .2s; }
+  h1 { font-size:20px; margin-bottom:16px; }
+  .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  button { padding:6px 14px; border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--text); cursor:pointer; font-size:13px; transition:all .15s; }
+  button:hover { border-color:#3b82f6; color:#60a5fa; transform:translateY(-1px); }
+  .grid { display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .card-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--card);
+    border:1px solid var(--border); border-radius:10px; padding:10px 14px;
+    font:12px ui-monospace,monospace; color:var(--muted); max-width:340px;
+    max-height:180px; overflow:auto; display:none; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+  #log.show { display:block; }
+</style>
+</head>
+<body>
+<h1>TreemapChart · 精修版</h1>
+
+<div class="toolbar">
+  <button id="btn-theme">🌓 主题</button>
+  <button id="btn-depth">📏 层级</button>
+  <button id="btn-values">🔢 值标签</button>
+  <button id="btn-rand">🎲 随机</button>
+  <button id="btn-replay">▶ 重播</button>
+  <button id="btn-log">📋 日志</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-label">嵌套层级 · 目录大小</div>
+    <div id="c1"></div>
+  </div>
+  <div class="card">
+    <div class="card-label">平铺 · 市场份额</div>
+    <div id="c2"></div>
+  </div>
+</div>
+
+<div id="log"></div>
+
+<script type="module">
+import TreemapChart from './kit/charts/treemap.js'
+
+const logEl = document.getElementById('log')
+function log(...a) {
+  logEl.classList.add('show')
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 3000) logEl.textContent = logEl.textContent.slice(0, 3000)
+}
+document.getElementById('btn-log').onclick = () => logEl.classList.toggle('show')
+
+const rand = (a, b) => Math.round(a + Math.random() * (b - a))
+
+const mkNested = () => ([
+  { label: 'src', children: [
+    { label: 'components', value: rand(300, 900) },
+    { label: 'pages', value: rand(200, 600) },
+    { label: 'hooks', value: rand(80, 200) },
+    { label: 'utils', value: rand(100, 300) },
+    { label: 'styles', value: rand(60, 180) },
+  ]},
+  { label: 'node_modules', children: [
+    { label: 'react', value: rand(400, 800) },
+    { label: 'lodash', value: rand(200, 500) },
+    { label: 'moment', value: rand(300, 700) },
+    { label: 'axios', value: rand(80, 200) },
+  ]},
+  { label: 'dist', children: [
+    { label: 'bundle.js', value: rand(400, 900) },
+    { label: 'vendor.js', value: rand(200, 500) },
+    { label: 'styles.css', value: rand(50, 150) },
+  ]},
+  { label: 'assets', children: [
+    { label: 'images', value: rand(400, 1000) },
+    { label: 'fonts', value: rand(100, 300) },
+    { label: 'videos', value: rand(500, 1200) },
+  ]},
+  { label: 'docs', children: [
+    { label: 'api', value: rand(100, 300) },
+    { label: 'guide', value: rand(80, 200) },
+  ]},
+  { label: '.git', value: rand(300, 700) },
+  { label: 'test', value: rand(200, 500) },
+])
+
+const mkFlat = () => ([
+  { label: 'Chrome', value: 63.5 },
+  { label: 'Safari', value: 19.2 },
+  { label: 'Edge', value: 4.5 },
+  { label: 'Firefox', value: 3.1 },
+  { label: 'Samsung', value: 2.8 },
+  { label: 'Opera', value: 2.2 },
+  { label: 'UC', value: 1.5 },
+  { label: 'QQ', value: 1.2 },
+  { label: 'Baidu', value: 0.8 },
+  { label: '其他', value: 1.2 },
+])
+
+let data1 = mkNested()
+let data2 = mkFlat()
+
+const c1 = new TreemapChart('#c1', {
+  title: '项目目录占用',
+  subtitle: '悬停放大 · 点击查看层级',
+  data: data1,
+  height: 440,
+  depth: 1,
+  onHover: p => p && log('hover', p.label, p.value, p.parent ? '← ' + p.parent : ''),
+  onNodeClick: (n) => log('click', n.label, n.value, 'level=' + n.level),
+})
+
+const c2 = new TreemapChart('#c2', {
+  title: '浏览器市场份额',
+  data: data2,
+  height: 340,
+  depth: 0,
+  showValues: true,
+})
+
+let dark = false
+const depths = [1, 0, 2]
+let depthIdx = 0
+
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  const t = dark ? 'dark' : 'light'
+  ;[c1, c2].forEach(c => c.setOptions({ theme: t }))
+  log('主题 →', t)
+}
+
+document.getElementById('btn-depth').onclick = () => {
+  depthIdx = (depthIdx + 1) % depths.length
+  const d = depths[depthIdx]
+  c1.setOptions({ depth: d })
+  log('层级 →', d)
+}
+
+document.getElementById('btn-values').onclick = () => {
+  const v = !c1.opts.showValues
+  c1.setOptions({ showValues: v })
+  c2.setOptions({ showValues: v })
+  log('值标签 →', v)
+}
+
+document.getElementById('btn-rand').onclick = () => {
+  data1 = mkNested()
+  data2 = mkFlat()
+  c1.setData(data1)
+  c2.setData(data2)
+  log('已刷新')
+}
+
+document.getElementById('btn-replay').onclick = () => {
+  ;[c1, c2].forEach(c => c.replay())
+  log('重播动画')
+}
+
+window.addEventListener('error', e => log('ERR', e.message))
+</script>
+</body>
+</html>

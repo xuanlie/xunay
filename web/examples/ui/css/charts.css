@@ -1,0 +1,1133 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · charts.css
+   图表系统 · 1000+ 行完整版
+   ───────────────────────────────────────────────────────────────────────
+   目录：
+     01 · 图表容器
+     02 · 提示框 Tooltip
+     03 · 图例 Legend
+     04 · 坐标轴 Axis
+     05 · 网格 Grid
+     06 · 数据标签 Label
+     07 · 折线图 Line
+     08 · 柱状图 Bar
+     09 · 饼图 Pie
+     10 · 环形图 Donut
+     11 · 雷达图 Radar
+     12 · 散点图 Scatter
+     13 · 仪表盘 Gauge
+     14 · 热力图 Heatmap
+     15 · 迷你图 Sparkline
+     16 · 数据画笔 Brush
+     17 · 图表卡片
+     18 · 加载 / 空状态
+     19 · 响应式
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   01 · 图表容器
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart {
+  position: relative;
+  font-family: var(--x-font, sans-serif);
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg, #1a1a1a);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+.x-chart-canvas {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.x-chart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.x-chart svg text {
+  font-family: inherit;
+  font-size: inherit;
+  fill: var(--x-fg-dim, #666);
+}
+
+.x-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+.x-chart-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+
+.x-chart-footer {
+  padding-top: 12px;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  margin-top: 12px;
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   02 · 提示框 Tooltip
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-tip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  min-width: 100px;
+  max-width: 280px;
+  padding: 8px 12px;
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-md, 10px);
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg, #1a1a1a);
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity var(--x-dur-2), left 80ms, top 80ms;
+  white-space: nowrap;
+  line-height: 1.5;
+  opacity: 0;
+}
+
+.x-chart-tip.visible {
+  opacity: 1;
+}
+
+.x-chart-tip-title {
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  margin-bottom: 6px;
+  font-size: var(--x-fs-sm, 12.5px);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--x-line, #e5e5e5);
+}
+
+.x-chart-tip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.8;
+}
+
+.x-chart-tip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+}
+
+.x-chart-tip-label {
+  color: var(--x-fg-dim, #666);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.x-chart-tip-value {
+  margin-left: auto;
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  font-variant-numeric: tabular-nums;
+}
+
+.x-chart-tip-percent {
+  color: var(--x-fg-mute, #999);
+  font-weight: var(--x-fw-r, 400);
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9em;
+}
+
+.x-chart-tip-total {
+  padding-top: 6px;
+  margin-top: 6px;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  font-weight: var(--x-fw-m, 500);
+  color: var(--x-fg, #1a1a1a);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 十字准线 */
+.x-chart-crosshair-x,
+.x-chart-crosshair-y {
+  position: absolute;
+  background: var(--x-line-2, #ccc);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.x-chart-crosshair-x {
+  width: 1px;
+  top: 0;
+  bottom: 0;
+}
+
+.x-chart-crosshair-y {
+  height: 1px;
+  left: 0;
+  right: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   03 · 图例 Legend
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+  font-size: var(--x-fs-sm, 12.5px);
+  padding: 4px 0;
+}
+
+.x-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--x-fg-dim, #666);
+  cursor: pointer;
+  user-select: none;
+  transition: opacity var(--x-dur-2), color var(--x-dur-1);
+  padding: 3px 6px;
+  border-radius: var(--x-r-sm, 6px);
+  min-height: 24px;
+}
+
+.x-chart-legend-item:hover {
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-soft, #f5f5f5);
+}
+
+.x-chart-legend-item.off {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.x-chart-legend-item.off .x-chart-legend-dot {
+  background: var(--x-fg-mute, #999) !important;
+}
+
+.x-chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+}
+
+.x-chart-legend-dot.circle {
+  border-radius: 50%;
+}
+
+.x-chart-legend-dot.line {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.x-chart-legend-value {
+  margin-left: 4px;
+  color: var(--x-fg, #1a1a1a);
+  font-weight: var(--x-fw-m, 500);
+  font-variant-numeric: tabular-nums;
+}
+
+.x-chart-legend-vertical {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.x-chart-legend-left,
+.x-chart-legend-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+.x-chart-legend-left  { left: 0; }
+.x-chart-legend-right { right: 0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   04 · 坐标轴 Axis
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-axis {
+  stroke: var(--x-line-2, #ccc);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.x-chart-axis-line {
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.x-chart-axis-tick {
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.x-chart-axis-label {
+  fill: var(--x-fg-mute, #999);
+  font-size: 11px;
+  font-family: var(--x-font, sans-serif);
+  dominant-baseline: middle;
+}
+
+.x-chart-axis-title {
+  fill: var(--x-fg-dim, #666);
+  font-size: 12px;
+  font-weight: var(--x-fw-m, 500);
+}
+
+.x-chart-axis-x .x-chart-axis-label {
+  text-anchor: middle;
+}
+
+.x-chart-axis-y .x-chart-axis-label {
+  text-anchor: end;
+}
+
+/* 隐藏轴 */
+.x-chart-axis-hidden {
+  display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   05 · 网格 Grid
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-grid {
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  shape-rendering: crispEdges;
+}
+
+.x-chart-grid-x {
+  stroke-dasharray: 2 4;
+}
+
+.x-chart-grid-solid {
+  stroke-dasharray: none;
+}
+
+.x-chart-grid-band {
+  fill: var(--x-bg-soft, #f5f5f5);
+  opacity: 0.5;
+}
+
+.x-chart-grid-band-alt {
+  fill: var(--x-bg-soft, #f5f5f5);
+  opacity: 0.3;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   06 · 数据标签 Label
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-label {
+  font-size: 11px;
+  fill: var(--x-fg, #1a1a1a);
+  font-weight: var(--x-fw-m, 500);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.x-chart-label-outside {
+  text-anchor: start;
+  dominant-baseline: middle;
+}
+
+.x-chart-label-inside {
+  fill: #fff;
+}
+
+.x-chart-label-bg {
+  fill: var(--x-bg-elev, #fff);
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+}
+
+.x-chart-label-total {
+  font-size: 13px;
+  font-weight: var(--x-fw-b, 700);
+  fill: var(--x-fg, #1a1a1a);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.x-chart-label-sub {
+  font-size: 11px;
+  fill: var(--x-fg-mute, #999);
+  font-weight: var(--x-fw-r, 400);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   07 · 折线图 Line
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dashoffset var(--x-dur-6) var(--x-ease);
+}
+
+.x-chart-line-smooth {
+  stroke-linejoin: round;
+}
+
+.x-chart-area {
+  stroke: none;
+  opacity: 0.15;
+}
+
+.x-chart-area-gradient {
+  opacity: 0.25;
+}
+
+.x-chart-dot {
+  stroke: var(--x-bg-elev, #fff);
+  stroke-width: 2;
+  transition: r var(--x-dur-1), stroke-width var(--x-dur-1);
+  cursor: pointer;
+}
+
+.x-chart-dot:hover {
+  stroke-width: 3;
+}
+
+.x-chart-dot-active {
+  stroke: var(--x-primary, #2563eb);
+  stroke-width: 3;
+}
+
+.x-chart-point-group {
+  cursor: pointer;
+}
+
+/* 动画 */
+.x-chart-line-animate {
+  stroke-dasharray: var(--x-line-length, 1000);
+  stroke-dashoffset: var(--x-line-length, 1000);
+  animation: x-chart-draw var(--x-dur-7) var(--x-ease) forwards;
+}
+
+@keyframes x-chart-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · 柱状图 Bar
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-bar {
+  transition: opacity var(--x-dur-1), fill var(--x-dur-1);
+  cursor: pointer;
+}
+
+.x-chart-bar:hover {
+  opacity: 0.85;
+}
+
+.x-chart-bar-active {
+  filter: brightness(0.92);
+}
+
+.x-chart-bar-rounded {
+  rx: 4;
+  ry: 4;
+}
+
+.x-chart-bar-stacked {
+  transition: opacity var(--x-dur-1);
+}
+
+.x-chart-bar-group {
+  cursor: pointer;
+}
+
+.x-chart-bar-group:hover .x-chart-bar {
+  opacity: 0.85;
+}
+
+.x-chart-bar-label {
+  font-size: 11px;
+  fill: var(--x-fg, #1a1a1a);
+  font-weight: var(--x-fw-m, 500);
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 动画 */
+.x-chart-bar-animate {
+  transform-origin: bottom;
+  animation: x-chart-bar-grow var(--x-dur-4) var(--x-ease-spring) backwards;
+}
+
+@keyframes x-chart-bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+.x-chart-bar-animate-x {
+  transform-origin: left;
+  animation: x-chart-bar-grow-x var(--x-dur-4) var(--x-ease-spring) backwards;
+}
+
+@keyframes x-chart-bar-grow-x {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 · 饼图 Pie
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-pie-slice {
+  cursor: pointer;
+  transition: transform var(--x-dur-2) var(--x-ease),
+              opacity var(--x-dur-1);
+  transform-origin: center;
+}
+
+.x-chart-pie-slice:hover {
+  opacity: 0.9;
+}
+
+.x-chart-pie-slice-active {
+  transform: scale(1.03);
+}
+
+.x-chart-pie-label {
+  font-size: 11px;
+  fill: var(--x-fg, #1a1a1a);
+  font-weight: var(--x-fw-m, 500);
+  pointer-events: none;
+  dominant-baseline: middle;
+}
+
+.x-chart-pie-label-line {
+  stroke: var(--x-line-2, #ccc);
+  stroke-width: 1;
+  fill: none;
+  pointer-events: none;
+}
+
+.x-chart-pie-label-value {
+  font-size: 11px;
+  fill: var(--x-fg-dim, #666);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · 环形图 Donut
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-donut-slice {
+  cursor: pointer;
+  transition: transform var(--x-dur-2);
+  transform-origin: center;
+}
+
+.x-chart-donut-slice:hover {
+  transform: scale(1.02);
+}
+
+.x-chart-donut-center {
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.x-chart-donut-center-value {
+  font-size: 22px;
+  font-weight: var(--x-fw-b, 700);
+  fill: var(--x-fg, #1a1a1a);
+  font-variant-numeric: tabular-nums;
+}
+
+.x-chart-donut-center-label {
+  font-size: 11px;
+  fill: var(--x-fg-mute, #999);
+  font-weight: var(--x-fw-r, 400);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.x-chart-donut-track {
+  fill: none;
+  stroke: var(--x-bg-soft, #f5f5f5);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · 雷达图 Radar
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-radar-grid {
+  fill: none;
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+}
+
+.x-chart-radar-axis-line {
+  stroke: var(--x-line, #e5e5e5);
+  stroke-width: 1;
+}
+
+.x-chart-radar-area {
+  fill-opacity: 0.2;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition: opacity var(--x-dur-2);
+  cursor: pointer;
+}
+
+.x-chart-radar-area:hover {
+  fill-opacity: 0.35;
+}
+
+.x-chart-radar-point {
+  stroke: var(--x-bg-elev, #fff);
+  stroke-width: 2;
+}
+
+.x-chart-radar-label {
+  font-size: 11px;
+  fill: var(--x-fg-dim, #666);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · 散点图 Scatter
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-scatter-dot {
+  fill-opacity: 0.7;
+  stroke: var(--x-bg-elev, #fff);
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill-opacity var(--x-dur-1), r var(--x-dur-1);
+}
+
+.x-chart-scatter-dot:hover {
+  fill-opacity: 1;
+  stroke-width: 2;
+}
+
+.x-chart-bubble {
+  fill-opacity: 0.6;
+  stroke: var(--x-bg-elev, #fff);
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill-opacity var(--x-dur-1);
+}
+
+.x-chart-bubble:hover {
+  fill-opacity: 0.85;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · 仪表盘 Gauge
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-gauge-arc {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.x-chart-gauge-track {
+  stroke: var(--x-bg-soft, #f5f5f5);
+}
+
+.x-chart-gauge-fill {
+  transition: stroke-dashoffset var(--x-dur-5) var(--x-ease);
+}
+
+.x-chart-gauge-value {
+  font-size: 28px;
+  font-weight: var(--x-fw-b, 700);
+  fill: var(--x-fg, #1a1a1a);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.x-chart-gauge-unit {
+  font-size: 14px;
+  fill: var(--x-fg-mute, #999);
+  font-weight: var(--x-fw-r, 400);
+  text-anchor: middle;
+}
+
+.x-chart-gauge-label {
+  font-size: 12px;
+  fill: var(--x-fg-dim, #666);
+  text-anchor: middle;
+}
+
+.x-chart-gauge-tick {
+  stroke: var(--x-line-2, #ccc);
+  stroke-width: 1;
+}
+
+.x-chart-gauge-tick-label {
+  font-size: 10px;
+  fill: var(--x-fg-mute, #999);
+  text-anchor: middle;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · 热力图 Heatmap
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-heatmap-cell {
+  transition: opacity var(--x-dur-1), stroke var(--x-dur-1);
+  cursor: pointer;
+  stroke: var(--x-bg-elev, #fff);
+  stroke-width: 1;
+}
+
+.x-chart-heatmap-cell:hover {
+  stroke-width: 2;
+  stroke: var(--x-fg, #1a1a1a);
+}
+
+.x-chart-heatmap-label {
+  font-size: 10px;
+  fill: var(--x-fg-dim, #666);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.x-chart-heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--x-fg-mute, #999);
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.x-chart-heatmap-gradient {
+  height: 8px;
+  width: 120px;
+  border-radius: 4px;
+  background: linear-gradient(90deg,
+    var(--x-primary-100, #dbeafe),
+    var(--x-primary-500, #2563eb),
+    var(--x-primary-900, #1e3a8a));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 迷你图 Sparkline
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-spark {
+  display: inline-block;
+  vertical-align: middle;
+  width: 100px;
+  height: 24px;
+}
+
+.x-chart-spark-line {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.x-chart-spark-area {
+  opacity: 0.15;
+}
+
+.x-chart-spark-dot {
+  fill: currentColor;
+}
+
+.x-chart-spark-bars .x-chart-spark-bar {
+  fill: currentColor;
+}
+
+.x-chart-spark-positive { color: var(--x-success, #16a34a); }
+.x-chart-spark-negative { color: var(--x-danger, #dc2626); }
+.x-chart-spark-neutral  { color: var(--x-fg-mute, #999); }
+
+.x-chart-spark-primary { color: var(--x-primary, #2563eb); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   16 · 数据画笔 Brush
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-brush {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+}
+
+.x-chart-brush-rect {
+  fill: var(--x-primary-soft, rgba(37,99,235,.15));
+  stroke: var(--x-primary, #2563eb);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.x-chart-brush-handle {
+  fill: var(--x-primary, #2563eb);
+  cursor: ew-resize;
+}
+
+.x-chart-brush-handle::after {
+  content: "";
+}
+
+.x-chart-brush-hint {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  background: var(--x-fg, #1a1a1a);
+  color: var(--x-bg, #fff);
+  font-size: 11px;
+  border-radius: var(--x-r-xs, 4px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   17 · 图表卡片
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-card {
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-lg, 14px);
+  padding: 16px;
+  transition: box-shadow var(--x-dur-2), border-color var(--x-dur-2);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.x-chart-card:hover {
+  box-shadow: var(--x-sh-sm, 0 1px 3px rgba(0,0,0,.06));
+  border-color: var(--x-line-2, #ccc);
+}
+
+.x-chart-title {
+  font-size: var(--x-fs-md, 15px);
+  font-weight: var(--x-fw-sb, 600);
+  color: var(--x-fg, #1a1a1a);
+  margin: 0 0 4px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.x-chart-subtitle {
+  font-size: var(--x-fs-sm, 12.5px);
+  color: var(--x-fg-dim, #666);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.x-chart-value {
+  font-size: var(--x-fs-2xl, 24px);
+  font-weight: var(--x-fw-b, 700);
+  color: var(--x-fg, #1a1a1a);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 8px 0;
+}
+
+.x-chart-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--x-fs-sm, 12.5px);
+  font-weight: var(--x-fw-m, 500);
+  font-variant-numeric: tabular-nums;
+}
+
+.x-chart-trend.up   { color: var(--x-success, #16a34a); }
+.x-chart-trend.down { color: var(--x-danger, #dc2626); }
+.x-chart-trend.flat { color: var(--x-fg-mute, #999); }
+
+.x-chart-toolbar {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.x-chart-tool {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--x-r-sm, 6px);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--x-fg-mute, #999);
+  cursor: pointer;
+  transition: all var(--x-dur-1);
+  font-size: 13px;
+  padding: 0;
+}
+
+.x-chart-tool:hover {
+  background: var(--x-bg-soft, #f5f5f5);
+  color: var(--x-fg, #1a1a1a);
+  border-color: var(--x-line, #e5e5e5);
+}
+
+.x-chart-tool.active {
+  background: var(--x-primary-soft, rgba(37,99,235,.1));
+  color: var(--x-primary, #2563eb);
+  border-color: transparent;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   18 · 加载 / 空状态
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.x-chart-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--x-bg-glass, rgba(255,255,255,.7));
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 10;
+  border-radius: inherit;
+}
+
+.x-chart-loading::after {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--x-primary, #2563eb);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: x-chart-spin 0.7s linear infinite;
+}
+
+@keyframes x-chart-spin {
+  to { transform: rotate(360deg); }
+}
+
+.x-chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--x-fg-mute, #999);
+  font-size: var(--x-fs-sm, 12.5px);
+  text-align: center;
+  min-height: 200px;
+  gap: 12px;
+}
+
+.x-chart-empty-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--x-fg-subtle, #bbb);
+  opacity: 0.6;
+}
+
+.x-chart-error {
+  color: var(--x-danger, #dc2626);
+}
+
+.x-chart-error-icon {
+  color: var(--x-danger, #dc2626);
+}
+
+.x-chart-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  min-height: 200px;
+  justify-content: flex-end;
+}
+
+.x-chart-skeleton-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 100%;
+}
+
+.x-chart-skeleton-bar {
+  flex: 1;
+  background: linear-gradient(90deg,
+    var(--x-bg-soft, #f5f5f5) 0%,
+    var(--x-bg-hover, #ebebeb) 50%,
+    var(--x-bg-soft, #f5f5f5) 100%);
+  background-size: 200% 100%;
+  animation: x-chart-skeleton 1.5s infinite;
+  border-radius: var(--x-r-xs, 4px);
+  min-height: 20px;
+}
+
+@keyframes x-chart-skeleton {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   19 · 响应式
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .x-chart-card {
+    padding: 12px;
+    border-radius: var(--x-r-md, 10px);
+  }
+
+  .x-chart-title {
+    font-size: var(--x-fs, 14px);
+  }
+
+  .x-chart-value {
+    font-size: var(--x-fs-xl, 20px);
+  }
+
+  .x-chart-tip {
+    max-width: 220px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .x-chart-legend {
+    gap: 6px 12px;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+
+  .x-chart-legend-item {
+    padding: 2px 4px;
+    min-height: 20px;
+  }
+
+  .x-chart-donut-center-value {
+    font-size: 18px;
+  }
+
+  .x-chart-gauge-value {
+    font-size: 22px;
+  }
+
+  /* 触摸设备：hover 效果改为按下 */
+  .x-chart-pie-slice:active,
+  .x-chart-bar:active,
+  .x-chart-dot:active {
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 480px) {
+  .x-chart {
+    min-height: 160px;
+  }
+
+  .x-chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .x-chart-toolbar {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   主题适配
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"] .x-chart-tip,
+[data-theme="dracula"] .x-chart-tip,
+[data-theme="tokyo"] .x-chart-tip,
+[data-theme="catppuccin"] .x-chart-tip,
+[data-theme="one-dark"] .x-chart-tip {
+  background: var(--x-bg-elev, #1c2128);
+  border-color: var(--x-line, #30363d);
+  box-shadow: var(--x-sh-xl, 0 16px 40px rgba(0,0,0,.55));
+}
+
+[data-theme="dark"] .x-chart-crosshair-x,
+[data-theme="dark"] .x-chart-crosshair-y,
+[data-theme="dracula"] .x-chart-crosshair-x,
+[data-theme="dracula"] .x-chart-crosshair-y {
+  background: var(--x-line-2, #484f58);
+}

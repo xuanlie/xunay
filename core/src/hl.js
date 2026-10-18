@@ -179,7 +179,7 @@ export function highlight(code, lang) {
   out = out.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   // 第三步：把占位符恢复成带样式的 span（token 文本也做转义）
-  out = out.replace(/\uE000([\uE000-\uF8FF]+)\uE001/g, (_, ch) => {
+  out = out.replace(/\uE000([\uE000-\uF8FF])\uE001/g, (_, ch) => {
     const m = marks[ch.charCodeAt(0) - 0xE000]
     if (!m) return ''
     const text = m.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')

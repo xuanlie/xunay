@@ -1,6 +1,59 @@
 // 自动生成，请勿手改
 export const nav = [
   {
+    "group": "Xuyg",
+    "items": [
+      {
+        "slug": "xuyg-overview",
+        "title": "总览"
+      },
+      {
+        "slug": "xuyg-keywords",
+        "title": "三大关键字"
+      },
+      {
+        "slug": "xuyg-sdu",
+        "title": "sdu 模板"
+      },
+      {
+        "slug": "xuyg-binding",
+        "title": "绑定系统"
+      },
+      {
+        "slug": "xuyg-events",
+        "title": "事件系统"
+      },
+      {
+        "slug": "xuyg-if-media",
+        "title": "条件渲染 + 响应式"
+      },
+      {
+        "slug": "xuyg-builtins",
+        "title": "内置模板"
+      },
+      {
+        "slug": "xuyg-charts",
+        "title": "图表集成"
+      },
+      {
+        "slug": "xuyg-examples",
+        "title": "完整案例"
+      },
+      {
+        "slug": "xuyg-structure",
+        "title": "项目结构"
+      },
+      {
+        "slug": "xuyg-antipatterns",
+        "title": "反模式"
+      },
+      {
+        "slug": "xuyg-limits",
+        "title": "限制与修复"
+      }
+    ]
+  },
+  {
     "group": "速查",
     "items": [
       {
@@ -65,6 +118,15 @@ export const nav = [
     ]
   },
   {
+    "group": "React 兼容",
+    "items": [
+      {
+        "slug": "api-react-compat",
+        "title": "React Compat"
+      }
+    ]
+  },
+  {
     "group": "动画",
     "items": [
       {
@@ -123,14 +185,6 @@ export const nav = [
       {
         "slug": "10-faq",
         "title": "常见问题"
-      },
-      {
-        "slug": "11-design",
-        "title": "设计理念"
-      },
-      {
-        "slug": "12-changelog",
-        "title": "版本历史"
       }
     ]
   },
@@ -743,20 +797,148 @@ export const nav = [
         "title": "kit: ContextMenu"
       },
       {
-        "slug": "api-kit-barchart",
-        "title": "kit: BarChart"
+        "slug": "api-kit-chart-line",
+        "title": "kit: 折线图"
       },
       {
-        "slug": "api-kit-linechart",
-        "title": "kit: LineChart"
+        "slug": "api-kit-chart-bar",
+        "title": "kit: 柱状图"
       },
       {
-        "slug": "api-kit-piechart",
-        "title": "kit: PieChart"
+        "slug": "api-kit-chart-area",
+        "title": "kit: 面积图"
       },
       {
-        "slug": "api-kit-sparkline",
-        "title": "kit: Sparkline"
+        "slug": "api-kit-chart-pie",
+        "title": "kit: 饼/环/玫瑰"
+      },
+      {
+        "slug": "api-kit-chart-scatter",
+        "title": "kit: 散点图"
+      },
+      {
+        "slug": "api-kit-chart-radar",
+        "title": "kit: 雷达图"
+      },
+      {
+        "slug": "api-kit-chart-boxplot",
+        "title": "kit: 箱线图"
+      },
+      {
+        "slug": "api-kit-chart-violin",
+        "title": "kit: 小提琴图"
+      },
+      {
+        "slug": "api-kit-chart-ridgeline",
+        "title": "kit: 山脊图"
+      },
+      {
+        "slug": "api-kit-chart-hexbin",
+        "title": "kit: 六边形分箱"
+      },
+      {
+        "slug": "api-kit-chart-calendar",
+        "title": "kit: 日历热力"
+      },
+      {
+        "slug": "api-kit-chart-wordcloud",
+        "title": "kit: 词云"
+      },
+      {
+        "slug": "api-kit-chart-treemap",
+        "title": "kit: 矩形树图"
+      },
+      {
+        "slug": "api-kit-chart-sunburst",
+        "title": "kit: 旭日图"
+      },
+      {
+        "slug": "api-kit-chart-circlepack",
+        "title": "kit: 圆堆积"
+      },
+      {
+        "slug": "api-kit-chart-tree",
+        "title": "kit: 树形图"
+      },
+      {
+        "slug": "api-kit-chart-icicle",
+        "title": "kit: 冰柱图"
+      },
+      {
+        "slug": "api-kit-chart-marimekko",
+        "title": "kit: 马赛克图"
+      },
+      {
+        "slug": "api-kit-chart-sankey",
+        "title": "kit: 桑基图"
+      },
+      {
+        "slug": "api-kit-chart-chord",
+        "title": "kit: 和弦图"
+      },
+      {
+        "slug": "api-kit-chart-parallel",
+        "title": "kit: 平行坐标"
+      },
+      {
+        "slug": "api-kit-chart-voronoi",
+        "title": "kit: 泰森多边形"
+      },
+      {
+        "slug": "api-kit-chart-network",
+        "title": "kit: 关系图"
+      },
+      {
+        "slug": "api-kit-chart-bump",
+        "title": "kit: 凹凸图"
+      },
+      {
+        "slug": "api-kit-chart-candlestick",
+        "title": "kit: K 线图"
+      },
+      {
+        "slug": "api-kit-chart-gantt",
+        "title": "kit: 甘特图"
+      },
+      {
+        "slug": "api-kit-chart-waterfall",
+        "title": "kit: 瀑布图"
+      },
+      {
+        "slug": "api-kit-chart-slope",
+        "title": "kit: 斜率图"
+      },
+      {
+        "slug": "api-kit-chart-dumbbell",
+        "title": "kit: 哑铃图"
+      },
+      {
+        "slug": "api-kit-chart-lollipop",
+        "title": "kit: 棒棒糖图"
+      },
+      {
+        "slug": "api-kit-chart-waffle",
+        "title": "kit: 华夫图"
+      },
+      {
+        "slug": "api-kit-chart-bullet",
+        "title": "kit: 子弹图"
+      },
+      {
+        "slug": "api-kit-chart-stream",
+        "title": "kit: 流图"
+      },
+      {
+        "slug": "api-kit-chart-funnel",
+        "title": "kit: 漏斗图"
+      },
+      {
+        "slug": "api-kit-chart-gauge",
+        "title": "kit: 仪表盘"
+      },
+      {
+        "slug": "api-kit-chart-heatmap",
+        "title": "kit: 热力图"
       },
       {
         "slug": "api-kit-virtuallist",
@@ -777,7 +959,7 @@ export const nav = [
     "items": [
       {
         "slug": "kit-overview",
-        "title": "106 组件总览"
+        "title": "Kit 总览"
       },
       {
         "slug": "kit-api",
@@ -1105,7 +1287,7 @@ export const nav = [
     "items": [
       {
         "slug": "misc-philosophy",
-        "title": "设计哲学"
+        "title": "设计哲学（当前）"
       },
       {
         "slug": "misc-perf",
@@ -1125,7 +1307,7 @@ export const nav = [
       },
       {
         "slug": "misc-versions",
-        "title": "版本"
+        "title": "版本（当前）"
       },
       {
         "slug": "misc-license",
@@ -1142,15 +1324,6 @@ export const nav = [
       {
         "slug": "tool-babylon",
         "title": "Babylon.js 集成"
-      }
-    ]
-  },
-  {
-    "group": "Godot 集成",
-    "items": [
-      {
-        "slug": "tool-godot-ui",
-        "title": "XuNay → Godot UI DSL"
       }
     ]
   },

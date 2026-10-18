@@ -1,5 +1,5 @@
 // app 别名
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -10,6 +10,6 @@ export function Doc() {
     H2("说明"),
     P("mount 的短别名。跟 m 完全一样。"),
     H2("示例"),
-    Code("import { app, div } from 'xunay'\n\napp(() => div(null, 'Hello'), '#app')", "xuy"),
+    Code("import { app } from 'xunay'\n\napp(() => div(null, 'Hello'), '#app')", "xuy"),
   )
 }

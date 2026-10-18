@@ -1,5 +1,5 @@
 // lazy(loader)
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -12,9 +12,9 @@ export function Doc() {
     H2("返回值"),
     P("返回一个组件函数。第一次调用触发 loader，加载完渲染，加载中返回 null。"),
     H2("示例"),
-    Code("import { lazy, div } from 'xunay'\n\nconst Chart = lazy(() => import('./Chart.js'))\n\ndiv(null, Chart({ data }))", "xuy"),
+    Code("import { lazy } from 'xunay'\n\nconst Chart = lazy(() => import('./Chart.js'))\n\ndiv(null, Chart({ data }))", "xuy"),
     H2("配合 loading"),
-    Code("import { lazy, signal, show, span } from 'xunay'\n\nconst loading = signal(true)\nconst Heavy = lazy(() => import('./Heavy.js').then(m => {\n  loading(false)\n  return m\n}))\n\ndiv(null,\n  show(() => loading(), () => span(null, '加载中')),\n  () => loading() ? null : Heavy({})\n)", "xuy"),
+    Code("import { lazy, signal, show } from 'xunay'\n\nconst loading = signal(true)\nconst Heavy = lazy(() => import('./Heavy.js').then(m => {\n  loading(false)\n  return m\n}))\n\ndiv(null,\n  show(() => loading(), () => span(null, '加载中')),\n  () => loading() ? null : Heavy({})\n)", "xuy"),
     H2("陷阱"),
     H3("立即执行的 import"),
     Code("// 错误\nconst C = lazy(import('./C.js'))\n\n// 正确\nconst C = lazy(() => import('./C.js'))", "xuy"),

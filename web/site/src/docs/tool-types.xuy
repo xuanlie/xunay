@@ -1,5 +1,5 @@
 // 类型声明
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -14,7 +14,7 @@ export function Doc() {
     H2("配置"),
     Code("// tsconfig.json\n{\n  \"compilerOptions\": {\n    \"types\": [\"./types/xunay.d.ts\"]\n  }\n}", "json"),
     H2("使用"),
-    Code("import { signal, computed, div, span } from 'xunay'\n\n// 编辑器会自动推导类型\nconst n = signal(0)          // Signal<number>\nconst s = computed(() => n().toString())   // Accessor<string>\nconst el = div(null, span(null, () => n()))   // VNode", "ts"),
+    Code("import { signal, computed } from 'xunay'\n\n// 编辑器会自动推导类型\nconst n = signal(0)          // Signal<number>\nconst s = computed(() => n().toString())   // Accessor<string>\nconst el = div(null, span(null, () => n()))   // VNode", "ts"),
     H2("在 .xuy 里"),
     P(".xuy 是 JS，不写类型注解。但编辑器读 d.ts 后依然能给 API 补全。"),
     H2("设计哲学"),

@@ -1,0 +1,377 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · color-picker · 颜色选择器
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.cpicker { position: relative; display: inline-block; width: 100%; max-width: 300px; }
+
+/* ─── 触发框 ─── */
+.cpicker-input {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; height: 40px; padding: 0 12px;
+  font: inherit; font-size: 14px;
+  color: var(--x-fg, #1a1a1a);
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line-2, #ccc);
+  border-radius: 10px; cursor: pointer;
+  box-sizing: border-box; user-select: none;
+  transition: border-color .15s, box-shadow .15s;
+  text-align: left;
+}
+.cpicker-input:hover { border-color: var(--x-line-strong, #888); }
+.cpicker-input.open {
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28));
+  outline: none;
+}
+
+/* 色板（带透明棋盘） */
+.cpicker-swatch {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.08),
+    0 1px 2px rgba(0,0,0,.06);
+}
+.cpicker-swatch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+.cpicker-swatch-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--cp-color, #2563eb);
+  z-index: 1;
+}
+
+.cpicker-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--x-font-mono, ui-monospace, monospace);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--x-fg, #1a1a1a);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+.cpicker-arrow {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  color: var(--x-fg-mute, #999);
+  transition: transform .2s;
+}
+.cpicker-input.open .cpicker-arrow { transform: rotate(180deg); }
+
+/* ─── 面板 ─── */
+.cpicker-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 900;
+  width: 300px;
+  background: var(--x-bg-elev, #fff);
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 48px -16px rgba(0,0,0,.22),
+    0 8px 20px -8px rgba(0,0,0,.10);
+  display: none;
+  overflow: hidden;
+  animation: c-picker-in .22s cubic-bezier(.34,1.56,.64,1);
+  transform-origin: top left;
+}
+.cpicker-panel.open { display: block; }
+@keyframes c-picker-in {
+  from { opacity: 0; transform: scale(.94) translateY(-8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── 饱和度-明度 选择区 ─── */
+.cpicker-sv {
+  position: relative;
+  height: 150px;
+  background: #f00;
+  cursor: crosshair;
+  overflow: hidden;
+  user-select: none;
+}
+.cpicker-sv-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, #fff, transparent),
+    linear-gradient(to top, #000, transparent);
+}
+.cpicker-sv-pointer {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4),
+    0 2px 6px rgba(0,0,0,.3);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ─── 色相条 ─── */
+.cpicker-hue {
+  position: relative;
+  height: 14px;
+  margin: 14px 14px 10px;
+  border-radius: 7px;
+  background: linear-gradient(to right,
+    #f00 0%, #ff0 17%, #0f0 33%,
+    #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  cursor: pointer;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.15);
+}
+.cpicker-hue-pointer {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.2),
+    0 2px 6px rgba(0,0,0,.25);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: var(--cp-hue, #f00);
+  z-index: 2;
+}
+
+/* ─── 透明度条 ─── */
+.cpicker-alpha {
+  position: relative;
+  height: 14px;
+  margin: 0 14px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  overflow: visible;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.15);
+}
+.cpicker-alpha::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background-image:
+    linear-gradient(45deg, #ddd 25%, transparent 25%),
+    linear-gradient(-45deg, #ddd 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ddd 75%),
+    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+  overflow: hidden;
+}
+.cpicker-alpha-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background: linear-gradient(to right,
+    transparent,
+    var(--cp-hue, #f00));
+}
+.cpicker-alpha-pointer {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.2),
+    0 2px 6px rgba(0,0,0,.25);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: var(--cp-color, #f00);
+  z-index: 2;
+}
+
+/* ─── 数值区 ─── */
+.cpicker-values {
+  display: flex;
+  gap: 8px;
+  padding: 4px 14px 12px;
+}
+
+.cpicker-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 10px;
+  background: var(--x-bg-soft, #f5f5f5);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: all .15s;
+}
+.cpicker-field:focus-within {
+  background: var(--x-bg-elev, #fff);
+  border-color: var(--x-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.15));
+}
+.cpicker-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--x-fg-mute, #999);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  flex-shrink: 0;
+}
+.cpicker-field input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-family: var(--x-font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  color: var(--x-fg, #1a1a1a);
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  text-transform: uppercase;
+}
+.cpicker-field input::-webkit-outer-spin-button,
+.cpicker-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cpicker-field input[type="number"] { -moz-appearance: textfield; }
+
+/* ─── 预设色 ─── */
+.cpicker-presets {
+  padding: 0 14px 14px;
+}
+.cpicker-presets-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--x-fg-mute, #999);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 8px;
+}
+.cpicker-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+.cpicker-preset {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+  transition: all .15s;
+}
+.cpicker-preset:hover {
+  transform: scale(1.15);
+  z-index: 1;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.08),
+    0 2px 8px rgba(0,0,0,.15);
+}
+.cpicker-preset.selected {
+  box-shadow:
+    inset 0 0 0 2px var(--x-bg-elev, #fff),
+    inset 0 0 0 3.5px var(--x-primary, #2563eb);
+}
+
+/* ─── 底部 ─── */
+.cpicker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  background: var(--x-bg-soft, #f5f5f5);
+}
+
+.cpicker-eyedropper {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: 8px;
+  color: var(--x-fg-dim, #666);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.cpicker-eyedropper svg { width: 13px; height: 13px; }
+.cpicker-eyedropper:hover {
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+}
+
+.cpicker-ok {
+  padding: 0 20px;
+  height: 32px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #fff;
+  border: 0;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  box-shadow: 0 2px 8px -2px rgba(37,99,235,.4);
+}
+.cpicker-ok:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 12px -2px rgba(37,99,235,.5);
+}
+.cpicker-ok:active { transform: translateY(1px); }
+
+/* 暗色 */
+[data-theme="dark"] .cpicker-panel,
+[data-theme="dracula"] .cpicker-panel,
+[data-theme="tokyo"] .cpicker-panel {
+  box-shadow: 0 20px 48px -16px rgba(0,0,0,.7), 0 8px 20px -8px rgba(0,0,0,.4);
+}
+
+/* 移动端 */
+@media (max-width: 480px) {
+  .cpicker-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0; top: auto;
+    width: 100%; max-width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding-bottom: var(--x-safe-b, 0);
+  }
+  .cpicker-sv { height: 180px; }
+}

@@ -1,5 +1,5 @@
 // 鸣谢
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -13,6 +13,6 @@ export function Doc() {
     H2("致谢"),
     P("感谢所有使用、反馈、贡献的人。"),
     H2("联系"),
-    Ul("GitHub: github.com/xxx/xunay","Email: hello@xunay.dev","文档: xunay.dev"),
+    Ul("GitHub: github.com/xuanlie/xunay","Email: (未公开)","文档: xunay.dev"),
   )
 }

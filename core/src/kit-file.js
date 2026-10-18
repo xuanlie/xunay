@@ -17,13 +17,13 @@ export function Upload(props, ...children) {
   }
   return div(null,
     children.length ? children : div({
-      style: { display: 'inline-block', padding: '10px 20px', background: '#1f6feb', color: '#fff', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' },
+      style: { display: 'inline-block', padding: '10px 20px', background: 'var(--x-primary)', color: 'var(--x-text-inverse)', borderRadius: '6px', cursor: 'pointer', fontSize: '14px' },
       on: { click: e => e.currentTarget.querySelector('input').click() }
     }, '选择文件', input({ type: 'file', accept, multiple, style: { display: 'none' }, on: { change: e => handle(e.target.files) } })),
     files().length ? div({ style: { marginTop: '12px' } },
-      ...files().map(f => div({ style: { padding: '8px 12px', background: '#f9fafb', borderRadius: '6px', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', fontSize: '13px' } },
+      ...files().map(f => div({ style: { padding: '8px 12px', background: 'var(--x-bg-soft)', borderRadius: '6px', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', fontSize: '13px' } },
         span(null, f.name),
-        span({ style: { color: '#9ca3af' } }, (f.size / 1024).toFixed(1) + ' KB')
+        span({ style: { color: 'var(--x-text-mute)' } }, (f.size / 1024).toFixed(1) + ' KB')
       ))
     ) : null
   )
@@ -33,12 +33,12 @@ export function FileList(props) {
   const { files = [], onRemove, onPreview } = px(props)
   return div(null,
     ...files.map(f => div({
-      style: { padding: '10px 14px', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px' }
+      style: { padding: '10px 14px', background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px' }
     },
-      span({ style: { fontSize: '18px' } }, f.type?.startsWith('image/') ? '🖼️' : '📄'),
+      span({ style: { fontSize: '14px', color: 'var(--x-text-mute)', fontFamily: 'var(--x-mono)' } }, f.type?.startsWith('image/') ? '◉' : '▢'),
       Col({ gap: 0, style: { flex: 1, minWidth: 0 } },
         div({ style: { fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, f.name),
-        span({ style: { fontSize: '11px', color: '#9ca3af' } }, (f.size / 1024).toFixed(1) + ' KB')
+        span({ style: { fontSize: '11px', color: 'var(--x-text-mute)' } }, (f.size / 1024).toFixed(1) + ' KB')
       ),
       onPreview ? Btn({ size: 'sm', onClick: () => onPreview(f) }, '预览') : null,
       onRemove ? Btn({ size: 'sm', onClick: () => onRemove(f) }, '删除') : null
@@ -52,10 +52,10 @@ export function Dropzone(props, ...children) {
   const handle = list => onFiles && onFiles(multiple ? Array.from(list) : list[0])
   return div({
     style: () => ({
-      border: '2px dashed ' + (hovering() ? '#1f6feb' : '#d1d5db'),
+      border: '2px dashed ' + (hovering() ? 'var(--x-primary)' : 'var(--x-border-strong)'),
       borderRadius: '12px', padding: '40px 20px', textAlign: 'center',
       cursor: 'pointer', transition: 'all .15s',
-      background: hovering() ? '#eff6ff' : 'transparent'
+      background: hovering() ? 'var(--x-primary-soft)' : 'transparent'
     }),
     on: {
       dragover: e => { e.preventDefault(); hovering(true) },
@@ -66,8 +66,12 @@ export function Dropzone(props, ...children) {
   },
     input({ type: 'file', accept, multiple, style: { display: 'none' }, on: { change: e => handle(e.target.files) } }),
     ...(children.length ? children : [
-      div({ style: { fontSize: '40px', marginBottom: '12px' } }, '📁'),
-      div({ style: { color: '#6b7280' } }, '拖拽文件到此处，或点击上传')
+      div({ style: { marginBottom: '12px', display: 'flex', justifyContent: 'center', color: 'var(--x-text-mute)' } },
+        createElement('svg', { width: 48, height: 48, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+          createElement('path', { d: 'M3 7h18v13H3z' }),
+          createElement('path', { d: 'M3 7l2-4h14l2 4' })
+        )),
+      div({ style: { color: 'var(--x-text-dim)' } }, '拖拽文件到此处，或点击上传')
     ])
   )
 }
@@ -87,14 +91,14 @@ export function FilePreview(props) {
     style: { position: 'fixed', inset: 0, zIndex: 5000, background: 'rgba(0,0,0,.85)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
     on: { click: e => e.target.style.position === 'fixed' && close() }
   },
-    div({ style: { background: '#fff', borderRadius: '10px', padding: '20px', maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto' } },
+    div({ style: { background: 'var(--x-text-inverse)', borderRadius: '10px', padding: '20px', maxWidth: '90vw', maxHeight: '90vh', overflow: 'auto' } },
       Row({ gap: 2, align: 'center', justify: 'between', style: { marginBottom: '12px' } },
         div({ style: { fontWeight: '600' } }, file.name),
         Btn({ size: 'sm', onClick: close }, '关闭')
       ),
       isImage
         ? img({ src: url, style: { maxWidth: '100%', maxHeight: '70vh', display: 'block' } })
-        : div({ style: { padding: '40px', textAlign: 'center', color: '#9ca3af' } }, '不支持预览此类型')
+        : div({ style: { padding: '40px', textAlign: 'center', color: 'var(--x-text-mute)' } }, '不支持预览此类型')
     )
   )
 }

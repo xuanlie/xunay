@@ -1,10 +1,10 @@
 // 切换后端
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
     H1("切换后端"),
-    P("改一行配置切四套后端——前端不用动。"),
+    P("改一行配置切五套后端——前端不用动。"),
     H2("配置文件"),
     Code("// xunay.config.json\n{\n  \"backend\": \"node\",\n  \"ports\": {\n    \"node\": 12341,\n    \"python\": 12342,\n    \"go\": 12343,\n    \"cpp\": 12344\n  }\n}", "json"),
     H2("切换命令"),

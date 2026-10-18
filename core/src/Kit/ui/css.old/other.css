@@ -1,0 +1,335 @@
+/* XuNay UI · other.css */
+
+a:hover { color: var(--x-primary-hover); text-decoration: underline; }
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+h2 { font-size: 24px; letter-spacing: -.01em; }
+
+h3 { font-size: 20px; }
+
+h4 { font-size: 17px; }
+
+h5 { font-size: 15px; }
+
+h6 { font-size: 14px; color: var(--x-text-dim); }
+
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--x-text);
+  margin-bottom: 6px;
+}
+
+.label .required { color: var(--x-danger); margin-left: 2px; }
+
+.hint { font-size: 12px; color: var(--x-text-mute); margin-top: 4px; }
+
+.error-msg { font-size: 12px; color: var(--x-danger); margin-top: 4px; }
+
+.panel {
+  background: var(--x-bg-soft);
+  border-radius: var(--x-radius);
+  padding: 16px;
+}
+
+/* ============ 移动端适配层 ============ */
+
+/* ===== XuNay 移动端适配 ===== */
+/* 基础：触摸优化 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* 移动端断点 */
+
+/* 超小屏 */
+@media (max-width: 375px) {
+  html { font-size: 14px; }
+  .modal-body { padding: 12px 16px; }
+  .card { padding: 12px; }
+}
+
+button.ghost:hover { background: var(--x-bg-hover); color: var(--x-text); }
+
+button.dashed:hover { border-color: var(--x-primary); color: var(--x-primary); background: transparent; }
+
+input::placeholder, textarea::placeholder { color: var(--x-text-mute); }
+
+textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+a:hover { color: var(--x-primary-hover); text-decoration: underline; }
+
+/* ---------- 表格 ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 14px;
+  color: var(--x-text);
+  background: var(--x-bg-elev);
+}
+
+thead { background: var(--x-bg-soft); }
+
+th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--x-text);
+  border-bottom: 2px solid var(--x-border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--x-border);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: 0; }
+
+tbody tr:hover { background: var(--x-bg-soft); }
+
+table.striped tbody tr:nth-child(even) { background: var(--x-bg-soft); }
+
+table.striped tbody tr:nth-child(even):hover { background: var(--x-bg-hover); }
+
+table.bordered { border: 1px solid var(--x-border); border-radius: var(--x-radius); overflow: hidden; }
+
+table.bordered th, table.bordered td { border-right: 1px solid var(--x-border); }
+
+table.bordered th:last-child, table.bordered td:last-child { border-right: 0; }
+
+h2 { font-size: 24px; letter-spacing: -.01em; }
+
+h3 { font-size: 20px; }
+
+h4 { font-size: 16px; }
+
+h5 { font-size: 14px; }
+
+h6 { font-size: 13px; color: var(--x-text-dim); }
+
+img.round { border-radius: 50%; }
+
+img.bordered { border: 1px solid var(--x-border); }
+
+/* ============================================================
+   主题系统 v2 —— 多预设 / 任意主色 / 渐变 / 自定义
+   用法：
+     1. 预设：<html data-theme="dracula">
+     2. 主色：<html data-accent="green">  (或 red/orange/purple/cyan/pink)
+     3. 自定义：JS 改 --x-primary 等变量
+     4. 渐变：class="bg-gradient-to-r from-blue to-purple"
+   ============================================================ */
+
+/* ---------- 预设主题：Dracula ---------- */
+[data-theme="dracula"] {
+  --x-bg: #282a36;
+  --x-bg-soft: #21222c;
+  --x-bg-elev: #343746;
+  --x-bg-hover: #44475a;
+  --x-border: #44475a;
+  --x-border-strong: #6272a4;
+  --x-text: #f8f8f2;
+  --x-text-dim: #bdc0cf;
+  --x-text-mute: #6272a4;
+  --x-text-inverse: #282a36;
+  --x-primary: #bd93f9;
+  --x-primary-hover: #caa9fa;
+  --x-primary-soft: rgba(189,147,249,.15);
+  --x-danger: #ff5555;
+  --x-success: #50fa7b;
+  --x-warning: #f1fa8c;
+}
+
+/* 线性渐变方向 */
+.gradient-to-r { background: linear-gradient(to right, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6)); }
+
+.gradient-to-l { background: linear-gradient(to left, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6)); }
+
+.gradient-to-t { background: linear-gradient(to top, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6)); }
+
+.gradient-to-b { background: linear-gradient(to bottom, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6)); }
+
+.gradient-to-br { background: linear-gradient(to bottom right, var(--x-grad-from, #3b82f6), var(--x-grad-to, #8b5cf6)); }
+
+/* ---------- 一键换肤 API（JS 调用）---------- */
+/*
+  用法：
+    // 换主题
+    document.documentElement.setAttribute('data-theme', 'dracula')
+    // 换主色
+    document.documentElement.setAttribute('data-accent', 'green')
+    // 完全自定义
+    document.documentElement.style.setProperty('--x-primary', '#ff6600')
+    document.documentElement.style.setProperty('--x-bg', '#1a1a1a')
+
+  提供的主题值：
+    data-theme: light(默认) / dark / dracula / nord / solarized / tokyo / monokai
+    data-accent: (默认) / green / red / orange / purple / cyan / pink
+*/
+
+/* ============ A11y 无障碍增强 ============ */
+/* ============================================================
+   XuNay UI · a11y 补丁 · 追加到 ui.css 之后
+   - 完整 ARIA 状态样式
+   - 强制色模式 / 高对比度增强
+   - 减少动效增强
+   - 键盘导航可见性
+   ============================================================ */
+
+@layer components {
+
+/* ---------- 按钮 ARIA 状态 ---------- */
+.btn[aria-pressed="true"] {
+  background: var(--x-primary-soft);
+  color: var(--x-primary);
+  border-color: var(--x-primary);
+}
+.btn[aria-expanded="true"] { background: var(--x-bg-soft); }
+.btn[aria-busy="true"] { pointer-events: none; }
+
+/* ---------- 输入 aria-invalid ---------- */
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"],
+.select[aria-invalid="true"] {
+  border-color: var(--x-danger);
+  background-image: none;
+}
+.input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px oklch(0.55 0.215 25 / 0.2);
+}
+/* 错误时 label 也变红（配合 .field.error） */
+.field.error .label { color: var(--x-danger); }
+.field.success .label { color: var(--x-success); }
+
+/* ---------- 表格 aria-selected / aria-sort ---------- */
+.table tbody tr[aria-selected="true"],
+table tbody tr[aria-selected="true"] {
+  background: var(--x-primary-soft);
+}
+.table th[aria-sort="ascending"]::after  { content: " ▲"; color: var(--x-text-dim); font-size: 0.7em; }
+.table th[aria-sort="descending"]::after { content: " ▼"; color: var(--x-text-dim); font-size: 0.7em; }
+.table th[aria-sort] { cursor: pointer; user-select: none; }
+
+/* ---------- Tabs 完整 ARIA ---------- */
+.tab[role="tab"][aria-selected="true"] {
+  color: var(--x-primary);
+  border-block-end-color: var(--x-primary);
+}
+.tab[role="tab"][aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tabs[role="tablist"] { position: relative; }
+
+/* ---------- Accordion ---------- */
+.accordion-item[aria-expanded="true"] > .accordion-trigger { color: var(--x-primary); }
+.accordion-trigger[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+/* ---------- Menu / Listbox ---------- */
+.dropdown-item[aria-selected="true"],
+.dropdown-item[aria-current="true"] {
+  background: var(--x-primary-soft);
+  color: var(--x-primary);
+}
+.dropdown-item[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------- Switch 键盘增强 ---------- */
+
+.switch { outline-offset: 2px; }
+.switch[role="switch"] { cursor: pointer; }
+
+/* ---------- Tooltip / Popover 可见性 ---------- */
+[role="tooltip"] {
+  position: absolute;
+  z-index: var(1500);
+  padding: var(4px) var(8px);
+  font-size: var(12px);
+  background: var(--x-text);
+  color: var(--x-text-inverse);
+  border-radius: var(var(--x-radius));
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---------- Focus 全局增强 ---------- */
+*:focus-visible {
+  outline: 2px solid var(--x-primary);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+/* 高优先级可见性：卡片 / 面板内的聚焦元素 */
+.card:focus-within {
+  border-color: var(--x-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+}
+
+/* /@layer components */
+
+/* ---------- 强制色模式（Windows 高对比度）---------- */
+@media (forced-colors: active) {
+  .btn, .input, .card, .alert, .table, .dropdown-menu {
+    border: 1px solid CanvasText;
+  }
+  .btn-primary, .badge-primary, .alert-info {
+    background: Highlight;
+    color: HighlightText;
+  }
+  .tab[aria-selected="true"] {
+    border-block-end: 2px solid Highlight;
+  }
+  .switch[aria-checked="true"] { background: Highlight; }
+  .switch-thumb { background: ButtonText; }
+}
+
+/* Checkbox / Radio 命令式 */
+.cb-box, .rd-dot { position:relative; display:inline-flex; align-items:center;
+  justify-content:center; width:18px; height:18px; flex-shrink:0;
+  border:1.5px solid var(--x-border-strong); background:var(--x-bg-elev);
+  transition:background .2s cubic-bezier(.34,1.56,.64,1), border-color .15s }
+
+.cb-box { border-radius:5px }
+
+.rd-dot { border-radius:50% }
+
+.cb-check { position:absolute; inset:0; padding:2px; opacity:0;
+  transition:opacity .15s }
+
+.cb-check path { stroke-dasharray:24; stroke-dashoffset:24;
+  transition:stroke-dashoffset .28s cubic-bezier(.4,0,.2,1) .05s }
+
+.cb-mark { position:absolute; width:10px; height:2px; border-radius:1px;
+  background:#fff; opacity:0; transition:opacity .15s }
+
+.cb-inner-dot { width:10px; height:10px; border-radius:50%;
+  transform:scale(0); transition:transform .25s cubic-bezier(.34,1.56,.64,1) }
+
+/* ═══════════════════════════════════════════════════════════
+   补丁 · 补齐 JS 引用但 CSS 缺失的样式
+   追加于 2026-10（补齐 base.js 依赖的关键帧 / 类）
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 按钮涟漪（base.js Btn 依赖） ── */
+@keyframes x-btn-ripple {
+  from { transform: scale(0); opacity: .35; }
+  to   { transform: scale(1); opacity: 0; }
+}

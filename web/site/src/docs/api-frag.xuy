@@ -1,5 +1,5 @@
 // frag(...children)
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -8,7 +8,7 @@ export function Doc() {
     H2("签名"),
     Code("frag(...children)", "js"),
     H2("示例"),
-    Code("import { frag, h1, p } from 'xunay'\n\nfrag(\n  h1(null, '标题'),\n  p(null, '正文')\n)", "xuy"),
+    Code("import { frag } from 'xunay'\n\nfrag(\n  h1(null, '标题'),\n  p(null, '正文')\n)", "xuy"),
     H2("别名"),
     P("F 是 frag 的别名。"),
     Code("import { F } from 'xunay'\nF(h1(null, 'a'), p(null, 'b'))", "xuy"),

@@ -1,0 +1,74 @@
+/* XuNay UI · nav.css */
+
+/* === 表格 === */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  background: var(--x-bg-elev);
+  border: 1px solid var(--x-border);
+  border-radius: var(--x-radius);
+  overflow: hidden;
+}
+
+.table th, .table td {
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--x-border);
+}
+
+.table th {
+  background: var(--x-bg-soft);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--x-text-dim);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.table tr:last-child td { border-bottom: none; }
+
+.table tbody tr:hover td { background: var(--x-bg-soft); }
+
+.table-sm th, .table-sm td { padding: 6px 12px; font-size: 13px; }
+
+.table-striped tbody tr:nth-child(even) td { background: var(--x-bg-soft); }
+
+.table-bordered th, .table-bordered td { border-right: 1px solid var(--x-border); }
+
+.table-bordered th:last-child, .table-bordered td:last-child { border-right: none; }
+
+/* === 标签页 === */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--x-border);
+  gap: 4px;
+}
+
+.tab {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--x-text-dim);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all .15s;
+}
+
+.tab:hover { color: var(--x-text); }
+
+.tab.active { color: var(--x-primary); border-bottom-color: var(--x-primary); }
+
+/* ---------- 键盘导航：Tab 内的方向键提示（视觉）---------- */
+.tab:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -4px;
+  inset-inline: 0;
+  block-size: 2px;
+  background: var(--x-primary);
+}

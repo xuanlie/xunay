@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>内联样式测试</title>
+<style>body{padding:40px;font:18px sans-serif;background:#fff;color:#000}
+.box{padding:14px;margin:12px 0;font-weight:bold}</style>
+</head><body>
+<h2>看两个方块的边框</h2>
+
+<!-- D：内联 style 以 -- 开头 -->
+<div class="box" style="--x-h: 40px; border: 4px solid green; background: #eef">
+  D · 内联 style 以 -- 开头（期望：绿框浅蓝底）
+</div>
+
+<!-- E：内联 style 以普通属性开头，-- 放最后 -->
+<div class="box" style="border: 4px solid blue; background: #ffe; --x-h: 40px">
+  E · -- 放最后（期望：蓝框浅黄底）
+</div>
+
+<!-- F：内联 style 里有 var() fallback -->
+<div class="box" style="border: 4px solid var(--nd, red); background: #efe">
+  F · var() fallback（期望：红框浅绿底）
+</div>
+
+</body></html>

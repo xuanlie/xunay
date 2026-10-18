@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>diag2</title>
+<style>body{font:13px/1.5 ui-monospace,monospace;padding:20px;background:#0f172a;color:#e2e8f0}
+pre{background:#1e293b;padding:10px;border-radius:6px;overflow:auto}
+#host{border:2px dashed #f87171;padding:14px;margin:10px 0;min-height:50px}
+b{color:#fbbf24}</style>
+</head><body>
+<h2>渲染诊断</h2>
+<div id="host">(空)</div>
+<pre id="out"></pre>
+<script type="module">
+const out = document.getElementById('out')
+const host = document.getElementById('host')
+const log = (...a) => { out.textContent += a.join(' ') + '\n' }
+window.onerror = (m,f,l) => log('!! ERR', m, f+':'+l)
+
+import { Input } from './kit/ui/input.js'
+log('✓ Input 已导入:', typeof Input)
+
+// 直接调用看 vnode 结构
+const vnode = Input({ label: '用户名', placeholder: '请输入', hint: '提示' })
+log('vnode type:', vnode && vnode.type)
+log('vnode class:', vnode && vnode.props && vnode.props.class)
+log('vnode style 类型:', typeof (vnode && vnode.props && vnode.props.style))
+log('vnode children 数量:', vnode && vnode.children && vnode.children.length)
+log('vnode children[0] type:', vnode.children[0] && vnode.children[0].type)
+log('vnode children[1] type:', vnode.children[1] && vnode.children[1].type)
+
+// 手动渲染
+function render(vnode, container) {
+  if (vnode == null || vnode === false || vnode === true) return null
+  if (Array.isArray(vnode)) { for (const v of vnode) render(v, container); return null }
+  if (typeof vnode === 'function') return render(vnode(), container)
+  if (typeof vnode !== 'object') {
+    const t = document.createTextNode(String(vnode)); container.appendChild(t); return t
+  }
+  if (!vnode.type) { log('!! 无 type 的 vnode:', JSON.stringify(vnode).slice(0,100)); return null }
+  const el = document.createElement(vnode.type)
+  const p = vnode.props || {}
+  for (const k in p) {
+    const v = p[k]
+    if (k === 'on' && v) { for (const ev in v) if (typeof v[ev] === 'function') el.addEventListener(ev, v[ev]) }
+    else if (k === 'ref' && typeof v === 'function') v(el)
+    else if (k === 'style') {
+      const st = typeof v === 'function' ? v() : v
+      if (typeof st === 'string') el.style.cssText = st
+    }
+    else if (k === 'class' || k === 'className') {
+      const c = typeof v === 'function' ? v() : v; if (c) el.className = c
+    }
+    else if (typeof v !== 'function' && v != null) {
+      if (v === true) el.setAttribute(k, '')
+      else el.setAttribute(k, v)
+    }
+  }
+  const ch = vnode.children || []
+  for (const c of ch) render(c, el)
+  container.appendChild(el)
+  return el
+}
+
+try {
+  const el = render(vnode, host)
+  log('✓ 渲染完成，DOM 元素:', el && el.tagName)
+  log('---HTML---')
+  log(host.innerHTML)
+  log('---end---')
+} catch (e) {
+  log('!! 渲染抛错:', e.message)
+  log(e.stack)
+}
+</script>
+</body></html>

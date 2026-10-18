@@ -1,0 +1,814 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · themes.css
+   主题系统 · 1000+ 行完整版
+   ───────────────────────────────────────────────────────────────────────
+   目录：
+     01 · 主题预设 · Dark
+     02 · 主题预设 · Dracula
+     03 · 主题预设 · Nord
+     04 · 主题预设 · Tokyo Night
+     05 · 主题预设 · Solarized
+     06 · 主题预设 · Monokai
+     07 · 主题预设 · Catppuccin
+     08 · 主题预设 · Gruvbox
+     09 · 主题预设 · One Dark
+     10 · 主题预设 · GitHub
+     11 · 主色 accent 变体
+     12 · 品牌色 brand
+     13 · 渐变工具
+     14 · 渐变文字
+     15 · 渐变边框
+     16 · 渐变按钮
+     17 · 玻璃拟态
+     18 · 彩色阴影
+     19 · 高对比度
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   01 · 主题预设 · Dark
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --x-bg:           oklch(0.155 0.008 250);
+  --x-bg-canvas:    oklch(0.135 0.008 250);
+  --x-bg-subtle:    oklch(0.185 0.010 250);
+  --x-bg-soft:      oklch(0.215 0.012 250);
+  --x-bg-muted:     oklch(0.255 0.012 250);
+  --x-bg-elev:      oklch(0.195 0.010 250);
+  --x-bg-hover:     oklch(0.255 0.012 250);
+  --x-bg-active:    oklch(0.290 0.014 250);
+  --x-bg-inv:       oklch(0.945 0.004 250);
+  --x-bg-overlay:   oklch(0 0 0 / 0.65);
+  --x-bg-glass:     oklch(0.195 0.010 250 / 0.72);
+
+  --x-fg:           oklch(0.945 0.004 250);
+  --x-fg-strong:    oklch(0.985 0.002 250);
+  --x-fg-dim:       oklch(0.720 0.010 250);
+  --x-fg-mute:      oklch(0.545 0.010 250);
+  --x-fg-subtle:    oklch(0.425 0.012 250);
+  --x-fg-inv:       oklch(0.155 0.008 250);
+
+  --x-line:         oklch(0.290 0.012 250);
+  --x-line-2:       oklch(0.390 0.014 250);
+  --x-line-strong:  oklch(0.500 0.014 250);
+
+  --x-primary:      oklch(0.72 0.15 262);
+  --x-primary-hov:  oklch(0.78 0.14 262);
+  --x-primary-act:  oklch(0.82 0.13 262);
+  --x-primary-soft: oklch(0.72 0.15 262 / 0.16);
+  --x-primary-tint: oklch(0.72 0.15 262 / 0.08);
+  --x-primary-ring: oklch(0.72 0.15 262 / 0.35);
+
+  --x-danger:       oklch(0.70 0.18 25);
+  --x-danger-soft:  oklch(0.70 0.18 25 / 0.16);
+  --x-success:      oklch(0.72 0.14 152);
+  --x-success-soft: oklch(0.72 0.14 152 / 0.16);
+  --x-warning:      oklch(0.78 0.14 75);
+  --x-warning-soft: oklch(0.78 0.14 75 / 0.18);
+  --x-warning-fg:   oklch(0.85 0.10 75);
+  --x-info:         oklch(0.72 0.13 235);
+  --x-info-soft:    oklch(0.72 0.13 235 / 0.16);
+
+  --x-sh-xs: 0 1px 2px oklch(0 0 0 / 0.30);
+  --x-sh-sm: 0 1px 3px oklch(0 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.25);
+  --x-sh:    0 2px 6px oklch(0 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.25);
+  --x-sh-md: 0 4px 12px oklch(0 0 0 / 0.40), 0 2px 4px oklch(0 0 0 / 0.25);
+  --x-sh-lg: 0 8px 24px oklch(0 0 0 / 0.45), 0 4px 8px oklch(0 0 0 / 0.25);
+  --x-sh-xl: 0 16px 40px oklch(0 0 0 / 0.55), 0 8px 16px oklch(0 0 0 / 0.30);
+  --x-sh-2xl: 0 24px 56px oklch(0 0 0 / 0.65), 0 12px 24px oklch(0 0 0 / 0.35);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   02 · 主题预设 · Dracula
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="dracula"] {
+  --x-bg:           oklch(0.220 0.018 280);
+  --x-bg-canvas:    oklch(0.185 0.015 280);
+  --x-bg-subtle:    oklch(0.240 0.020 280);
+  --x-bg-soft:      oklch(0.260 0.022 280);
+  --x-bg-muted:     oklch(0.300 0.024 280);
+  --x-bg-elev:      oklch(0.260 0.022 280);
+  --x-bg-hover:     oklch(0.320 0.026 280);
+  --x-bg-active:    oklch(0.365 0.028 280);
+  --x-bg-inv:       oklch(0.960 0.010 280);
+  --x-bg-glass:     oklch(0.260 0.022 280 / 0.72);
+
+  --x-fg:           oklch(0.960 0.010 280);
+  --x-fg-strong:    oklch(0.985 0.005 280);
+  --x-fg-dim:       oklch(0.720 0.020 280);
+  --x-fg-mute:      oklch(0.545 0.020 280);
+  --x-fg-inv:       oklch(0.220 0.018 280);
+
+  --x-line:         oklch(0.320 0.026 280);
+  --x-line-2:       oklch(0.400 0.028 280);
+  --x-line-strong:  oklch(0.520 0.028 280);
+
+  --x-primary:      oklch(0.750 0.150 310);
+  --x-primary-hov:  oklch(0.800 0.140 310);
+  --x-primary-act:  oklch(0.850 0.130 310);
+  --x-primary-soft: oklch(0.750 0.150 310 / 0.16);
+
+  --x-success:      oklch(0.870 0.200 145);
+  --x-success-soft: oklch(0.870 0.200 145 / 0.16);
+  --x-warning:      oklch(0.940 0.150 95);
+  --x-warning-soft: oklch(0.940 0.150 95 / 0.18);
+  --x-warning-fg:   oklch(0.94 0.15 95);
+  --x-danger:       oklch(0.720 0.220 20);
+  --x-danger-soft:  oklch(0.720 0.220 20 / 0.16);
+  --x-info:         oklch(0.780 0.150 195);
+  --x-info-soft:    oklch(0.780 0.150 195 / 0.16);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   03 · 主题预设 · Nord
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="nord"] {
+  --x-bg:           oklch(0.300 0.020 240);
+  --x-bg-canvas:    oklch(0.280 0.020 240);
+  --x-bg-subtle:    oklch(0.330 0.020 240);
+  --x-bg-soft:      oklch(0.360 0.020 240);
+  --x-bg-muted:     oklch(0.400 0.020 240);
+  --x-bg-elev:      oklch(0.360 0.020 240);
+  --x-bg-hover:     oklch(0.420 0.020 240);
+  --x-bg-active:    oklch(0.460 0.020 240);
+  --x-bg-inv:       oklch(0.940 0.010 240);
+
+  --x-fg:           oklch(0.940 0.010 240);
+  --x-fg-strong:    oklch(0.985 0.005 240);
+  --x-fg-dim:       oklch(0.850 0.015 240);
+  --x-fg-mute:      oklch(0.650 0.015 240);
+  --x-fg-inv:       oklch(0.300 0.020 240);
+
+  --x-line:         oklch(0.420 0.020 240);
+  --x-line-2:       oklch(0.480 0.020 240);
+  --x-line-strong:  oklch(0.580 0.020 240);
+
+  --x-primary:      oklch(0.780 0.060 200);
+  --x-primary-hov:  oklch(0.820 0.060 200);
+  --x-primary-soft: oklch(0.780 0.060 200 / 0.20);
+
+  --x-success:      oklch(0.780 0.100 145);
+  --x-warning:      oklch(0.850 0.120 90);
+  --x-danger:       oklch(0.680 0.140 25);
+  --x-info:         oklch(0.740 0.080 230);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   04 · 主题预设 · Tokyo Night
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="tokyo"] {
+  --x-bg:           oklch(0.180 0.020 260);
+  --x-bg-canvas:    oklch(0.150 0.020 260);
+  --x-bg-subtle:    oklch(0.220 0.025 260);
+  --x-bg-soft:      oklch(0.240 0.025 260);
+  --x-bg-muted:     oklch(0.280 0.025 260);
+  --x-bg-elev:      oklch(0.240 0.025 260);
+  --x-bg-hover:     oklch(0.300 0.025 260);
+  --x-bg-active:    oklch(0.340 0.025 260);
+  --x-bg-inv:       oklch(0.820 0.050 260);
+
+  --x-fg:           oklch(0.820 0.050 260);
+  --x-fg-strong:    oklch(0.920 0.030 260);
+  --x-fg-dim:       oklch(0.720 0.050 260);
+  --x-fg-mute:      oklch(0.520 0.050 260);
+  --x-fg-inv:       oklch(0.180 0.020 260);
+
+  --x-line:         oklch(0.300 0.025 260);
+  --x-line-2:       oklch(0.380 0.025 260);
+  --x-line-strong:  oklch(0.500 0.025 260);
+
+  --x-primary:      oklch(0.720 0.150 260);
+  --x-primary-hov:  oklch(0.780 0.140 260);
+  --x-primary-soft: oklch(0.720 0.150 260 / 0.18);
+
+  --x-success:      oklch(0.820 0.140 140);
+  --x-warning:      oklch(0.800 0.140 80);
+  --x-danger:       oklch(0.720 0.200 20);
+  --x-info:         oklch(0.760 0.120 220);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   05 · 主题预设 · Solarized
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="solarized"] {
+  --x-bg:           oklch(0.960 0.030 90);
+  --x-bg-canvas:    oklch(0.940 0.030 85);
+  --x-bg-subtle:    oklch(0.920 0.030 85);
+  --x-bg-soft:      oklch(0.900 0.030 85);
+  --x-bg-muted:     oklch(0.880 0.030 85);
+  --x-bg-elev:      oklch(0.980 0.015 90);
+  --x-bg-hover:     oklch(0.900 0.030 85);
+  --x-bg-active:    oklch(0.870 0.030 85);
+
+  --x-fg:           oklch(0.420 0.030 200);
+  --x-fg-strong:    oklch(0.320 0.030 200);
+  --x-fg-dim:       oklch(0.520 0.030 200);
+  --x-fg-mute:      oklch(0.620 0.020 200);
+
+  --x-line:         oklch(0.860 0.030 85);
+  --x-line-2:       oklch(0.780 0.030 85);
+  --x-line-strong:  oklch(0.640 0.030 200);
+
+  --x-primary:      oklch(0.580 0.150 240);
+  --x-primary-hov:  oklch(0.520 0.160 240);
+  --x-primary-soft: oklch(0.580 0.150 240 / 0.12);
+
+  --x-success:      oklch(0.620 0.160 100);
+  --x-warning:      oklch(0.720 0.150 85);
+  --x-danger:       oklch(0.600 0.210 25);
+  --x-info:         oklch(0.580 0.150 240);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   06 · 主题预设 · Monokai
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="monokai"] {
+  --x-bg:           oklch(0.220 0.010 100);
+  --x-bg-canvas:    oklch(0.180 0.010 100);
+  --x-bg-subtle:    oklch(0.250 0.012 100);
+  --x-bg-soft:      oklch(0.280 0.012 100);
+  --x-bg-muted:     oklch(0.320 0.012 100);
+  --x-bg-elev:      oklch(0.280 0.012 100);
+  --x-bg-hover:     oklch(0.340 0.012 100);
+  --x-bg-active:    oklch(0.380 0.012 100);
+
+  --x-fg:           oklch(0.950 0.010 100);
+  --x-fg-strong:    oklch(0.985 0.005 100);
+  --x-fg-dim:       oklch(0.750 0.020 100);
+  --x-fg-mute:      oklch(0.580 0.020 100);
+  --x-fg-inv:       oklch(0.220 0.010 100);
+
+  --x-line:         oklch(0.340 0.012 100);
+  --x-line-2:       oklch(0.420 0.012 100);
+  --x-line-strong:  oklch(0.540 0.012 100);
+
+  --x-primary:      oklch(0.850 0.180 130);
+  --x-primary-hov:  oklch(0.890 0.165 130);
+  --x-primary-soft: oklch(0.850 0.180 130 / 0.16);
+
+  --x-success:      oklch(0.850 0.180 130);
+  --x-warning:      oklch(0.880 0.150 95);
+  --x-danger:       oklch(0.680 0.230 350);
+  --x-info:         oklch(0.750 0.150 200);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   07 · 主题预设 · Catppuccin
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="catppuccin"] {
+  --x-bg:           oklch(0.230 0.030 285);
+  --x-bg-canvas:    oklch(0.200 0.030 285);
+  --x-bg-subtle:    oklch(0.260 0.032 285);
+  --x-bg-soft:      oklch(0.290 0.034 285);
+  --x-bg-muted:     oklch(0.330 0.034 285);
+  --x-bg-elev:      oklch(0.290 0.034 285);
+  --x-bg-hover:     oklch(0.350 0.036 285);
+  --x-bg-active:    oklch(0.400 0.038 285);
+
+  --x-fg:           oklch(0.900 0.020 285);
+  --x-fg-strong:    oklch(0.960 0.010 285);
+  --x-fg-dim:       oklch(0.760 0.030 285);
+  --x-fg-mute:      oklch(0.580 0.030 285);
+  --x-fg-inv:       oklch(0.230 0.030 285);
+
+  --x-line:         oklch(0.350 0.036 285);
+  --x-line-2:       oklch(0.420 0.038 285);
+  --x-line-strong:  oklch(0.550 0.038 285);
+
+  --x-primary:      oklch(0.780 0.130 265);
+  --x-primary-hov:  oklch(0.830 0.120 265);
+  --x-primary-soft: oklch(0.780 0.130 265 / 0.18);
+
+  --x-success:      oklch(0.850 0.120 145);
+  --x-warning:      oklch(0.880 0.130 85);
+  --x-danger:       oklch(0.720 0.180 15);
+  --x-info:         oklch(0.820 0.100 200);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · 主题预设 · Gruvbox
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="gruvbox"] {
+  --x-bg:           oklch(0.240 0.020 80);
+  --x-bg-canvas:    oklch(0.200 0.020 80);
+  --x-bg-subtle:    oklch(0.270 0.022 80);
+  --x-bg-soft:      oklch(0.300 0.024 80);
+  --x-bg-muted:     oklch(0.340 0.024 80);
+  --x-bg-elev:      oklch(0.300 0.024 80);
+  --x-bg-hover:     oklch(0.360 0.026 80);
+  --x-bg-active:    oklch(0.410 0.028 80);
+
+  --x-fg:           oklch(0.920 0.030 85);
+  --x-fg-strong:    oklch(0.965 0.015 85);
+  --x-fg-dim:       oklch(0.780 0.040 85);
+  --x-fg-mute:      oklch(0.600 0.040 85);
+  --x-fg-inv:       oklch(0.240 0.020 80);
+
+  --x-line:         oklch(0.360 0.026 80);
+  --x-line-2:       oklch(0.440 0.028 80);
+  --x-line-strong:  oklch(0.560 0.030 80);
+
+  --x-primary:      oklch(0.680 0.140 250);
+  --x-primary-hov:  oklch(0.740 0.130 250);
+  --x-primary-soft: oklch(0.680 0.140 250 / 0.18);
+
+  --x-success:      oklch(0.760 0.150 130);
+  --x-warning:      oklch(0.820 0.140 75);
+  --x-danger:       oklch(0.640 0.190 30);
+  --x-info:         oklch(0.720 0.120 200);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 · 主题预设 · One Dark
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="one-dark"] {
+  --x-bg:           oklch(0.260 0.014 250);
+  --x-bg-canvas:    oklch(0.230 0.014 250);
+  --x-bg-subtle:    oklch(0.290 0.016 250);
+  --x-bg-soft:      oklch(0.320 0.018 250);
+  --x-bg-muted:     oklch(0.360 0.018 250);
+  --x-bg-elev:      oklch(0.320 0.018 250);
+  --x-bg-hover:     oklch(0.380 0.020 250);
+  --x-bg-active:    oklch(0.420 0.020 250);
+
+  --x-fg:           oklch(0.830 0.010 250);
+  --x-fg-strong:    oklch(0.930 0.005 250);
+  --x-fg-dim:       oklch(0.680 0.010 250);
+  --x-fg-mute:      oklch(0.520 0.010 250);
+  --x-fg-inv:       oklch(0.260 0.014 250);
+
+  --x-line:         oklch(0.380 0.018 250);
+  --x-line-2:       oklch(0.440 0.020 250);
+  --x-line-strong:  oklch(0.560 0.020 250);
+
+  --x-primary:      oklch(0.740 0.130 240);
+  --x-primary-hov:  oklch(0.790 0.120 240);
+  --x-primary-soft: oklch(0.740 0.130 240 / 0.18);
+
+  --x-success:      oklch(0.800 0.140 140);
+  --x-warning:      oklch(0.800 0.140 80);
+  --x-danger:       oklch(0.700 0.180 25);
+  --x-info:         oklch(0.760 0.110 220);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · 主题预设 · GitHub
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-theme="github"] {
+  --x-bg:           oklch(1.000 0     0);
+  --x-bg-canvas:    oklch(0.985 0.002 240);
+  --x-bg-subtle:    oklch(0.975 0.003 240);
+  --x-bg-soft:      oklch(0.960 0.005 240);
+  --x-bg-muted:     oklch(0.935 0.006 240);
+  --x-bg-elev:      oklch(1.000 0     0);
+  --x-bg-hover:     oklch(0.960 0.005 240);
+  --x-bg-active:    oklch(0.935 0.006 240);
+
+  --x-fg:           oklch(0.240 0.012 250);
+  --x-fg-strong:    oklch(0.140 0.010 250);
+  --x-fg-dim:       oklch(0.480 0.012 250);
+  --x-fg-mute:      oklch(0.680 0.010 250);
+
+  --x-line:         oklch(0.925 0.005 240);
+  --x-line-2:       oklch(0.865 0.008 240);
+  --x-line-strong:  oklch(0.700 0.010 240);
+
+  --x-primary:      oklch(0.620 0.170 145);
+  --x-primary-hov:  oklch(0.560 0.170 145);
+  --x-primary-soft: oklch(0.620 0.170 145 / 0.12);
+
+  --x-success:      oklch(0.620 0.170 145);
+  --x-warning:      oklch(0.760 0.160 75);
+  --x-danger:       oklch(0.610 0.200 25);
+  --x-info:         oklch(0.640 0.150 235);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · 主色 accent 变体
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-accent="blue"] {
+  --x-primary:      oklch(0.58 0.18 262);
+  --x-primary-hov:  oklch(0.52 0.19 262);
+  --x-primary-soft: oklch(0.58 0.18 262 / 0.10);
+}
+[data-accent="indigo"] {
+  --x-primary:      oklch(0.57 0.19 285);
+  --x-primary-hov:  oklch(0.51 0.19 285);
+  --x-primary-soft: oklch(0.57 0.19 285 / 0.10);
+}
+[data-accent="violet"] {
+  --x-primary:      oklch(0.58 0.22 300);
+  --x-primary-hov:  oklch(0.52 0.23 300);
+  --x-primary-soft: oklch(0.58 0.22 300 / 0.10);
+}
+[data-accent="purple"] {
+  --x-primary:      oklch(0.60 0.22 315);
+  --x-primary-hov:  oklch(0.54 0.22 315);
+  --x-primary-soft: oklch(0.60 0.22 315 / 0.10);
+}
+[data-accent="pink"] {
+  --x-primary:      oklch(0.66 0.21 0);
+  --x-primary-hov:  oklch(0.60 0.21 0);
+  --x-primary-soft: oklch(0.66 0.21 0 / 0.10);
+}
+[data-accent="rose"] {
+  --x-primary:      oklch(0.65 0.22 15);
+  --x-primary-hov:  oklch(0.59 0.22 15);
+  --x-primary-soft: oklch(0.65 0.22 15 / 0.10);
+}
+[data-accent="red"] {
+  --x-primary:      oklch(0.60 0.21 25);
+  --x-primary-hov:  oklch(0.54 0.22 25);
+  --x-primary-soft: oklch(0.60 0.21 25 / 0.10);
+}
+[data-accent="orange"] {
+  --x-primary:      oklch(0.70 0.19 55);
+  --x-primary-hov:  oklch(0.64 0.20 55);
+  --x-primary-soft: oklch(0.70 0.19 55 / 0.10);
+}
+[data-accent="amber"] {
+  --x-primary:      oklch(0.75 0.16 75);
+  --x-primary-hov:  oklch(0.69 0.17 75);
+  --x-primary-soft: oklch(0.75 0.16 75 / 0.12);
+}
+[data-accent="yellow"] {
+  --x-primary:      oklch(0.80 0.15 95);
+  --x-primary-hov:  oklch(0.74 0.16 95);
+  --x-primary-soft: oklch(0.80 0.15 95 / 0.12);
+}
+[data-accent="lime"] {
+  --x-primary:      oklch(0.72 0.18 125);
+  --x-primary-hov:  oklch(0.66 0.18 125);
+  --x-primary-soft: oklch(0.72 0.18 125 / 0.10);
+}
+[data-accent="green"] {
+  --x-primary:      oklch(0.62 0.17 152);
+  --x-primary-hov:  oklch(0.56 0.17 152);
+  --x-primary-soft: oklch(0.62 0.17 152 / 0.10);
+}
+[data-accent="emerald"] {
+  --x-primary:      oklch(0.65 0.17 165);
+  --x-primary-hov:  oklch(0.59 0.17 165);
+  --x-primary-soft: oklch(0.65 0.17 165 / 0.10);
+}
+[data-accent="teal"] {
+  --x-primary:      oklch(0.68 0.13 180);
+  --x-primary-hov:  oklch(0.62 0.13 180);
+  --x-primary-soft: oklch(0.68 0.13 180 / 0.10);
+}
+[data-accent="cyan"] {
+  --x-primary:      oklch(0.68 0.14 210);
+  --x-primary-hov:  oklch(0.62 0.14 210);
+  --x-primary-soft: oklch(0.68 0.14 210 / 0.10);
+}
+[data-accent="sky"] {
+  --x-primary:      oklch(0.65 0.16 220);
+  --x-primary-hov:  oklch(0.59 0.16 220);
+  --x-primary-soft: oklch(0.65 0.16 220 / 0.10);
+}
+
+/* 暗色下更亮 */
+[data-theme="dark"][data-accent="blue"],
+[data-theme="dracula"][data-accent="blue"],
+[data-theme="tokyo"][data-accent="blue"],
+[data-theme="catppuccin"][data-accent="blue"],
+[data-theme="one-dark"][data-accent="blue"] {
+  --x-primary: oklch(0.72 0.15 262);
+  --x-primary-hov: oklch(0.78 0.14 262);
+  --x-primary-soft: oklch(0.72 0.15 262 / 0.16);
+}
+[data-theme="dark"][data-accent="green"],
+[data-theme="dracula"][data-accent="green"],
+[data-theme="tokyo"][data-accent="green"],
+[data-theme="catppuccin"][data-accent="green"],
+[data-theme="one-dark"][data-accent="green"] {
+  --x-primary: oklch(0.74 0.15 152);
+  --x-primary-hov: oklch(0.80 0.14 152);
+  --x-primary-soft: oklch(0.74 0.15 152 / 0.16);
+}
+[data-theme="dark"][data-accent="red"],
+[data-theme="dracula"][data-accent="red"],
+[data-theme="tokyo"][data-accent="red"],
+[data-theme="catppuccin"][data-accent="red"],
+[data-theme="one-dark"][data-accent="red"] {
+  --x-primary: oklch(0.72 0.19 25);
+  --x-primary-hov: oklch(0.78 0.18 25);
+  --x-primary-soft: oklch(0.72 0.19 25 / 0.16);
+}
+[data-theme="dark"][data-accent="purple"],
+[data-theme="dracula"][data-accent="purple"],
+[data-theme="tokyo"][data-accent="purple"],
+[data-theme="catppuccin"][data-accent="purple"],
+[data-theme="one-dark"][data-accent="purple"] {
+  --x-primary: oklch(0.76 0.17 300);
+  --x-primary-hov: oklch(0.82 0.16 300);
+  --x-primary-soft: oklch(0.76 0.17 300 / 0.16);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · 品牌色 brand（独立于 accent）
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-brand] {
+  --x-brand:  var(--x-primary);
+  --x-brand-2: var(--x-purple);
+}
+
+[data-brand="xunay"] {
+  --x-brand:   oklch(0.65 0.19 285);
+  --x-brand-2: oklch(0.68 0.20 315);
+}
+
+[data-brand="ocean"] {
+  --x-brand:   oklch(0.60 0.17 220);
+  --x-brand-2: oklch(0.66 0.15 190);
+}
+
+[data-brand="sunset"] {
+  --x-brand:   oklch(0.70 0.19 55);
+  --x-brand-2: oklch(0.66 0.21 0);
+}
+
+[data-brand="forest"] {
+  --x-brand:   oklch(0.62 0.17 152);
+  --x-brand-2: oklch(0.72 0.18 125);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · 渐变工具
+   ═══════════════════════════════════════════════════════════════════════ */
+.bg-gradient-primary {
+  background: linear-gradient(135deg,
+    var(--x-primary, #2563eb),
+    var(--x-purple, #7c3aed));
+}
+.bg-gradient-danger {
+  background: linear-gradient(135deg, #f43f5e, #dc2626);
+}
+.bg-gradient-success {
+  background: linear-gradient(135deg, #10b981, #16a34a);
+}
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+.bg-gradient-info {
+  background: linear-gradient(135deg, #38bdf8, #0891b2);
+}
+.bg-gradient-sunset {
+  background: linear-gradient(135deg, #fb7185, #fbbf24);
+}
+.bg-gradient-ocean {
+  background: linear-gradient(135deg, #1e3a8a, #22d3ee);
+}
+.bg-gradient-forest {
+  background: linear-gradient(135deg, #065f46, #a3e635);
+}
+.bg-gradient-candy {
+  background: linear-gradient(135deg, #f9a8d4, #c084fc);
+}
+.bg-gradient-fire {
+  background: linear-gradient(135deg, #ef4444, #f97316 50%, #fbbf24);
+}
+.bg-gradient-aurora {
+  background: linear-gradient(135deg, #4ade80, #22d3ee 50%, #c084fc);
+}
+.bg-gradient-rainbow {
+  background: linear-gradient(90deg,
+    #ff0000, #ff7f00, #ffff00, #00ff00,
+    #0000ff, #4b0082, #9400d3);
+}
+.bg-gradient-mesh {
+  background:
+    radial-gradient(at 27% 37%, oklch(0.58 0.18 262) 0px, transparent 50%),
+    radial-gradient(at 97% 21%, oklch(0.66 0.21 0)   0px, transparent 50%),
+    radial-gradient(at 52% 99%, oklch(0.75 0.15 75)  0px, transparent 50%),
+    radial-gradient(at 10% 29%, oklch(0.58 0.22 300) 0px, transparent 50%),
+    radial-gradient(at 97% 96%, oklch(0.64 0.15 235) 0px, transparent 50%);
+  background-color: var(--x-bg, #fff);
+}
+
+/* 方向 */
+.gradient-to-r  { background-image: linear-gradient(to right, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-l  { background-image: linear-gradient(to left, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-t  { background-image: linear-gradient(to top, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-b  { background-image: linear-gradient(to bottom, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-br { background-image: linear-gradient(to bottom right, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-bl { background-image: linear-gradient(to bottom left, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-tr { background-image: linear-gradient(to top right, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+.gradient-to-tl { background-image: linear-gradient(to top left, var(--x-grad-from, #2563eb), var(--x-grad-to, #7c3aed)); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · 渐变文字
+   ═══════════════════════════════════════════════════════════════════════ */
+.text-gradient {
+  background-image: linear-gradient(135deg,
+    var(--x-grad-from, var(--x-primary, #2563eb)),
+    var(--x-grad-to, var(--x-purple, #7c3aed))) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  display: inline-block;
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-gradient-sunset {
+  background: linear-gradient(135deg, #f472b6, #fbbf24);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-gradient-rainbow {
+  background: linear-gradient(90deg,
+    #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 渐变边框
+   ═══════════════════════════════════════════════════════════════════════ */
+.border-gradient {
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.border-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg,
+    var(--x-grad-from, var(--x-primary, #2563eb)),
+    var(--x-grad-to, var(--x-purple, #7c3aed)));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.border-gradient-primary::before {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+.border-gradient-success::before {
+  background: linear-gradient(135deg, #10b981, #16a34a);
+}
+.border-gradient-danger::before {
+  background: linear-gradient(135deg, #f43f5e, #dc2626);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   16 · 渐变按钮
+   ═══════════════════════════════════════════════════════════════════════ */
+.btn-gradient,
+.btn-gradient-primary {
+  background: linear-gradient(135deg,
+    var(--x-grad-from, #2563eb),
+    var(--x-grad-to, #7c3aed));
+  color: #fff;
+  border: 0;
+}
+
+.btn-gradient:hover:not(:disabled),
+.btn-gradient-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  color: #fff;
+  box-shadow: var(--x-sh-lg, 0 8px 24px rgba(0,0,0,.1));
+}
+
+.btn-gradient:active:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+.btn-gradient-sunset {
+  background: linear-gradient(135deg, #f472b6, #fbbf24);
+  color: #fff;
+  border: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   17 · 玻璃拟态
+   ═══════════════════════════════════════════════════════════════════════ */
+.glass {
+  background: rgba(255,255,255,.10);
+  backdrop-filter: blur(12px) saturate(1.8);
+  -webkit-backdrop-filter: blur(12px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,.20);
+}
+
+.glass-strong {
+  background: rgba(255,255,255,.22);
+  backdrop-filter: blur(20px) saturate(2);
+  -webkit-backdrop-filter: blur(20px) saturate(2);
+  border: 1px solid rgba(255,255,255,.35);
+}
+
+.glass-light {
+  background: rgba(255,255,255,.60);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,.60);
+}
+
+.glass-dark {
+  background: rgba(20,20,30,.55);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+[data-theme="dark"] .glass,
+[data-theme="dracula"] .glass,
+[data-theme="tokyo"] .glass,
+[data-theme="catppuccin"] .glass,
+[data-theme="one-dark"] .glass,
+[data-theme="monokai"] .glass,
+[data-theme="gruvbox"] .glass {
+  background: rgba(0,0,0,.30);
+  border-color: rgba(255,255,255,.10);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   18 · 彩色阴影
+   ═══════════════════════════════════════════════════════════════════════ */
+.shadow-colored {
+  box-shadow: 0 8px 24px -8px var(--x-primary, #2563eb);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px var(--x-primary-soft, rgba(37,99,235,.2)),
+              0 0 40px var(--x-primary-soft, rgba(37,99,235,.2));
+}
+
+.shadow-primary { box-shadow: 0 8px 24px -8px var(--x-primary, #2563eb); }
+.shadow-success { box-shadow: 0 8px 24px -8px var(--x-success, #16a34a); }
+.shadow-warning { box-shadow: 0 8px 24px -8px var(--x-warning, #d97706); }
+.shadow-danger  { box-shadow: 0 8px 24px -8px var(--x-danger, #dc2626); }
+.shadow-info    { box-shadow: 0 8px 24px -8px var(--x-info, #0891b2); }
+
+/* 内发光 */
+.ring-primary {
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.3));
+}
+.ring-danger {
+  box-shadow: 0 0 0 3px var(--x-danger-soft, rgba(220,38,38,.3));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   19 · 高对比度
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (prefers-contrast: more) {
+  [data-theme],
+  :root {
+    --x-fg-dim:  var(--x-fg, #000);
+    --x-fg-mute: var(--x-fg-dim, #333);
+    --x-line:    var(--x-line-strong, #555);
+    --x-line-2:  var(--x-line-strong, #555);
+    --x-sh-xs: none;
+    --x-sh-sm: none;
+    --x-sh: none;
+    --x-sh-md: none;
+  }
+
+  .glass,
+  .glass-strong,
+  .glass-light,
+  .glass-dark {
+    background: var(--x-bg-elev);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--x-line-strong);
+  }
+}

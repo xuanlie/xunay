@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>loading...</title></head>
+<body style="font:16px sans-serif;padding:40px;background:#0f172a;color:#e2e8f0">
+<div id="sync" style="font-size:24px;color:#f87171">sync 未执行</div>
+<div id="mod" style="font-size:20px;color:#f87171;margin-top:20px">module 未执行</div>
+<div id="imp" style="font-size:16px;color:#f87171;margin-top:20px">import 未执行</div>
+
+<script>
+  document.getElementById('sync').textContent = '✓ sync 已执行'
+  document.getElementById('sync').style.color = '#4ade80'
+  document.title = 'sync-ok'
+</script>
+
+<script type="module">
+  document.getElementById('mod').textContent = '✓ module 已执行'
+  document.getElementById('mod').style.color = '#4ade80'
+  try {
+    const m = await import('./kit/ui/input.js')
+    document.getElementById('imp').textContent = '✓ import OK: ' + Object.keys(m).join(',')
+    document.getElementById('imp').style.color = '#4ade80'
+    document.title = 'all-ok'
+  } catch (e) {
+    document.getElementById('imp').textContent = '✗ import: ' + e.message
+    document.title = 'import-fail'
+  }
+</script>
+</body></html>

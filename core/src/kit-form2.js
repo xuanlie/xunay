@@ -14,7 +14,7 @@ export function ColorPicker(props) {
       style: { width: '40px', height: '32px', border: '1px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', padding: 0 },
       on: { input: e => onChange && onChange(e.target.value) }
     }),
-    showText ? span({ style: { fontSize: '12px', fontFamily: 'monospace', color: '#6b7280' } }, () => val() || '#000000') : null
+    showText ? span({ style: { fontSize: '12px', fontFamily: 'monospace', color: 'var(--x-text-dim)' } }, () => val() || '#000000') : null
   )
 }
 
@@ -57,7 +57,7 @@ export function Mentions(props) {
     show(showList, () => div({
       style: {
         position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
-        background: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px',
+        background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb', borderRadius: '6px',
         boxShadow: '0 4px 12px rgba(0,0,0,.1)', marginTop: '4px', maxHeight: '150px', overflow: 'auto'
       }
     },
@@ -69,7 +69,7 @@ export function Mentions(props) {
             onChange && onChange(v)
             showList(false)
           },
-          mouseenter: e => e.currentTarget.style.background = '#f3f4f6',
+          mouseenter: e => e.currentTarget.style.background = 'var(--x-bg-hover)',
           mouseleave: e => e.currentTarget.style.background = 'transparent'
         }
       }, o))
@@ -86,7 +86,7 @@ export function Transfer(props) {
   const Item = (it, side) => div({
     style: {
       padding: '6px 10px', fontSize: '13px', cursor: 'pointer', borderRadius: '4px',
-      background: (side === 'L' ? selL() : selR()).includes(it.key) ? '#eff6ff' : 'transparent'
+      background: (side === 'L' ? selL() : selR()).includes(it.key) ? 'var(--x-primary-soft)' : 'transparent'
     },
     on: { click: () => {
       const s = side === 'L' ? selL : selR
@@ -109,7 +109,7 @@ export function Transfer(props) {
   const Box = (title, arr, side) => div({
     style: { flex: 1, border: '1px solid #e5e7eb', borderRadius: '8px', display: 'flex', flexDirection: 'column' }
   },
-    div({ style: { padding: '8px 12px', background: '#f9fafb', borderBottom: '1px solid #e5e7eb', fontSize: '12px', fontWeight: '600' } }, title),
+    div({ style: { padding: '8px 12px', background: 'var(--x-bg-soft)', borderBottom: '1px solid #e5e7eb', fontSize: '12px', fontWeight: '600' } }, title),
     div({ style: { flex: 1, padding: '8px', maxHeight: '240px', overflow: 'auto' } },
       ...arr().map(it => Item(it, side)))
   )
@@ -144,13 +144,13 @@ export function Cascader(props) {
       class: 'input', style: { cursor: 'pointer', display: 'flex', justifyContent: 'space-between' },
       on: { click: () => open(!open()) }
     },
-      span({ style: { color: val() ? '#111' : '#9ca3af' } }, () => val() ? val().join(' / ') : placeholder),
-      span({ style: { color: '#9ca3af', fontSize: '12px' } }, '▾')
+      span({ style: { color: val() ? 'var(--x-text)' : 'var(--x-text-mute)' } }, () => val() ? val().join(' / ') : placeholder),
+      span({ style: { color: 'var(--x-text-mute)', fontSize: '12px' } }, '▾')
     ),
     show(open, () => div({
       style: {
         position: 'absolute', top: '100%', left: 0, zIndex: 100, marginTop: '4px',
-        background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px',
+        background: 'var(--x-text-inverse)', border: '1px solid #e5e7eb', borderRadius: '8px',
         boxShadow: '0 8px 24px rgba(0,0,0,.1)', display: 'flex', minWidth: '240px'
       }
     },
@@ -168,10 +168,10 @@ export function Cascader(props) {
               if (o.children) path([...path(), o.value])
               else { onChange && onChange([...path(), o.value], o); open(false) }
             },
-            mouseenter: e => e.currentTarget.style.background = '#f3f4f6',
+            mouseenter: e => e.currentTarget.style.background = 'var(--x-bg-hover)',
             mouseleave: e => e.currentTarget.style.background = 'transparent'
           }
-        }, o.label, o.children ? span({ style: { color: '#9ca3af' } }, '›') : null))
+        }, o.label, o.children ? span({ style: { color: 'var(--x-text-mute)' } }, '›') : null))
       )
     ))
   )

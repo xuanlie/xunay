@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card 测试</title>
+<style>
+  :root { --x-bg:#f8fafc; --x-card:#fff; --x-text:#0f172a; --x-muted:#64748b; --x-border:#e2e8f0; --x-primary:#3b82f6; --x-bg-soft:#f1f5f9; }
+  [data-theme="dark"] { --x-bg:#0a0e17; --x-card:#0f172a; --x-text:#e2e8f0; --x-muted:#94a3b8; --x-border:#1e293b; --x-primary:#60a5fa; --x-bg-soft:#1e293b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--x-bg); color:var(--x-text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC",sans-serif; padding:32px; transition:background .2s,color .2s; }
+  h1 { font-size:22px; margin-bottom:6px; }
+  h2 { font-size:12px; color:var(--x-muted); font-weight:500; margin:28px 0 12px; letter-spacing:.08em; text-transform:uppercase; }
+  .toolbar { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .toolbar button { padding:6px 14px; border:1px solid var(--x-border); border-radius:8px; background:var(--x-card); color:var(--x-text); cursor:pointer; font-size:13px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+  #log { position:fixed; bottom:16px; right:16px; background:var(--x-card); border:1px solid var(--x-border); border-radius:10px; padding:10px 14px; font:12px ui-monospace,monospace; color:var(--x-muted); max-width:340px; max-height:200px; overflow:auto; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+</style>
+</head>
+<body>
+  <h1>Card · 精密版</h1>
+  <div style="color:var(--x-muted);font-size:13px">悬浮抬升 · 按下阻尼 · 色带 · 封面 · 骨架 · 加载 · 折叠</div>
+  <div class="toolbar">
+    <button id="btn-theme">🌓 主题</button>
+    <button id="btn-clear">清日志</button>
+  </div>
+
+  <h2>基础</h2>
+  <div class="grid" id="row1"></div>
+
+  <h2>图标 + 色带</h2>
+  <div class="grid" id="row2"></div>
+
+  <h2>封面</h2>
+  <div class="grid" id="row3"></div>
+
+  <h2>可点击 / 可折叠 / 加载 / 骨架</h2>
+  <div class="grid" id="row4"></div>
+
+  <div id="log">点击卡片看日志…</div>
+
+<script type="module">
+const link = document.createElement('link')
+link.rel = 'stylesheet'
+link.href = './kit/ui/card.css'
+document.head.appendChild(link)
+
+import { Card } from './kit/ui/index.js'
+import { Btn } from './kit/ui/index.js'
+const btnCss = document.createElement('link')
+btnCss.rel = 'stylesheet'; btnCss.href = './kit/ui/btn.css'
+document.head.appendChild(btnCss)
+
+const logEl = document.getElementById('log')
+function say(...a) {
+  logEl.textContent = `[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n` + logEl.textContent
+  if (logEl.textContent.length > 4000) logEl.textContent = logEl.textContent.slice(0, 4000)
+}
+
+function render(vnode, container) {
+  if (vnode == null || vnode === false || vnode === true) return
+  if (Array.isArray(vnode)) { for (const v of vnode) render(v, container); return }
+  if (typeof vnode === 'function') return render(vnode(), container)
+  if (typeof vnode !== 'object') { container.appendChild(document.createTextNode(String(vnode))); return }
+  if (!vnode.type) return
+  const el = document.createElement(vnode.type)
+  const p = vnode.props || {}
+  for (const k in p) {
+    if (k === 'on' && p.on) for (const ev in p.on) el.addEventListener(ev, p.on[ev])
+    else if (k === 'ref' && typeof p[k] === 'function') p[k](el)
+    else if (k === 'style') {
+      const st = typeof p.style === 'function' ? p.style() : p.style
+      if (typeof st === 'string') el.style.cssText = st
+      else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk]
+    }
+    else if (k === 'class' || k === 'className') {
+      const c = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (c) el.className = c
+    }
+    else if (k.startsWith('aria-') || k.startsWith('data-')) {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (v != null) el.setAttribute(k, v)
+    }
+    else if (k === 'disabled' || k === 'checked' || k === 'selected' || k === 'tabindex') {
+      const v = typeof p[k] === 'function' ? p[k]() : p[k]
+      if (v) el.setAttribute(k, k === 'tabindex' ? v : '')
+    }
+    else if (typeof p[k] !== 'function') el.setAttribute(k, p[k])
+  }
+  const children = vnode.children || []
+  for (const c of children) render(c, el)
+  container.appendChild(el)
+}
+
+const iconSvg = (path, color) => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width','20'); svg.setAttribute('height','20')
+  svg.setAttribute('fill','none'); svg.setAttribute('stroke', color||'currentColor')
+  svg.setAttribute('stroke-width','2'); svg.setAttribute('stroke-linecap','round'); svg.setAttribute('stroke-linejoin','round')
+  const p = document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d', path); svg.appendChild(p); return svg
+}
+
+// 基础
+render(Card({ title: '标题', desc: '这是一段描述文字，会自动省略两行。' }), document.getElementById('row1'))
+render(Card({ title: 'Elevated', desc: '带阴影', variant:'elevated' }), document.getElementById('row1'))
+render(Card({ title: 'Outlined', desc: '带边框', variant:'outlined' }), document.getElementById('row1'))
+render(Card({ title: 'Flat', desc: '扁平', variant:'flat' }), document.getElementById('row1'))
+
+// 图标 + 色带
+render(Card({
+  icon: iconSvg('M3 12l9-9 9 9v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2z'),
+  title: '首页', desc: '色带 + 图标',
+  stripe: 'left', tone: 'brand',
+}), document.getElementById('row2'))
+render(Card({
+  icon: iconSvg('M20 6L9 17l-5-5', '#10b981'),
+  title: '完成', desc: '成功态',
+  stripe: 'top', tone: 'success',
+}), document.getElementById('row2'))
+render(Card({
+  icon: iconSvg('M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z', '#f59e0b'),
+  title: '警告', desc: '需要注意',
+  stripe: 'left', tone: 'warning',
+}), document.getElementById('row2'))
+
+// 封面
+render(Card({
+  cover: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  title: '封面卡片', desc: '16:9 封面',
+}), document.getElementById('row3'))
+render(Card({
+  cover: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  coverRatio: 21/9,
+  title: '宽幅封面', desc: '21:9',
+}), document.getElementById('row3'))
+
+// 交互
+render(Card({
+  title: '点击我', desc: '有按下反馈',
+  pressable: true, variant: 'outlined',
+  onClick: () => say('clicked!'),
+  onLongPress: () => say('long press!'),
+  footer: (() => { const b = Btn({ size:'sm', type:'primary' }, '确认'); return b })()
+}), document.getElementById('row4'))
+
+render(Card({
+  title: '折叠卡片', desc: '点卡片切换',
+  collapsible: true, defaultOpen: false, variant: 'outlined',
+}, div({ style: 'font-size:13px;color:var(--x-muted);line-height:1.6' }, '这是隐藏的内容，点击卡片展开或收起。可以放任意内容。')),
+document.getElementById('row4'))
+
+render(Card({
+  title: '加载中', desc: '内容模糊 + spinner',
+  loading: true, variant: 'outlined',
+}, div({ style: 'font-size:13px;line-height:1.6' }, '一段文字内容会变模糊，并显示一个圆形加载指示器。')),
+document.getElementById('row4'))
+
+render(Card({
+  title: '骨架屏', desc: '占位条动画',
+  skeleton: true, variant: 'outlined',
+}), document.getElementById('row4'))
+
+let dark = false
+document.getElementById('btn-theme').onclick = () => {
+  dark = !dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  say('主题', dark ? 'dark' : 'light')
+}
+document.getElementById('btn-clear').onclick = () => { logEl.textContent = '已清空' }
+say('Card 加载完成')
+</script>
+</body>
+</html>

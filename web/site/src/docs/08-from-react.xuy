@@ -1,5 +1,5 @@
 // 从 React 迁移
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -25,7 +25,7 @@ export function Doc() {
     H3("依赖变化时执行"),
     Code("// React\nuseEffect(() => {\n  console.log(a, b)\n}, [a, b])\n\n// XuNay\neffect(() => {\n  console.log(a(), b())\n})", "xuy"),
     H3("挂载/卸载各执行一次"),
-    Code("// React\nuseEffect(() => {\n  const id = setInterval(tick, 1000)\n  return () => clearInterval(id)\n}, [])\n\n// XuNay\neffect(() => {\n  const id = setInterval(tick, 1000)\n  return () => clearInterval(id)\n})", "xuy"),
+    Code("// React\nuseEffect(() => {\n  const id = setInterval(tick, 1000)\n  return () => clearInterval(id)\n}, [])\n\n// XuNay\neffect(() => {\n  const id = setInterval(tick, 1000)\n  onCleanup(() => clearInterval(id))\n})", "xuy"),
     H2("Context 对比"),
     Code("// React\nconst ThemeCtx = createContext('light')\n\n<ThemeCtx.Provider value=\"dark\">\n  <Card />\n</ThemeCtx.Provider>\n\nfunction Card() {\n  const theme = useContext(ThemeCtx)\n}\n\n// XuNay\nconst ThemeCtx = ctx('light')\n\nThemeCtx.provide('dark', () => Card())\n\nfunction Card() {\n  const theme = ThemeCtx.get()\n}", "xuy"),
     H2("常见 React 模式的 XuNay 写法"),

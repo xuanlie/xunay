@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>WaffleChart</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0a0e17;--card:#0f172a;--text:#e2e8f0;--border:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 system-ui;padding:24px;transition:background .2s,color .2s}
+h1{font-size:20px;margin-bottom:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer;font-size:13px;transition:all .15s}
+button:hover{border-color:#3b82f6;color:#60a5fa;transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.card-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+#log{position:fixed;bottom:16px;right:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font:12px ui-monospace,monospace;color:var(--muted);max-width:340px;max-height:180px;overflow:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+#log.show{display:block}
+</style></head><body>
+<h1>WaffleChart · 华夫图</h1>
+<div class="toolbar">
+<button id="btn-theme">🌓 主题</button>
+<button id="btn-order">🔀 填充顺序</button>
+<button id="btn-rand">🎲 随机</button>
+<button id="btn-replay">▶ 重播</button>
+<button id="btn-log">📋 日志</button>
+</div>
+<div class="grid">
+<div class="card"><div class="card-label">浏览器占比 · 10×10</div><div id="c1"></div></div>
+<div class="card"><div class="card-label">员工构成 · 蛇形填充</div><div id="c2"></div></div>
+</div>
+<div id="log"></div>
+<script type="module">
+import WaffleChart from './kit/charts/waffle.js'
+const logEl = document.getElementById('log')
+function log(...a){logEl.classList.add('show');logEl.textContent=`[${new Date().toLocaleTimeString()}] ${a.join(' ')}\n`+logEl.textContent;if(logEl.textContent.length>3000)logEl.textContent=logEl.textContent.slice(0,3000)}
+document.getElementById('btn-log').onclick=()=>logEl.classList.toggle('show')
+const rand=(a,b)=>Math.round(a+Math.random()*(b-a))
+const mkBrowser=()=>[
+  { label:'Chrome', value: 635 },
+  { label:'Safari', value: 192 },
+  { label:'Edge', value: 45 },
+  { label:'Firefox', value: 31 },
+  { label:'Samsung', value: 28 },
+  { label:'Opera', value: 22 },
+  { label:'其他', value: 47 },
+]
+const mkStaff=()=>[
+  { label:'工程', value: 420 },
+  { label:'销售', value: 180 },
+  { label:'市场', value: 95 },
+  { label:'设计', value: 62 },
+  { label:'运营', value: 85 },
+  { label:'行政', value: 45 },
+  { label:'财务', value: 33 },
+]
+const c1 = new WaffleChart('#c1',{
+  title:'浏览器份额',
+  subtitle:'10×10 = 100 格 · 每格 ≈ 1%',
+  data: mkBrowser(),
+  cols: 10, rows: 10,
+  gap: 3, radius: 3,
+  colors:['#3b82f6','#06b6d4','#8b5cf6','#f59e0b','#10b981','#ec4899','#94a3b8'],
+  onHover: d => d && log('hover', d.label, d.value),
+  onCellClick: (d,i) => log('click', d.label),
+})
+const c2 = new WaffleChart('#c2',{
+  title:'员工构成',
+  subtitle:'蛇形填充',
+  data: mkStaff(),
+  cols: 14, rows: 8,
+  order:'snake',
+  gap: 2, radius: 2,
+  colors:['#8b5cf6','#6366f1','#3b82f6','#06b6d4','#10b981','#f59e0b','#ec4899'],
+  legendFormat: (item, pct) => `${item.label} ${item.value}人`,
+})
+let dark=false
+document.getElementById('btn-theme').onclick=()=>{dark=!dark;document.documentElement.setAttribute('data-theme',dark?'dark':'');const t=dark?'dark':'light';[c1,c2].forEach(c=>c.setOptions({theme:t}));log('主题 →',t)}
+let orders=['rows','snake','cols'], oi=0
+document.getElementById('btn-order').onclick=()=>{oi=(oi+1)%orders.length;const o=orders[oi];c1.setOptions({order:o});log('顺序 →',o)}
+document.getElementById('btn-rand').onclick=()=>{c1.setData(mkBrowser());c2.setData(mkStaff());log('已刷新')}
+document.getElementById('btn-replay').onclick=()=>{[c1,c2].forEach(c=>c.replay());log('重播')}
+window.addEventListener('error',e=>log('ERR',e.message))
+</script></body></html>

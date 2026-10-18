@@ -1,5 +1,5 @@
 // DevTools 总览
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -19,7 +19,7 @@ export function Doc() {
     Code("{\n  \"xunay\": {\n    \"devtools\": true\n  }\n}", "json"),
     Table(["值","行为"], [["true","打包并在页面显示"],["false","完全剔除——产物无按钮代码"]]),
     H2("配置为 false 时"),
-    P("devtools 是独立 bundle——核心 4.86KB 从不包含它，按需加载 13.14KB。"),
+    P("devtools 是独立 bundle——核心 7.06KB 从不包含它，按需加载 15.89KB。"),
     H2("不打包也能用"),
     P("用 CDN 或手动引入："),
     Code("<script src=\"/xunay-devtools.js\"></script>\n<script>\n  window.openDevtools()\n</script>", "html"),

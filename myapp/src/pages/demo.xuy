@@ -1,0 +1,112 @@
+import { div, a } from 'xunay'
+import { Btn, Card, Tag, Row, Divider } from 'xunay/kit/ui'
+import { Counter } from '@/components/Counter.xuy'
+import { go } from '@/router.xuy'
+
+const SIGNAL_CODE = `const n = signal(0)
+
+n.set(1)      // 修改
+n()           // 读取 → 1`
+
+const COMPUTED_CODE = `const a = signal(2)
+const b = signal(3)
+
+const sum = computed(() => a() + b())
+sum()          // → 5`
+
+const EFFECT_CODE = `const n = signal(0)
+
+effect(() => {
+  console.log('n =', n())
+})
+
+n.set(1)       // 自动打印 n = 1`
+
+const API_DEMOS = [
+  { name: 'signal',  desc: '响应式基本单元', code: SIGNAL_CODE,   color: '#6366f1' },
+  { name: 'computed',desc: '派生计算属性',   code: COMPUTED_CODE, color: '#06b6d4' },
+  { name: 'effect',  desc: '副作用自动追踪', code: EFFECT_CODE,   color: '#8b5cf6' }
+]
+
+export function Demo() {
+  return div({ class: 'page-wrap' },
+
+    // ═══ 标题区 ═══
+    div({ style: 'text-align:center;margin-bottom:40px' },
+      div({ style: 'display:inline-flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center' },
+        Tag({ type: 'primary', variant: 'outline' }, 'Signal'),
+        Tag({ type: 'info',    variant: 'outline' }, 'Computed'),
+        Tag({ type: 'success', variant: 'outline' }, 'Effect')
+      ),
+      div({ style: 'font-size:34px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px' }, '示例'),
+      div({ style: 'color:var(--x-fg-dim);font-size:15px' }, '演示 XuNay 的响应式核心与组件系统')
+    ),
+
+    // ═══ 计数器 ═══
+    div({ style: 'text-align:left;margin-bottom:16px' },
+      div({ style: 'font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:6px' }, '计数器'),
+      div({ style: 'color:var(--x-fg-dim);font-size:13px' }, 'signal 直挂 DOM，点击即更新')
+    ),
+    Card({ hover: true },
+      div({ style: 'padding:16px 0' }, Counter())
+    ),
+
+    // ═══ 响应式 API ═══
+    Divider({ text: '响应式 API' }),
+
+    div({ class: 'grid-3', style: 'margin-top:24px' },
+      ...API_DEMOS.map(api =>
+        Card({ hover: true },
+          div({ style: 'display:flex;align-items:center;gap:10px;margin-bottom:12px' },
+            div({ style: 'width:8px;height:8px;border-radius:50%;background:' + api.color + ';box-shadow:0 0 0 4px ' + api.color + '22' }),
+            div({ style: 'font-size:15px;font-weight:700;font-family:var(--x-mono);color:' + api.color }, api.name)
+          ),
+          div({ style: 'font-size:13px;color:var(--x-fg-dim);margin-bottom:14px;line-height:1.5' }, api.desc),
+          div({ style: 'background:#0f172a;border-radius:10px;padding:14px 16px;overflow:auto' },
+            div({ style: 'color:#e2e8f0;font-family:var(--x-mono);font-size:12px;line-height:1.7;white-space:pre' }, api.code)
+          )
+        )
+      )
+    ),
+
+    // ═══ 组件画廊 ═══
+    Divider({ text: '组件画廊' }),
+
+    div({ style: 'margin-top:24px' },
+      Card({ title: 'Button' },
+        Row({ gap: 2, wrap: true },
+          Btn({ type: 'primary' }, '主要按钮'),
+          Btn({}, '默认按钮'),
+          Btn({ type: 'primary', size: 'lg' }, '大号按钮'),
+          Btn({ size: 'sm' }, '小号按钮'),
+          Btn({ type: 'primary', disabled: true }, '禁用')
+        )
+      ),
+
+      div({ style: 'height:16px' }),
+
+      Card({ title: 'Tag' },
+        Row({ gap: 2, wrap: true },
+          Tag({ type: 'primary' }, 'Primary'),
+          Tag({ type: 'success' }, 'Success'),
+          Tag({ type: 'warning' }, 'Warning'),
+          Tag({ type: 'danger'  }, 'Danger'),
+          Tag({ type: 'info'    }, 'Info'),
+          Tag({ type: 'primary', variant: 'outline' }, 'Outline')
+        )
+      )
+    ),
+
+    // ═══ 路由导航 ═══
+    Divider({ text: '路由导航' }),
+
+    div({ style: 'margin-top:24px;text-align:center' },
+      div({ style: 'color:var(--x-fg-dim);font-size:13px;margin-bottom:16px' }, 'go() 函数式跳转，无需 <Link> 组件'),
+      Row({ gap: 2, justify: 'center', wrap: true },
+        Btn({ type: 'primary', onClick: () => go('/') }, '前往首页'),
+        Btn({ onClick: () => go('/about') }, '前往关于'),
+        a({ class: 'btn', href: '#/nope' }, '触发 404')
+      )
+    )
+  )
+}

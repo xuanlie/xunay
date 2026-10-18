@@ -1,5 +1,5 @@
 // show(cond, fn)
-import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link } from '../docs-kit.xuy'
+import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
@@ -10,7 +10,7 @@ export function Doc() {
     H2("参数"),
     Table(["参数","类型","说明"], [["cond","() => boolean","条件函数"],["renderFn","() => VNode","为真时渲染"]]),
     H2("示例"),
-    Code("import { show, signal, div } from 'xunay'\n\nconst open = signal(false)\n\ndiv(null,\n  show(() => open(), () => div(null, '内容'))\n)", "xuy"),
+    Code("import { show, signal } from 'xunay'\n\nconst open = signal(false)\n\ndiv(null,\n  show(() => open(), () => div(null, '内容'))\n)", "xuy"),
     H2("生命周期"),
     Table(["切换","行为"], [["假 → 真","createScope + render + appendChild"],["真 → 假","disposeScope + removeChild"]]),
     H2("vs 三目"),

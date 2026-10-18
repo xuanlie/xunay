@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kit UI Debug</title>
+<link rel="stylesheet" href="/xunay/Kit/ui/ui.css">
+<link rel="stylesheet" href="/xunay/Kit/ui/tw.css">
+<script type="importmap">
+{ "imports": {
+  "xunay/kit/ui": "/xunay/Kit/ui/index.js",
+  "xunay/kit/ui/": "/xunay/Kit/ui/",
+  "xunay/element": "/xunay/element.js",
+  "xunay/core": "/xunay/core.js",
+  "xunay/runtime": "/xunay/runtime.js",
+  "xunay/misc": "/xunay/misc.js",
+  "xunay/mobile": "/xunay/mobile.js",
+  "xunay/hl": "/xunay/hl.js",
+  "xunay/sanitize": "/xunay/sanitize.js",
+  "xunay/render": "/xunay/render.js",
+  "xunay/events": "/xunay/events.js",
+  "xunay": "/xunay/index.js"
+}}
+</script>
+<style>
+  body { padding: 20px; background: #f8fafc; color: #0f172a; font: 13px/1.5 monospace }
+  h1 { font-size: 18px; margin: 0 0 12px; font-family: sans-serif }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 12px }
+  .label { color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px }
+  .ok { color: #10b981 }
+  .err { color: #ef4444 }
+  .val { color: #3b82f6; font-weight: 600 }
+  pre { margin: 6px 0; white-space: pre-wrap; word-break: break-all }
+</style>
+</head>
+<body>
+<h1>Kit UI 诊断</h1>
+
+<div class="card">
+  <div class="label">1. CSS 变量是否加载</div>
+  <pre id="css-check"></pre>
+</div>
+
+<div class="card">
+  <div class="label">2. 组件导入</div>
+  <pre id="import-check"></pre>
+</div>
+
+<div class="card">
+  <div class="label">3. Btn 渲染（实际效果）</div>
+  <div id="btn-demo" style="padding:14px;background:#fff;border:1px dashed #cbd5e1;border-radius:6px"></div>
+  <pre id="btn-style" style="margin-top:10px"></pre>
+</div>
+
+<script type="module">
+const $ = id => document.getElementById(id)
+
+// ===== 1. CSS 检查 =====
+function cssCheck() {
+  const rs = getComputedStyle(document.documentElement)
+  const vars = ['--x-bg', '--x-primary', '--x-border', '--x-text', '--x-bg-soft']
+  const out = []
+  for (const v of vars) {
+    const val = rs.getPropertyValue(v).trim()
+    out.push(`  ${v}: ${val ? '✓ ' + val : '✗ 未定义'}`)
+  }
+  // 检查样式表数量
+  out.unshift(`样式表数量: ${document.styleSheets.length}`)
+  try {
+    let ruleCount = 0
+    for (const sheet of document.styleSheets) {
+      try { ruleCount += sheet.cssRules.length } catch {}
+    }
+    out.push(`CSS 规则总数: ${ruleCount}`)
+  } catch {}
+  // 检查 .btn 类是否定义了
+  let hasBtn = false, hasBtnPrimary = false
+  for (const sheet of document.styleSheets) {
+    try {
+      for (const r of sheet.cssRules) {
+        if (r.selectorText === '.btn') hasBtn = true
+        if (r.selectorText === '.btn-primary') hasBtnPrimary = true
+      }
+    } catch {}
+  }
+  out.push(`.btn 规则: ${hasBtn ? '✓ 存在' : '✗ 缺失'}`)
+  out.push(`.btn-primary 规则: ${hasBtnPrimary ? '✓ 存在' : '✗ 缺失'}`)
+  $('css-check').innerHTML = out.map(l => {
+    return l.replace(/✓[^<]*/g, m => `<span class="ok">${m}</span>`)
+            .replace(/✗[^<]*/g, m => `<span class="err">${m}</span>`)
+  }).join('\n')
+}
+cssCheck()
+
+// ===== 2. import =====
+try {
+  const UI = await import('xunay/kit/ui')
+  $('import-check').innerHTML = `<span class="ok">✓ 导入成功</span>\n组件数: <span class="val">${Object.keys(UI).length}</span>\nBtn: <span class="val">${typeof UI.Btn}</span>`
+
+  // ===== 3. 渲染 Btn =====
+  // mini renderer
+  function render(v, c) {
+    if (v == null || v === false || v === true) return
+    if (Array.isArray(v)) { for (const x of v) render(x, c); return }
+    if (typeof v === 'function') return render(v(), c)
+    if (typeof v !== 'object') { c.appendChild(document.createTextNode(String(v))); return }
+    if (!v.type) return
+    const el = document.createElement(v.type)
+    const p = v.props || {}
+    for (const k in p) {
+      const val = p[k]
+      if (k === 'on' && val) { for (const ev in val) if (typeof val[ev] === 'function') el.addEventListener(ev, val[ev]) }
+      else if (k === 'ref' && typeof val === 'function') val(el)
+      else if (k === 'style') { const st = typeof val === 'function' ? val() : val; if (typeof st === 'string') el.setAttribute('style', st); else if (st && typeof st === 'object') for (const sk in st) el.style[sk] = st[sk] }
+      else if (k === 'class' || k === 'className') { const cc = typeof val === 'function' ? val() : val; if (cc) el.className = cc }
+      else if (typeof val !== 'function' && val != null) { if (val === true) el.setAttribute(k, ''); else el.setAttribute(k, val) }
+    }
+    for (const ch of (v.children || [])) render(ch, el)
+    c.appendChild(el)
+  }
+
+  const demo = $('btn-demo')
+  render(UI.Btn({ type: 'primary' }, '主要'), demo)
+  render(UI.Btn(null, '默认'), demo)
+  render(UI.Btn({ type: 'danger' }, '危险'), demo)
+
+  // 检查按钮 computed style
+  setTimeout(() => {
+    const btns = demo.querySelectorAll('button')
+    const out = []
+    out.push(`按钮数: ${btns.length}`)
+    btns.forEach((b, i) => {
+      const cs = getComputedStyle(b)
+      out.push(`\n[按钮 ${i+1}] text="${b.textContent}"`)
+      out.push(`  class="${b.className}"`)
+      out.push(`  padding: ${cs.padding}`)
+      out.push(`  border: ${cs.borderWidth} ${cs.borderStyle} ${cs.borderColor}`)
+      out.push(`  background: ${cs.backgroundColor}`)
+      out.push(`  color: ${cs.color}`)
+      out.push(`  border-radius: ${cs.borderRadius}`)
+      out.push(`  font-size: ${cs.fontSize}`)
+      out.push(`  display: ${cs.display}`)
+    })
+    $('btn-style').textContent = out.join('\n')
+  }, 50)
+} catch (e) {
+  $('import-check').innerHTML = `<span class="err">✗ ${e.message}</span>`
+  console.error(e)
+}
+</script>
+</body>
+</html>

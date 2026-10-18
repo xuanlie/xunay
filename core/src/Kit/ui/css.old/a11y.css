@@ -1,0 +1,38 @@
+/* XuNay UI · a11y.css */
+
+/* ---------- 减少动效（增强：包括 scroll / 光标）---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .x-swipe { scroll-snap-type: none; }
+}
+
+/* ---------- 高对比度增强 ---------- */
+@media (prefers-contrast: more) {
+  :root {
+    --x-border: #6b7280;
+    --x-border-strong: #374151;
+    --x-border: #9ca3af;
+    --x-text-dim: #1f2937;
+    --x-text-mute: #374151;
+    --shadow-sm: none;
+    --shadow-md: none;
+  }
+  .btn, .input, .select, .textarea, .card {
+    border-width: 2px;
+  }
+  .btn:focus-visible, .input:focus {
+    outline-width: 3px;
+  }
+  code, pre { border: 2px solid var(--x-border); }
+}
+
+/* ---------- 强制减少透明 ---------- */
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--x-bg-elev); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .modal-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; background: oklch(0 0 0 / 0.75); }
+}

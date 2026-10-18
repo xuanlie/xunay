@@ -57,16 +57,29 @@ export function Timeline(props) {
 }
 
 export function Tree(props) {
-  const { data = [], render } = px(props)
+  const { data = [], render, defaultExpandAll = true } = px(props)
+  // 一次性收集所有有 children 的 key
+  const collectKeys = (nodes, out = {}) => {
+    for (const n of nodes) {
+      const k = n.key != null ? n.key : n.label
+      if (n.children && n.children.length) {
+        out[k] = defaultExpandAll
+        collectKeys(n.children, out)
+      }
+    }
+    return out
+  }
+  const openMap = signal(collectKeys(data))
+  const toggle = k => openMap({ ...openMap(), [k]: !openMap()[k] })
   const Node = (node, depth) => {
-    const open = signal(true)
+    const k = node.key != null ? node.key : node.label
     const hasChildren = node.children && node.children.length > 0
     return div(null,
-      div({ style: { padding: '6px 8px', paddingLeft: (8 + depth * 16) + 'px', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '6px' }, on: { click: () => hasChildren ? open(!open()) : (node.onClick && node.onClick()) } },
-        hasChildren ? span({ style: { transition: 'transform .15s', display: 'inline-block', transform: open() ? 'rotate(90deg)' : 'none', color: 'var(--x-text-mute)', fontSize: '12px' } }, '›') : span({ style: { width: '12px' } }),
+      div({ style: { padding: '6px 8px', paddingLeft: (8 + depth * 16) + 'px', cursor: 'pointer', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '6px' }, on: { click: () => hasChildren ? toggle(k) : (node.onClick && node.onClick()) } },
+        hasChildren ? span({ style: () => ({ transition: 'transform .15s', display: 'inline-block', transform: openMap()[k] ? 'rotate(90deg)' : 'none', color: 'var(--x-text-mute)', fontSize: '12px' }) }, '›') : span({ style: { width: '12px' } }),
         span(null, render ? render(node) : node.label)
       ),
-      hasChildren && open() ? div(null, ...node.children.map(c => Node(c, depth + 1))) : null
+      hasChildren && openMap()[k] ? div(null, ...node.children.map(c => Node(c, depth + 1))) : null
     )
   }
   return Col({ gap: 0 }, ...data.map(n => Node(n, 0)))
@@ -212,7 +225,7 @@ export function Calendar(props) {
             cursor: 'pointer',
             fontSize: '13px',
             background: isSelected ? 'var(--x-primary)' : isToday ? 'var(--x-primary-soft)' : 'transparent',
-            color: isSelected ? '#fff' : isToday ? 'var(--x-primary)' : 'var(--x-text)',
+            color: isSelected ? 'var(--x-text-inverse)' : isToday ? 'var(--x-primary)' : 'var(--x-text)',
             fontWeight: isSelected || isToday ? '600' : '400',
             transition: 'all .1s'
           }),

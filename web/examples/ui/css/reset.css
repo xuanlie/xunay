@@ -1,0 +1,1538 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   XuNay UI · reset.css
+   现代重置 · Normalize v8 + 自定义修正
+   ───────────────────────────────────────────────────────────────────────
+   目录：
+     01 · 盒模型
+     02 · HTML / Body
+     03 · 全局继承
+     04 · 媒体元素
+     05 · 表单容器
+     06 · 按钮
+     07 · 输入 · 文本类
+     08 · 输入 · 数字类
+     09 · 输入 · 日期类
+     10 · 输入 · 文件 / 颜色
+     11 · 输入 · 复选框 / 单选 / 滑块 / 进度
+     12 · 下拉框
+     13 · 文本域
+     14 · 标签 / 字段集
+     15 · 列表
+     16 · 链接
+     17 · 标题 / 段落
+     18 · 表格
+     19 · 引用 / 代码
+     20 · 图片
+     21 · 详情 / 摘要
+     22 · 对话框
+     23 · 其他元素
+     24 · 触摸优化
+     25 · 滚动条
+     26 · 焦点
+     27 · 选中
+     28 · 占位符
+     29 · 禁用状态
+     30 · 打印
+     31 · 无障碍 · 减弱动效
+     32 · 无障碍 · 高对比度
+     33 · 无障碍 · 强制色
+     34 · 无障碍 · 透明减弱
+     35 · 兼容修正
+   ═══════════════════════════════════════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   01 · 盒模型
+   ═══════════════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+  outline: 0 solid;
+  min-width: 0;
+}
+
+*,
+*::before,
+*::after {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   02 · HTML / Body
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+
+  -webkit-tap-highlight-color: transparent;
+
+  tab-size: 2;
+  -moz-tab-size: 2;
+  -o-tab-size: 2;
+
+  font-size: 100%;
+  line-height: 1.55;
+
+  overflow-y: scroll;
+  overflow-x: hidden;
+
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+
+  color-scheme: light;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  font-synthesis: none;
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+  font-synthesis-small-caps: none;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  font-family: var(--x-font, -apple-system, sans-serif);
+  font-size: var(--x-fs, 14px);
+  font-weight: var(--x-fw-r, 400);
+  line-height: var(--x-lh, 1.55);
+
+  color: var(--x-fg, #1a1a1a);
+  background-color: var(--x-bg, #ffffff);
+
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "tnum" 0;
+
+  position: relative;
+}
+
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   03 · 全局继承
+   ═══════════════════════════════════════════════════════════════════════ */
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+  appearance: button;
+}
+
+[type="search"] {
+  -webkit-appearance: textfield;
+  appearance: textfield;
+  outline-offset: -2px;
+}
+
+::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   04 · 媒体元素
+   ═══════════════════════════════════════════════════════════════════════ */
+
+img,
+picture,
+video,
+canvas,
+svg,
+iframe,
+embed,
+object,
+source,
+track {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+img {
+  border-style: none;
+  font-style: italic;
+  background-color: transparent;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+img[loading="lazy"] {
+  content-visibility: auto;
+}
+
+svg {
+  fill: currentColor;
+  overflow: hidden;
+}
+
+svg:not([fill]) {
+  fill: currentColor;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+video {
+  object-fit: contain;
+}
+
+iframe {
+  border: 0;
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+area,
+map {
+  display: inline;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   05 · 表单容器
+   ═══════════════════════════════════════════════════════════════════════ */
+
+form {
+  display: block;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0.35em 0.75em 0.625em;
+  min-width: 0;
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r, 8px);
+}
+
+legend {
+  padding: 0 0.5em;
+  color: inherit;
+  max-width: 100%;
+  white-space: normal;
+  display: table;
+  box-sizing: border-box;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   06 · 按钮
+   ═══════════════════════════════════════════════════════════════════════ */
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+  text-transform: none;
+  overflow: visible;
+  -webkit-appearance: button;
+  appearance: button;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+button::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+button:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+button[disabled],
+button:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   07 · 输入 · 文本类
+   ═══════════════════════════════════════════════════════════════════════ */
+
+input {
+  background: none;
+  border: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  min-width: 0;
+  font-family: inherit;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+input[type="search"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input::-ms-clear,
+input::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   08 · 输入 · 数字类
+   ═══════════════════════════════════════════════════════════════════════ */
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  height: auto;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--x-bg-muted, #e5e5e5);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--x-bg-muted, #e5e5e5);
+  border: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--x-primary, #2563eb);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform .15s;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--x-primary, #2563eb);
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 · 输入 · 日期类
+   ═══════════════════════════════════════════════════════════════════════ */
+
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 1.5em;
+  font-family: inherit;
+}
+
+input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity .15s;
+}
+
+input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · 输入 · 文件 / 颜色
+   ═══════════════════════════════════════════════════════════════════════ */
+
+input[type="file"] {
+  cursor: pointer;
+  line-height: 1.15;
+  background: none;
+}
+
+input[type="file"]::file-selector-button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  padding: 0 10px;
+  margin-right: 8px;
+  background: var(--x-bg-soft, #f5f5f5);
+  border-radius: var(--x-r-sm, 6px);
+  cursor: pointer;
+  transition: background .15s;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: var(--x-bg-hover, #ebebeb);
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  background: none;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-sm, 6px);
+}
+
+input[type="color"]::-moz-color-swatch {
+  border: 1px solid var(--x-line, #e5e5e5);
+  border-radius: var(--x-r-sm, 6px);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · 输入 · 复选框 / 单选 / 进度
+   ═══════════════════════════════════════════════════════════════════════ */
+
+input[type="checkbox"],
+input[type="radio"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  cursor: pointer;
+  vertical-align: middle;
+  position: relative;
+  display: inline-block;
+  background-color: var(--x-bg-elev, #fff);
+  border: 1.5px solid var(--x-line-2, #ccc);
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+  margin: 0;
+  padding: 0;
+}
+
+input[type="checkbox"]:hover:not(:disabled),
+input[type="radio"]:hover:not(:disabled) {
+  border-color: var(--x-primary, #2563eb);
+}
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--x-primary-soft, rgba(37,99,235,.28));
+  border-color: var(--x-primary, #2563eb);
+}
+
+input[type="checkbox"] {
+  border-radius: 5px;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5L6.5 11.5L12.5 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 13px 13px;
+}
+
+input[type="checkbox"]:indeterminate {
+  background-color: var(--x-primary, #2563eb);
+  border-color: var(--x-primary, #2563eb);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' d='M4 8h8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 13px 13px;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="radio"]:checked {
+  border-color: var(--x-primary, #2563eb);
+  background-color: var(--x-primary, #2563eb);
+  box-shadow: inset 0 0 0 4px var(--x-bg-elev, #fff);
+}
+
+input[type="checkbox"]:disabled,
+input[type="radio"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--x-bg-soft, #f5f5f5);
+}
+
+input[type="checkbox"]:disabled:checked {
+  background-color: var(--x-line-2, #ccc);
+  border-color: var(--x-line-2, #ccc);
+}
+
+input[type="radio"]:disabled:checked {
+  background-color: var(--x-line-2, #ccc);
+  border-color: var(--x-line-2, #ccc);
+}
+
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+label:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 列表
+   ═══════════════════════════════════════════════════════════════════════ */
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul ul,
+ul ol,
+ol ul,
+ol ol {
+  margin-bottom: 0;
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}
+
+dl,
+dt,
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   16 · 链接
+   ═══════════════════════════════════════════════════════════════════════ */
+
+a {
+  color: inherit;
+  text-decoration: none;
+  background-color: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:active,
+a:hover {
+  outline-width: 0;
+}
+
+a[disabled],
+a.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   17 · 标题 / 段落
+   ═══════════════════════════════════════════════════════════════════════ */
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--x-line, #e5e5e5);
+  margin: var(--x-sp-6, 24px) 0;
+  height: 0;
+  overflow: visible;
+  box-sizing: content-box;
+}
+
+pre {
+  font-family: var(--x-font-mono, monospace);
+  font-size: 1em;
+  margin: 0;
+  white-space: pre;
+  word-wrap: normal;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--x-font-mono, monospace);
+  font-size: 1em;
+}
+
+b,
+strong {
+  font-weight: bolder;
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+abbr[title] {
+  border-bottom: none;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+dfn {
+  font-style: italic;
+}
+
+mark {
+  background-color: #fff7cc;
+  color: #000;
+}
+
+q {
+  quotes: "«" "»" "‹" "›";
+}
+
+address {
+  font-style: normal;
+  display: block;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   18 · 表格
+   ═══════════════════════════════════════════════════════════════════════ */
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-indent: 0;
+  width: 100%;
+  table-layout: auto;
+}
+
+caption {
+  text-align: left;
+  caption-side: bottom;
+}
+
+th {
+  text-align: inherit;
+  font-weight: inherit;
+  vertical-align: top;
+}
+
+td,
+th {
+  padding: 0;
+  vertical-align: inherit;
+}
+
+colgroup,
+col {
+  display: table-column;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   19 · 引用 / 代码
+   ═══════════════════════════════════════════════════════════════════════ */
+
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+figure {
+  margin: 0;
+}
+
+figcaption {
+  font-size: 0.875em;
+}
+
+kbd {
+  display: inline-block;
+}
+
+var {
+  font-style: italic;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   20 · 图片
+   ═══════════════════════════════════════════════════════════════════════ */
+
+picture {
+  display: inline-block;
+  max-width: 100%;
+}
+
+source {
+  display: none;
+}
+
+area {
+  display: inline;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   21 · 详情 / 摘要
+   ═══════════════════════════════════════════════════════════════════════ */
+
+details {
+  display: block;
+}
+
+summary {
+  display: list-item;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::marker {
+  content: "";
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   22 · 对话框
+   ═══════════════════════════════════════════════════════════════════════ */
+
+dialog {
+  position: absolute;
+  display: block;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  height: fit-content;
+  margin: auto;
+  border: solid;
+  padding: 1em;
+  background: var(--x-bg-elev, #fff);
+  color: var(--x-fg, #000);
+  max-width: calc(100% - 2em);
+  max-height: calc(100% - 2em);
+  overflow: auto;
+}
+
+dialog:not([open]) {
+  display: none;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   23 · 其他元素
+   ═══════════════════════════════════════════════════════════════════════ */
+
+template {
+  display: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+[inert] {
+  pointer-events: none;
+  cursor: default;
+}
+
+main {
+  display: block;
+}
+
+article,
+aside,
+footer,
+header,
+nav,
+section,
+figure,
+figcaption,
+main {
+  display: block;
+}
+
+time,
+data {
+  display: inline;
+}
+
+output {
+  display: inline-block;
+}
+
+slot {
+  display: contents;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   24 · 触摸优化
+   ═══════════════════════════════════════════════════════════════════════ */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+[role="link"],
+[role="tab"],
+[role="menuitem"],
+[tabindex]:not([tabindex="-1"]) {
+  touch-action: manipulation;
+}
+
+[data-touchable] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+img,
+a,
+button {
+  -webkit-user-drag: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   25 · 滚动条
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* WebKit */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--x-line-2, #ccc);
+  border-radius: var(--x-r-full, 9999px);
+  border: 2px solid var(--x-bg, #fff);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--x-line-strong, #888);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--x-fg-dim, #666);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--x-line-2, #ccc) transparent;
+  }
+}
+
+/* 隐藏滚动条（保留滚动功能） */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   26 · 焦点
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+  border-radius: var(--x-r-xs, 4px);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 键盘用户保留 :focus 轮廓 */
+.keyboard-user *:focus {
+  outline: 2px solid var(--x-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* 鼠标用户去掉 */
+.mouse-user :focus {
+  outline: none;
+}
+
+/* 高对比度下始终显示 */
+@media (forced-colors: active) {
+  :focus {
+    outline: 3px solid Highlight;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   27 · 选中
+   ═══════════════════════════════════════════════════════════════════════ */
+
+::selection {
+  background-color: var(--x-primary-soft, rgba(37, 99, 235, 0.15));
+  color: var(--x-fg, #000);
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background-color: var(--x-primary-soft, rgba(37, 99, 235, 0.15));
+  color: var(--x-fg, #000);
+  text-shadow: none;
+}
+
+[data-theme="dark"] ::selection {
+  background-color: var(--x-primary-soft, rgba(96, 165, 250, 0.25));
+  color: var(--x-fg-strong, #fff);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   28 · 占位符
+   ═══════════════════════════════════════════════════════════════════════ */
+
+::placeholder {
+  color: var(--x-fg-subtle, #999);
+  opacity: 1;
+}
+
+::-webkit-input-placeholder {
+  color: var(--x-fg-subtle, #999);
+  opacity: 1;
+}
+
+::-moz-placeholder {
+  color: var(--x-fg-subtle, #999);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--x-fg-subtle, #999);
+}
+
+input:placeholder-shown {
+  text-overflow: ellipsis;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   29 · 禁用状态
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[disabled],
+:disabled,
+.disabled {
+  cursor: not-allowed;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled,
+button:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   30 · 打印
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
+
+  html,
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+    color: #000;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.9em;
+    color: #555;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after,
+  a[href^="mailto:"]::after,
+  a[href^="tel:"]::after {
+    content: "";
+  }
+
+  abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+
+  p,
+  blockquote,
+  ul,
+  ol,
+  dl,
+  pre {
+    orphans: 3;
+    widows: 3;
+  }
+
+  blockquote,
+  pre,
+  table,
+  figure {
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+
+  nav,
+  aside,
+  footer,
+  header,
+  [role="navigation"],
+  [role="banner"],
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+
+  @page :first {
+    margin-top: 1cm;
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   31 · 无障碍 · 减弱动效
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  [data-animate],
+  .animate {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   32 · 无障碍 · 高对比度
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-contrast: more) {
+  :root {
+    --x-fg-dim:    var(--x-fg, #000);
+    --x-fg-mute:   var(--x-fg-dim, #333);
+    --x-fg-subtle: var(--x-fg-dim, #333);
+    --x-line:      var(--x-line-strong, #555);
+    --x-line-2:    var(--x-line-strong, #555);
+    --x-line-soft: var(--x-line-strong, #555);
+    --x-line-subtle: var(--x-line, #999);
+  }
+
+  * {
+    text-shadow: none !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   33 · 无障碍 · 强制色
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (forced-colors: active) {
+  * {
+    forced-color-adjust: auto;
+  }
+
+  button,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    border: 1px solid ButtonText;
+  }
+
+  a {
+    color: LinkText;
+  }
+
+  a:visited {
+    color: VisitedText;
+  }
+
+  ::selection {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  img,
+  svg,
+  video {
+    forced-color-adjust: none;
+  }
+
+  [data-theme] {
+    forced-color-adjust: none;
+  }
+
+  progress::-webkit-progress-value {
+    background: Highlight;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   34 · 无障碍 · 透明减弱
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-transparency: reduce) {
+  *,
+  *::before,
+  *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-theme] {
+    --x-bg-glass: var(--x-bg-elev);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   35 · 兼容修正
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Safari：去掉自动填充黄底 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--x-bg-elev, #fff) inset !important;
+  -webkit-text-fill-color: var(--x-fg, #000) !important;
+  caret-color: var(--x-fg, #000);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Firefox：去掉按钮内阴影 */
+input::-moz-focus-inner,
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* IE/Edge：隐藏密码眼睛 */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* Safari iOS：禁止长按弹出菜单 */
+* {
+  -webkit-touch-callout: none;
+}
+
+img,
+a {
+  -webkit-touch-callout: default;
+}
+
+/* Chrome：修正 fieldset 最小宽度 */
+fieldset {
+  min-inline-size: 0;
+}
+
+/* 修正 summary marker 与 flex 冲突 */
+summary {
+  display: list-item;
+}
+details[open] summary {
+  margin-bottom: 0;
+}
+
+/* 修正 details 内部 flex 布局 */
+details > summary:first-of-type {
+  display: list-item;
+  list-style-position: inside;
+}
+
+/* 修正 dialog 在有些浏览器下背景色 */
+dialog {
+  color: var(--x-fg, #000);
+  background: var(--x-bg-elev, #fff);
+}
+
+/* 修正 select 多选 */
+select[multiple],
+select[size] {
+  height: auto;
+  background-image: none;
+  padding-right: 12px;
+}
+
+/* 修正 textarea 在不同浏览器的 resize */
+textarea {
+  resize: vertical;
+  resize: block;
+}
+
+/* 修正 input number 的步进按钮位置 */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 修正 search 输入 */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+/* 修正 hr 在旧浏览器 */
+hr {
+  box-sizing: content-box;
+  height: 0;
+  overflow: visible;
+}
+
+/* 修正 pre 溢出 */
+pre {
+  overflow: auto;
+}
+
+/* 修正 code 换行 */
+code {
+  word-wrap: break-word;
+}
+
+/* 修正表格宽度 */
+table {
+  border-color: inherit;
+  text-indent: 0;
+}
+
+/* 修正 details marker 定位 */
+summary::marker,
+summary::-webkit-details-marker {
+  content: "";
+  display: none;
+}
+
+/* 修正 ruby */
+ruby {
+  display: ruby;
+}
+
+rb,
+rt {
+  line-height: 1;
+}
+
+/* 修正 bdo */
+bdo[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: bidi-override;
+}
+
+bdo[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: bidi-override;
+}
+
+/* 修正 container 命名 */
+:where([hidden]) {
+  display: none !important;
+}
+
+/* 修正 aria-hidden 焦点 */
+[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+[aria-hidden="true"] * {
+  pointer-events: none;
+}
+
+/* 修正 tabindex 负值 */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+/* 修正 script/style 显示 */
+script,
+style,
+link,
+meta,
+title,
+base,
+head {
+  display: none !important;
+}

@@ -1,3 +1,33 @@
+v1.3.0
+
+xuyg 极简语法 + 安全加固
+
+  xuyg
+    bin/Xuyg.js 极简语法 CLI（分流到 compiler4）
+    4 关键字：cpt 组件 / pag 页面 / dt 假数据 / sdu 模板
+    sdu<N> 批量生成 + $数据源 + @字段绑定 + vmodel + @media
+    20 个内置模板（NavBar / GoodsCard / Table / Form ...）
+    编译期展开，运行时零开销，core bundle 体积不变
+
+  安全修复
+    xai-server 路径穿越 / 未鉴权 RCE（V036+V038+V040+V048）
+    RichText / Markdown 加 sanitize（V016）
+    pushNotification 改 textContent（V015）
+    SVG innerHTML 颜色白名单（V023）
+
+  修复
+    signal 级联 effect 丢更新（V001）
+    query hashKey 排序 / retriesLeft 重置（V005/V002）
+    auth isValid 副作用订阅（V004）
+    xuyc3 多文件 .xuy 支持（V077-V081）
+    xuyc 中断兜底恢复源码（V031）
+    根 bin/xuyc.js 转发到 core/bin/xuyc.js，消除双版本分叉
+
+  已知限制
+    xuyg 不支持 JSX / TypeScript / 增量编译
+    React Compat 为 API 层兼容，行为语义按 AI.spec 分级
+    V059/V063/V064 部署配置待人工决策
+
 v1.2.8
 
 开发服务器 + 版本号动态注入

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { compile } from '../src/index.js'
 import { TAGS, VOID_TAGS } from '../src/tags.js'
 
-const allTags = [...TAGS]
+const allTags = [...TAGS].filter(tag => tag !== 'fragment')
 const nonVoid = allTags.filter(t => !VOID_TAGS.has(t))
 
 // ===== 1. 每个标签 × 动态函数子节点（50 个）=====

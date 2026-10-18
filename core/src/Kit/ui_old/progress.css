@@ -1,0 +1,4 @@
+@keyframes x-progress-stripe {
+  0% { background-position: 0 0 }
+  100% { background-position: 32px 0 }
+}
