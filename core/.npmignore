@@ -15,3 +15,16 @@ node_modules/
 # 编辑器
 .vscode/
 .idea/
+# 排除所有备份与临时产物
+*.bak
+*.bak[0-9]*
+*.bak.*
+*.before-*
+*.pre-*
+*.prededup.*
+*.premerge.*
+*.prepatch.*
+**/.xuyg-*
+**/dist-test/
+**/kittest-dist/
+**/test-results/
