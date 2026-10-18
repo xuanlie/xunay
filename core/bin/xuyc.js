@@ -182,6 +182,21 @@ const XUNAY_MAP = {
 function resolveXunaySub(sub) {
   if (!sub) return xunayPath
   // xunay/kit/ui → 指向真实源码（core/src/Kit/ui/）
+  // xunay/kit/icons → core/src/Kit/icons.js（绕过 /kit → xunay-kit 前缀吞并）
+  if (sub === '/kit/icons') {
+    return path.join(ROOT, 'src/Kit/icons.js')
+  }
+  // xunay/kit/charts（不带子路径）→ 聚合 index
+  if (sub === '/kit/charts') {
+    return path.join(ROOT, 'src/Kit/charts/index.js')
+  }
+  // xunay/kit/charts/* → core/src/Kit/charts/*.js（绕过 /kit → xunay-kit 前缀吞并）
+  if (sub.startsWith('/kit/charts/')) {
+    const name = sub.slice('/kit/charts/'.length)
+    if (!name) return path.join(ROOT, 'src/Kit/charts/index.js')
+    const rel = name.endsWith('.js') ? name : name + '.js'
+    return path.join(ROOT, 'src/Kit/charts', rel)
+  }
   if (sub === '/kit/ui' || sub.startsWith('/kit/ui/')) {
     const sub2 = sub.slice('/kit/ui'.length)
     if (!sub2) return path.join(ROOT, 'src/Kit/ui/index.js')
