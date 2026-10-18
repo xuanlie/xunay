@@ -1,10 +1,10 @@
-// 三大关键字
+// 五大关键字（cpt / pag / dt / xuy / sdu）
 import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, ChartDemo, IconGrid } from '../docs-kit.xuy'
 
 export function Doc() {
   return D(
-    H1("Xuyg · cpt / pag / dt"),
-    P("三个关键字编译期都展开成 export function。隐式返回：函数体最后一句是表达式就自动 return。"),
+    H1("Xuyg · cpt / pag / dt / xuy"),
+    P("四个声明式关键字编译期都展开成标准 JS；sdu 模板调用见「sdu 模板」文档。隐式返回：函数体最后一句是表达式就自动 return。"),
     H2("cpt · 组件"),
     Code("cpt Card(p) {\n  div({ class: 'card' }, p.title)\n}\n\ncpt Header() {\n  div({ class: 'header' }, 'ShopX')\n}\n\n// 单表达式写法\ncpt Btn(p) => button({ class: 'btn' }, p.text)", "js"),
     P("编译成："),
@@ -13,8 +13,14 @@ export function Doc() {
     Code("pag Home() {\n  div(null, Card({ title: 'Hi' }))\n}\n\n// 带路由参数\npag Detail(id) {\n  const g = LIST.find(x => String(x.id) === String(id))\n  div(null, g.name)\n}", "js"),
     Tip("pag 定义在 src/pages/*.xuy，会被 scan-pages 自动扫成路由。"),
     H2("dt · 数据模板"),
-    Code("dt goods(12) {\n  id: seq\n  name: '商品 ' + seq\n  price: rand(99, 9999)\n  orig: price + 100          // 引用上面的字段\n  img: '/p/' + seq + '.jpg'\n}\n\nconst LIST = goods(12)", "js"),
-    Table(["内置","说明"], [["seq","自增序号（1, 2, 3...）"],["rand(a, b)","随机整数 [a, b]"],["pick([...])","随机挑一个"],["其它字段名","引用上面已定义的字段，自动加 row. 前缀"]]),
-    Table(["调用","结果"], [["goods()","默认 20 条"],["goods(0)","全部（默认 100 条上限）"],["goods(5)","5 条"],["goods(n)","用变量 n 作数量"]]),
+    Code("dt goods(12) {\n  id: seq\n  name: '商品 ' + seq\n  price: rand(99, 9999)\n  orig: price + 100          // 编译成 row.price + 100\n  img: '/p/' + seq + '.jpg'\n}\n\nconst LIST = goods(12)", "js"),
+    Table(["内置","说明"], [["seq","自增序号（1, 2, 3...）"],["rand(a, b)","随机整数 [a, b]"],["pick([...])","随机挑一个"],["其它字段名","裸字段名引用编译期自动加 row. 前缀（如 price → row.price）"]]),
+    Table(["调用","结果"], [["goods()","默认 20 条"],["goods(0)","全部（固定 100 条上限）"],["goods(5)","5 条"],["goods(n)","用变量 n 作数量"]]),
+    H2("xuy · 嵌套生成器"),
+    Code("xuy Home  = (div, $LIST, 12)\nxuy Feeds = (div, $feed, 3).psc(article, items, 5)", "js"),
+    P("第一层 (tag, data, count) 是顶层，.psc(...) 可链多层嵌套。每层做 data.slice(0, count).map(item => tag(item, ...inner))。"),
+    P("数据源：$VAR / #VAR / cVAR（c 后接大写）= 全局；无前缀 = 从父项取字段。"),
+    P("count 默认 1；数据源为函数时自动调用 fn(count)；父项缺失时内层为空数组。"),
+    Tip("xuy 只做嵌套 map，不支持条件 / 事件 / 样式。"),
   )
 }

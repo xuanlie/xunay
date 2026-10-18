@@ -213,6 +213,21 @@ GROUPS = [
   ]),
 
 # 原分组
+  ('Xuyg', [
+    ('xuyg-overview', '总览', []),
+    ('xuyg-keywords', '五大关键字', []),
+    ('xuyg-sdu', 'sdu 模板', []),
+    ('xuyg-binding', '绑定系统', []),
+    ('xuyg-events', '事件系统', []),
+    ('xuyg-if-media', '条件渲染 + 响应式', []),
+    ('xuyg-builtins', '内置模板', []),
+    ('xuyg-charts', '图表集成', []),
+    ('xuyg-examples', '完整案例', []),
+    ('xuyg-structure', '项目结构', []),
+    ('xuyg-antipatterns', '反模式', []),
+    ('xuyg-limits', '限制与修复', []),
+  ]),
+
   ('React 兼容', [
     ('api-react-compat', 'React Compat', [
       ('H1', 'React Compat'),

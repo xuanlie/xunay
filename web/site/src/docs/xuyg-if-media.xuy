@@ -10,7 +10,7 @@ export function Doc() {
     Code("((function(){\n  var _c = (LIST.length > 0)\n  if (!_c) return null\n  return (function(){ /* 循环渲染 */ })()\n})())", "js"),
     H2("@media 响应式"),
     Code("sdu<12> Card($LIST)({\n  @media (max-width: 600px): { width: 100%; margin: 8px 0; display: block; }\n  h3: @name\n})", "js"),
-    P("编译时向 <head> 注入 <style id=\"sdu-xxx-css\">，只注入一次。"),
+    P("编译时每个 @media 块生成一个独立 <style>，id 形如 sdu-N-css，同名 id 不重复注入。"),
     Tip("可以写多个 @media，会自动合并。"),
   )
 }

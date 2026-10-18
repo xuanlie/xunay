@@ -9,8 +9,8 @@ export function Doc() {
     H2("核心优势"),
     Table(["项","常规","Xuyg"], [["import","每文件 5-10 行","0 行（自动）"],["export function","13 字符","cpt 3 字符"],["return","每个函数末尾","隐式返回"],["数据定义","12 条商品 72 行","dt 6 行"],["嵌套","手写 map","sdu 一行"],["页面","60 行","4 行"]]),
     H2("命令"),
-    Code("# 构建\nnode ~/xunay/bin/Xuyg.js build app.xuy --out dist\n\n# 构建 + 起服务（前台，Ctrl+C 停）\nnode ~/xunay/bin/Xuyg.js build app.xuy --out dist --serve 12343\n\n# 构建 + 起服务 + 自动打开浏览器\nnode ~/xunay/bin/Xuyg.js build app.xuy --out dist --serve 12343 --open\n\n# 生产压缩\nnode ~/xunay/bin/Xuyg.js build app.xuy --out dist --minify\n\n# 开发热重载\nnode ~/xunay/bin/Xuyg.js dev app.xuy --out dist --port 12344\n\n# 调试模式（打印编译产物）\nXUYG_DEBUG=1 node ~/xunay/bin/Xuyg.js build app.xuy --out dist", "bash"),
+    Code("# 构建（安装后）\nnpx xuyg build app.xuy --out dist\n\n# 本地 monorepo 开发\nnode ~/xunay/core/bin/Xuyg.js build app.xuy --out dist\n\n# 调试模式（打印编译产物）\nXUYG_DEBUG=1 npx xuyg build app.xuy --out dist", "bash"),
     H2("触发条件"),
-    P("文件里出现 cpt / pag / dt / sdu 任一关键字 → 走 Xuyg。否则走原 xuyc，零影响。"),
+    P("文件里出现 cpt / pag / dt / xuy 声明、sdu<N> 循环、sdu 内置模板调用任一模式 → 走 Xuyg；否则走原 xuyc，零影响。"),
   )
 }

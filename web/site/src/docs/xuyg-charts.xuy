@@ -14,6 +14,6 @@ export function Doc() {
     H2("关键坑"),
     Warn("LineChart 数据格式是 series 数组：{ series: [{ name, data: [{label,value}] }] }，不是 { data: [{label,value}] }。"),
     Danger("图表容器必须有固定高度，否则 _measure() 拿到宽高为 0，什么都画不出来。"),
-    Tip("36 种图表可通过 xunay/kit/charts 导入，单独导入可用 xunay/kit/charts/line。"),
+    Tip("逐个从 xunay/kit/charts/<name> 导入（default export），如 xunay/kit/charts/line。"),
   )
 }

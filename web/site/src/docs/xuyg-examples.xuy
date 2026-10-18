@@ -4,7 +4,7 @@ import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, 
 export function Doc() {
   return D(
     H1("Xuyg · 完整案例"),
-    H2("案例 1：电商首页（4 行）"),
+    H2("案例 1：电商首页（15 行）"),
     Code("// pages/home.xuy\n\ndt goods(12) {\n  id: seq\n  name: pick(['iPhone', 'AirPods', '小米手环']) + ' ' + seq\n  price: rand(99, 9999)\n  img: '/p/' + seq + '.jpg'\n}\n\nconst LIST = goods(12)\n\npag Home() {\n  div(null,\n    sdu NavBar({ brand: 'ShopX', search: '搜索' }),\n    sdu GoodsList({ items: LIST }),\n    sdu Footer({ cols: [], copy: '© 2026 ShopX' })\n  )\n}", "js"),
     P("整页 15 行，含数据 + 顶栏 + 商品列表 + 页脚。"),
     H2("案例 2：带状态 + 事件的待办"),
