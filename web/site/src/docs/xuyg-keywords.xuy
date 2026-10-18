@@ -3,8 +3,8 @@ import { D, H1, H2, H3, P, Code, Ul, Ol, Quote, Tip, Warn, Danger, Table, Link, 
 
 export function Doc() {
   return D(
-    H1("Xuyg · cpt / pag / dt / xuy"),
-    P("四个声明式关键字编译期都展开成标准 JS；sdu 模板调用见「sdu 模板」文档。隐式返回：函数体最后一句是表达式就自动 return。"),
+    H1("Xuyg · cpt / pag / dt / xuy / sdu"),
+    P("四个声明式关键字（cpt / pag / dt / xuy）编译期都展开成标准 JS；sdu 是模板调用语法，与四个声明式关键字并列。隐式返回：函数体最后一句是表达式就自动 return。"),
     H2("cpt · 组件"),
     Code("cpt Card(p) {\n  div({ class: 'card' }, p.title)\n}\n\ncpt Header() {\n  div({ class: 'header' }, 'ShopX')\n}\n\n// 单表达式写法\ncpt Btn(p) => button({ class: 'btn' }, p.text)", "js"),
     P("编译成："),
@@ -17,10 +17,55 @@ export function Doc() {
     Table(["内置","说明"], [["seq","自增序号（1, 2, 3...）"],["rand(a, b)","随机整数 [a, b]"],["pick([...])","随机挑一个"],["其它字段名","裸字段名引用编译期自动加 row. 前缀（如 price → row.price）"]]),
     Table(["调用","结果"], [["goods()","默认 20 条"],["goods(0)","全部（固定 100 条上限）"],["goods(5)","5 条"],["goods(n)","用变量 n 作数量"]]),
     H2("xuy · 嵌套生成器"),
+    P("xuy 用一行 DSL 声明多层嵌套 map。第一层 (tag, data, count) 是顶层，.psc(...) 的参数与第一层完全同构，可链多次表示多层。"),
     Code("xuy Home  = (div, $LIST, 12)\nxuy Feeds = (div, $feed, 3).psc(article, items, 5)", "js"),
-    P("第一层 (tag, data, count) 是顶层，.psc(...) 可链多层嵌套。每层做 data.slice(0, count).map(item => tag(item, ...inner))。"),
-    P("数据源：$VAR / #VAR / cVAR（c 后接大写）= 全局；无前缀 = 从父项取字段。"),
-    P("count 默认 1；数据源为函数时自动调用 fn(count)；父项缺失时内层为空数组。"),
-    Tip("xuy 只做嵌套 map，不支持条件 / 事件 / 样式。"),
+
+    H3("参数 (tag, data, count)"),
+    Table(["参数","默认","含义"], [
+      ["tag","div","每层生成的标签函数"],
+      ["data","(空)","数据源表达式，规则见下表"],
+      ["count","1","每层切片数量，.slice(0, count)"],
+    ]),
+
+    H3("data 规则"),
+    Table(["写法","isGlobal","编译结果"], [
+      ["(空)","true","Array.from({ length: count }, () => ({}))，生成 count 个空对象"],
+      ["$VAR","true","(typeof VAR === 'function' ? VAR(count) : VAR) || []"],
+      ["#VAR","true","同上，旧写法"],
+      ["cVAR（c 后接大写）","true","同上，class 风格"],
+      ["不带前缀的字段名","false","(parent.data) || []，从父项取字段"],
+      ["首层就不带前缀","false","[]，无父项为空数组，不报错"],
+    ]),
+
+    H3("编译产物"),
+    P("每层生成一个 map。最内层只传当前项，中间层把内层结果展开成子节点："),
+    Code("// xuy Feeds = (div, $feed, 3).psc(article, items, 5)\n// 编译成\nexport function Feeds() {\n  return ((typeof feed === 'function' ? feed(3) : feed) || [])\n    .slice(0, 3)\n    .map(function(_i0) {\n      return div(_i0, ...((_i0.items) || []).slice(0, 5).map(function(_i1) {\n        return article(_i1)\n      }))\n    })\n}", "js"),
+
+    H3("链式多层"),
+    P(".psc 可链任意次。第二层的 data 不带前缀时从第一项取字段，第三层从第二项取字段，依此类推。每一层的 count 独立。"),
+    Code("// 三层：目录 → 分组 → 条目\nxuy Menu = (section, $sections, 10)\n  .psc(group, groups, 5)\n  .psc(item, items, 20)", "js"),
+
+    H3("数据源是函数时"),
+    P("编译成 fn(count)，不是 fn()。所以 dt 生成的 goods(n) 直接放进 data 就能拿到 n 条："),
+    Code("xuy Goods = (div, goods(12), 12)   // goods(12) 返回 12 条数组\n// 也可写成\nxuy Goods = (div, goods, 12)        // 编译成 goods(12)", "js"),
+
+    Tip("xuy 只做嵌套 map，不支持条件 / 事件 / 样式。要在内层加事件，把内层写成 cpt 组件，xuy 里只调组件。"),
+    H2("sdu · 模板调用"),
+    P("sdu 有两种形态：调用 20 个内置模板之一（一行一个），或用 <N> 循环生成自定义结构。完整规则见「sdu 模板」文档。"),
+    Code("// 内置模板\nsdu NavBar({ brand: 'ShopX', search: '搜索' })\nsdu Footer({ cols: [], copy: '© 2026' })\n\n// 自定义循环\nsdu<12> GoodsCard($LIST)({\n  img: @img\n  h3: @name\n  p: '¥' + @price\n})", "js"),
+
+    H3("触发条件"),
+    P("needsCompile4 里 sdu 只有两条正则命中，裸写 sdu xxx 不触发："),
+    Table(["模式","示例"], [
+      ["sdu<数量> 组件名","sdu<12> GoodsCard($LIST)({...})"],
+      ["sdu 内置模板名","sdu NavBar({...})、sdu Empty()"],
+    ]),
+
+    H3("内置模板（20 个）"),
+    Table(["分组","模板"], [
+      ["电商","NavBar / Hero / CateGrid / GoodsCard / GoodsList / SeckillBar / Footer / SideBar"],
+      ["通用","StatCard / StatRow / UserCard / UserRow / ListItem / Tabs / Breadcrumb / Empty / Loading / Table / Modal / Form"],
+    ]),
+    Tip("用了任一内置模板，编译产物自动注入 BUILTIN_CSS（只注入一次，id=sdu-builtin-css）。"),
   )
 }
